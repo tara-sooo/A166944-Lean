@@ -1,0 +1,72 @@
+name: A166944 canonical verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - A166944/ResearchDefs.lean
+      - A166944/Lemmas.lean
+      - A166944/TargetDefs.lean
+      - A166944/Bridge.lean
+      - A166944/Baseline.lean
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/verify.yml
+  pull_request:
+    paths:
+      - A166944/**
+      - lakefile.toml
+      - lake-manifest.json
+      - lean-toolchain
+      - .github/workflows/verify.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a166944-canonical-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+
+      - name: Fetch pinned dependencies
+        run: lake update
+
+      - name: Fetch Mathlib precompiled cache
+        run: lake exe cache get
+
+      - name: Build lightweight recurrence definitions
+        run: lake build A166944.ResearchDefs
+
+      - name: Build verified lightweight lemmas
+        run: lake build A166944.Lemmas
+
+      - name: Build prime target definitions
+        run: lake build A166944.TargetDefs
+
+      - name: Build active attempt
+        run: lake build A166944.Attempt
+
+      - name: Build canonical bridge
+        run: lake build A166944/Bridge.lean
+
+      - name: Check canonical bridge
+        run: lake env lean A166944/Bridge.lean
+
+      - name: Check reproducible canonical baseline
+        run: lake env lean A166944/Baseline.lean
