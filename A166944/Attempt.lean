@@ -663,4 +663,49 @@ example {k P r : Nat} (hk : 2 ≤ k)
       (d (k + 1) < d r ∧ IsAttainedPreviousMaximum (d r) r) :=
   critical_first_event_current_or_new_max hk hP hnew hr hdr hfirst
 
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (heven : r % 2 = 0) :
+    ∃ q : Nat, C - s = (r - s) + 1 + d r * q ∧ q % 2 = 1 ∧
+      1 ≤ q ∧ C' - r = d r * (q + 1) :=
+  moving_horizon_even_quotient_normal_form hstep heven
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hodd : r % 2 = 1) :
+    ∃ q : Nat, C - s + 3 = (r - s) + d r * q ∧ q % 2 = 0 ∧
+      2 ≤ q ∧ C' - r + 4 = d r * (q + 1) :=
+  moving_horizon_odd_quotient_normal_form hstep hodd
+
+example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hnorm : C - s = 2 * P) (hnew : P < d r) (hPodd : P % 2 = 1) :
+    r % 2 = 0 ∧ C' - r = 2 * d r :=
+  moving_horizon_normalized_new_max_even hstep hnorm hnew hPodd
+
+example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hP : IsAttainedPreviousMaximum P s) (hP5 : 5 < P)
+    (hnorm : C - s = 2 * P) (hnew : P < d r) :
+    ∃ c : Nat, r = d r * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      IsAttainedPreviousMaximum (d r) r ∧
+      C' = d r * (c + 2) ∧ D r = d r * (c + 2) :=
+  moving_horizon_record_state_regeneration hstep hP hP5 hnorm hnew
+
+example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hnorm : C - s = 2 * P) (hfar : d r + 3 ≤ r - s) :
+    B r + 2 ≤ 2 * P :=
+  moving_horizon_far_old_event_envelope hstep hnorm hfar
+
+example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hnorm : C - s = 2 * P) (hold : d r ≤ P) :
+    (d r ≤ P ∧ r - s ≤ d r + 2) ∨ B r + 2 ≤ 2 * P :=
+  moving_horizon_old_event_dichotomy hstep hnorm hold
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    C' = C + (d r - 1) :=
+  moving_horizon_step_update hstep
+
+example {s C r C' u C'' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'') :
+    Nat.gcd (d r) (d u) ∣ 3 :=
+  moving_horizon_successive_event_gcd_dvd_three hstep hnext
+
 end A166944Research
