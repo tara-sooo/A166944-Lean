@@ -5023,4 +5023,186 @@ theorem moving_horizon_same_quotient_plateau_power
         exact hpowmul
       exact hcop.dvd_of_dvd_mul_left (by simpa [Nat.mul_comm] using hdiv)
 
+theorem fundamental_reset {m : Nat} (hm : 2 ≤ m) (hfund : B m = 2) :
+    (d (m + 1) = 1 ∧ d (m + 2) = 1 ∧ B (m + 2) = 0 ∧
+      d (m + 3) = m + 1 ∧ B (m + 3) + 2 = m + 1) ∨
+    (d (m + 1) = 1 ∧ d (m + 2) = 3 ∧ B (m + 2) = 2 ∧
+      d (m + 3) = 1 ∧ d (m + 4) = 1 ∧ B (m + 4) = 0 ∧
+      d (m + 5) = m + 3 ∧ B (m + 5) + 2 = m + 3) := by
+  have hfirst := B_two_transition hm hfund
+  have hm0 : m % 2 = 0 := by
+    calc
+      m % 2 = B m % 2 := (B_mod_two_of_two_le hm).symm
+      _ = 2 % 2 := by rw [hfund]
+      _ = 0 := by simp
+  have hm1 : (m + 1) % 2 = 1 := by simp [Nat.add_mod, hm0]
+  rcases B_one_transition (Nat.le_trans hm (by simp)) hm1 hfirst.2 with hcase | hcase
+  · rcases hcase with ⟨hd2, hB2⟩
+    have hzero := B_zero_transition (k := m + 2) (by omega) hB2
+    left
+    exact ⟨hfirst.1, hd2, hB2, hzero.1, by simpa using hzero.2⟩
+  · rcases hcase with ⟨hd2, hB2⟩
+    have htwo := B_two_transition (k := m + 2) (by omega) hB2
+    have hm3 : (m + 3) % 2 = 1 := by simp [Nat.add_mod, hm0]
+    rcases B_one_transition (k := m + 3) (by omega) hm3 htwo.2 with hcase' | hcase'
+    · rcases hcase' with ⟨hd4, hB4⟩
+      have hzero := B_zero_transition (k := m + 4) (by omega) hB4
+      right
+      exact ⟨hfirst.1, hd2, hB2, htwo.1, hd4, hB4,
+        hzero.1, by simpa using hzero.2⟩
+    · rcases hcase' with ⟨hd4, hB4⟩
+      have hmap1 := d_succ_eq_gcd_small_residual (k := m + 1)
+        (by omega) hm1 (by simpa [hfirst.2])
+      have hmap2 := d_succ_eq_gcd_small_residual (k := m + 3)
+        (by omega) hm3 (by simpa [htwo.2])
+      have hmap1' : d (m + 2) = Nat.gcd (m + 2) 3 := by
+        simpa [hfirst.2] using hmap1
+      have hmap2' : d (m + 4) = Nat.gcd (m + 4) 3 := by
+        simpa [htwo.2] using hmap2
+      have hdiv1 : 3 ∣ m + 2 := by
+        have hg := Nat.gcd_dvd_left (m + 2) 3
+        rw [← hmap1', hd2] at hg
+        exact hg
+      have hdiv2 : 3 ∣ m + 4 := by
+        have hg := Nat.gcd_dvd_left (m + 4) 3
+        rw [← hmap2', hd4] at hg
+        exact hg
+      rcases hdiv1 with ⟨q1, hq1⟩
+      rcases hdiv2 with ⟨q2, hq2⟩
+      omega
+
+theorem fundamental_reset_coordinate {m : Nat} (hm : 2 ≤ m)
+    (hfund : B m = 2) :
+    (d (m + 3) = m + 1 ∧ D (m + 3) = 2 * (m + 1) - 2) ∨
+    (d (m + 5) = m + 3 ∧ D (m + 5) = 2 * (m + 3) - 2) := by
+  rcases fundamental_reset hm hfund with hleft | hright
+  · rcases hleft with ⟨_, _, _, hd, hB⟩
+    left
+    refine ⟨hd, ?_⟩
+    have hrel := B_add_index_eq_D_add_two (n := m + 3) (by omega)
+    omega
+  · rcases hright with ⟨_, _, _, _, _, _, hd, hB⟩
+    right
+    refine ⟨hd, ?_⟩
+    have hrel := B_add_index_eq_D_add_two (n := m + 5) (by omega)
+    omega
+
+theorem moving_horizon_critical_even_q_one
+    {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    ∃ q : Nat, C - s = (r - s) + 1 + delta * q ∧ q % 2 = 1 ∧
+      1 ≤ q ∧ C' - r = delta * (q + 1) ∧ q = 1 := by
+  rcases hcrit with ⟨hdelta, hc, hcmod, hc2, hC'⟩
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hreven : r % 2 = 0 := by
+    have hdeltaodd : delta % 2 = 1 := by
+      rw [← hdelta]
+      exact d_mod_two_eq_one_of_three_le hr3
+    calc
+      r % 2 = (delta * c) % 2 := congrArg (fun x : Nat => x % 2) hc
+      _ = 0 := by simp [Nat.mul_mod, hcmod]
+  rcases moving_horizon_even_quotient_normal_form hstep hreven with
+    ⟨q, hL, hqmod, hq1, hL'⟩
+  have hCminus : C' - r = 2 * delta := by
+    rw [hC', hc]
+    calc
+      delta * (c + 2) - delta * c = delta * ((c + 2) - c) :=
+        (Nat.mul_sub_left_distrib delta (c + 2) c).symm
+      _ = 2 * delta := by simp [Nat.mul_comm]
+  have hqmul : delta * (q + 1) = delta * 2 := by
+    calc
+      delta * (q + 1) = C' - r := by simpa [hdelta] using hL'.symm
+      _ = 2 * delta := hCminus
+      _ = delta * 2 := by simp [Nat.mul_comm]
+  have hdelta_pos : 0 < delta := by
+    rw [← hdelta]
+    exact d_pos_of_two_le
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  have hqeq : q = 1 := by
+    have hqle : q + 1 ≤ 2 := by
+      by_cases hle : q + 1 ≤ 2
+      · exact hle
+      · have hgt : 2 < q + 1 := Nat.lt_of_not_ge hle
+        have hmul : delta * 2 < delta * (q + 1) :=
+          (Nat.mul_lt_mul_left hdelta_pos).2 hgt
+        rw [hqmul] at hmul
+        exact False.elim (Nat.lt_irrefl _ hmul)
+    omega
+  exact ⟨q, by simpa [hdelta] using hL, hqmod, hq1,
+    by simpa [hdelta] using hL', hqeq⟩
+
+theorem moving_horizon_critical_entry_barrier
+    {M delta s C r C' c Y : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * M) (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    r % 2 = 0 ∧ C' - r = 2 * delta ∧
+      Y + (r - s) + delta + 5 = 2 * M ∧ Y + 8 ≤ M := by
+  rcases hcrit with ⟨hdelta, hc, hcmod, hc2, hC'⟩
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hdeltaodd : delta % 2 = 1 := by
+    rw [← hdelta]
+    exact d_mod_two_eq_one_of_three_le hr3
+  have hreven : r % 2 = 0 := by
+    calc
+      r % 2 = (delta * c) % 2 := congrArg (fun x : Nat => x % 2) hc
+      _ = 0 := by simp [Nat.mul_mod, hcmod]
+  have hCminus : C' - r = 2 * delta := by
+    rw [hC', hc]
+    calc
+      delta * (c + 2) - delta * c = delta * ((c + 2) - c) :=
+        (Nat.mul_sub_left_distrib delta (c + 2) c).symm
+      _ = 2 * delta := by simp [Nat.mul_comm]
+  have hDcrit : D r = delta * (c + 2) :=
+    hstep.2.2.2.2.2.2.1.symm.trans hC'
+  have hBr : B r + 2 = 2 * delta + 4 := by
+    have hrel := B_add_index_eq_D_add_two
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+    have hrel' : B r + delta * c = delta * c + (2 * delta + 2) := by
+      calc
+        B r + delta * c = B r + r := by rw [hc]
+        _ = D r + 2 := hrel
+        _ = delta * (c + 2) + 2 := by rw [hDcrit]
+        _ = delta * c + (2 * delta + 2) := by
+          simp [Nat.mul_add, Nat.mul_comm, Nat.add_assoc, Nat.add_comm,
+            Nat.add_left_comm]
+    have hrel'' : delta * c + B r = delta * c + (2 * delta + 2) := by
+      simpa [Nat.add_comm, Nat.add_left_comm, Nat.add_assoc] using hrel'
+    have hB : B r = 2 * delta + 2 := Nat.add_left_cancel hrel''
+    omega
+  have htrans := moving_horizon_excess_transition hstep
+  have hentry : Y + (r - s) + delta + 5 = 2 * M := by
+    omega
+  have hdelta2 : M + 2 ≤ delta := by omega
+  have hgap : 1 ≤ r - s := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_comm] using Nat.succ_le_of_lt hstep.2.1
+  refine ⟨hreven, hCminus, hentry, ?_⟩
+  omega
+
+theorem moving_horizon_first_dangerous_crossing
+    {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hslack : C - s ≤ M) (hcross : M < C' - r) :
+    r - s + 2 ≤ d r := by
+  have htrans := moving_horizon_slack_transition hstep
+  omega
+
+theorem critical_entry_cumulative_compression
+    {M delta Y E T t : Nat} (hModd : M % 2 = 1)
+    (hdeltaodd : delta % 2 = 1) (hnew : M < delta) (ht : 1 ≤ t)
+    (htel : Y + E = M + T)
+    (hentry : Y + t + delta + 5 = 2 * M) :
+    M + E = T + t + delta + 5 ∧ T + 8 ≤ E := by
+  have hdelta2 : M + 2 ≤ delta := by omega
+  constructor
+  · omega
+  · omega
+
 end A166944Research

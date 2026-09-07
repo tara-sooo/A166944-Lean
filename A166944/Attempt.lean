@@ -965,4 +965,46 @@ example {k delta c : Nat} (hD : D (k + 1) = delta * (c + 2))
     D k = delta * (c + 1) + 1 :=
   critical_previous_D_coordinate hD hdelta
 
+example {m : Nat} (hm : 2 ≤ m) (hfund : B m = 2) :
+    (d (m + 1) = 1 ∧ d (m + 2) = 1 ∧ B (m + 2) = 0 ∧
+      d (m + 3) = m + 1 ∧ B (m + 3) + 2 = m + 1) ∨
+    (d (m + 1) = 1 ∧ d (m + 2) = 3 ∧ B (m + 2) = 2 ∧
+      d (m + 3) = 1 ∧ d (m + 4) = 1 ∧ B (m + 4) = 0 ∧
+      d (m + 5) = m + 3 ∧ B (m + 5) + 2 = m + 3) :=
+  fundamental_reset hm hfund
+
+example {M delta s C r C' c Y : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * M) (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    r % 2 = 0 ∧ C' - r = 2 * delta ∧
+      Y + (r - s) + delta + 5 = 2 * M ∧ Y + 8 ≤ M :=
+  moving_horizon_critical_entry_barrier hstep hYs hModd hnew hcrit
+
+example {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hslack : C - s ≤ M) (hcross : M < C' - r) :
+    r - s + 2 ≤ d r :=
+  moving_horizon_first_dangerous_crossing hstep hslack hcross
+
+example {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    ∃ q : Nat, C - s = (r - s) + 1 + delta * q ∧ q % 2 = 1 ∧
+      1 ≤ q ∧ C' - r = delta * (q + 1) ∧ q = 1 :=
+  moving_horizon_critical_even_q_one hstep hcrit
+
+example {m : Nat} (hm : 2 ≤ m) (hfund : B m = 2) :
+    (d (m + 3) = m + 1 ∧ D (m + 3) = 2 * (m + 1) - 2) ∨
+    (d (m + 5) = m + 3 ∧ D (m + 5) = 2 * (m + 3) - 2) :=
+  fundamental_reset_coordinate hm hfund
+
+example {M delta Y E T t : Nat} (hModd : M % 2 = 1)
+    (hdeltaodd : delta % 2 = 1) (hnew : M < delta) (ht : 1 ≤ t)
+    (htel : Y + E = M + T)
+    (hentry : Y + t + delta + 5 = 2 * M) :
+    M + E = T + t + delta + 5 ∧ T + 8 ≤ E :=
+  critical_entry_cumulative_compression hModd hdeltaodd hnew ht htel hentry
+
 end A166944Research
