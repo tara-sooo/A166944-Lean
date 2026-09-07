@@ -1,0 +1,83 @@
+import Init.Data.Nat.Gcd
+import Init.WF
+
+/-!
+# Ultra-lightweight A166944 recurrence definitions
+
+This file mirrors the recurrence-side mathematical definitions from the pinned
+Formal Conjectures source for OEIS A166944, but deliberately stays on the Lean
+standard-library path.
+
+Purpose: fast interactive proof search on Termux/Android. In particular, this
+file does NOT import Mathlib, Mathlib prime definitions, Formal Conjectures, or
+FormalConjecturesUtil.
+
+The primality-side target is separated into `A166944/TargetDefs.lean` so that
+early recurrence/invariant work does not pay that import cost.
+
+Pinned upstream source:
+google-deepmind/formal-conjectures@8323e878b83fcd7f4a448256069352a265460d75
+FormalConjectures/OEIS/166944.lean
+-/
+
+namespace A166944Research
+
+def a : Nat → Nat
+  | 0 => 0
+  | 1 => 2
+  | n + 2 =>
+    let prev := a (n + 1)
+    let idx := n + 2
+    if idx % 2 = 0 then prev + Nat.gcd idx prev
+    else prev + Nat.gcd (idx - 2) prev
+
+def d (n : Nat) : Nat := a n - a (n - 1)
+
+def D (n : Nat) : Nat := a n - n
+
+def B (n : Nat) : Nat := a n - (2 * n - 2)
+
+/-- A state whose next event can be searched on the bounded horizon `s < j ≤ C`. -/
+def IsMovingHorizonState (s C : Nat) : Prop :=
+  2 ≤ s ∧ D s = C ∧ s < C
+
+/-- One first-event transition, including the unit tail and the next state. -/
+def IsMovingHorizonStep (s C r C' : Nat) : Prop :=
+  IsMovingHorizonState s C ∧ s < r ∧ r ≤ C ∧ 1 < d r ∧
+    (∀ j : Nat, s < j → j < r → d j = 1) ∧
+    D (r - 1) = C ∧ C' = D r ∧ C + 2 ≤ C' ∧
+    IsMovingHorizonState r C'
+
+/-- A finite chain of first-event transitions. -/
+def HasMovingHorizonChain (s C : Nat) : Nat → Prop
+  | 0 => IsMovingHorizonState s C
+  | Nat.succ q =>
+      ∃ r C', IsMovingHorizonStep s C r C' ∧
+        HasMovingHorizonChain r C' q
+
+/-- A candidate last nontrivial increment before `m`; this is only a predicate.
+Existence is proved separately when the endpoint and earlier increment permit it.
+-/
+def IsLastNontrivialBefore (rho m : Nat) : Prop :=
+  2 ≤ rho ∧ rho < m ∧ 1 < d rho ∧
+    ∀ j : Nat, rho < j → j ≤ m → d j = 1
+
+/-- A finite ordered chain of nontrivial increments; this predicate asserts no
+existence beyond the explicit chain supplied to a theorem using it. -/
+def HasNontrivialChain (start finish : Nat) : Nat → Prop
+  | 0 => start ≤ finish
+  | Nat.succ s =>
+      ∃ r : Nat, start < r ∧ r ≤ finish ∧ 1 < d r ∧
+        HasNontrivialChain r finish s
+
+def IsDifferenceRecord (R : Nat) : Prop :=
+  ∃ n : Nat, 2 ≤ n ∧ d n = R ∧ ∀ k : Nat, 2 ≤ k → k < n → d k < R
+
+/-- `P` is an attained running maximum through `k`.
+The occurrence is intentionally existential; the first occurrence is extracted
+by a separate theorem so that it can be used as a strict difference record. -/
+def IsAttainedPreviousMaximum (P k : Nat) : Prop :=
+  (∀ j : Nat, 2 ≤ j → j ≤ k → d j ≤ P) ∧
+    ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P
+
+end A166944Research
