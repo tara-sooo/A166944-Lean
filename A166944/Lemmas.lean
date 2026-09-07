@@ -1527,6 +1527,130 @@ theorem record_index_eq_of_history_envelope {R n : Nat} (hR : 5 < R)
     · exact False.elim (odd_late_impossible_of_history_envelope hR hn hd hprior
         hlate.2 hlate.1 henv)
 
+theorem even_occurrence_impossible_of_history_envelope_before {R n s : Nat}
+    (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ k : Nat, 2 ≤ k → k < n → d k < R)
+    (hns : n < s) (heven : n % 2 = 0)
+    (henv : HasHistoryEnvelopeBefore s) : False := by
+  have hhist : ∀ j : Nat, 2 ≤ j → j ≤ n → d j ≤ R := by
+    intro j hj hjn
+    rcases Nat.eq_or_lt_of_le hjn with hjeq | hjlt
+    · simpa [hjeq, hd]
+    · exact Nat.le_of_lt (hprior j hj hjlt)
+  exact even_occurrence_contradicts_envelope hR ⟨n, hn, hd, hprior⟩ hn hd
+    heven (by exact henv n R hn hns hhist)
+
+theorem odd_late_impossible_of_history_envelope_before {R n s : Nat}
+    (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ k : Nat, 2 ≤ k → k < n → d k < R)
+    (hns : n < s) (hlate : 3 * R + 2 ≤ n) (hodd : n % 2 = 1)
+    (henv : HasHistoryEnvelopeBefore s) : False := by
+  have hhist : ∀ j : Nat, 2 ≤ j → j ≤ n - 1 → d j ≤ R - 1 := by
+    intro j hj hjlast
+    have hn1 : 1 ≤ n := Nat.le_trans (by simp) hn
+    have hjlt : j < n := by
+      have hjlt' := Nat.lt_succ_of_le hjlast
+      rw [Nat.succ_eq_add_one, Nat.sub_add_cancel hn1] at hjlt'
+      exact hjlt'
+    have hstep : d j + 1 ≤ R := Nat.succ_le_of_lt (hprior j hj hjlt)
+    exact Nat.le_sub_of_add_le hstep
+  have hn3 : 3 ≤ n := occurrence_index_three_le hR hn hd
+  have hnprev : 2 ≤ n - 1 :=
+    Nat.le_sub_of_add_le (by simpa using hn3)
+  have hnprevlt : n - 1 < s := by omega
+  have hRpos : 0 < R := Nat.lt_trans (Nat.zero_lt_succ 4) hR
+  have hM : R - 1 < R := Nat.sub_one_lt (Nat.ne_of_gt hRpos)
+  exact odd_late_contradicts_envelope hR ⟨n, hn, hd, hprior⟩ hn hd hlate hodd hM
+    (by exact henv (n - 1) (R - 1) hnprev hnprevlt hhist)
+
+theorem record_index_eq_of_history_envelope_before {R n s : Nat}
+    (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ k : Nat, 2 ≤ k → k < n → d k < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) : n = R + 2 := by
+  have hrec : IsDifferenceRecord R := ⟨n, hn, hd, hprior⟩
+  rcases record_index_structure hR hrec hn hd with hmain | hlate
+  · exact hmain
+  · rcases hlate with hlate | hlate
+    · exact False.elim (even_occurrence_impossible_of_history_envelope_before
+        hR hn hd hprior hns hlate.1 henv)
+    · exact False.elim (odd_late_impossible_of_history_envelope_before
+        hR hn hd hprior hns hlate.2 hlate.1 henv)
+
+theorem canonical_record_value_of_history_envelope_before {R n s : Nat}
+    (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ k : Nat, 2 ≤ k → k < n → d k < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) :
+    n = R + 2 ∧ a (R + 1) = 2 * R := by
+  have hrec : IsDifferenceRecord R := ⟨n, hn, hd, hprior⟩
+  have hindex := record_index_eq_of_history_envelope_before hR hn hd hprior hns henv
+  have hRodd : R % 2 = 1 := record_value_mod_two_eq_one hR hrec
+  have hnodd : n % 2 = 1 := by
+    rw [hindex]
+    simp [Nat.add_mod, hRodd]
+  rcases record_odd_occurrence_excess hR hrec hn hd hnodd with
+    ⟨c, q, hc, hq, hc1, hq0, hgcd, hcpos, hc_cases, hqbound, hqeq, hclate⟩
+  have hnsub : n - 2 = R := by rw [hindex]; simp
+  have hRc : R * c = R := hc.symm.trans hnsub
+  have hRpos : 0 < R := Nat.lt_trans (Nat.zero_lt_succ 4) hR
+  have hc_one : c = 1 := by
+    apply Nat.mul_left_cancel hRpos
+    calc
+      R * c = R := hRc
+      _ = R * 1 := (Nat.mul_one R).symm
+  have hq' : a (R + 1) = R * q := by
+    have hpred : n - 1 = R + 1 := by rw [hindex]; omega
+    simpa [hpred] using hq
+  have hhist : ∀ j : Nat, 2 ≤ j → j ≤ n → d j ≤ R := by
+    intro j hj hjn
+    rcases Nat.eq_or_lt_of_le hjn with hjeq | hjlt
+    · simpa [hjeq, hd]
+    · exact Nat.le_of_lt (hprior j hj hjlt)
+  have henvn := henv n R hn hns hhist
+  have hstep : a n = R * q + R := by
+    have hidx : (n - 1) + 1 = n := Nat.sub_add_cancel (Nat.le_trans (by simp) hn)
+    have ha := a_add_d_succ (k := n - 1)
+    rw [hidx, hd] at ha
+    calc
+      a n = a (n - 1) + R := by rw [← ha]
+      _ = R * q + R := by rw [hq]
+  have hRq : R * q ≤ 3 * R := by
+    rw [hstep] at henvn
+    rw [hindex] at henvn
+    omega
+  have hqle : q ≤ 3 := by
+    by_cases hqle : q ≤ 3
+    · exact hqle
+    · have hq4 : 4 ≤ q := by omega
+      have hmul : R * 4 ≤ R * q := Nat.mul_le_mul_left R hq4
+      have hbad : 4 * R ≤ 3 * R := by
+        exact Nat.le_trans (by simpa [Nat.mul_comm] using hmul) hRq
+      omega
+  have hqeq2 : q = 2 := by omega
+  constructor
+  · exact hindex
+  · rw [hq', hqeq2]
+    simp [Nat.mul_comm]
+
+theorem canonical_record_excess_eq_of_history_envelope_before {R n s : Nat}
+    (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ k : Nat, 2 ≤ k → k < n → d k < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) : B n + 2 = R := by
+  have hcanon := canonical_record_value_of_history_envelope_before hR hn hd hprior hns henv
+  have hprev : a (n - 1) = 2 * R := by
+    calc
+      a (n - 1) = a (R + 1) := by rw [hcanon.1]; simp
+      _ = 2 * R := hcanon.2
+  have hstep : a n = 2 * R + R := by
+    have hidx : (n - 1) + 1 = n := Nat.sub_add_cancel (Nat.le_trans (by simp) hn)
+    have ha := a_add_d_succ (k := n - 1)
+    rw [hidx, hd] at ha
+    calc
+      a n = a (n - 1) + R := by rw [← ha]
+      _ = 2 * R + R := by rw [hprev]
+  simp only [B]
+  rw [hstep, hcanon.1]
+  omega
+
 theorem base_eq_two_mul_pred (k : Nat) :
     2 * k - 2 = 2 * (k - 1) := by
   rw [Nat.mul_sub_left_distrib]
@@ -2209,6 +2333,42 @@ theorem critical_previous_maximum_prefix {k M : Nat} (hk : 2 ≤ k)
     exact ⟨p, c, u, v, hp2, hpk, hdp, hprior, hM5, hsplit,
       Or.inr ⟨hp1, hpu, hpv, hu1, hv0, huv, hupos, hucases⟩,
       hc, hcmod, hc2, hak, hD⟩
+
+theorem critical_previous_maximum_canonical {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ p c : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      5 < M ∧ p = M + 2 ∧ a (M + 1) = 2 * M ∧
+      B p + 2 = M ∧ D p + p = M * 3 ∧ D p = 2 * M - 2 ∧
+      k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      a k = d (k + 1) * (2 * c + 1) ∧
+      D (k + 1) = d (k + 1) * (c + 2) := by
+  rcases critical_previous_maximum_prefix hk hP hIH hnew hfail with
+    ⟨p, c, u, v, hp2, hpk, hdp, hprior, hM5, _, _, hc, hcmod, hc2, hak, hD⟩
+  have hpc : p = M + 2 ∧ a (M + 1) = 2 * M :=
+    canonical_record_value_of_history_envelope_before hM5 hp2 hdp hprior
+      (Nat.lt_succ_of_le hpk) henv
+  have hav : a (p - 1) = M * 2 := by
+    calc
+      a (p - 1) = a (M + 1) := by rw [hpc.1]; simp
+      _ = 2 * M := hpc.2
+      _ = M * 2 := by simp [Nat.mul_comm]
+  have hBpc : B p + 2 = M :=
+    canonical_record_excess_eq_of_history_envelope_before hM5 hp2 hdp hprior
+      (Nat.lt_succ_of_le hpk) henv
+  have hcoord : D p + p = M * 3 := by
+    calc
+      D p + p = M * (2 + 1) := previous_record_D_coordinate hp2 hdp hav
+      _ = M * 3 := by simp
+  have hDp : D p = 2 * M - 2 := by
+    rw [hpc.1] at hcoord ⊢
+    omega
+  exact ⟨p, c, hp2, hpk, hdp, hprior, hM5, hpc.1, hpc.2, hBpc, hcoord, hDp,
+    hc, hcmod, hc2, hak, hD⟩
 
 theorem critical_endpoint_lower_bound {k M m s : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))

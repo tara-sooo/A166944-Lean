@@ -240,6 +240,39 @@ example {k M : Nat} (hk : 2 ≤ k)
       D (k + 1) = d (k + 1) * (c + 2) :=
   critical_previous_maximum_prefix hk hP hIH hnew hfail
 
+example {R n s : Nat} (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ j : Nat, 2 ≤ j → j < n → d j < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) :
+    n = R + 2 :=
+  record_index_eq_of_history_envelope_before hR hn hd hprior hns henv
+
+example {R n s : Nat} (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ j : Nat, 2 ≤ j → j < n → d j < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) :
+    n = R + 2 ∧ a (R + 1) = 2 * R :=
+  canonical_record_value_of_history_envelope_before hR hn hd hprior hns henv
+
+example {R n s : Nat} (hR : 5 < R) (hn : 2 ≤ n) (hd : d n = R)
+    (hprior : ∀ j : Nat, 2 ≤ j → j < n → d j < R)
+    (hns : n < s) (henv : HasHistoryEnvelopeBefore s) :
+    B n + 2 = R :=
+  canonical_record_excess_eq_of_history_envelope_before hR hn hd hprior hns henv
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ p c : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      5 < M ∧ p = M + 2 ∧ a (M + 1) = 2 * M ∧
+      B p + 2 = M ∧ D p + p = M * 3 ∧ D p = 2 * M - 2 ∧
+      k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      a k = d (k + 1) * (2 * c + 1) ∧
+      D (k + 1) = d (k + 1) * (c + 2) :=
+  critical_previous_maximum_canonical hk hP hIH hnew hfail henv
+
 example {r C : Nat} (hr : 2 ≤ r) (hD : D (r - 1) = C) :
     d r = if r % 2 = 0 then Nat.gcd r (C - 1)
       else Nat.gcd (r - 2) (C + 1) :=

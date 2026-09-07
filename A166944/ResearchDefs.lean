@@ -106,6 +106,12 @@ def HasNontrivialChain (start finish : Nat) : Nat → Prop
 def IsDifferenceRecord (R : Nat) : Prop :=
   ∃ n : Nat, 2 ≤ n ∧ d n = R ∧ ∀ k : Nat, 2 ≤ k → k < n → d k < R
 
+/- A history envelope asserted only on indices before `s`. -/
+def HasHistoryEnvelopeBefore (s : Nat) : Prop :=
+  ∀ k M : Nat, 2 ≤ k → k < s →
+    (∀ j : Nat, 2 ≤ j → j ≤ k → d j ≤ M) →
+      a k + 4 ≤ 2 * k + 2 * M
+
 /-- `P` is an attained running maximum through `k`.
 The occurrence is intentionally existential; the first occurrence is extracted
 by a separate theorem so that it can be used as a strict difference record. -/
