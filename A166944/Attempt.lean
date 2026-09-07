@@ -774,6 +774,24 @@ example {P X s C r C' X' : Nat}
     X' + (r - s) + 1 = X + d r :=
   moving_horizon_excess_coordinates hstep hXs hXr
 
+example {P Y Y' s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * P)
+    (hYr : B r + 2 + Y' = 2 * P) :
+    Y' + d r = Y + (r - s) + 1 :=
+  moving_horizon_deficit_transition hstep hYs hYr
+
+example {M : Nat} (hM : 5 < M) (hodd : M % 2 = 1)
+    (hD : D (M + 2) = 2 * M - 2) :
+    d (M + 3) = Nat.gcd (M + 3) (2 * M - 3) ∧
+      d (M + 3) ∣ 9 :=
+  canonical_start_next_step_gcd_dvd_nine hM hodd hD
+
+example {M r : Nat} (hM : 5 < M)
+    (hrange : r ≤ 2 * M - 2) (hafter : M + 2 < r)
+    (hD : D (r - 1) = 2 * M - 2) (hnew : M < d r) : False :=
+  canonical_start_event_not_larger_before_horizon hM hrange hafter hD hnew
+
 example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
     (hnorm : C - s = 2 * P) (hclose : r - s ≤ d r + 2) :
     B r + 2 = 2 * P + (d r + 3 - (r - s)) :=

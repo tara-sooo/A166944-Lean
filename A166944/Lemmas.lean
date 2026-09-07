@@ -479,6 +479,37 @@ theorem constant_D_event_map {r C : Nat} (hr : 2 ≤ r)
     simpa [Nat.add_assoc] using
       (Nat.gcd_add_mul_right_right (r - 2) (C + 1) 1)
 
+theorem canonical_start_next_step_gcd_dvd_nine {M : Nat}
+    (hM : 5 < M) (hodd : M % 2 = 1)
+    (hD : D (M + 2) = 2 * M - 2) :
+    d (M + 3) = Nat.gcd (M + 3) (2 * M - 3) ∧
+      d (M + 3) ∣ 9 := by
+  have hmap := constant_D_event_map (r := M + 3) (C := 2 * M - 2)
+    (by omega) (by simpa using hD)
+  have heven : (M + 3) % 2 = 0 := by omega
+  rw [if_pos heven] at hmap
+  have harg : 2 * M - 2 - 1 = 2 * M - 3 := by omega
+  rw [harg] at hmap
+  constructor
+  · exact hmap
+  · rw [hmap]
+    have hg1 : Nat.gcd (M + 3) (2 * M - 3) ∣ M + 3 :=
+      Nat.gcd_dvd_left _ _
+    have hg2 : Nat.gcd (M + 3) (2 * M - 3) ∣ 2 * M - 3 :=
+      Nat.gcd_dvd_right _ _
+    have hmul : Nat.gcd (M + 3) (2 * M - 3) ∣ 2 * (M + 3) := by
+      rcases hg1 with ⟨q, hq⟩
+      refine ⟨2 * q, ?_⟩
+      calc
+        2 * (M + 3) = 2 * (Nat.gcd (M + 3) (2 * M - 3) * q) :=
+          congrArg (fun x => 2 * x) hq
+        _ = Nat.gcd (M + 3) (2 * M - 3) * (2 * q) := by
+          simp [Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm]
+    have hsub := Nat.dvd_sub hmul hg2
+    have harg' : 2 * (M + 3) - (2 * M - 3) = 9 := by omega
+    rw [harg'] at hsub
+    exact hsub
+
 theorem isDTransition_of_two_le {n : Nat} (hn : 2 ≤ n) :
     IsDTransition n (D (n - 1)) (D n) := by
   refine ⟨hn, ?_⟩
@@ -719,6 +750,20 @@ theorem constant_D_event_odd_size_bound_of_le {r C : Nat} (hr : 3 ≤ r)
   apply constant_D_event_odd_size_bound hr hD hodd
   exact (constant_D_event_odd_proper_iff hr hD hodd).2
     (constant_D_event_odd_not_dvd_of_le hr hle)
+
+theorem canonical_start_event_not_larger_before_horizon {M r : Nat}
+    (hM : 5 < M) (hrange : r ≤ 2 * M - 2) (hafter : M + 2 < r)
+    (hD : D (r - 1) = 2 * M - 2) (hnew : M < d r) : False := by
+  have hr3 : 3 ≤ r := by omega
+  have hnontriv : 1 < d r := by omega
+  rcases Nat.mod_two_eq_zero_or_one r with heven | hodd
+  · have hbound := constant_D_event_even_size_bound_of_le
+      hr3 hD heven hrange hnontriv
+    omega
+  · have hoddne : r % 2 ≠ 0 := by omega
+    have hbound := constant_D_event_odd_size_bound_of_le
+      hr3 hD hoddne hrange
+    omega
 
 theorem constant_D_event_coprime_of_critical_form {delta c r : Nat}
     (hr : 3 ≤ r)
@@ -3458,6 +3503,14 @@ theorem moving_horizon_excess_coordinates {P X s C r C' X' : Nat}
       2 * P + (X + d r) := by
     simpa [Nat.add_assoc] using hcancel
   exact Nat.add_left_cancel hcancel'
+
+theorem moving_horizon_deficit_transition {P Y Y' s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * P)
+    (hYr : B r + 2 + Y' = 2 * P) :
+    Y' + d r = Y + (r - s) + 1 := by
+  have h := moving_horizon_excess_transition hstep
+  omega
 
 theorem moving_horizon_normalized_close_old_excess
     {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
