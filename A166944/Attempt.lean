@@ -708,4 +708,88 @@ example {s C r C' u C'' : Nat}
     Nat.gcd (d r) (d u) ∣ 3 :=
   moving_horizon_successive_event_gcd_dvd_three hstep hnext
 
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    (B r + 2) + (r - s) + 1 = (B s + 2) + d r :=
+  moving_horizon_excess_transition hstep
+
+example {P X s C r C' X' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hXs : B s + 2 = 2 * P + X)
+    (hXr : B r + 2 = 2 * P + X') :
+    X' + (r - s) + 1 = X + d r :=
+  moving_horizon_excess_coordinates hstep hXs hXr
+
+example {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hnorm : C - s = 2 * P) (hclose : r - s ≤ d r + 2) :
+    B r + 2 = 2 * P + (d r + 3 - (r - s)) :=
+  moving_horizon_normalized_close_old_excess hstep hnorm hclose
+
+example {P s C r C' c c' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcanon_s : s = P * c) (hcanon_C : C = P * (c + 2))
+    (hnew : P < d r)
+    (hregen : r = d r * c' ∧ c' % 2 = 0 ∧ 2 ≤ c' ∧
+      C' = d r * (c' + 2)) :
+    r - s + d r + 1 = 2 * P ∧
+      d r * (c' + 1) + 1 = P * (c + 2) ∧ c' ≤ c :=
+  moving_horizon_regenerated_record_quotient_transition
+    hstep hcanon_s hcanon_C hnew hregen
+
+example {P e c : Nat} (hPpos : 1 ≤ P) (hnew : P < e)
+    (hquot : e * (c + 1) + 1 = P * (c + 2)) :
+    P - 1 = (e - P) * (c + 1) :=
+  moving_horizon_same_quotient_plateau hPpos hnew hquot
+
+example {P e f c : Nat} (hPpos : 1 ≤ P) (hPe : P < e) (hef : e < f)
+    (hquot₁ : e * (c + 1) + 1 = P * (c + 2))
+    (hquot₂ : f * (c + 1) + 1 = e * (c + 2)) :
+    (c + 1) ^ 2 ∣ P - 1 :=
+  moving_horizon_same_quotient_two_step_dvd hPpos hPe hef hquot₁ hquot₂
+
+example {s C r C' u C'' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'') (hre : r % 2 = 0) :
+    Nat.gcd (d r) (d u) = 1 :=
+  moving_horizon_successive_event_gcd_eq_one_of_prev_even hstep hnext hre
+
+example {s C r C' u C'' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (hro : r % 2 = 1) (huo : u % 2 = 1) :
+    Nat.gcd (d r) (d u) = 1 :=
+  moving_horizon_successive_event_gcd_eq_one_of_odd_odd hstep hnext hro huo
+
+example {s C r C' u C'' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (hro : r % 2 = 1) (hue : u % 2 = 0) :
+    Nat.gcd (d r) (d u) ∣ 3 :=
+  moving_horizon_successive_event_gcd_dvd_three_of_odd_even hstep hnext hro hue
+
+example {s C r C' u C'' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (heq : d r = d u) : d r = 3 :=
+  moving_horizon_equal_successive_event_is_three hstep hnext heq
+
+example {s C r C' u C'' v C''' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (hlast : IsMovingHorizonStep u C'' v C''')
+    (heq1 : d r = d u) (heq2 : d u = d v) : False :=
+  moving_horizon_no_three_equal_successive_events hstep hnext hlast heq1 heq2
+
+example {P s C X E T q : Nat}
+    (hchain : HasMovingHorizonCloseChain P s C X E T q) :
+    ∃ sf Cf Xf, IsMovingHorizonState sf Cf ∧
+      B sf + 2 = 2 * P + Xf ∧ Xf + T = X + E :=
+  moving_horizon_close_chain_excess_telescope hchain
+
+example {P s C X E T q : Nat}
+    (hP : IsAttainedPreviousMaximum P s)
+    (hchain : HasMovingHorizonCloseChain P s C X E T q) :
+    ∃ sf Cf Xf, IsMovingHorizonState sf Cf ∧
+      IsAttainedPreviousMaximum P sf ∧ B sf + 2 = 2 * P + Xf ∧
+      Xf + T = X + E :=
+  moving_horizon_close_chain_preserves_maximum hP hchain
+
 end A166944Research

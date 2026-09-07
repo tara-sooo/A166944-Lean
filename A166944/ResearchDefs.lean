@@ -55,6 +55,16 @@ def HasMovingHorizonChain (s C : Nat) : Nat → Prop
       ∃ r C', IsMovingHorizonStep s C r C' ∧
         HasMovingHorizonChain r C' q
 
+/-- A finite close-old segment with explicit envelope excess and Nat sums. -/
+def HasMovingHorizonCloseChain (P s C X E T : Nat) : Nat → Prop
+  | 0 => IsMovingHorizonState s C ∧ B s + 2 = 2 * P + X ∧ E = 0 ∧ T = 0
+  | Nat.succ q =>
+      ∃ r C' X' E' T', IsMovingHorizonStep s C r C' ∧
+        d r ≤ P ∧ r - s ≤ d r + 2 ∧
+        B s + 2 = 2 * P + X ∧ B r + 2 = 2 * P + X' ∧
+        E = E' + d r ∧ T = T' + (r - s + 1) ∧
+        HasMovingHorizonCloseChain P r C' X' E' T' q
+
 /-- A candidate last nontrivial increment before `m`; this is only a predicate.
 Existence is proved separately when the endpoint and earlier increment permit it.
 -/
