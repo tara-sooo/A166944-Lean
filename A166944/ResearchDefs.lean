@@ -65,6 +65,14 @@ def HasMovingHorizonCloseChain (P s C X E T : Nat) : Nat → Prop
         E = E' + d r ∧ T = T' + (r - s + 1) ∧
         HasMovingHorizonCloseChain P r C' X' E' T' q
 
+/- A quotient-only projection of consecutive regenerated record steps with a
+   fixed quotient c. -/
+def HasSameQuotientRegenerationChain (P c : Nat) : Nat → Prop
+  | 0 => True
+  | Nat.succ q =>
+      ∃ e : Nat, P < e ∧ e * (c + 1) + 1 = P * (c + 2) ∧
+        HasSameQuotientRegenerationChain e c q
+
 /-- A candidate last nontrivial increment before `m`; this is only a predicate.
 Existence is proved separately when the endpoint and earlier increment permit it.
 -/

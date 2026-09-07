@@ -792,4 +792,68 @@ example {P s C X E T q : Nat}
       Xf + T = X + E :=
   moving_horizon_close_chain_preserves_maximum hP hchain
 
+example {delta M e t q : Nat}
+    (hdeltaodd : delta % 2 = 1) (heodd : e % 2 = 1)
+    (hMe : M < e) (hEd : e < delta)
+    (hbound : delta + 6 ≤ 2 * M) (hclose : t ≤ e + 2)
+    (hform : 2 * delta = t + 1 + e * q)
+    (hqodd : q % 2 = 1) : q = 3 :=
+  critical_intermediate_even_quotient_eq_three
+    hdeltaodd heodd hMe hEd hbound hclose hform hqodd
+
+example {delta M e t q : Nat}
+    (hMe : M < e) (hbound : delta + 6 ≤ 2 * M)
+    (hform : 2 * delta + 3 = t + e * q)
+    (hqeven : q % 2 = 0) (hq2 : 2 ≤ q) : q = 2 :=
+  critical_intermediate_odd_quotient_eq_two hMe hbound hform hqeven hq2
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    (r % 2 = 0 ∧ d r = Nat.gcd r (C - 1) ∧ 1 < d r ∧
+        (∀ j : Nat, s < j → j < r →
+          (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+          (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1))) ∨
+      (r % 2 = 1 ∧ d r = Nat.gcd (r - 2) (C + 1) ∧ 1 < d r ∧
+        (∀ j : Nat, s < j → j < r →
+          (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+          (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1))) :=
+  moving_horizon_first_hit_map hstep
+
+example {s₁ C₁ r₁ C₁' s₂ C₂ r₂ C₂' e : Nat}
+    (hstep₁ : IsMovingHorizonStep s₁ C₁ r₁ C₁')
+    (hstep₂ : IsMovingHorizonStep s₂ C₂ r₂ C₂')
+    (he₁ : d r₁ = e) (he₂ : d r₂ = e)
+    (hpar : r₁ % 2 = r₂ % 2) :
+    e ∣ r₂ - r₁ ∧ e ∣ C₂ - C₁ :=
+  moving_horizon_same_parity_event_drift hstep₁ hstep₂ he₁ he₂ hpar
+
+example {e₁ e₂ : Nat} (he₁ : 3 ≤ e₁) (he₂ : 3 ≤ e₂)
+    (h₁ : e₁ ∣ e₁ + e₂ - 2) (h₂ : e₂ ∣ e₁ + e₂ - 2) : False :=
+  moving_horizon_no_two_event_drift_cycle he₁ he₂ h₁ h₂
+
+example {s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ r₄ C₄ e₁ e₂ : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hstep₂ : IsMovingHorizonStep r₁ C₁ r₂ C₂)
+    (hstep₃ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (hstep₄ : IsMovingHorizonStep r₃ C₃ r₄ C₄)
+    (he₁ : d r₁ = e₁) (he₂ : d r₂ = e₂)
+    (he₃ : d r₃ = e₁) (he₄ : d r₄ = e₂)
+    (hp₁ : r₁ % 2 = r₃ % 2) (hp₂ : r₂ % 2 = r₄ % 2) : False :=
+  moving_horizon_no_repeated_two_event_block
+    hstep₁ hstep₂ hstep₃ hstep₄ he₁ he₂ he₃ he₄ hp₁ hp₂
+
+example {P X s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hP : IsAttainedPreviousMaximum P s) (hP5 : 5 < P)
+    (hXs : B s + 2 = 2 * P + X) (hX : X ≤ 5)
+    (hnew : P < d r) :
+    ∃ c : Nat, r = d r * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      IsAttainedPreviousMaximum (d r) r ∧
+      C' = d r * (c + 2) ∧ D r = d r * (c + 2) :=
+  moving_horizon_small_excess_new_max hstep hP hP5 hXs hX hnew
+
+example {P c q : Nat} (hPpos : 1 ≤ P)
+    (hchain : HasSameQuotientRegenerationChain P c q) :
+    (c + 1) ^ q ∣ P - 1 :=
+  moving_horizon_same_quotient_plateau_power hPpos hchain
+
 end A166944Research

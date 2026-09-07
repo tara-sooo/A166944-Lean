@@ -4354,4 +4354,365 @@ theorem later_nontrivial_residual_transport {k m rho : Nat}
       · exact Or.inl hzero
       · exact Or.inr hbound⟩⟩
 
+theorem critical_intermediate_even_quotient_eq_three
+    {delta M e t q : Nat}
+    (hdeltaodd : delta % 2 = 1) (heodd : e % 2 = 1)
+    (hMe : M < e) (hEd : e < delta)
+    (hbound : delta + 6 ≤ 2 * M) (hclose : t ≤ e + 2)
+    (hform : 2 * delta = t + 1 + e * q)
+    (hqodd : q % 2 = 1) : q = 3 := by
+  have hgap : e + 2 ≤ delta := by omega
+  have hqle : q < 5 := by
+    by_cases hq5 : 5 ≤ q
+    · have hdelta2e : delta < 2 * e := by omega
+      have h2delta5e : 2 * delta < 5 * e := by omega
+      have h5eq : 5 * e ≤ e * q := by
+        simpa [Nat.mul_comm] using Nat.mul_le_mul_left e hq5
+      have heqle : e * q ≤ 2 * delta := by omega
+      have h5le : 5 * e ≤ 2 * delta := Nat.le_trans h5eq heqle
+      exact False.elim ((Nat.not_lt_of_ge h5le) h2delta5e)
+    · exact Nat.lt_of_not_ge hq5
+  rcases one_or_three_le_of_mod_two_eq_one hqodd with hqone | hqthree
+  · simp [hqone] at hform
+    omega
+  · omega
+
+theorem critical_intermediate_odd_quotient_eq_two
+    {delta M e t q : Nat}
+    (hMe : M < e) (hbound : delta + 6 ≤ 2 * M)
+    (hform : 2 * delta + 3 = t + e * q)
+    (hqeven : q % 2 = 0) (hq2 : 2 ≤ q) : q = 2 := by
+  have hqle : q < 4 := by
+    by_cases hq4 : 4 ≤ q
+    · have hdelta2e : delta + 6 < 2 * e := by omega
+      have h4e : 4 * e ≤ e * q := by
+        simpa [Nat.mul_comm] using Nat.mul_le_mul_left e hq4
+      have heqle : e * q ≤ 2 * delta + 3 := by omega
+      have h4le : 4 * e ≤ 2 * delta + 3 := Nat.le_trans h4e heqle
+      have hdelta4e : 2 * delta + 3 < 4 * e := by omega
+      exact False.elim ((Nat.not_lt_of_ge h4le) hdelta4e)
+    · exact Nat.lt_of_not_ge hq4
+  omega
+
+theorem moving_horizon_first_hit_map {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    (r % 2 = 0 ∧ d r = Nat.gcd r (C - 1) ∧ 1 < d r ∧
+        (∀ j : Nat, s < j → j < r →
+          (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+          (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1))) ∨
+      (r % 2 = 1 ∧ d r = Nat.gcd (r - 2) (C + 1) ∧ 1 < d r ∧
+        (∀ j : Nat, s < j → j < r →
+          (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+          (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1))) := by
+  rcases hstep with ⟨hs, hsr, hrC, hdr, hfirst, hDr, hC', hgrowth, hrstate⟩
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hs.1) (Nat.succ_le_of_lt hsr)
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr3) hDr
+  have hunit : ∀ j : Nat, s < j → j < r →
+      (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+      (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1) := by
+    intro j hsj hjr
+    have hj2 : 2 ≤ j := Nat.le_trans hs.1 (Nat.le_of_lt hsj)
+    have hfirstj : ∀ l : Nat, s < l → l < j → d l = 1 := by
+      intro l hsl hlj
+      exact hfirst l hsl (Nat.lt_trans hlj hjr)
+    have hDj : D (j - 1) = C :=
+      first_later_event_D_eq hs.1 hs.2.1 hsj hfirstj
+    have hjmap := constant_D_event_map hj2 hDj
+    have hdj : d j = 1 := hfirst j hsj hjr
+    constructor
+    · intro hevenj
+      rw [if_pos hevenj] at hjmap
+      rw [hjmap] at hdj
+      exact hdj
+    · intro hoddj
+      have hjne : j % 2 ≠ 0 := by simp [hoddj]
+      rw [if_neg hjne] at hjmap
+      rw [hjmap] at hdj
+      exact hdj
+  by_cases heven : r % 2 = 0
+  · left
+    rw [if_pos heven] at hmap
+    exact ⟨heven, hmap, hdr, hunit⟩
+  · right
+    have hodd : r % 2 = 1 := by
+      rcases Nat.mod_two_eq_zero_or_one r with hzero | hone
+      · exact False.elim (heven hzero)
+      · exact hone
+    rw [if_neg heven] at hmap
+    exact ⟨hodd, hmap, hdr, hunit⟩
+
+theorem moving_horizon_same_parity_event_drift
+    {s₁ C₁ r₁ C₁' s₂ C₂ r₂ C₂' e : Nat}
+    (hstep₁ : IsMovingHorizonStep s₁ C₁ r₁ C₁')
+    (hstep₂ : IsMovingHorizonStep s₂ C₂ r₂ C₂')
+    (he₁ : d r₁ = e) (he₂ : d r₂ = e)
+    (hpar : r₁ % 2 = r₂ % 2) :
+    e ∣ r₂ - r₁ ∧ e ∣ C₂ - C₁ := by
+  rcases hstep₁ with ⟨hs₁, hs₁r, hr₁C, hdr₁, hfirst₁, hD₁, hC₁', hg₁, hstate₁⟩
+  rcases hstep₂ with ⟨hs₂, hs₂r, hr₂C, hdr₂, hfirst₂, hD₂, hC₂', hg₂, hstate₂⟩
+  have hr₁3 : 3 ≤ r₁ := by
+    exact Nat.le_trans (Nat.succ_le_succ hs₁.1) (Nat.succ_le_of_lt hs₁r)
+  have hr₂3 : 3 ≤ r₂ := by
+    exact Nat.le_trans (Nat.succ_le_succ hs₂.1) (Nat.succ_le_of_lt hs₂r)
+  rcases Nat.mod_two_eq_zero_or_one r₁ with h₁even | h₁odd
+  · have h₂even : r₂ % 2 = 0 := by simpa [hpar] using h₁even
+    have hmap₁ := constant_D_event_map (Nat.le_trans (by simp) hr₁3) hD₁
+    have hmap₂ := constant_D_event_map (Nat.le_trans (by simp) hr₂3) hD₂
+    rw [if_pos h₁even] at hmap₁
+    rw [if_pos h₂even] at hmap₂
+    have hdivr₁ : e ∣ r₁ := by
+      rw [← he₁, hmap₁]
+      exact Nat.gcd_dvd_left _ _
+    have hdivr₂ : e ∣ r₂ := by
+      rw [← he₂, hmap₂]
+      exact Nat.gcd_dvd_left _ _
+    have hdivC₁ : e ∣ C₁ - 1 := by
+      rw [← he₁, hmap₁]
+      exact Nat.gcd_dvd_right _ _
+    have hdivC₂ : e ∣ C₂ - 1 := by
+      rw [← he₂, hmap₂]
+      exact Nat.gcd_dvd_right _ _
+    have hdiffR := Nat.dvd_sub hdivr₂ hdivr₁
+    have hdiffC := Nat.dvd_sub hdivC₂ hdivC₁
+    have hC₁pos : 1 ≤ C₁ := by
+      rw [← hs₁.2.1]
+      have hD1 : 1 ≤ D 1 := by simp [D, a]
+      exact Nat.le_trans hD1
+        (D_le_of_le (Nat.le_trans (by simp) hs₁.1))
+    have hsumC : 1 + (C₁ - 1) = C₁ := by
+      rw [Nat.add_comm, Nat.sub_add_cancel hC₁pos]
+    constructor
+    · exact hdiffR
+    · simpa [Nat.sub_sub, hsumC] using hdiffC
+  · have h₂odd : r₂ % 2 = 1 := by simpa [hpar] using h₁odd
+    have hmap₁ := constant_D_event_map (Nat.le_trans (by simp) hr₁3) hD₁
+    have hmap₂ := constant_D_event_map (Nat.le_trans (by simp) hr₂3) hD₂
+    rw [if_neg (by simp [h₁odd])] at hmap₁
+    rw [if_neg (by simp [h₂odd])] at hmap₂
+    have hdivr₁ : e ∣ r₁ - 2 := by
+      rw [← he₁, hmap₁]
+      exact Nat.gcd_dvd_left _ _
+    have hdivr₂ : e ∣ r₂ - 2 := by
+      rw [← he₂, hmap₂]
+      exact Nat.gcd_dvd_left _ _
+    have hdivC₁ : e ∣ C₁ + 1 := by
+      rw [← he₁, hmap₁]
+      exact Nat.gcd_dvd_right _ _
+    have hdivC₂ : e ∣ C₂ + 1 := by
+      rw [← he₂, hmap₂]
+      exact Nat.gcd_dvd_right _ _
+    have hdiffR := Nat.dvd_sub hdivr₂ hdivr₁
+    have hdiffC := Nat.dvd_sub hdivC₂ hdivC₁
+    have hr₁2 : 2 ≤ r₁ := Nat.le_trans hs₁.1 (Nat.le_of_lt hs₁r)
+    have hdiffCeq : (C₂ + 1) - (C₁ + 1) = C₂ - C₁ := by omega
+    have hshift : 2 + (r₁ - 2) = r₁ := by
+      rw [Nat.add_comm, Nat.sub_add_cancel hr₁2]
+    constructor
+    · simpa [Nat.sub_sub, hshift] using hdiffR
+    · rw [hdiffCeq] at hdiffC
+      exact hdiffC
+
+theorem moving_horizon_no_two_event_drift_cycle {e₁ e₂ : Nat}
+    (he₁ : 3 ≤ e₁) (he₂ : 3 ≤ e₂)
+    (h₁ : e₁ ∣ e₁ + e₂ - 2) (h₂ : e₂ ∣ e₁ + e₂ - 2) : False := by
+  have hd₁ := Nat.dvd_sub h₁ (Nat.dvd_refl e₁)
+  have hd₂ := Nat.dvd_sub h₂ (Nat.dvd_refl e₂)
+  have hEq₁ : e₁ + e₂ - 2 - e₁ = e₂ - 2 := by omega
+  have hEq₂ : e₁ + e₂ - 2 - e₂ = e₁ - 2 := by omega
+  rw [hEq₁] at hd₁
+  rw [hEq₂] at hd₂
+  rcases Nat.le_total e₁ e₂ with hle | hle
+  · have hlt : e₁ - 2 < e₂ := by omega
+    have hz : e₁ - 2 = 0 := Nat.eq_zero_of_dvd_of_lt hd₂ hlt
+    omega
+  · have hlt : e₂ - 2 < e₁ := by omega
+    have hz : e₂ - 2 = 0 := Nat.eq_zero_of_dvd_of_lt hd₁ hlt
+    omega
+
+theorem moving_horizon_no_repeated_two_event_block
+    {s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ r₄ C₄ e₁ e₂ : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hstep₂ : IsMovingHorizonStep r₁ C₁ r₂ C₂)
+    (hstep₃ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (hstep₄ : IsMovingHorizonStep r₃ C₃ r₄ C₄)
+    (he₁ : d r₁ = e₁) (he₂ : d r₂ = e₂)
+    (he₃ : d r₃ = e₁) (he₄ : d r₄ = e₂)
+    (hp₁ : r₁ % 2 = r₃ % 2) (hp₂ : r₂ % 2 = r₄ % 2) : False := by
+  have hu₁ := moving_horizon_step_update hstep₁
+  have hu₂ := moving_horizon_step_update hstep₂
+  have hu₃ := moving_horizon_step_update hstep₃
+  rw [he₁] at hu₁
+  rw [he₂] at hu₂
+  rw [he₃] at hu₃
+  have hC₀₂ : C₂ - C₀ = (e₁ - 1) + (e₂ - 1) := by
+    rw [hu₂, hu₁]
+    omega
+  have hC₁₃ : C₃ - C₁ = (e₁ - 1) + (e₂ - 1) := by
+    rw [hu₃, hu₂]
+    omega
+  have hdr₁₃ := moving_horizon_same_parity_event_drift
+    hstep₁ hstep₃ he₁ he₃ hp₁
+  have hdr₂₄ := moving_horizon_same_parity_event_drift
+    hstep₂ hstep₄ he₂ he₄ hp₂
+  have hdiv₁ : e₁ ∣ (e₁ - 1) + (e₂ - 1) := by
+    rw [← hC₀₂]
+    exact hdr₁₃.2
+  have hdiv₂ : e₂ ∣ (e₁ - 1) + (e₂ - 1) := by
+    rw [← hC₁₃]
+    exact hdr₂₄.2
+  have he₁pos : 1 ≤ e₁ := by
+    rw [← he₁]
+    exact one_le_d_of_two_le (Nat.le_trans hstep₁.1.1 (Nat.le_of_lt hstep₁.2.1))
+  have he₂pos : 1 ≤ e₂ := by
+    rw [← he₂]
+    exact one_le_d_of_two_le (Nat.le_trans hstep₂.1.1 (Nat.le_of_lt hstep₂.2.1))
+  have hsum : (e₁ - 1) + (e₂ - 1) = e₁ + e₂ - 2 := by omega
+  rw [hsum] at hdiv₁ hdiv₂
+  have he₁odd : e₁ % 2 = 1 := by
+    rw [← he₁]
+    exact d_mod_two_eq_one_of_three_le
+      (Nat.le_trans (Nat.succ_le_succ hstep₁.1.1)
+        (Nat.succ_le_of_lt hstep₁.2.1))
+  have he₂odd : e₂ % 2 = 1 := by
+    rw [← he₂]
+    exact d_mod_two_eq_one_of_three_le
+      (Nat.le_trans (Nat.succ_le_succ hstep₂.1.1)
+        (Nat.succ_le_of_lt hstep₂.2.1))
+  have he₁min : 3 ≤ e₁ := by
+    have hgt : 1 < e₁ := by simpa [he₁] using hstep₁.2.2.2.1
+    rcases one_or_three_le_of_mod_two_eq_one he₁odd with h | h
+    · omega
+    · exact h
+  have he₂min : 3 ≤ e₂ := by
+    have hgt : 1 < e₂ := by simpa [he₂] using hstep₂.2.2.2.1
+    rcases one_or_three_le_of_mod_two_eq_one he₂odd with h | h
+    · omega
+    · exact h
+  exact moving_horizon_no_two_event_drift_cycle he₁min he₂min hdiv₁ hdiv₂
+
+theorem moving_horizon_small_excess_new_max
+    {P X s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hP : IsAttainedPreviousMaximum P s) (hP5 : 5 < P)
+    (hXs : B s + 2 = 2 * P + X) (hX : X ≤ 5)
+    (hnew : P < d r) :
+    ∃ c : Nat, r = d r * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      IsAttainedPreviousMaximum (d r) r ∧
+      C' = d r * (c + 2) ∧ D r = d r * (c + 2) := by
+  have hPodd : P % 2 = 1 :=
+    attained_previous_maximum_value_mod_two_eq_one hP hP5
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have heodd : d r % 2 = 1 := d_mod_two_eq_one_of_three_le hr3
+  have hcoord := moving_horizon_slack_coordinate hstep.1
+  have hL : C - s + 4 = 2 * P + X := by
+    calc
+      C - s + 4 = B s + 2 := by rw [hcoord]
+      _ = 2 * P + X := hXs
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · have hqpack := moving_horizon_even_quotient_normal_form hstep hreven
+    rcases hqpack with ⟨q, hqform, hqmod, _, hqnext⟩
+    have hq : q = 1 := by
+      rcases one_or_three_le_of_mod_two_eq_one hqmod with hqone | hqthree
+      · exact hqone
+      · have hmul : 3 * d r ≤ d r * q := by
+          simpa [Nat.mul_comm] using Nat.mul_le_mul_left (d r) hqthree
+        exfalso
+        omega
+    have hnext : C' - r = 2 * d r := by
+      simpa [hq, Nat.mul_comm] using hqnext
+    have hfirst : ∀ j : Nat, s < j → j < r → d j = 1 :=
+      hstep.2.2.2.2.1
+    have hmax := moving_horizon_max_transfer hP hstep.2.1
+      hstep.2.2.2.1 hfirst
+    have hnewhist : IsAttainedPreviousMaximum (d r) r := by
+      rcases hmax with h | h
+      · exact False.elim ((Nat.not_le_of_gt hnew) h.1)
+      · exact h.2
+    rcases hstep with ⟨hs, hsr, hrC, hdr, _, hDr, hC', _, hrstate⟩
+    have hdivr : d r ∣ r := by
+      have hmap := constant_D_event_map (Nat.le_trans (by simp) hr3) hDr
+      rw [if_pos hreven] at hmap
+      rw [hmap]
+      exact Nat.gcd_dvd_left _ _
+    rcases hdivr with ⟨c, hc⟩
+    have hcmod : c % 2 = 0 := by
+      calc
+        c % 2 = (d r * c) % 2 := quotient_mod_two_of_left_odd heodd
+        _ = r % 2 := congrArg (fun x : Nat => x % 2) hc.symm
+        _ = 0 := hreven
+    have hcpos : 0 < c := by
+      cases c with
+      | zero =>
+          have hrzero : r = 0 := by simpa using hc
+          omega
+      | succ c => exact Nat.zero_lt_succ c
+    have hc2 : 2 ≤ c := two_le_of_pos_of_mod_two_eq_zero hcpos hcmod
+    have hrleC' : r ≤ C' := Nat.le_of_lt hrstate.2.2
+    have hsum : (C' - r) + r = C' := Nat.sub_add_cancel hrleC'
+    have hCeq : C' = d r * (c + 2) := by
+      calc
+        C' = (C' - r) + r := hsum.symm
+        _ = 2 * d r + r := by rw [hnext]
+        _ = 2 * d r + d r * c := congrArg (fun x : Nat => 2 * d r + x) hc
+        _ = d r * (c + 2) := by
+          simp [Nat.mul_add, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm,
+            Nat.mul_comm]
+    exact ⟨c, hc, hcmod, hc2, hnewhist, hCeq, hC'.symm.trans hCeq⟩
+  · have hqpack := moving_horizon_odd_quotient_normal_form hstep hrodd
+    rcases hqpack with ⟨q, hqform, hqmod, hq2, _⟩
+    have hmul : 2 * d r ≤ d r * q := by
+      simpa [Nat.mul_comm] using Nat.mul_le_mul_left (d r) hq2
+    have hPe2 : P + 2 ≤ d r := by omega
+    have htpos : 1 ≤ r - s := by
+      apply Nat.le_sub_of_add_le
+      simpa [Nat.add_comm] using Nat.succ_le_of_lt hstep.2.1
+    have hEq : (r - s) + d r * q + 1 = 2 * P + X := by
+      calc
+        (r - s) + d r * q + 1 = (C - s + 3) + 1 := by rw [hqform]
+        _ = C - s + 4 := by omega
+        _ = 2 * P + X := hL
+    exfalso
+    omega
+
+theorem moving_horizon_same_quotient_plateau_power
+    {P c q : Nat} (hPpos : 1 ≤ P)
+    (hchain : HasSameQuotientRegenerationChain P c q) :
+    (c + 1) ^ q ∣ P - 1 := by
+  induction q generalizing P with
+  | zero => exact ⟨P - 1, by simp⟩
+  | succ q ih =>
+      rcases hchain with ⟨e, hPe, hquot, htail⟩
+      have hepos : 1 ≤ e := Nat.le_trans hPpos (Nat.le_of_lt hPe)
+      have hrel : (e - 1) * (c + 1) = (P - 1) * (c + 2) := by
+        have heq : e * (c + 1) = P * (c + 2) - 1 :=
+          Nat.eq_sub_of_add_eq hquot
+        rw [Nat.sub_mul, Nat.sub_mul, heq]
+        have hck : 1 + (c + 1) = c + 2 := by omega
+        simp [Nat.sub_sub, hck]
+      have hpow : (c + 1) ^ q ∣ e - 1 := ih hepos htail
+      have hpowmul : (c + 1) ^ (q + 1) ∣ (e - 1) * (c + 1) := by
+        rcases hpow with ⟨z, hz⟩
+        refine ⟨z, ?_⟩
+        rw [Nat.pow_succ]
+        calc
+          (e - 1) * (c + 1) = ((c + 1) ^ q * z) * (c + 1) := by rw [hz]
+          _ = (c + 1) ^ q * (c + 1) * z := by
+            simp [Nat.mul_comm, Nat.mul_left_comm]
+      have hcop0 : Nat.Coprime (c + 1) (c + 2) := by
+        rw [Nat.coprime_iff_gcd_eq_one]
+        calc
+          Nat.gcd (c + 1) (c + 2) = Nat.gcd (c + 1) 1 := by
+            rw [show c + 2 = 1 + (c + 1) by omega]
+            exact Nat.gcd_add_self_right _ _
+          _ = 1 := Nat.gcd_one_right _
+      have hcop : Nat.Coprime ((c + 1) ^ (q + 1)) (c + 2) :=
+        hcop0.pow_left _
+      have hdiv : (c + 1) ^ (q + 1) ∣ (P - 1) * (c + 2) := by
+        rw [← hrel]
+        exact hpowmul
+      exact hcop.dvd_of_dvd_mul_left (by simpa [Nat.mul_comm] using hdiv)
+
 end A166944Research
