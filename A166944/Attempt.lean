@@ -218,6 +218,28 @@ example {P k : Nat} (hP : IsAttainedPreviousMaximum P k) (hP5 : 5 < P) :
             1 ≤ c ∧ (c = 1 ∨ 3 ≤ c))) := by
   exact attained_previous_maximum_quotient_structure hP hP5
 
+example {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∃ p c u v : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      5 < M ∧
+      (p = M + 2 ∨
+        (M + 2 < p ∧ d (M + 2) < M ∧
+          d (M + 2) = Nat.gcd M (a (M + 1)) ∧
+          Nat.gcd M (a (M + 1)) < M ∧ ¬ M ∣ a (M + 1))) ∧
+      ((p % 2 = 0 ∧ p = M * u ∧ a (p - 1) = M * v ∧
+          u % 2 = 0 ∧ v % 2 = 1 ∧ Nat.gcd u v = 1 ∧ 2 ≤ u) ∨
+        (p % 2 = 1 ∧ p - 2 = M * u ∧ a (p - 1) = M * v ∧
+          u % 2 = 1 ∧ v % 2 = 0 ∧ Nat.gcd u v = 1 ∧
+          1 ≤ u ∧ (u = 1 ∨ 3 ≤ u))) ∧
+      k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      a k = d (k + 1) * (2 * c + 1) ∧
+      D (k + 1) = d (k + 1) * (c + 2) :=
+  critical_previous_maximum_prefix hk hP hIH hnew hfail
+
 example {r C : Nat} (hr : 2 ≤ r) (hD : D (r - 1) = C) :
     d r = if r % 2 = 0 then Nat.gcd r (C - 1)
       else Nat.gcd (r - 2) (C + 1) :=

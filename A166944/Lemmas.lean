@@ -2115,6 +2115,49 @@ theorem critical_failure_impossible_of_small_previous_max {k P : Nat}
       _ ≤ d (k + 1) + 1 := Nat.succ_le_succ hdelta9
   exact critical_failure_impossible_of_separation hk hIH hnew hfail hsep
 
+theorem critical_previous_maximum_prefix {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∃ p c u v : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      5 < M ∧
+      (p = M + 2 ∨
+        (M + 2 < p ∧ d (M + 2) < M ∧
+          d (M + 2) = Nat.gcd M (a (M + 1)) ∧
+          Nat.gcd M (a (M + 1)) < M ∧ ¬ M ∣ a (M + 1))) ∧
+      ((p % 2 = 0 ∧ p = M * u ∧ a (p - 1) = M * v ∧
+          u % 2 = 0 ∧ v % 2 = 1 ∧ Nat.gcd u v = 1 ∧ 2 ≤ u) ∨
+        (p % 2 = 1 ∧ p - 2 = M * u ∧ a (p - 1) = M * v ∧
+          u % 2 = 1 ∧ v % 2 = 0 ∧ Nat.gcd u v = 1 ∧
+          1 ≤ u ∧ (u = 1 ∨ 3 ≤ u))) ∧
+      k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      a k = d (k + 1) * (2 * c + 1) ∧
+      D (k + 1) = d (k + 1) * (c + 2) := by
+  have hM5 : 5 < M := by
+    by_cases hM5 : 5 < M
+    · exact hM5
+    · exact False.elim (critical_failure_impossible_of_small_previous_max hk hIH
+        hnew hfail (Nat.le_of_not_gt hM5))
+  rcases attained_previous_maximum_first_occurrence hP with
+    ⟨p, hp2, hpk, hdp, hprior⟩
+  have hrec : IsDifferenceRecord M := ⟨p, hp2, hdp, hprior⟩
+  have hsplit := record_index_or_late_gcd_reduction hM5 hp2 hdp hprior
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, hak, hD, _, _⟩
+  rcases Nat.mod_two_eq_zero_or_one p with hp0 | hp1
+  · rcases record_even_occurrence_quotients hM5 hrec hp2 hdp hp0 with
+      ⟨u, v, hpu, hpv, hu0, hv1, huv, hu2⟩
+    exact ⟨p, c, u, v, hp2, hpk, hdp, hprior, hM5, hsplit,
+      Or.inl ⟨hp0, hpu, hpv, hu0, hv1, huv, hu2⟩,
+      hc, hcmod, hc2, hak, hD⟩
+  · rcases record_odd_occurrence_quotients hM5 hrec hp2 hdp hp1 with
+      ⟨u, v, hpu, hpv, hu1, hv0, huv, hupos, hucases⟩
+    exact ⟨p, c, u, v, hp2, hpk, hdp, hprior, hM5, hsplit,
+      Or.inr ⟨hp1, hpu, hpv, hu1, hv0, huv, hupos, hucases⟩,
+      hc, hcmod, hc2, hak, hD⟩
+
 theorem critical_endpoint_lower_bound {k M m s : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
     (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
