@@ -2078,6 +2078,21 @@ theorem critical_even_quotient_normal_form {k M : Nat} (hk : 2 ≤ k)
     gcd_quotients_eq_one (d_pos_of_two_le hn2) hgd
   exact ⟨c, hc, hcmod, hc2, ha, hD, by simp [Nat.add_mod], hcop⟩
 
+theorem critical_initial_slack {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    k + 1 + 2 * d (k + 1) = D (k + 1) := by
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, _, _, _, hD, _, _⟩
+  have hkc : k + 1 + 2 * d (k + 1) =
+      d (k + 1) * c + 2 * d (k + 1) :=
+    congrArg (fun x : Nat => x + 2 * d (k + 1)) hc
+  calc
+    k + 1 + 2 * d (k + 1) = d (k + 1) * c + 2 * d (k + 1) := hkc
+    _ = d (k + 1) * (c + 2) := by
+      simp [Nat.mul_add, Nat.mul_comm, Nat.add_assoc]
+    _ = D (k + 1) := hD.symm
+
 theorem critical_failure_impossible_of_separation {k P : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
     (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
@@ -2262,6 +2277,20 @@ theorem moving_horizon_no_event_telescope {s C : Nat}
       B C + (C - s) = B (s + (C - s)) + (C - s) := by rw [hsum]
       _ = B s := htail.2
 
+theorem moving_horizon_slack_coordinate {s C : Nat}
+    (hs : IsMovingHorizonState s C) :
+    B s = (C - s) + 2 := by
+  rcases hs with ⟨hs2, hDs, hsc⟩
+  have hsle : s ≤ C := Nat.le_of_lt hsc
+  have hsum : (C - s) + s = C := Nat.sub_add_cancel hsle
+  have hrel := B_add_index_eq_D_add_two hs2
+  apply Nat.add_right_cancel
+  calc
+    B s + s = D s + 2 := hrel
+    _ = C + 2 := by rw [hDs]
+    _ = ((C - s) + 2) + s := by
+      rw [Nat.add_assoc, Nat.add_comm 2 s, ← Nat.add_assoc, hsum]
+
 theorem moving_horizon_step_of_exists {s C : Nat}
     (hs : IsMovingHorizonState s C)
     (hex : ∃ j : Nat, s < j ∧ j ≤ C ∧ 1 < d j) :
@@ -2293,6 +2322,28 @@ theorem moving_horizon_step_of_exists {s C : Nat}
   refine ⟨r, D r, ?_⟩
   exact ⟨hs, hsr, hrC, hdr, hfirst, hDrpred, rfl, hgrowth,
     ⟨hr2, rfl, hrC'⟩⟩
+
+theorem moving_horizon_slack_transition {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    (C' - r) + (r - s) = (C - s) + (d r - 1) := by
+  rcases hstep with ⟨hs, hsr, hrC, hdr, _, hDr, hC', _, _⟩
+  have hr1 : 1 ≤ r :=
+    Nat.le_trans (by simp) (Nat.le_trans hs.1 (Nat.le_of_lt hsr))
+  have hrsucc : r - 1 + 1 = r := Nat.sub_add_cancel hr1
+  have hDstep : D r = C + (d r - 1) := by
+    have h := D_succ_eq_D_add_d_sub_one (r - 1)
+    rw [hrsucc, hDr] at h
+    exact h
+  have hsle : s ≤ r := Nat.le_of_lt hsr
+  calc
+    (C' - r) + (r - s) = (C + (d r - 1) - r) + (r - s) := by
+      rw [hC', hDstep]
+    _ = ((C - r) + (d r - 1)) + (r - s) := by
+      rw [Nat.sub_add_comm hrC]
+    _ = (C - r + (r - s)) + (d r - 1) := by
+      simp [Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+    _ = (C - s) + (d r - 1) := by
+      rw [Nat.sub_add_sub_cancel hrC hsle]
 
 theorem moving_horizon_step_size_le_slack {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') :
@@ -2439,6 +2490,35 @@ theorem moving_horizon_step_size_le_slack {s C r C' : Nat}
           _ = (d r) % 2 := by rw [hqeqd]
           _ = 1 := hdodd
       cases hbad
+
+theorem moving_horizon_step_size_add_le {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    d r + s ≤ C := by
+  exact (Nat.le_sub_iff_add_le (Nat.le_of_lt hstep.1.2.2)).1
+    (moving_horizon_step_size_le_slack hstep)
+
+theorem moving_horizon_next_slack_upper {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    C' - r + 2 ≤ 2 * (C - s) := by
+  have htransition := moving_horizon_slack_transition hstep
+  have hsize := moving_horizon_step_size_le_slack hstep
+  have hdist : 1 ≤ r - s := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_comm] using Nat.succ_le_of_lt hstep.2.1
+  have hleft : C' - r + 1 ≤ (C - s) + (d r - 1) := by
+    calc
+      C' - r + 1 ≤ (C' - r) + (r - s) :=
+        Nat.add_le_add_left hdist (C' - r)
+      _ = (C - s) + (d r - 1) := htransition
+  have hdpos : 1 ≤ d r :=
+    one_le_d_of_two_le (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  calc
+    C' - r + 2 = (C' - r + 1) + 1 := by simp [Nat.add_assoc]
+    _ ≤ (C - s) + (d r - 1) + 1 := Nat.add_le_add_right hleft 1
+    _ = (C - s) + ((d r - 1) + 1) := by simp [Nat.add_assoc]
+    _ = (C - s) + d r := by rw [Nat.sub_add_cancel hdpos]
+    _ ≤ (C - s) + (C - s) := Nat.add_le_add_left hsize _
+    _ = 2 * (C - s) := by simp [Nat.two_mul]
 
 theorem moving_horizon_step_event_package {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') :

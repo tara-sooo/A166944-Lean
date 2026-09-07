@@ -580,10 +580,26 @@ example {s C : Nat} (hs : IsMovingHorizonState s C)
     D C = C ∧ B C + (C - s) = B s :=
   moving_horizon_no_event_telescope hs hno
 
+example {s C : Nat} (hs : IsMovingHorizonState s C) :
+    B s = (C - s) + 2 :=
+  moving_horizon_slack_coordinate hs
+
 example {s C : Nat} (hs : IsMovingHorizonState s C)
     (hex : ∃ j : Nat, s < j ∧ j ≤ C ∧ 1 < d j) :
     ∃ r C', IsMovingHorizonStep s C r C' :=
   moving_horizon_step_of_exists hs hex
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    (C' - r) + (r - s) = (C - s) + (d r - 1) :=
+  moving_horizon_slack_transition hstep
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    d r + s ≤ C :=
+  moving_horizon_step_size_add_le hstep
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    C' - r + 2 ≤ 2 * (C - s) :=
+  moving_horizon_next_slack_upper hstep
 
 example {s C : Nat} (hs : IsMovingHorizonState s C) :
     (∀ j : Nat, s < j → j ≤ C → d j = 1) ∨
@@ -620,6 +636,12 @@ example {k M : Nat} (hk : 2 ≤ k)
     (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
     IsMovingHorizonState (k + 1) (D (k + 1)) :=
   critical_failure_moving_horizon_state hk hIH hnew hfail
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    k + 1 + 2 * d (k + 1) = D (k + 1) :=
+  critical_initial_slack hk hIH hnew hfail
 
 example {k M : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
