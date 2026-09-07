@@ -7,6 +7,8 @@ The long-term target is the conjecture formalized as `OeisA166944.conjecture` in
 This repository is **research in progress**: it contains kernel-checked partial
 results and reproducible experiments, not a claimed proof of the open conjecture.
 
+Public tracker: https://github.com/tara-sooo/A166944-Lean/issues/1
+
 ## Current structure
 
 - `A166944/ResearchDefs.lean` — ultra-light recurrence and record definitions.
@@ -16,6 +18,8 @@ results and reproducible experiments, not a claimed proof of the open conjecture
 - `A166944/Bridge.lean` — bridge from the lightweight definitions to the pinned Formal Conjectures definitions.
 - `A166944/Baseline.lean` — canonical upstream target/axiom baseline.
 - `AGENTS.md` — correctness and research rules for Codex/LLM-assisted work.
+- `RESEARCH_PROTOCOL.md` — external-status, novelty, semantic-fidelity, and correction checks.
+- `PROVENANCE.md` — AI/tool provenance and audit ledger.
 
 ## Current research position
 
