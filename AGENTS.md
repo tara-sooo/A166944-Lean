@@ -2,7 +2,7 @@
 
 These rules apply to all work in this repository.
 
-Read `README.md` before starting a research task. The GitHub Issue for the target problem is the task-specific source of truth.
+Read `README.md` before starting a research task. GitHub Issue #1 is the current task-specific research tracker and source of truth for A166944 milestone state.
 
 ## Correctness first
 
@@ -39,7 +39,7 @@ Read `README.md` before starting a research task. The GitHub Issue for the targe
 
 ## Literature and novelty
 
-15. Before claiming a new mathematical result, follow `RESEARCH_VERIFICATION_PROTOCOL.md`.
+15. Before claiming a new mathematical result, follow `RESEARCH_PROTOCOL.md`.
 16. Verify that the problem is still open and that the proposed argument is not already in the literature.
 17. Track provenance of imported ideas, public LLM attempts, papers, and existing formalizations. Do not present a repaired public argument as independently discovered.
 18. If the public formalization disagrees with the source problem, treat semantic equivalence as an open verification task.
