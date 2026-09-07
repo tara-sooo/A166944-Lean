@@ -1,0 +1,644 @@
+import A166944.ResearchDefs
+import A166944.Lemmas
+
+/-!
+# A166944 active proof attempt
+
+This file stays on the lightweight recurrence path. The reusable Milestone 3
+proofs live in `Lemmas.lean`; these examples keep their public names
+kernel-checked here. The history-bounded envelope remains unproved.
+-/
+
+namespace A166944Research
+
+example {m : Nat} (hm : 2 ≤ m) :
+    B m = 2 ↔ a m = 2 * m := fundamental_point_iff hm
+
+example {l t : Nat} (hl : 2 ≤ l)
+    (hone : ∀ j : Nat, l < j → j ≤ l + t → d j = 1) :
+    D (l + t) = D l ∧ B (l + t) + t = B l :=
+  one_interval_const_D_B hl hone
+
+example {rho m : Nat} (hrho : 2 ≤ rho) (hbelow : rho < m)
+    (hfund : B m = 2)
+    (hone : ∀ j : Nat, rho < j → j ≤ m → d j = 1) :
+    ∃ t : Nat, 0 < t ∧ m = rho + t ∧ D m = D rho ∧ B rho = 2 + t :=
+  last_nontrivial_telescope hrho hbelow hfund hone
+
+example {k : Nat} (hk : 2 ≤ k) (hB : B k = 2) :
+    d (k + 1) = 1 ∧ B (k + 1) = 1 := B_two_transition hk hB
+
+example {k : Nat} (hk : 2 ≤ k) (hk1 : k % 2 = 1) (hB : B k = 1) :
+    (d (k + 1) = 1 ∧ B (k + 1) = 0) ∨
+      (d (k + 1) = 3 ∧ B (k + 1) = 2) :=
+  B_one_transition hk hk1 hB
+
+example {k : Nat} (hk : 2 ≤ k) (hk1 : k % 2 = 1) (hB : B k = 3) :
+    d (k + 1) = 1 ∧ B (k + 1) = 2 := B_three_transition hk hk1 hB
+
+example {k : Nat} (hk : 2 ≤ k) (hB : B k = 0) :
+    d (k + 1) = k - 1 ∧ B (k + 1) + 2 = k - 1 :=
+  B_zero_transition hk hB
+
+example {k M m : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hbelow : k + 1 < m) (hfund : B m = 2)
+    (hone : ∀ j : Nat, k + 1 < j → j ≤ m → d j = 1) :
+    m = k + 1 + 2 * d (k + 1) :=
+  odd_failure_fundamental_distance hk hIH hnew hfail hbelow hfund hone
+
+example {k M m : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hrho : IsLastNontrivialBefore (k + 1) m) (hfund : B m = 2) :
+    m = k + 1 + 2 * d (k + 1) :=
+  odd_failure_distance_of_last_nontrivial hk hIH hnew hfail hrho hfund
+
+example {k m rho : Nat} (hcrit : 1 < d (k + 1))
+    (hbelow : k + 1 < m)
+    (hrho : IsLastNontrivialBefore rho m) :
+    k + 1 ≤ rho :=
+  critical_index_le_last_nontrivial hcrit hbelow hrho
+
+example {k M m rho : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hcrit : 1 < d (k + 1)) (hbelow : k + 1 < m)
+    (hfund : B m = 2) (hrho : IsLastNontrivialBefore rho m) :
+    m = k + 1 + 2 * d (k + 1) ∨ k + 1 < rho :=
+  odd_failure_distance_or_later_nontrivial hk hIH hnew hfail hcrit hbelow hfund hrho
+
+example {m : Nat} (hm : d m = 1)
+    (hex : ∃ q : Nat, 2 ≤ q ∧ q < m ∧ 1 < d q) :
+    ∃ rho : Nat, IsLastNontrivialBefore rho m :=
+  exists_last_nontrivial_before hm hex
+
+example {m : Nat} :
+    (∃ rho : Nat, IsLastNontrivialBefore rho m) ↔
+      (d m = 1 ∧ ∃ q : Nat, 2 ≤ q ∧ q < m ∧ 1 < d q) :=
+  exists_last_nontrivial_before_iff
+
+example {rho sigma m : Nat}
+    (hrho : IsLastNontrivialBefore rho m)
+    (hsigma : IsLastNontrivialBefore sigma m) :
+    rho = sigma := last_nontrivial_before_unique hrho hsigma
+
+example {rho m : Nat}
+    (hrho : IsLastNontrivialBefore rho m) (hfund : B m = 2) :
+    3 * rho ≤ 2 * m ↔ m + 6 ≤ 3 * B rho :=
+  rho_bound_iff_B_bound hrho hfund
+
+example {rho m : Nat}
+    (hrho : IsLastNontrivialBefore rho m) (hfund : B m = 2) :
+    B rho + rho = m + 2 :=
+  last_nontrivial_telescope_addition hrho hfund
+
+example {rho m : Nat}
+    (hrho : IsLastNontrivialBefore rho m) (hfund : B m = 2) :
+    3 ≤ B rho ∧ B rho ≤ m :=
+  last_nontrivial_B_bounds hrho hfund
+
+example {k m rho : Nat} (hk : 2 ≤ k) (hlater : k + 1 < rho)
+    (hrho : IsLastNontrivialBefore rho m) :
+    3 ≤ d rho ∧ B rho + 2 = B (rho - 1) + d rho ∧
+      ((rho % 2 = 0 ∧
+          ((B (rho - 1) = 1 ∧ d rho = 3) ∨
+            (4 ≤ B (rho - 1) ∧
+              ∃ t : Nat, B (rho - 1) - 4 = d rho * t ∧
+                t % 2 = 1 ∧ d rho + 4 ≤ B (rho - 1)))) ∨
+        (rho % 2 = 1 ∧
+          ∃ t : Nat, B (rho - 1) = d rho * t ∧
+            t % 2 = 0 ∧
+            (B (rho - 1) = 0 ∨ 2 * d rho ≤ B (rho - 1)))) :=
+  later_nontrivial_residual_transport hk hlater hrho
+
+example {n : Nat} (hn : 2 ≤ n) : B n + n = D n + 2 :=
+  B_add_index_eq_D_add_two hn
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    k % 2 = 1 ∧ 4 ≤ B k ∧ B k = d (k + 1) + 4 ∧
+      B (k + 1) + 2 = 2 * d (k + 1) + 4 ∧
+      d (k + 1) + 6 ≤ 2 * M :=
+  new_max_failure_reduction hk hIH hnew hfail
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    B (k + 1) = 2 * d (k + 1) + 2 :=
+  new_max_failure_next_B_eq hk hIH hnew hfail
+
+example {k M m rho : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hlater : k + 1 < rho) (hrho : IsLastNontrivialBefore rho m) :
+    2 * d (k + 1) + k + 3 < B rho + rho :=
+  critical_later_strict_transport hk hIH hnew hfail hlater hrho
+
+example {k M m rho : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hbelow : k + 1 < m) (hfund : B m = 2)
+    (hrho : IsLastNontrivialBefore rho m) (hlater : k + 1 < rho) :
+    k + 1 + 2 * d (k + 1) < m :=
+  critical_later_distance_strict hk hIH hnew hfail hbelow hfund hrho hlater
+
+example {n : Nat} : D (n + 1) = D n + (d (n + 1) - 1) := by
+  rw [D_succ_eq_add_d_sub_one n]
+  exact Nat.add_sub_assoc (one_le_d_succ n) (D n)
+
+example {start finish s : Nat} (hstart : 2 ≤ start)
+    (hchain : HasNontrivialChain start finish s) :
+    D start + 2 * s ≤ D finish :=
+  D_growth_of_nontrivial_chain hstart hchain
+
+example {m : Nat} (hm : 2 ≤ m) (hfund : B m = 2) :
+    D m = m := D_eq_self_of_fundamental hm hfund
+
+example {k M m s : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hbelow : k + 1 < m) (hfund : B m = 2)
+    (hchain : HasNontrivialChain (k + 1) m s) :
+    k + 1 + 2 * d (k + 1) + 2 * s ≤ m :=
+  critical_endpoint_lower_bound hk hIH hnew hfail hbelow hfund hchain
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    9 ≤ d (k + 1) := critical_new_increment_lower_bound hk hIH hnew hfail
+
+example : ¬ D 0 + 2 ≤ D 1 := by decide
+
+example : ¬ D 1 + 2 ≤ D 2 := by decide
+
+example : HasNontrivialChain 2 5 1 := by
+  refine ⟨5, by decide, by decide, by decide, ?_⟩
+  simp [HasNontrivialChain]
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∃ c : Nat, k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      a k = d (k + 1) * (2 * c + 1) ∧
+      D (k + 1) = d (k + 1) * (c + 2) ∧
+      (2 * c + 1) % 2 = 1 ∧ Nat.gcd c (2 * c + 1) = 1 :=
+  critical_even_quotient_normal_form hk hIH hnew hfail
+
+example {k P : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hsep : 2 * P ≤ d (k + 1) + 1) : False :=
+  critical_failure_impossible_of_separation hk hIH hnew hfail hsep
+
+example {k P : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) (hPsmall : P ≤ 5) : False :=
+  critical_failure_impossible_of_small_previous_max hk hIH hnew hfail hPsmall
+
+example {P k : Nat} (hP : IsAttainedPreviousMaximum P k) :
+    ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P ∧
+      ∀ j : Nat, 2 ≤ j → j < r → d j < P :=
+  attained_previous_maximum_first_occurrence hP
+
+example {P k : Nat} (hP : IsAttainedPreviousMaximum P k) :
+    ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P ∧ IsDifferenceRecord P :=
+  attained_previous_maximum_record hP
+
+example {P k : Nat} (hP : IsAttainedPreviousMaximum P k) (hP5 : 5 < P) :
+    ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P ∧
+      ((r % 2 = 0 ∧
+          ∃ c q : Nat, r = P * c ∧ a (r - 1) = P * q ∧
+            c % 2 = 0 ∧ q % 2 = 1 ∧ Nat.gcd c q = 1 ∧ 2 ≤ c) ∨
+        (r % 2 = 1 ∧
+          ∃ c q : Nat, r - 2 = P * c ∧ a (r - 1) = P * q ∧
+            c % 2 = 1 ∧ q % 2 = 0 ∧ Nat.gcd c q = 1 ∧
+            1 ≤ c ∧ (c = 1 ∨ 3 ≤ c))) := by
+  exact attained_previous_maximum_quotient_structure hP hP5
+
+example {r C : Nat} (hr : 2 ≤ r) (hD : D (r - 1) = C) :
+    d r = if r % 2 = 0 then Nat.gcd r (C - 1)
+      else Nat.gcd (r - 2) (C + 1) :=
+  constant_D_event_map hr hD
+
+example {s C : Nat} (hs : 1 ≤ s) (hD : D s = C) :
+    d (s + 1) = if (s + 1) % 2 = 0 then Nat.gcd (s + 1) (C - 1)
+      else Nat.gcd (s - 1) (C + 1) := by
+  have hr : 2 ≤ s + 1 := Nat.succ_le_succ hs
+  have hpred : s + 1 - 1 = s := Nat.add_sub_cancel s 1
+  have hpred2 : s + 1 - 2 = s - 1 := by
+    cases s with
+    | zero => simp at hs
+    | succ s => simp [Nat.add_assoc]
+  simpa [hpred, hpred2] using constant_D_event_map hr (by simpa [hpred] using hD)
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (heven : r % 2 = 0) :
+    d r < C - 1 ↔ ¬ (C - 1) ∣ r := by
+  have hs : 2 ≤ r - 1 := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_assoc] using hr
+  have hC2 : 2 ≤ C := by
+    rw [← hD]
+    calc
+      2 = D 2 := by simp [D, a]
+      _ ≤ D (r - 1) := D_le_of_le hs
+  have hqpos : 0 < C - 1 := by
+    exact Nat.sub_pos_of_lt (Nat.lt_of_lt_of_le (by simp) hC2)
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+  rw [if_pos heven] at hmap
+  rw [hmap]
+  constructor
+  · intro hlt hdiv
+    rw [Nat.gcd_eq_right hdiv] at hlt
+    exact False.elim (Nat.lt_irrefl _ hlt)
+  · intro hnot
+    apply Nat.lt_of_le_of_ne (Nat.gcd_le_right r hqpos)
+    intro heq
+    apply hnot
+    exact (Nat.gcd_eq_right_iff_dvd).1 heq
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (hodd : r % 2 ≠ 0) :
+    d r < C + 1 ↔ ¬ (C + 1) ∣ r - 2 := by
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+  rw [if_neg hodd] at hmap
+  rw [hmap]
+  constructor
+  · intro hlt hdiv
+    rw [Nat.gcd_eq_right hdiv] at hlt
+    exact False.elim (Nat.lt_irrefl _ hlt)
+  · intro hnot
+    apply Nat.lt_of_le_of_ne (Nat.gcd_le_right (r - 2) (by simp))
+    intro heq
+    apply hnot
+    exact (Nat.gcd_eq_right_iff_dvd).1 heq
+
+example {x q : Nat} (hxodd : x % 2 = 1) (hqodd : q % 2 = 1)
+    (hxgt : 1 < x) (hdiv : x ∣ q) (hproper : x < q) :
+    3 * x ≤ q := by
+  rcases hdiv with ⟨t, ht⟩
+  have htodd : t % 2 = 1 := by
+    calc
+      t % 2 = (x * t) % 2 := quotient_mod_two_of_left_odd hxodd
+      _ = q % 2 := by rw [ht]
+      _ = 1 := hqodd
+  rcases one_or_three_le_of_mod_two_eq_one htodd with ht1 | ht3
+  · have heq : q = x := by
+      calc
+        q = x * t := ht
+        _ = x := by rw [ht1]; simp
+    have : x < x := by simpa [heq] using hproper
+    exact False.elim (Nat.lt_irrefl x this)
+  · calc
+      3 * x = x * 3 := by simp [Nat.mul_comm]
+      _ ≤ x * t := Nat.mul_le_mul_left x ht3
+      _ = q := ht.symm
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (heven : r % 2 = 0) (hnontriv : 1 < d r)
+    (hproper : d r < C - 1) :
+    3 * d r ≤ C - 1 := by
+  have hs : 2 ≤ r - 1 := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_assoc] using hr
+  have hCmod : C % 2 = 0 := by
+    rw [← hD]
+    exact D_mod_two_eq_zero_of_two_le hs
+  have hC2 : 2 ≤ C := by
+    rw [← hD]
+    calc
+      2 = D 2 := by simp [D, a]
+      _ ≤ D (r - 1) := D_le_of_le hs
+  have hdmod : d r % 2 = 1 := d_mod_two_eq_one_of_three_le hr
+  have hCstep : C - 1 + 1 = C := Nat.sub_add_cancel (Nat.le_trans (by simp) hC2)
+  have hqmod : (C - 1) % 2 = 1 := by
+    rcases Nat.mod_two_eq_zero_or_one (C - 1) with hq0 | hq1
+    · have hbad : C % 2 = 1 := by
+        calc
+          C % 2 = ((C - 1) + 1) % 2 := by rw [hCstep]
+          _ = 1 := by simp [Nat.add_mod, hq0]
+      simp [hCmod] at hbad
+    · exact hq1
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+  rw [if_pos heven] at hmap
+  have hdiv : d r ∣ C - 1 := by
+    rw [hmap]
+    exact Nat.gcd_dvd_right _ _
+  rcases hdiv with ⟨t, ht⟩
+  have htmod : t % 2 = 1 := by
+    calc
+      t % 2 = (d r * t) % 2 := quotient_mod_two_of_left_odd hdmod
+      _ = (C - 1) % 2 := by rw [ht]
+      _ = 1 := hqmod
+  rcases one_or_three_le_of_mod_two_eq_one htmod with ht1 | ht3
+  · have heq : C - 1 = d r := by
+      calc
+        C - 1 = d r * t := ht
+        _ = d r := by rw [ht1]; simp
+    have : d r < d r := by simpa [heq] using hproper
+    exact False.elim (Nat.lt_irrefl _ this)
+  · calc
+      3 * d r = d r * 3 := by simp [Nat.mul_comm]
+      _ ≤ d r * t := Nat.mul_le_mul_left _ ht3
+      _ = C - 1 := ht.symm
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (hodd : r % 2 ≠ 0) (hnontriv : 1 < d r)
+    (hproper : d r < C + 1) :
+    3 * d r ≤ C + 1 := by
+  have hs : 2 ≤ r - 1 := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_assoc] using hr
+  have hCmod : C % 2 = 0 := by
+    rw [← hD]
+    exact D_mod_two_eq_zero_of_two_le hs
+  have hdmod : d r % 2 = 1 := d_mod_two_eq_one_of_three_le hr
+  have hqmod : (C + 1) % 2 = 1 := by simp [Nat.add_mod, hCmod]
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+  rw [if_neg hodd] at hmap
+  have hdiv : d r ∣ C + 1 := by
+    rw [hmap]
+    exact Nat.gcd_dvd_right _ _
+  rcases hdiv with ⟨t, ht⟩
+  have htmod : t % 2 = 1 := by
+    calc
+      t % 2 = (d r * t) % 2 := quotient_mod_two_of_left_odd hdmod
+      _ = (C + 1) % 2 := by rw [ht]
+      _ = 1 := hqmod
+  rcases one_or_three_le_of_mod_two_eq_one htmod with ht1 | ht3
+  · have heq : C + 1 = d r := by
+      calc
+        C + 1 = d r * t := ht
+        _ = d r := by rw [ht1]; simp
+    have : d r < d r := by simpa [heq] using hproper
+    exact False.elim (Nat.lt_irrefl _ this)
+  · calc
+      3 * d r = d r * 3 := by simp [Nat.mul_comm]
+      _ ≤ d r * t := Nat.mul_le_mul_left _ ht3
+      _ = C + 1 := ht.symm
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (heven : r % 2 = 0) (hle : r ≤ C) (hnontriv : 1 < d r) :
+    ¬ (C - 1) ∣ r := by
+  have hs : 2 ≤ r - 1 := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_assoc] using hr
+  have hCmod : C % 2 = 0 := by
+    rw [← hD]
+    exact D_mod_two_eq_zero_of_two_le hs
+  have hC2 : 2 ≤ C := by
+    rw [← hD]
+    calc
+      2 = D 2 := by simp [D, a]
+      _ ≤ D (r - 1) := D_le_of_le hs
+  have hCpos : 0 < C - 1 :=
+    Nat.sub_pos_of_lt (Nat.lt_of_lt_of_le (by simp) hC2)
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+  rw [if_pos heven] at hmap
+  have hdvd : d r ∣ C - 1 := by
+    rw [hmap]
+    exact Nat.gcd_dvd_right _ _
+  have hdle : d r ≤ C - 1 := Nat.le_of_dvd hCpos hdvd
+  have hd2 : 2 ≤ d r := Nat.succ_le_of_lt hnontriv
+  have hq2 : 2 ≤ C - 1 := Nat.le_trans hd2 hdle
+  have hqodd : (C - 1) % 2 = 1 := by
+    have hCstep : C - 1 + 1 = C := Nat.sub_add_cancel (Nat.le_trans (by simp) hC2)
+    rcases Nat.mod_two_eq_zero_or_one (C - 1) with hq0 | hq1
+    · have hbad : C % 2 = 1 := by
+        calc
+          C % 2 = ((C - 1) + 1) % 2 := by rw [hCstep]
+          _ = 1 := by simp [Nat.add_mod, hq0]
+      simp [hCmod] at hbad
+    · exact hq1
+  intro hdiv
+  have hqle : C - 1 ≤ r := Nat.le_of_dvd (Nat.lt_of_lt_of_le (by simp) hr) hdiv
+  have hupper : r ≤ (C - 1) + 1 := by
+    calc
+      r ≤ C := hle
+      _ = (C - 1) + 1 := (Nat.sub_add_cancel (Nat.le_trans (by simp) hC2)).symm
+  rcases Nat.lt_or_eq_of_le hqle with hlt | heq
+  · have hreq : r = (C - 1) + 1 :=
+      Nat.le_antisymm hupper (Nat.succ_le_of_lt hlt)
+    have hone : C - 1 ∣ 1 := by
+      have hsub := Nat.dvd_sub hdiv (Nat.dvd_refl (C - 1))
+      rw [hreq] at hsub
+      simpa [Nat.add_sub_cancel_left] using hsub
+    have hqone : C - 1 = 1 := Nat.eq_one_of_dvd_one hone
+    have : (2 : Nat) ≤ 1 := by simpa [hqone] using hq2
+    simp at this
+  · have hbad : (1 : Nat) = 0 := by
+      calc
+        1 = (C - 1) % 2 := hqodd.symm
+        _ = r % 2 := by rw [heq]
+        _ = 0 := heven
+    cases hbad
+
+example {r C : Nat} (hr : 3 ≤ r) (hle : r ≤ C) :
+    ¬ (C + 1) ∣ r - 2 := by
+  intro hdiv
+  have hr2 : 0 < r - 2 :=
+    Nat.sub_pos_of_lt (Nat.lt_of_lt_of_le (by simp) hr)
+  have hqle : C + 1 ≤ r - 2 := Nat.le_of_dvd hr2 hdiv
+  have hbad : C + 1 ≤ C :=
+    Nat.le_trans hqle (Nat.le_trans (Nat.sub_le r 2) hle)
+  exact (Nat.not_succ_le_self C) hbad
+
+example {delta c r : Nat} (hr : 3 ≤ r)
+    (hD : D (r - 1) = delta * (c + 2)) :
+    Nat.gcd delta (d r) = 1 := by
+  have hs : 2 ≤ r - 1 := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_assoc] using hr
+  have hC2 : 2 ≤ delta * (c + 2) := by
+    rw [← hD]
+    calc
+      2 = D 2 := by simp [D, a]
+      _ ≤ D (r - 1) := D_le_of_le hs
+  have hCpos : 1 ≤ delta * (c + 2) := Nat.le_trans (by simp) hC2
+  by_cases heven : r % 2 = 0
+  · have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+    rw [if_pos heven] at hmap
+    have hdvd : d r ∣ delta * (c + 2) - 1 := by
+      rw [hmap]
+      exact Nat.gcd_dvd_right _ _
+    let g := Nat.gcd delta (d r)
+    have hgdelta : g ∣ delta := Nat.gcd_dvd_left _ _
+    have hgd : g ∣ d r := Nat.gcd_dvd_right _ _
+    have hgq : g ∣ delta * (c + 2) - 1 := Nat.dvd_trans hgd hdvd
+    have hgC : g ∣ delta * (c + 2) :=
+      Nat.dvd_mul_right_of_dvd hgdelta (c + 2)
+    have hg1 : g ∣ 1 := by
+      have hsub := Nat.dvd_sub hgC hgq
+      have hdiff : delta * (c + 2) -
+          (delta * (c + 2) - 1) = 1 :=
+        Nat.sub_sub_self hCpos
+      rw [hdiff] at hsub
+      exact hsub
+    exact Nat.eq_one_of_dvd_one hg1
+
+  · have hmap := constant_D_event_map (Nat.le_trans (by simp) hr) hD
+    rw [if_neg heven] at hmap
+    have hdvd : d r ∣ delta * (c + 2) + 1 := by
+      rw [hmap]
+      exact Nat.gcd_dvd_right _ _
+    let g := Nat.gcd delta (d r)
+    have hgdelta : g ∣ delta := Nat.gcd_dvd_left _ _
+    have hgd : g ∣ d r := Nat.gcd_dvd_right _ _
+    have hgq : g ∣ delta * (c + 2) + 1 := Nat.dvd_trans hgd hdvd
+    have hgC : g ∣ delta * (c + 2) :=
+      Nat.dvd_mul_right_of_dvd hgdelta (c + 2)
+    have hg1 : g ∣ 1 := by
+      have hsub := Nat.dvd_sub hgq hgC
+      simpa using hsub
+    exact Nat.eq_one_of_dvd_one hg1
+
+example {n : Nat} (hn : 2 ≤ n) : D n % 2 = 0 :=
+  D_mod_two_eq_zero_of_two_le hn
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (heven : r % 2 = 0) (hle : r ≤ C) (hnontriv : 1 < d r) :
+    3 * d r ≤ C - 1 :=
+  constant_D_event_even_size_bound_of_le hr hD heven hle hnontriv
+
+example {r C : Nat} (hr : 3 ≤ r) (hD : D (r - 1) = C)
+    (hodd : r % 2 ≠ 0) (hle : r ≤ C) :
+    3 * d r ≤ C + 1 :=
+  constant_D_event_odd_size_bound_of_le hr hD hodd hle
+
+example {delta c r : Nat} (hr : 3 ≤ r)
+    (hD : D (r - 1) = delta * (c + 2)) :
+    Nat.gcd delta (d r) = 1 :=
+  constant_D_event_coprime_of_critical_form hr hD
+
+example {k P : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hno : ∀ j : Nat, k + 1 < j → j ≤ D (k + 1) → d j = 1) :
+    B (D (k + 1)) = 2 ∧ D (D (k + 1)) = D (k + 1) := by
+  exact critical_failure_no_event_to_fundamental hk hIH hnew hfail hno
+
+example {n C : Nat} (hn : 2 ≤ n) :
+    (∀ j : Nat, n < j → j ≤ C → d j = 1) ∨
+      ∃ r : Nat, n < r ∧ r ≤ C ∧ 1 < d r ∧
+        ∀ j : Nat, n < j → j < r → d j = 1 :=
+  first_later_nontrivial_dichotomy hn
+
+example {n C r : Nat} (hn : 2 ≤ n) (hC : D n = C) (hnr : n < r)
+    (hfirst : ∀ j : Nat, n < j → j < r → d j = 1) :
+    D (r - 1) = C :=
+  first_later_event_D_eq hn hC hnr hfirst
+
+example {k P : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    (B (D (k + 1)) = 2 ∧ D (D (k + 1)) = D (k + 1)) ∨
+      ∃ r : Nat, k + 1 < r ∧ r ≤ D (k + 1) ∧ 1 < d r ∧
+        ∀ j : Nat, k + 1 < j → j < r → d j = 1 :=
+  critical_failure_first_event_dichotomy hk hIH hnew hfail
+
+example {k M C r : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hC : D (k + 1) = C) (hr : k + 1 < r) (hrC : r ≤ C)
+    (hdr : 1 < d r)
+    (hfirst : ∀ j : Nat, k + 1 < j → j < r → d j = 1) :
+    ∃ c : Nat, k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      D (r - 1) = C ∧
+      ((r % 2 = 0 ∧ d r ∣ C - 1 ∧ d r < C - 1 ∧
+          3 * d r ≤ C - 1 ∧ Nat.gcd (d (k + 1)) (d r) = 1) ∨
+        (r % 2 = 1 ∧ d r ∣ C + 1 ∧ d r < C + 1 ∧
+          3 * d r ≤ C + 1 ∧ Nat.gcd (d (k + 1)) (d r) = 1)) ∧
+      B r + 2 = B (r - 1) + d r ∧
+      D r = C + (d r - 1) ∧
+      C + 2 ≤ D r ∧
+      B (r - 1) + (r - 1) = C + 2 ∧
+      B r + r = D r + 2 :=
+  critical_first_event_transfer hk hIH hnew hfail hC hr hrC hdr hfirst
+
+example {k M P C r : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum P k)
+    (hIH : B k + 2 ≤ 2 * P) (hnew : P < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hC : D (k + 1) = C) (hr : k + 1 < r) (hrC : r ≤ C)
+    (hdr : 1 < d r)
+    (hfirst : ∀ j : Nat, k + 1 < j → j < r → d j = 1) :
+    d r ≤ P ∨ (P < d r ∧ d r < d (k + 1)) ∨
+      IsAttainedPreviousMaximum (d r) r :=
+  critical_first_event_previous_or_new_max hk hP hIH hnew hfail hC hr hrC hdr hfirst
+
+example {r C finish s : Nat} (hr : 2 ≤ r)
+    (hstep : D r = C + (d r - 1))
+    (hchain : HasNontrivialChain r finish s) :
+    C + (d r - 1) + 2 * s ≤ D finish :=
+  D_growth_after_D_step hr hstep hchain
+
+example {s C : Nat} (hs : IsMovingHorizonState s C)
+    (hno : ∀ j : Nat, s < j → j ≤ C → d j = 1) :
+    D C = C ∧ B C + (C - s) = B s :=
+  moving_horizon_no_event_telescope hs hno
+
+example {s C : Nat} (hs : IsMovingHorizonState s C)
+    (hex : ∃ j : Nat, s < j ∧ j ≤ C ∧ 1 < d j) :
+    ∃ r C', IsMovingHorizonStep s C r C' :=
+  moving_horizon_step_of_exists hs hex
+
+example {s C : Nat} (hs : IsMovingHorizonState s C) :
+    (∀ j : Nat, s < j → j ≤ C → d j = 1) ∨
+      ∃ r C', IsMovingHorizonStep s C r C' :=
+  moving_horizon_dichotomy hs
+
+example {P s : Nat} (hs : 2 ≤ s)
+    (hP : IsAttainedPreviousMaximum P (s - 1)) (hnew : P < d s) :
+    IsAttainedPreviousMaximum (d s) s :=
+  attained_previous_maximum_extend hs hP hnew
+
+example {P s r : Nat} (hP : IsAttainedPreviousMaximum P s)
+    (hsr : s < r) (hdr : 1 < d r)
+    (hfirst : ∀ j : Nat, s < j → j < r → d j = 1) :
+    (d r ≤ P ∧ IsAttainedPreviousMaximum P r) ∨
+      (P < d r ∧ IsAttainedPreviousMaximum (d r) r) :=
+  moving_horizon_max_transfer hP hsr hdr hfirst
+
+example {s C q : Nat} (hchain : HasMovingHorizonChain s C q) :
+    ∃ sf Cf, IsMovingHorizonState sf Cf ∧ C + 2 * q ≤ Cf :=
+  moving_horizon_chain_growth hchain
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    (r % 2 = 0 ∧ d r ∣ C - 1 ∧ d r < C - 1 ∧ 3 * d r ≤ C - 1) ∨
+      (r % 2 = 1 ∧ d r ∣ C + 1 ∧ d r < C + 1 ∧ 3 * d r ≤ C + 1) :=
+  moving_horizon_step_event_package hstep
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    d r ≤ C - s :=
+  moving_horizon_step_size_le_slack hstep
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    IsMovingHorizonState (k + 1) (D (k + 1)) :=
+  critical_failure_moving_horizon_state hk hIH hnew hfail
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    (∀ j : Nat, k + 1 < j → j ≤ D (k + 1) → d j = 1) ∨
+      ∃ r C', IsMovingHorizonStep (k + 1) (D (k + 1)) r C' :=
+  critical_failure_moving_horizon_dichotomy hk hIH hnew hfail
+
+example {k P : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum P k) (hnew : P < d (k + 1)) :
+    IsAttainedPreviousMaximum (d (k + 1)) (k + 1) :=
+  critical_failure_current_maximum hk hP hnew
+
+example {k P r : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum P k) (hnew : P < d (k + 1))
+    (hr : k + 1 < r) (hdr : 1 < d r)
+    (hfirst : ∀ j : Nat, k + 1 < j → j < r → d j = 1) :
+    (d r ≤ d (k + 1) ∧ IsAttainedPreviousMaximum (d (k + 1)) r) ∨
+      (d (k + 1) < d r ∧ IsAttainedPreviousMaximum (d r) r) :=
+  critical_first_event_current_or_new_max hk hP hnew hr hdr hfirst
+
+end A166944Research
