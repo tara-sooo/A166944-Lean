@@ -41,6 +41,21 @@ def B (n : Nat) : Nat := a n - (2 * n - 2)
 def IsMovingHorizonState (s C : Nat) : Prop :=
   2 ≤ s ∧ D s = C ∧ s < C
 
+/- An exact recurrence transition for the D-coordinate at index n. -/
+def IsDTransition (n C C' : Nat) : Prop :=
+  2 ≤ n ∧
+    C' + 1 = C +
+      (if n % 2 = 0 then Nat.gcd n (C - 1)
+      else Nat.gcd (n - 2) (C + 1))
+
+/- A genuine recurrence path from a previous record to a larger increment.
+   The cap applies only to strict intermediate indices; the endpoint is delta. -/
+def IsCappedDPath (p s M delta : Nat) : Prop :=
+  p < s ∧ d s = delta ∧ M < delta ∧
+    (∀ j : Nat, p < j → j < s → d j ≤ M) ∧
+    (∀ j : Nat, p < j → j ≤ s →
+      IsDTransition j (D (j - 1)) (D j))
+
 /-- One first-event transition, including the unit tail and the next state. -/
 def IsMovingHorizonStep (s C r C' : Nat) : Prop :=
   IsMovingHorizonState s C ∧ s < r ∧ r ≤ C ∧ 1 < d r ∧

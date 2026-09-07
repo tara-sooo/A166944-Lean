@@ -479,6 +479,32 @@ theorem constant_D_event_map {r C : Nat} (hr : 2 ≤ r)
     simpa [Nat.add_assoc] using
       (Nat.gcd_add_mul_right_right (r - 2) (C + 1) 1)
 
+theorem isDTransition_of_two_le {n : Nat} (hn : 2 ≤ n) :
+    IsDTransition n (D (n - 1)) (D n) := by
+  refine ⟨hn, ?_⟩
+  have hn1 : 1 ≤ n := Nat.le_trans (by simp) hn
+  have hidx : n - 1 + 1 = n := Nat.sub_add_cancel hn1
+  have hstep := D_succ_add_one_eq_add_d (n - 1)
+  rw [hidx] at hstep
+  rw [constant_D_event_map hn (rfl : D (n - 1) = D (n - 1))] at hstep
+  exact hstep
+
+theorem attained_previous_maximum_capped_D_path {P k delta : Nat}
+    (hP : IsAttainedPreviousMaximum P k) (hnew : P < delta)
+    (hdelta : d (k + 1) = delta) :
+    ∃ p : Nat, 2 ≤ p ∧ p ≤ k ∧ d p = P ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < P) ∧
+      IsCappedDPath p (k + 1) P delta := by
+  rcases attained_previous_maximum_first_occurrence hP with
+    ⟨p, hp2, hpk, hdp, hprior⟩
+  refine ⟨p, hp2, hpk, hdp, hprior, ?_⟩
+  refine ⟨Nat.lt_succ_of_le hpk, hdelta, hnew, ?_, ?_⟩
+  · intro j hpj hjs
+    exact hP.1 j (Nat.le_trans hp2 (Nat.le_of_lt hpj))
+      (Nat.le_of_lt_succ hjs)
+  · intro j hpj hjs
+    exact isDTransition_of_two_le (Nat.le_trans hp2 (Nat.le_of_lt hpj))
+
 theorem constant_D_event_map_succ {s C : Nat} (hs : 1 ≤ s)
     (hD : D s = C) :
     d (s + 1) = if (s + 1) % 2 = 0 then Nat.gcd (s + 1) (C - 1)
@@ -1016,6 +1042,32 @@ theorem a_add_d_succ {k : Nat} :
   have hsub : d (k + 1) = a (k + 1) - a k := by simp [d]
   rw [hsub]
   simpa [Nat.add_comm] using Nat.sub_add_cancel (a_le_succ k)
+
+theorem previous_record_D_coordinate {M p v : Nat} (hp : 2 ≤ p)
+    (hd : d p = M) (hav : a (p - 1) = M * v) :
+    D p + p = M * (v + 1) := by
+  have hp1 : 1 ≤ p := Nat.le_trans (by simp) hp
+  have hidx : (p - 1) + 1 = p := Nat.sub_add_cancel hp1
+  have ha := a_add_d_succ (k := p - 1)
+  rw [hidx, hd] at ha
+  calc
+    D p + p = a p := Nat.sub_add_cancel (index_le_a p)
+    _ = M * v + M := by rw [← ha, hav]
+    _ = M * (v + 1) := by simp [Nat.mul_add]
+
+theorem critical_previous_D_coordinate {k delta c : Nat}
+    (hD : D (k + 1) = delta * (c + 2))
+    (hdelta : d (k + 1) = delta) :
+    D k = delta * (c + 1) + 1 := by
+  have hstep := D_succ_add_one_eq_add_d k
+  have hsum : D k + delta = (delta * (c + 1) + 1) + delta := by
+    calc
+      D k + delta = D (k + 1) + 1 := by simpa [hdelta] using hstep.symm
+      _ = delta * (c + 2) + 1 := by rw [hD]
+      _ = (delta * (c + 1) + 1) + delta := by
+        simp [Nat.mul_add, Nat.mul_two, Nat.add_assoc, Nat.add_comm,
+          Nat.add_left_comm]
+  exact Nat.add_right_cancel hsum
 
 theorem a_succ_ge_add_one {k : Nat} :
     a k + 1 ≤ a (k + 1) := by

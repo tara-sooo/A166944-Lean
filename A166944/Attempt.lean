@@ -878,4 +878,40 @@ example {P c q : Nat} (hPpos : 1 ≤ P)
     (c + 1) ^ q ∣ P - 1 :=
   moving_horizon_same_quotient_plateau_power hPpos hchain
 
+example {n : Nat} (hn : 2 ≤ n) :
+    IsDTransition n (D (n - 1)) (D n) :=
+  isDTransition_of_two_le hn
+
+example {k M : Nat} (hP : IsAttainedPreviousMaximum M k)
+    (hnew : M < d (k + 1)) :
+    ∃ p : Nat, 2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      IsCappedDPath p (k + 1) M (d (k + 1)) :=
+  attained_previous_maximum_capped_D_path hP hnew rfl
+
+example {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∃ p delta c : Nat,
+      IsCappedDPath p (k + 1) M delta ∧
+      d (k + 1) = delta ∧
+      k + 1 = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      D (k + 1) = delta * (c + 2) := by
+  rcases attained_previous_maximum_capped_D_path hP hnew rfl with
+    ⟨p, _, _, _, _, hpath⟩
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, _, hD, _, _⟩
+  exact ⟨p, d (k + 1), c, hpath, rfl, hc, hcmod, hc2, hD⟩
+
+example {M p v : Nat} (hp : 2 ≤ p) (hd : d p = M)
+    (hav : a (p - 1) = M * v) :
+    D p + p = M * (v + 1) :=
+  previous_record_D_coordinate hp hd hav
+
+example {k delta c : Nat} (hD : D (k + 1) = delta * (c + 2))
+    (hdelta : d (k + 1) = delta) :
+    D k = delta * (c + 1) + 1 :=
+  critical_previous_D_coordinate hD hdelta
+
 end A166944Research
