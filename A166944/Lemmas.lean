@@ -3579,6 +3579,84 @@ theorem moving_horizon_capped_old_path_telescope
       rw [hE, hT]
       omega
 
+theorem moving_horizon_capped_old_path_ledger
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    Cf + q = C + E ∧ sf + q = s + T := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, _, _, _, hE, hT⟩
+      omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, _, _, _, hE, hT, htail⟩
+      have hupdate := moving_horizon_step_update hstep
+      have htail' := ih htail
+      have hCf := htail'.1
+      have hsf := htail'.2
+      have hdpos : 1 ≤ d r := one_le_d_of_two_le
+        (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+      have hsr : s < r := hstep.2.1
+      constructor
+      · omega
+      · omega
+
+theorem moving_horizon_capped_old_path_canonical_ledger
+    {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    C + q = (2 * M - 2) + E ∧ s + q = (M + 2) + T :=
+  moving_horizon_capped_old_path_ledger hpath
+
+theorem moving_horizon_capped_old_path_canonical_absolute_ledger
+    {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    D s + q = (2 * M - 2) + E ∧ s + q = (M + 2) + T := by
+  have hstate := moving_horizon_capped_old_path_endpoint hpath
+  have hledger := moving_horizon_capped_old_path_canonical_ledger hpath
+  have hDs : D s = C := hstate.1.2.1
+  rcases hledger with ⟨hC, hS⟩
+  constructor
+  · rw [hDs]
+    exact hC
+  · exact hS
+
+theorem moving_horizon_capped_old_path_count_bounds
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    3 * q ≤ E ∧ E ≤ M * q ∧ 2 * q ≤ T := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨_, _, _, _, _, hE, hT⟩
+      omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, hOld, _, _, hE, hT, htail⟩
+      have htail' := ih htail
+      rcases htail' with ⟨h3q, hEq, hTq⟩
+      have hr3 : 3 ≤ r := by
+        exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+          (Nat.succ_le_of_lt hstep.2.1)
+      have hd3 : 3 ≤ d r := by
+        have hdodd : d r % 2 = 1 := d_mod_two_eq_one_of_three_le hr3
+        rcases one_or_three_le_of_mod_two_eq_one hdodd with hd1 | hd3
+        · have hbad : (1 : Nat) < 1 := by
+            simpa [hd1] using hstep.2.2.2.1
+          omega
+        · exact hd3
+      have hsr : s < r := hstep.2.1
+      have hgap : 2 ≤ r - s + 1 := by omega
+      constructor
+      · rw [hE]
+        omega
+      constructor
+      · rw [hE]
+        rw [Nat.mul_succ]
+        omega
+      · rw [hT]
+        omega
+
 theorem moving_horizon_capped_old_path_total_compression
     {M s C sf Cf E T q : Nat}
     (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)

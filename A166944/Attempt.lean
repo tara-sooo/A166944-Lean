@@ -1053,6 +1053,28 @@ example {M s C sf Cf E T q : Nat}
     ∃ kappa : Nat, E = T + kappa ∧ Cf - sf = C - s + kappa :=
   moving_horizon_capped_old_path_total_compression hpath hET
 
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    Cf + q = C + E ∧ sf + q = s + T :=
+  moving_horizon_capped_old_path_ledger hpath
+
+example {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    C + q = (2 * M - 2) + E ∧ s + q = (M + 2) + T :=
+  moving_horizon_capped_old_path_canonical_ledger hpath
+
+example {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    D s + q = (2 * M - 2) + E ∧ s + q = (M + 2) + T :=
+  moving_horizon_capped_old_path_canonical_absolute_ledger hpath
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    3 * q ≤ E ∧ E ≤ M * q ∧ 2 * q ≤ T :=
+  moving_horizon_capped_old_path_count_bounds hpath
+
 example {M sf Cf r C' E T q : Nat} (hM : 5 < M)
     (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
       sf Cf E T q)
@@ -1221,6 +1243,27 @@ example :
       omega
 
 example : D 41 = 42 ∧ D 33 ≠ 46 ∧ D 50 ≠ 66 := by decide
+
+example :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 9 11 16 41 50 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  have hD : D 41 = 50 :=
+    (moving_horizon_capped_old_path_endpoint hpath).1.2.1
+  exact (by decide : D 41 ≠ 50) hD
+
+example :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 13 15 24 33 46 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  have hD : D 33 = 46 :=
+    (moving_horizon_capped_old_path_endpoint hpath).1.2.1
+  exact (by decide : D 33 ≠ 46) hD
+
+example :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 19 21 36 50 66 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  have hD : D 50 = 66 :=
+    (moving_horizon_capped_old_path_endpoint hpath).1.2.1
+  exact (by decide : D 50 ≠ 66) hD
 
 example :
     D 15 = 24 ∧ d 17 = 5 ∧ D 17 = 28 ∧ d 18 = 9 ∧ D 18 = 36 ∧
