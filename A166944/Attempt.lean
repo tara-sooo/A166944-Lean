@@ -1521,4 +1521,16 @@ example : ¬ ∃ k : Nat, IsAttainedPreviousMaximum 60 k := by
   rcases h with ⟨k, hP⟩
   exact no_even_attained_previous_maximum hP (by decide) (by decide)
 
+-- Positive control for the proposed fundamental-predecessor chain.
+example :
+    B 12 = 2 ∧ B 13 = 1 ∧ B 14 = 0 ∧ d 13 = 1 ∧ d 14 = 1 ∧
+      d 15 = 13 ∧ B 15 + 2 = 13 := by decide
+
+example :
+    B (13 - 1) = 2 ∧ B 13 = 1 ∧ B (13 + 1) = 0 ∧
+      d (13 + 1) = 1 ∧ d 13 = 1 ∧ d (13 + 2) = 13 ∧
+      B (13 + 2) + 2 = 13 := by
+  exact canonical_record_fundamental_predecessor
+    (M := 13) (by decide) (by decide) (by decide) (by decide) (by decide)
+
 end A166944Research

@@ -3627,6 +3627,166 @@ theorem moving_horizon_capped_old_path_endpoint
       rcases hpath with ⟨_, _, _, r, C', E', T', _, _, _, _, _, _, htail⟩
       exact ih htail
 
+theorem moving_horizon_step_interval_B_envelope
+    {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hstart : B s + 2 ≤ 2 * M) (hend : B r + 2 ≤ 2 * M) :
+    ∀ j : Nat, s ≤ j → j ≤ r → B j + 2 ≤ 2 * M := by
+  rcases hstep with
+    ⟨hstate, hsr, hrC, hdr, hfirst, hD, hC', hg, hstateR⟩
+  intro j hsj hjr
+  by_cases hjeq : j = r
+  · simpa [hjeq] using hend
+  have hjlt : j < r := Nat.lt_of_le_of_ne hjr hjeq
+  have hsum : s + (j - s) = j := by omega
+  have hone : ∀ l : Nat, s < l → l ≤ s + (j - s) → d l = 1 := by
+    intro l hsl hlj
+    have hlj' : l ≤ j := by omega
+    exact hfirst l hsl (Nat.lt_of_le_of_lt hlj' hjlt)
+  have htail := one_interval_const_D_B hstate.1 hone
+  rw [hsum] at htail
+  omega
+
+theorem moving_horizon_capped_old_path_maximum_transport
+    {M s C sf Cf E T q : Nat}
+    (hP : IsAttainedPreviousMaximum M s)
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    IsAttainedPreviousMaximum M sf := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, _, _, _, hE, hT⟩
+      subst sf
+      exact hP
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, hold, _, _, hE, hT, htail⟩
+      rcases hstep with
+        ⟨hstate, hsr, hrC, hdr, hfirst, hD, hC', hg, hstateR⟩
+      have hmax := moving_horizon_max_transfer hP hsr hdr hfirst
+      have hPr : IsAttainedPreviousMaximum M r := by
+        rcases hmax with h | h
+        · exact h.2
+        · omega
+      exact ih hPr htail
+
+theorem moving_horizon_capped_old_path_B_envelope
+    {M s C sf Cf E T q : Nat} (hM5 : 5 < M)
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    ∀ j : Nat, s ≤ j → j ≤ sf → B j + 2 ≤ 2 * M := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, hstate, hslack, hB, hE, hT⟩
+      intro j hsj hjsf
+      have hjeq : j = s := by omega
+      subst j
+      have hcoord := moving_horizon_slack_coordinate hstate
+      omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨hstate, hslack, hB, r, C', E', T', hstep, hold, hslack',
+          hBr, hE, hT, htail⟩
+      rcases hstep with
+        ⟨hstateStep, hsr, hrC, hdr, hfirst, hD, hC', hg, hstateR⟩
+      have hstep' : IsMovingHorizonStep s C r C' :=
+        ⟨hstateStep, hsr, hrC, hdr, hfirst, hD, hC', hg, hstateR⟩
+      have hstart : B s + 2 ≤ 2 * M := by
+        have hcoord := moving_horizon_slack_coordinate hstate
+        omega
+      have hend : B r + 2 ≤ 2 * M := by
+        have hcoord := moving_horizon_slack_coordinate hstateR
+        omega
+      intro j hsj hjsf
+      by_cases hjr : j < r
+      · exact moving_horizon_step_interval_B_envelope hstep' hstart hend j hsj
+          (Nat.le_of_lt hjr)
+      · have hrj : r ≤ j := Nat.le_of_not_gt hjr
+        exact ih htail j hrj hjsf
+
+theorem moving_horizon_dangerous_suffix_maximum_transport
+    {M s C sf Cf q : Nat}
+    (hP : IsAttainedPreviousMaximum M s)
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    IsAttainedPreviousMaximum M sf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hsuffix with ⟨hsf, hCf, _, _, _, _⟩
+      subst sf
+      exact hP
+  | succ q ih =>
+      rcases hsuffix with
+        ⟨_, _, _, _, r, C', hstep, hold, _, _, _, htail⟩
+      rcases hstep with
+        ⟨hstate, hsr, hrC, hdr, hfirst, hD, hC', hg, hstateR⟩
+      have hmax := moving_horizon_max_transfer hP hsr hdr hfirst
+      have hPr : IsAttainedPreviousMaximum M r := by
+        rcases hmax with h | h
+        · exact h.2
+        · omega
+      exact ih hPr htail
+
+theorem moving_horizon_dangerous_suffix_B_envelope
+    {M s C sf Cf q : Nat}
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    ∀ j : Nat, s ≤ j → j ≤ sf → B j + 2 ≤ 2 * M := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hsuffix with ⟨hsf, hCf, hstate, hdanger, hbound, hB⟩
+      intro j hsj hjsf
+      have hjeq : j = s := by omega
+      subst j
+      exact hbound
+  | succ q ih =>
+      rcases hsuffix with
+        ⟨hstate, hdanger, hbound, hB, r, C', hstep, hold, hcross,
+          hbound', hBr, htail⟩
+      intro j hsj hjsf
+      by_cases hjr : j < r
+      · exact moving_horizon_step_interval_B_envelope hstep hbound hbound' j hsj
+          (Nat.le_of_lt hjr)
+      · have hrj : r ≤ j := Nat.le_of_not_gt hjr
+        exact ih htail j hrj hjsf
+
+theorem moving_horizon_terminal_dangerous_excursion_next_record
+    {M delta sf Cf rf Cf' c : Nat} (hM5 : 5 < M)
+    (hPstart : IsAttainedPreviousMaximum M (M + 2))
+    (hpath : HasMovingHorizonTerminalDangerousExcursion
+      M delta sf Cf rf Cf' c) :
+    IsDifferenceRecord delta ∧
+      (∀ j : Nat, M + 2 < j → j < rf → d j ≤ M) := by
+  rcases hpath with
+    ⟨s, C, r, C', E, T, q₀, q₁, hprefix, hsstate, hsbound, hsB,
+      hstep, hold, hcross, hband, hBr, hsuffix, hfinal, hnew, hdelta,
+      hrf, hcmod, hc2, hCf'⟩
+  rcases hstep with
+    ⟨hstateS, hsr, hrC, hdr, hfirst, hD, hCstep, hgrowth, hstateR⟩
+  have hPs := moving_horizon_capped_old_path_maximum_transport
+    hPstart hprefix
+  have hmax := moving_horizon_max_transfer hPs hsr hdr hfirst
+  have hPr : IsAttainedPreviousMaximum M r := by
+    rcases hmax with h | h
+    · exact h.2
+    · omega
+  have hPsf := moving_horizon_dangerous_suffix_maximum_transport hPr hsuffix
+  rcases hfinal with
+    ⟨hstateF, hsf_rf, hrfCf, hdfinal, hfirstF, hDfinal, hCfFinal, hgFinal,
+      hstateRF⟩
+  have hcap : ∀ j : Nat, M + 2 < j → j < rf → d j ≤ M := by
+    intro j hjstart hjrf
+    by_cases hjsf : j ≤ sf
+    · exact hPsf.1 j (by omega) hjsf
+    · have hsfj : sf < j := Nat.lt_of_not_ge hjsf
+      have hunit := hfirstF j hsfj hjrf
+      omega
+  have hprior : ∀ j : Nat, 2 ≤ j → j < rf → d j < delta := by
+    intro j hj2 hjrf
+    by_cases hjsf : j ≤ sf
+    · exact Nat.lt_of_le_of_lt (hPsf.1 j hj2 hjsf) hnew
+    · have hsfj : sf < j := Nat.lt_of_not_ge hjsf
+      have hunit := hfirstF j hsfj hjrf
+      omega
+  have hsf2 : 2 ≤ sf := hstateF.1
+  have hrf2 : 2 ≤ rf := by omega
+  exact ⟨⟨rf, hrf2, hdelta, hprior⟩, hcap⟩
+
 theorem moving_horizon_capped_old_path_telescope
     {M s C sf Cf E T q : Nat}
     (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
@@ -4624,6 +4784,83 @@ theorem B_zero_transition {k : Nat} (hk : 2 ≤ k) (hB : B k = 0) :
       B (k + 1) + 2 = B k + d (k + 1) := hstep
       _ = k - 1 := by rw [hB, hd]; simp
   exact ⟨hd, hnext⟩
+
+theorem canonical_record_fundamental_predecessor {M : Nat}
+    (hM5 : 5 < M) (hModd : M % 2 = 1)
+    (ha : a (M + 1) = 2 * M) (hdp : d (M + 2) = M)
+    (hBcanon : B (M + 2) + 2 = M) :
+    B (M - 1) = 2 ∧ B M = 1 ∧ B (M + 1) = 0 ∧
+      d (M + 1) = 1 ∧ d M = 1 ∧ d (M + 2) = M ∧
+      B (M + 2) + 2 = M := by
+  have hM2 : 2 ≤ M := by omega
+  have hM3 : 3 ≤ M := by omega
+  have hMminus2 : 2 ≤ M - 1 := by omega
+  have hidx : M - 1 + 1 = M := by omega
+  have hBsucc : B (M + 1) = 0 := by
+    simp only [B]
+    rw [ha]
+    omega
+  have hstepM := excess_succ_add_two hM2
+  rw [hBsucc] at hstepM
+  have hBMmod := B_mod_two_of_two_le hM2
+  have hdnextpos : 1 ≤ d (M + 1) :=
+    one_le_d_of_two_le (by omega)
+  have hdnextmod := d_mod_two_eq_one_of_three_le (by omega : 3 ≤ M + 1)
+  have hBM : B M = 1 := by omega
+  have hdnext : d (M + 1) = 1 := by omega
+  have hstepMminus := excess_succ_add_two hMminus2
+  rw [hidx, hBM] at hstepMminus
+  have hBminusmod := B_mod_two_of_two_le hMminus2
+  have hdMpos : 1 ≤ d M := one_le_d_of_two_le hM2
+  have hdMmod := d_mod_two_eq_one_of_three_le hM3
+  have hBminus : B (M - 1) = 2 := by
+    by_cases hzero : B (M - 1) = 0
+    · have hzero' := B_zero_transition hMminus2 hzero
+      rw [hidx] at hzero'
+      omega
+    · have hpos : 1 ≤ B (M - 1) := Nat.one_le_iff_ne_zero.mpr hzero
+      omega
+  have hdM : d M = 1 := by omega
+  exact ⟨hBminus, hBM, hBsucc, hdnext, hdM, hdp, hBcanon⟩
+
+theorem critical_previous_record_provenance_with_fundamental
+    {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ p : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      IsDifferenceRecord M ∧ 5 < M ∧ M % 2 = 1 ∧
+      p = M + 2 ∧ a (M + 1) = 2 * M ∧ B p + 2 = M ∧
+      D p + p = M * 3 ∧ D p = 2 * M - 2 ∧
+      B (M - 1) = 2 ∧ B M = 1 ∧ B (M + 1) = 0 ∧
+      d (M + 1) = 1 ∧ d M = 1 ∧ d (M + 2) = M ∧
+      B (M + 2) + 2 = M := by
+  rcases critical_previous_record_provenance hk hP hIH hnew hfail henv with
+    ⟨p, hp2, hpk, hdp, hprior, hrec, hM5, hModd, hp, ha, hB, hcoord, hD⟩
+  have hdp' : d (M + 2) = M := by simpa [hp] using hdp
+  have hB' : B (M + 2) + 2 = M := by simpa [hp] using hB
+  have hfund := canonical_record_fundamental_predecessor
+    hM5 hModd ha hdp' hB'
+  rcases hfund with ⟨hBm, hBM, hBsucc, hdnext, hdM, hdp', hB'⟩
+  exact ⟨p, hp2, hpk, hdp, hprior, hrec, hM5, hModd, hp, ha, hB,
+    hcoord, hD, hBm, hBM, hBsucc, hdnext, hdM, hdp', hB'⟩
+
+theorem canonical_record_attained_previous_maximum
+    {M p : Nat} (hp2 : 2 ≤ p) (hdp : d p = M)
+    (hprior : ∀ j : Nat, 2 ≤ j → j < p → d j < M)
+  (hp : p = M + 2) :
+    IsAttainedPreviousMaximum M (M + 2) := by
+  have hdp' : d (M + 2) = M := by simpa [hp] using hdp
+  refine ⟨?_, ⟨M + 2, by omega, Nat.le_refl _, hdp'⟩⟩
+  intro j hj2 hjle
+  by_cases hjeq : j = M + 2
+  · have hdeq : d j = M := by simpa [hjeq, hp] using hdp
+    exact Nat.le_of_eq hdeq
+  · have hjp : j < p := by omega
+    exact Nat.le_of_lt (hprior j hj2 hjp)
 
 theorem odd_failure_fundamental_distance {k M m : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
