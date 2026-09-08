@@ -1402,4 +1402,85 @@ example :
     decide
   · simp [IsMovingHorizonState, D, a]
 
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e h, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf ∧
+          Cf - sf = e * h ∧ h % 2 = 0 ∧ 2 ≤ h) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2 ∧
+          Cf - sf + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h)) :=
+  moving_horizon_capped_old_path_endpoint_slack hpath hq
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e h, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧ Cf - sf ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf ∧
+          Cf - sf = e * h ∧ h % 2 = 0 ∧ 2 ≤ h ∧
+          2 * e ≤ Cf - sf ∧ 2 * e ≤ M) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2 ∧
+          Cf - sf + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h ∧
+          3 * e ≤ Cf - sf + 4 ∧ 3 * e ≤ M + 4)) :=
+  moving_horizon_capped_old_path_endpoint_slack_bounds hpath hq
+
+example {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    (q = 0 ∧ s = M + 2 ∧ C = 2 * M - 2) ∨
+      (1 ≤ q ∧
+        ∃ e h, e = d s ∧ 3 ≤ e ∧ e ≤ M ∧
+          ((s % 2 = 0 ∧ e ∣ s ∧ e ∣ C ∧
+              C - s = e * h ∧ h % 2 = 0 ∧ 2 ≤ h) ∨
+            (s % 2 = 1 ∧ e ∣ s - 2 ∧ e ∣ C + 2 ∧
+              C - s + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h))) :=
+  moving_horizon_canonical_endpoint_slack_or_zero hpath
+
+example : ¬ ∃ E T q,
+    HasMovingHorizonCappedOldPath 9 11 16 41 50 E T q :=
+  moving_horizon_no_canonical_prefix_A
+
+example : ¬ ∃ E T q,
+    HasMovingHorizonCappedOldPath 13 15 24 33 46 E T q :=
+  moving_horizon_no_canonical_prefix_B
+
+example : ¬ ∃ E T q,
+    HasMovingHorizonCappedOldPath 19 21 36 50 66 E T q :=
+  moving_horizon_no_canonical_prefix_C
+
+example
+    {M s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ E T q e : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hmid : HasMovingHorizonCappedOldPath M r₁ C₁ r₂ C₂ E T q)
+    (hstep₂ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (he₁ : d r₁ = e) (he₂ : d r₃ = e)
+    (hpar : r₁ % 2 = r₃ % 2) (hq : 1 ≤ q) :
+    e ∣ E - q - 1 ∧ e + q + 1 ≤ E :=
+  moving_horizon_same_parity_return_ledger
+    hstep₁ hmid hstep₂ he₁ he₂ hpar hq
+
+-- Smallest bounded abstract grammar survivor for the strict middle-event
+-- ascent candidate; this is not a recurrence path or a Lean path witness.
+example :
+    (65 - 2 = 7 * 9 ∧ 118 + 1 = 7 * 17 ∧ Nat.gcd 9 17 = 1 ∧
+      (17 - 9) % 2 = 0 ∧ 2 ≤ 17 - 9 ∧
+      124 + 2 = 7 * (17 + 1) ∧ 124 - 65 + 4 = 7 * (17 - 9 + 1)) ∧
+    (66 = 3 * 22 ∧ 124 - 1 = 3 * 41 ∧ Nat.gcd 22 41 = 1 ∧
+      (41 - 22) % 2 = 1 ∧ 1 ≤ 41 - 22 ∧
+      126 = 3 * (41 + 1) ∧ 126 - 66 = 3 * (41 - 22 + 1)) ∧
+    (70 = 5 * 14 ∧ 126 - 1 = 5 * 25 ∧ Nat.gcd 14 25 = 1 ∧
+      (25 - 14) % 2 = 1 ∧ 1 ≤ 25 - 14 ∧
+      130 = 5 * (25 + 1) ∧ 130 - 70 = 5 * (25 - 14 + 1)) ∧
+    (72 = 3 * 24 ∧ 130 - 1 = 3 * 43 ∧ Nat.gcd 24 43 = 1 ∧
+      (43 - 24) % 2 = 1 ∧ 1 ≤ 43 - 24 ∧
+      132 = 3 * (43 + 1) ∧ 132 - 72 = 3 * (43 - 24 + 1)) ∧
+    (79 - 2 = 7 * 11 ∧ 132 + 1 = 7 * 19 ∧ Nat.gcd 11 19 = 1 ∧
+      (19 - 11) % 2 = 0 ∧ 2 ≤ 19 - 11 ∧
+      138 + 2 = 7 * (19 + 1) ∧ 138 - 79 + 4 = 7 * (19 - 11 + 1)) ∧
+    (7 ∣ 11 - 3 - 1 ∧ 7 + 3 + 1 ≤ 11 ∧
+      ¬ (3 > 7 ∨ 5 > 7 ∨ 3 > 7)) := by decide
+
+example {e f : Nat} (h : e ∣ f - 1 - 1) : e ∣ f - 2 := by
+  omega
+
 end A166944Research

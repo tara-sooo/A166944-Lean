@@ -6098,4 +6098,215 @@ theorem moving_horizon_aba_ascent
   have hele : e ≤ f - 2 := Nat.le_of_dvd hpos hdiv
   exact ⟨hdiv, by omega⟩
 
+theorem moving_horizon_capped_old_path_endpoint_slack
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e h, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf ∧
+          Cf - sf = e * h ∧ h % 2 = 0 ∧ 2 ≤ h) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2 ∧
+          Cf - sf + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h)) := by
+  induction q generalizing s C E T with
+  | zero => omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, hold, _, _, _, _, htail⟩
+      cases q with
+      | zero =>
+          rcases htail with ⟨hsf, hCf, _, _, _, _, _⟩
+          subst sf
+          subst Cf
+          rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+          · rcases moving_horizon_even_factor_pair hstep rfl hreven with
+              ⟨u, v, hu, hv, _, hgap, hgap1, hC'⟩
+            have huv : u ≤ v := by omega
+            have hprod : d r * u ≤ d r * v :=
+              Nat.mul_le_mul_left (d r) huv
+            have hslack : C' - r = d r * (v - u + 1) := by
+              have hfirst : d r * (v + 1) - r =
+                  (d r * v - d r * u) + d r := by
+                rw [Nat.mul_add]
+                omega
+              rw [hC']
+              calc
+                d r * (v + 1) - r =
+                    (d r * v - d r * u) + d r := hfirst
+                _ = d r * (v - u) + d r := by
+                      rw [Nat.mul_sub_left_distrib]
+                _ = d r * (v - u + 1) := by
+                      rw [Nat.mul_add]
+                      simp [Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+            refine ⟨d r, v - u + 1, rfl,
+              moving_horizon_step_event_ge_three hstep, hold,
+              Or.inl ⟨hreven, ⟨u, hu⟩, ⟨v + 1, hC'⟩,
+                hslack, ?_, by omega⟩⟩
+            simp [Nat.add_mod, hgap]
+          · rcases moving_horizon_odd_factor_pair hstep rfl hrodd with
+              ⟨u, v, hu, hv, _, hgap, hgap2, hC'⟩
+            have huv : u ≤ v := by omega
+            have hprod : d r * u ≤ d r * v :=
+              Nat.mul_le_mul_left (d r) huv
+            have hslack : C' - r + 4 = d r * (v - u + 1) := by
+              have hr2 : 2 ≤ r :=
+                Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1)
+              have hrC' : r ≤ C' :=
+                Nat.le_of_lt hstep.2.2.2.2.2.2.2.2.2.2
+              have hshift : C' - r + 4 = (C' + 2) - (r - 2) := by
+                omega
+              have hfirst : d r * (v + 1) - (r - 2) =
+                  (d r * v - d r * u) + d r := by
+                rw [Nat.mul_add]
+                omega
+              rw [hshift, hC']
+              calc
+                d r * (v + 1) - (r - 2) =
+                    (d r * v - d r * u) + d r := hfirst
+                _ = d r * (v - u) + d r := by
+                      rw [Nat.mul_sub_left_distrib]
+                _ = d r * (v - u + 1) := by
+                      rw [Nat.mul_add]
+                      simp [Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+            refine ⟨d r, v - u + 1, rfl,
+              moving_horizon_step_event_ge_three hstep, hold,
+              Or.inr ⟨hrodd, ⟨u, hu⟩, ⟨v + 1, hC'⟩,
+                hslack, ?_, by omega⟩⟩
+            simp [Nat.add_mod, hgap]
+      | succ q =>
+          exact ih htail (by simp)
+
+theorem moving_horizon_canonical_endpoint_slack_or_zero
+    {M s C E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q) :
+    (q = 0 ∧ s = M + 2 ∧ C = 2 * M - 2) ∨
+      (1 ≤ q ∧
+        ∃ e h, e = d s ∧ 3 ≤ e ∧ e ≤ M ∧
+          ((s % 2 = 0 ∧ e ∣ s ∧ e ∣ C ∧
+              C - s = e * h ∧ h % 2 = 0 ∧ 2 ≤ h) ∨
+            (s % 2 = 1 ∧ e ∣ s - 2 ∧ e ∣ C + 2 ∧
+              C - s + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h))) := by
+  cases q with
+  | zero =>
+      left
+      rcases hpath with ⟨hs, hC, _, _, _, _, _⟩
+      exact ⟨rfl, hs.symm, hC.symm⟩
+  | succ q =>
+      right
+      refine ⟨by simp, ?_⟩
+      exact moving_horizon_capped_old_path_endpoint_slack hpath (by simp)
+
+theorem moving_horizon_capped_old_path_endpoint_slack_bounds
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e h, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧ Cf - sf ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf ∧
+          Cf - sf = e * h ∧ h % 2 = 0 ∧ 2 ≤ h ∧
+          2 * e ≤ Cf - sf ∧ 2 * e ≤ M) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2 ∧
+          Cf - sf + 4 = e * h ∧ h % 2 = 1 ∧ 3 ≤ h ∧
+          3 * e ≤ Cf - sf + 4 ∧ 3 * e ≤ M + 4)) := by
+  have hcap := moving_horizon_capped_old_path_endpoint hpath
+  rcases moving_horizon_capped_old_path_endpoint_slack hpath hq with
+    ⟨e, h, he, he3, heM, hcase⟩
+  refine ⟨e, h, he, he3, heM, hcap.2.1, ?_⟩
+  rcases hcase with heven | hodd
+  · rcases heven with ⟨hpar, hdivs, hdivc, hL, hmod, h2⟩
+    have hmul : 2 * e ≤ e * h := by
+      simpa [Nat.mul_comm] using Nat.mul_le_mul_left e h2
+    rw [← hL] at hmul
+    exact Or.inl ⟨hpar, hdivs, hdivc, hL, hmod, h2, hmul, by omega⟩
+  · rcases hodd with ⟨hpar, hdivs, hdivc, hL, hmod, h3⟩
+    have hmul : 3 * e ≤ e * h := by
+      simpa [Nat.mul_comm] using Nat.mul_le_mul_left e h3
+    have hL3 : 3 * e ≤ Cf - sf + 4 := by
+      rw [hL]
+      exact hmul
+    exact Or.inr ⟨hpar, hdivs, hdivc, hL, hmod, h3, hL3, by omega⟩
+
+theorem moving_horizon_no_canonical_prefix_A :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 9 11 16 41 50 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  rcases moving_horizon_canonical_endpoint_slack_or_zero hpath with
+    hzero | hnonempty
+  · omega
+  · rcases hnonempty with ⟨hq, e, h, he, he3, he9, hcase⟩
+    rcases hcase with heven | hodd
+    · exact (by decide : ¬ (41 % 2 = 0)) heven.1
+    · have hEq : e * h = 13 := by omega
+      have hcases : e = 3 ∨ e = 4 ∨ e = 5 ∨ e = 6 ∨
+          e = 7 ∨ e = 8 ∨ e = 9 := by omega
+      rcases hcases with rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> omega
+
+theorem moving_horizon_no_canonical_prefix_B :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 13 15 24 33 46 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  rcases moving_horizon_canonical_endpoint_slack_or_zero hpath with
+    hzero | hnonempty
+  · omega
+  · rcases hnonempty with ⟨hq, e, h, he, he3, he13, hcase⟩
+    rcases hcase with heven | hodd
+    · exact (by decide : ¬ (33 % 2 = 0)) heven.1
+    · have hEq : e * h = 17 := by omega
+      have hcases : e = 3 ∨ e = 4 ∨ e = 5 ∨ e = 6 ∨
+          e = 7 ∨ e = 8 ∨ e = 9 ∨ e = 10 ∨ e = 11 ∨
+          e = 12 ∨ e = 13 := by omega
+      rcases hcases with rfl | rfl | rfl | rfl | rfl | rfl |
+          rfl | rfl | rfl | rfl | rfl <;> omega
+
+theorem moving_horizon_no_canonical_prefix_C :
+    ¬ ∃ E T q, HasMovingHorizonCappedOldPath 19 21 36 50 66 E T q := by
+  rintro ⟨E, T, q, hpath⟩
+  rcases moving_horizon_canonical_endpoint_slack_or_zero hpath with
+    hzero | hnonempty
+  · omega
+  · rcases hnonempty with ⟨hq, e, h, he, he3, he19, hcase⟩
+    rcases hcase with heven | hodd
+    · have h50 : e ∣ 50 := by simpa using heven.2.1
+      have h66 : e ∣ 66 := by simpa using heven.2.2.1
+      have h16 : e ∣ 16 := by
+        have h := Nat.dvd_sub h66 h50
+        simpa using h
+      have h48 : e ∣ 48 := by
+        have h := Nat.dvd_mul_right_of_dvd h16 3
+        simpa using h
+      have h2 : e ∣ 2 := by
+        have h := Nat.dvd_sub h50 h48
+        simpa using h
+      have hele : e ≤ 2 := Nat.le_of_dvd (by decide) h2
+      omega
+    · exact (by decide : ¬ (50 % 2 = 1)) hodd.1
+
+theorem moving_horizon_same_parity_return_ledger
+    {M s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ E T q e : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hmid : HasMovingHorizonCappedOldPath M r₁ C₁ r₂ C₂ E T q)
+    (hstep₂ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (he₁ : d r₁ = e) (he₂ : d r₃ = e)
+    (hpar : r₁ % 2 = r₃ % 2) (hq : 1 ≤ q) :
+    e ∣ E - q - 1 ∧ e + q + 1 ≤ E := by
+  have hcount := moving_horizon_capped_old_path_count_bounds hmid
+  have hledger := moving_horizon_capped_old_path_ledger hmid
+  have hupdate := moving_horizon_step_update hstep₁
+  rw [he₁] at hupdate
+  have he3 : 3 ≤ e := by
+    rw [← he₁]
+    exact moving_horizon_step_event_ge_three hstep₁
+  have hdrift := moving_horizon_same_parity_event_drift
+    hstep₁ hstep₂ he₁ he₂ hpar
+  have hCdiff : C₂ - C₀ = E - q + (e - 1) := by
+    omega
+  have hdiv0 : e ∣ E - q + (e - 1) := by
+    rw [← hCdiff]
+    exact hdrift.2
+  have hdiv1 := Nat.dvd_sub hdiv0 (Nat.dvd_refl e)
+  have hdivEq : E - q + (e - 1) - e = E - q - 1 := by
+    omega
+  rw [hdivEq] at hdiv1
+  have hpos : 0 < E - q - 1 := by
+    omega
+  have hele : e ≤ E - q - 1 := Nat.le_of_dvd hpos hdiv1
+  exact ⟨hdiv1, by omega⟩
+
 end A166944Research
