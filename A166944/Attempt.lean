@@ -1063,4 +1063,61 @@ example {M sf Cf r C' E T q : Nat} (hM : 5 < M)
       C' - r = Cf - sf + kappa ∧ 5 + T ≤ E + kappa :=
   moving_horizon_capped_old_path_first_crossing hM hpath hstep hold hcross
 
+example {M s C sf Cf q : Nat} (hM : 5 < M)
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    IsMovingHorizonState sf Cf ∧ M < Cf - sf ∧
+      Cf - sf ≤ 2 * M - 4 ∧ B sf ≠ 2 :=
+  moving_horizon_dangerous_suffix_endpoint_band hM hsuffix
+
+example {M s C sf Cf q : Nat} (hM : 5 < M)
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    IsMovingHorizonState s C ∧ M < C - s ∧
+      C - s ≤ 2 * M - 4 ∧ B s ≠ 2 :=
+  moving_horizon_dangerous_suffix_start_band hM hsuffix
+
+example {M delta sf Cf rf Cf' c : Nat} (hM : 5 < M)
+    (hpath : HasMovingHorizonTerminalDangerousExcursion
+      M delta sf Cf rf Cf' c) :
+    IsMovingHorizonState sf Cf ∧ M < Cf - sf ∧
+      Cf - sf ≤ 2 * M - 4 ∧ B sf ≠ 2 :=
+  moving_horizon_terminal_dangerous_excursion_endpoint_band hM hpath
+
+example {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hslack : C - s ≤ M) (hcross : M < C' - r) :
+    (r % 2 = 0 ∧
+        ∃ q : Nat, C - s = (r - s) + 1 + d r * q ∧
+          q % 2 = 1 ∧ 1 ≤ q ∧ C' - r = d r * (q + 1) ∧
+          d r * q + 2 ≤ M ∧ M < d r * (q + 1)) ∨
+      (r % 2 = 1 ∧
+        ∃ q : Nat, C - s + 3 = (r - s) + d r * q ∧
+          q % 2 = 0 ∧ 2 ≤ q ∧ C' - r + 4 = d r * (q + 1) ∧
+          d r * q ≤ M + 2 ∧ M + 4 < d r * (q + 1)) :=
+  moving_horizon_terminal_crossing_threshold hstep hslack hcross
+
+example {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    r % 2 = 0 ∧ C - 1 = r + delta ∧
+      C - 1 = delta * (c + 1) ∧ (c + 1) % 2 = 1 ∧ 3 ≤ c + 1 :=
+  moving_horizon_critical_predecessor_factorization hstep hcrit
+
+example {M delta Y s C r C' c : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * M) (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    M + 2 ≤ delta ∧ Y + (r - s) + 7 ≤ M ∧ r - s < delta :=
+  moving_horizon_critical_short_tail hstep hYs hModd hnew hcrit
+
+example {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    C - 1 = delta * (c + 1) ∧
+      delta = Nat.gcd r (C - 1) ∧
+      (∀ j : Nat, s < j → j < r →
+        (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+        (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1)) :=
+  moving_horizon_critical_predecessor_first_hit hstep hcrit
+
 end A166944Research

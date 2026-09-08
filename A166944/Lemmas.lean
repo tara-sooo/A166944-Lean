@@ -3614,6 +3614,91 @@ theorem moving_horizon_capped_old_path_first_crossing
     omega
   exact ⟨kappa, hk, hκpos, hold, hκslack, hbudget⟩
 
+theorem moving_horizon_dangerous_suffix_endpoint_band
+    {M s C sf Cf q : Nat} (hM : 5 < M)
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    IsMovingHorizonState sf Cf ∧ M < Cf - sf ∧
+      Cf - sf ≤ 2 * M - 4 ∧ B sf ≠ 2 := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hsuffix with ⟨hsf, hCf, hstate, hdanger, hband, hB⟩
+      subst sf
+      subst Cf
+      have hcoord := moving_horizon_slack_coordinate hstate
+      refine ⟨hstate, hdanger, ?_, hB⟩
+      omega
+  | succ q ih =>
+      rcases hsuffix with
+        ⟨_, _, _, _, r, C', _, _, _, _, _, htail⟩
+      exact ih htail
+
+theorem moving_horizon_dangerous_suffix_start_band
+    {M s C sf Cf q : Nat} (hM : 5 < M)
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    IsMovingHorizonState s C ∧ M < C - s ∧
+      C - s ≤ 2 * M - 4 ∧ B s ≠ 2 := by
+  cases q with
+  | zero =>
+      rcases hsuffix with ⟨hs, hC, hstate, hdanger, hband, hB⟩
+      subst sf
+      subst Cf
+      have hcoord := moving_horizon_slack_coordinate hstate
+      refine ⟨hstate, hdanger, ?_, hB⟩
+      omega
+  | succ q =>
+      rcases hsuffix with ⟨hstate, hdanger, hband, hB, _, _, _, _, _, _⟩
+      have hcoord := moving_horizon_slack_coordinate hstate
+      refine ⟨hstate, hdanger, ?_, hB⟩
+      omega
+
+theorem moving_horizon_terminal_dangerous_excursion_endpoint_band
+    {M delta sf Cf rf Cf' c : Nat} (hM : 5 < M)
+    (hpath : HasMovingHorizonTerminalDangerousExcursion
+      M delta sf Cf rf Cf' c) :
+    IsMovingHorizonState sf Cf ∧ M < Cf - sf ∧
+      Cf - sf ≤ 2 * M - 4 ∧ B sf ≠ 2 := by
+  rcases hpath with
+    ⟨s, C, r, C', E, T, q₀, q₁, hprefix, hs, hsafe, hBs,
+      hstep, hold, hcross, hband, hBr, hsuffix, hfinal, hnew, hdelta,
+      hrf, hcmod, hc2, hCf'⟩
+  exact moving_horizon_dangerous_suffix_endpoint_band hM hsuffix
+
+theorem moving_horizon_terminal_crossing_threshold
+    {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hslack : C - s ≤ M) (hcross : M < C' - r) :
+    (r % 2 = 0 ∧
+        ∃ q : Nat, C - s = (r - s) + 1 + d r * q ∧
+          q % 2 = 1 ∧ 1 ≤ q ∧ C' - r = d r * (q + 1) ∧
+          d r * q + 2 ≤ M ∧ M < d r * (q + 1)) ∨
+      (r % 2 = 1 ∧
+        ∃ q : Nat, C - s + 3 = (r - s) + d r * q ∧
+          q % 2 = 0 ∧ 2 ≤ q ∧ C' - r + 4 = d r * (q + 1) ∧
+          d r * q ≤ M + 2 ∧ M + 4 < d r * (q + 1)) := by
+  have hdist : 1 ≤ r - s := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_comm] using Nat.succ_le_of_lt hstep.2.1
+  rcases Nat.mod_two_eq_zero_or_one r with heven | hodd
+  · left
+    rcases moving_horizon_even_quotient_normal_form hstep heven with
+      ⟨q, hL, hqmod, hq1, hL'⟩
+    have hqbound : d r * q + 2 ≤ M := by
+      have hlow : d r * q + 2 ≤ C - s := by omega
+      exact Nat.le_trans hlow hslack
+    have hcross' : M < d r * (q + 1) := by
+      rw [← hL']
+      exact hcross
+    exact ⟨heven, q, hL, hqmod, hq1, hL', hqbound, hcross'⟩
+  · right
+    have hodd' : r % 2 = 1 := by
+      exact hodd
+    rcases moving_horizon_odd_quotient_normal_form hstep hodd' with
+      ⟨q, hL, hqmod, hq2, hL'⟩
+    have hqbound : d r * q ≤ M + 2 := by
+      omega
+    have hcross' : M + 4 < d r * (q + 1) := by
+      omega
+    exact ⟨hodd', q, hL, hqmod, hq2, hL', hqbound, hcross'⟩
+
 theorem moving_horizon_normalized_close_old_excess
     {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
     (hnorm : C - s = 2 * P)
@@ -5306,5 +5391,86 @@ theorem critical_entry_cumulative_compression
   constructor
   · omega
   · omega
+
+theorem moving_horizon_critical_predecessor_factorization
+    {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    r % 2 = 0 ∧ C - 1 = r + delta ∧
+      C - 1 = delta * (c + 1) ∧ (c + 1) % 2 = 1 ∧ 3 ≤ c + 1 := by
+  rcases hcrit with ⟨hdelta, hc, hcmod, hc2, hC'⟩
+  have hq := moving_horizon_critical_even_q_one hstep
+    ⟨hdelta, hc, hcmod, hc2, hC'⟩
+  rcases hq with ⟨q, hL, hqmod, hq1, hL', hqeq⟩
+  have hL1 : C - s = (r - s) + 1 + delta := by
+    simpa [hdelta, hqeq] using hL
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hdeltaodd : delta % 2 = 1 := by
+    rw [← hdelta]
+    exact d_mod_two_eq_one_of_three_le hr3
+  have hreven : r % 2 = 0 := by
+    rw [hc]
+    simp [Nat.mul_mod, hcmod]
+  have hsC : s ≤ C := Nat.le_of_lt hstep.1.2.2
+  have hsr : s ≤ r := Nat.le_of_lt hstep.2.1
+  have hCs : (C - s) + s = C := Nat.sub_add_cancel hsC
+  have hrs : (r - s) + s = r := Nat.sub_add_cancel hsr
+  have hC : C = r + delta + 1 := by
+    calc
+      C = (C - s) + s := hCs.symm
+      _ = ((r - s) + 1 + delta) + s := by rw [hL1]
+      _ = (r - s + s) + delta + 1 := by omega
+      _ = r + delta + 1 := by rw [hrs]
+  have hCminus : C - 1 = r + delta := by omega
+  have hfactor : C - 1 = delta * (c + 1) := by
+    calc
+      C - 1 = r + delta := hCminus
+      _ = delta * c + delta := by rw [hc]
+      _ = delta * (c + 1) := by simp [Nat.mul_succ]
+  refine ⟨hreven, hCminus, hfactor, ?_, ?_⟩
+  · simp [Nat.add_mod, hcmod]
+  · omega
+
+theorem moving_horizon_critical_short_tail
+    {M delta Y s C r C' c : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * M) (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    M + 2 ≤ delta ∧ Y + (r - s) + 7 ≤ M ∧ r - s < delta := by
+  have hbarrier := moving_horizon_critical_entry_barrier
+    hstep hYs hModd hnew hcrit
+  have hentry : Y + (r - s) + delta + 5 = 2 * M := hbarrier.2.2.1
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hdeltaodd : delta % 2 = 1 := by
+    rw [← hcrit.1]
+    exact d_mod_two_eq_one_of_three_le hr3
+  have hdelta2 : M + 2 ≤ delta := by omega
+  refine ⟨hdelta2, ?_, ?_⟩
+  · omega
+  · omega
+
+theorem moving_horizon_critical_predecessor_first_hit
+    {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      C' = delta * (c + 2)) :
+    C - 1 = delta * (c + 1) ∧
+      delta = Nat.gcd r (C - 1) ∧
+      (∀ j : Nat, s < j → j < r →
+        (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+        (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1)) := by
+  have hfactor := moving_horizon_critical_predecessor_factorization hstep hcrit
+  rcases moving_horizon_first_hit_map hstep with heven | hodd
+  · rcases heven with ⟨_, hmap, _, hunit⟩
+    refine ⟨hfactor.2.2.1, ?_, hunit⟩
+    exact hcrit.1.symm.trans hmap
+  · have hzero := hfactor.1
+    have hone := hodd.1
+    omega
 
 end A166944Research

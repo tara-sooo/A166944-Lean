@@ -83,6 +83,32 @@ def HasMovingHorizonCappedOldPath (M s C sf Cf E T : Nat) : Nat → Prop
           T = T' + (r - s + 1) ∧
           HasMovingHorizonCappedOldPath M r C' sf Cf E' T' q
 
+/- A post-crossing suffix. Every state is already in the dangerous band,
+   every event remains old, and the hereditary envelope bound is explicit. -/
+def HasMovingHorizonDangerousSuffix (M s C sf Cf : Nat) : Nat → Prop
+  | 0 =>
+      s = sf ∧ C = Cf ∧ IsMovingHorizonState s C ∧
+        M < C - s ∧ B s + 2 ≤ 2 * M ∧ B s ≠ 2
+  | Nat.succ q =>
+      IsMovingHorizonState s C ∧ M < C - s ∧ B s + 2 ≤ 2 * M ∧ B s ≠ 2 ∧
+        ∃ r C', IsMovingHorizonStep s C r C' ∧ d r ≤ M ∧
+          M < C' - r ∧ B r + 2 ≤ 2 * M ∧ B r ≠ 2 ∧
+          HasMovingHorizonDangerousSuffix M r C' sf Cf q
+
+/- A canonical-prefix path followed by the last-safe crossing, its terminal
+   dangerous excursion, and the final critical edge. -/
+def HasMovingHorizonTerminalDangerousExcursion
+    (M delta sf Cf rf Cf' c : Nat) : Prop :=
+  ∃ s C r C' E T q₀ q₁,
+    HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2) s C E T q₀ ∧
+    IsMovingHorizonState s C ∧ C - s ≤ M ∧ B s ≠ 2 ∧
+    IsMovingHorizonStep s C r C' ∧ d r ≤ M ∧ M < C' - r ∧
+    B r + 2 ≤ 2 * M ∧ B r ≠ 2 ∧
+    HasMovingHorizonDangerousSuffix M r C' sf Cf q₁ ∧
+    IsMovingHorizonStep sf Cf rf Cf' ∧ M < delta ∧
+    d rf = delta ∧ rf = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+    Cf' = delta * (c + 2)
+
 /-- A finite close-old segment with explicit envelope excess and Nat sums. -/
 def HasMovingHorizonCloseChain (P s C X E T : Nat) : Nat → Prop
   | 0 => IsMovingHorizonState s C ∧ B s + 2 = 2 * P + X ∧ E = 0 ∧ T = 0
