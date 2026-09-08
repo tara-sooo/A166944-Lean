@@ -1269,4 +1269,72 @@ example :
     D 15 = 24 ∧ d 17 = 5 ∧ D 17 = 28 ∧ d 18 = 9 ∧ D 18 = 36 ∧
       B 15 = 11 ∧ B 17 = 13 ∧ B 18 = 20 := by decide
 
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    3 ≤ d r := moving_horizon_step_event_ge_three hstep
+
+example {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) :
+    (r % 2 = 0 ∧ e ∣ r ∧ e ∣ C') ∨
+      (r % 2 = 1 ∧ e ∣ r - 2 ∧ e ∣ C' + 2) :=
+  moving_horizon_step_endpoint_anchor hstep he
+
+example {M r C' e : Nat}
+    (hstep : IsMovingHorizonStep (M + 2) (2 * M - 2) r C')
+    (he : d r = e) (hold : e ≤ M) :
+    3 ≤ e ∧ e ≤ M ∧
+      ((r % 2 = 0 ∧ e ∣ 2 * M - 3) ∨
+        (r % 2 = 1 ∧ e ∣ 2 * M - 1)) :=
+  moving_horizon_canonical_first_old_event_factorization hstep he hold
+
+example {M s C r C' E T q e : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q)
+    (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hold : e ≤ M) :
+    3 ≤ e ∧ e ≤ M ∧
+      ((r % 2 = 0 ∧
+          ∃ v : Nat, C - 1 = e * v ∧
+            e * v + (q + 1) = (2 * M - 2) + E) ∨
+        (r % 2 = 1 ∧
+          ∃ v : Nat, C + 1 = e * v ∧
+            e * v + (q + 1) = (2 * M - 2) + E + 2)) :=
+  moving_horizon_canonical_event_factor_ledger hpath hstep he hold
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e : Nat, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2)) :=
+  moving_horizon_capped_old_path_last_event_anchor hpath hq
+
+-- The genuine M=13 first event is the odd positive control: 5 divides 25.
+example :
+    IsMovingHorizonStep 15 24 17 28 ∧
+      5 ∣ (2 * 13 - 1) ∧
+      5 * 5 + (0 + 1) = (2 * 13 - 2) + 0 + 2 := by
+  refine ⟨?_, by decide, by decide⟩
+  refine ⟨?_, by decide, by decide, by decide, ?_, by decide,
+    by decide, by decide, ?_⟩
+  · simp [IsMovingHorizonState, D, a]
+  · intro j hsj hjr
+    have hj : j = 16 := by omega
+    subst j
+    decide
+  · simp [IsMovingHorizonState, D, a]
+
+-- The odd endpoint shifts are necessary: the unshifted divisibilities fail
+-- on the same genuine event.
+example :
+    5 ∣ (17 - 2) ∧ 5 ∣ (28 + 2) ∧
+      ¬ 5 ∣ 17 ∧ ¬ 5 ∣ 28 := by decide
+
+-- The smallest known factor-ancestry-compatible terminal survivors remain
+-- abstract event-map/history states, not full recurrence prefixes.
+example :
+    (7 ∣ 42 ∧ 7 ∣ 56) ∧
+      (9 ∣ 36 ∧ 9 ∣ 54) ∧ (5 ∣ 35 ∧ 5 ∣ 60) ∧
+      (13 ∣ 52 ∧ 13 ∣ 78) ∧ (7 ∣ 56 ∧ 7 ∣ 84) ∧
+      (5 ∣ 55 ∧ 5 ∣ 90) := by decide
+
 end A166944Research

@@ -5724,4 +5724,134 @@ theorem moving_horizon_terminal_crossing_debt_pullback
     hcross rfl ⟨hrf, hfactor.2.2.1⟩ rfl rfl hrfuture hCfuture
   exact ⟨s, C, r, C', d r, hcross, rfl, hdebt⟩
 
+theorem moving_horizon_step_event_ge_three
+    {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    3 ≤ d r := by
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hdodd : d r % 2 = 1 := d_mod_two_eq_one_of_three_le hr3
+  rcases one_or_three_le_of_mod_two_eq_one hdodd with hd1 | hd3
+  · have hbad : (1 : Nat) < 1 := by simpa [hd1] using hstep.2.2.2.1
+    exact False.elim (Nat.lt_irrefl 1 hbad)
+  · exact hd3
+
+theorem moving_horizon_step_endpoint_anchor
+    {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) :
+    (r % 2 = 0 ∧ e ∣ r ∧ e ∣ C') ∨
+      (r % 2 = 1 ∧ e ∣ r - 2 ∧ e ∣ C' + 2) := by
+  have hupdate := moving_horizon_step_update hstep
+  have heone : 1 ≤ e := by
+    have : 1 < e := by simpa [he] using hstep.2.2.2.1
+    exact Nat.le_of_lt this
+  have hCone : 1 ≤ C := by
+    exact Nat.le_trans (by simp)
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.1.2.2))
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · left
+    have hdiv := moving_horizon_event_divisibility_even hstep he hreven
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hreven, hdiv.1, ⟨v + 1, ?_⟩⟩
+    calc
+      C' = C + (d r - 1) := hupdate
+      _ = C + (e - 1) := by rw [he]
+      _ = (C - 1) + e := by omega
+      _ = e * v + e := by rw [hv]
+      _ = e * (v + 1) := by simpa using (Nat.mul_add e v 1).symm
+  · right
+    have hdiv := moving_horizon_event_divisibility_odd hstep he hrodd
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hrodd, hdiv.1, ⟨v + 1, ?_⟩⟩
+    calc
+      C' + 2 = C + (d r - 1) + 2 := by rw [hupdate]
+      _ = C + (e - 1) + 2 := by rw [he]
+      _ = (C + 1) + e := by omega
+      _ = e * v + e := by rw [hv]
+      _ = e * (v + 1) := by simpa using (Nat.mul_add e v 1).symm
+
+theorem moving_horizon_canonical_first_old_event_factorization
+    {M r C' e : Nat}
+    (hstep : IsMovingHorizonStep (M + 2) (2 * M - 2) r C')
+    (he : d r = e) (hold : e ≤ M) :
+    3 ≤ e ∧ e ≤ M ∧
+      ((r % 2 = 0 ∧ e ∣ 2 * M - 3) ∨
+        (r % 2 = 1 ∧ e ∣ 2 * M - 1)) := by
+  have he3 : 3 ≤ e := by
+    rw [← he]
+    exact moving_horizon_step_event_ge_three hstep
+  refine ⟨he3, hold, ?_⟩
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · left
+    have hdiv := moving_horizon_event_divisibility_even hstep he hreven
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hreven, ⟨v, ?_⟩⟩
+    omega
+  · right
+    have hdiv := moving_horizon_event_divisibility_odd hstep he hrodd
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hrodd, ⟨v, ?_⟩⟩
+    omega
+
+theorem moving_horizon_canonical_event_factor_ledger
+    {M s C r C' E T q e : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      s C E T q)
+    (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hold : e ≤ M) :
+    3 ≤ e ∧ e ≤ M ∧
+      ((r % 2 = 0 ∧
+          ∃ v : Nat, C - 1 = e * v ∧
+            e * v + (q + 1) = (2 * M - 2) + E) ∨
+        (r % 2 = 1 ∧
+          ∃ v : Nat, C + 1 = e * v ∧
+            e * v + (q + 1) = (2 * M - 2) + E + 2)) := by
+  have he3 : 3 ≤ e := by
+    rw [← he]
+    exact moving_horizon_step_event_ge_three hstep
+  have hledger := moving_horizon_capped_old_path_canonical_ledger hpath
+  have hC1 : 1 ≤ C := by
+    exact Nat.le_trans (by simp)
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.1.2.2))
+  refine ⟨he3, hold, ?_⟩
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · left
+    have hdiv := moving_horizon_event_divisibility_even hstep he hreven
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hreven, ⟨v, hv, ?_⟩⟩
+    omega
+  · right
+    have hdiv := moving_horizon_event_divisibility_odd hstep he hrodd
+    rcases hdiv.2 with ⟨v, hv⟩
+    refine ⟨hrodd, ⟨v, hv, ?_⟩⟩
+    omega
+
+theorem moving_horizon_capped_old_path_last_event_anchor
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hq : 1 ≤ q) :
+    ∃ e : Nat, e = d sf ∧ 3 ≤ e ∧ e ≤ M ∧
+      ((sf % 2 = 0 ∧ e ∣ sf ∧ e ∣ Cf) ∨
+        (sf % 2 = 1 ∧ e ∣ sf - 2 ∧ e ∣ Cf + 2)) := by
+  induction q generalizing s C E T with
+  | zero => omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, hold, _, _, _, _, htail⟩
+      cases q with
+      | zero =>
+          rcases htail with ⟨hsf, hCf, _, _, _, _, _⟩
+          subst sf
+          subst Cf
+          have hanchor := moving_horizon_step_endpoint_anchor hstep rfl
+          rcases hanchor with hanchor | hanchor
+          · exact ⟨d r, rfl,
+              moving_horizon_step_event_ge_three hstep,
+              hold, Or.inl hanchor⟩
+          · exact ⟨d r, rfl,
+              moving_horizon_step_event_ge_three hstep,
+              hold, Or.inr hanchor⟩
+      | succ q =>
+          exact ih htail (by simp)
+
 end A166944Research
