@@ -5854,4 +5854,248 @@ theorem moving_horizon_capped_old_path_last_event_anchor
       | succ q =>
           exact ih htail (by simp)
 
+theorem moving_horizon_even_factor_pair
+    {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hpar : r % 2 = 0) :
+    ∃ u v : Nat, r = e * u ∧ C - 1 = e * v ∧
+      Nat.gcd u v = 1 ∧ (v - u) % 2 = 1 ∧ 1 ≤ v - u ∧
+      C' = e * (v + 1) := by
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hepos : 1 ≤ e := by
+    rw [← he]
+    exact one_le_d_of_two_le (Nat.le_trans hstep.1.1
+      (Nat.le_of_lt hstep.2.1))
+  have hpack := moving_horizon_even_quotient_normal_form hstep hpar
+  rcases hpack with ⟨q, hL, hqmod, hq1, hL'⟩
+  rw [he] at hL
+  have hCpos : 1 ≤ C := by
+    exact Nat.le_trans (by simp)
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.1.2.2))
+  have hsr : s ≤ r := Nat.le_of_lt hstep.2.1
+  have hsC : s ≤ C := Nat.le_of_lt hstep.1.2.2
+  have hsumr : (r - s) + s = r := Nat.sub_add_cancel hsr
+  have hsumC : (C - s) + s = C := Nat.sub_add_cancel hsC
+  have hCeq : C = r + 1 + e * q := by omega
+  have hCminus : C - 1 = r + e * q := by omega
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr3)
+    hstep.2.2.2.2.2.1
+  rw [if_pos hpar] at hmap
+  have hdivr : e ∣ r := by
+    rw [← he, hmap]
+    exact Nat.gcd_dvd_left _ _
+  have hdivC : e ∣ C - 1 := by
+    rw [← he, hmap]
+    exact Nat.gcd_dvd_right _ _
+  rcases hdivr with ⟨u, hu⟩
+  rcases hdivC with ⟨v, hv⟩
+  have hgeq : Nat.gcd (e * u) (e * v) = e := by
+    calc
+      Nat.gcd (e * u) (e * v) = Nat.gcd r (C - 1) := by
+        rw [hu, hv]
+      _ = d r := hmap.symm
+      _ = e := he
+  have hcop : Nat.gcd u v = 1 :=
+    gcd_quotients_eq_one (Nat.lt_of_lt_of_le (by simp) hepos) hgeq
+  have hvEq : v = u + q := by
+    apply Nat.mul_left_cancel hepos
+    calc
+      e * v = C - 1 := hv.symm
+      _ = r + e * q := hCminus
+      _ = e * u + e * q := by rw [hu]
+      _ = e * (u + q) := by rw [Nat.mul_add]
+  have hgap : v - u = q := by omega
+  have hupdate := moving_horizon_step_update hstep
+  rw [he] at hupdate
+  have hCprime : C' = e * (v + 1) := by
+    calc
+      C' = C + (e - 1) := hupdate
+      _ = (C - 1) + e := by omega
+      _ = e * v + e := by rw [hv]
+      _ = e * (v + 1) := by simp [Nat.mul_add]
+  exact ⟨u, v, hu, hv, hcop, by rw [hgap]; exact hqmod,
+    by omega, hCprime⟩
+
+theorem moving_horizon_odd_factor_pair
+    {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hpar : r % 2 = 1) :
+    ∃ u v : Nat, r - 2 = e * u ∧ C + 1 = e * v ∧
+      Nat.gcd u v = 1 ∧ (v - u) % 2 = 0 ∧ 2 ≤ v - u ∧
+      C' + 2 = e * (v + 1) := by
+  have hr3 : 3 ≤ r := by
+    exact Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+      (Nat.succ_le_of_lt hstep.2.1)
+  have hepos : 1 ≤ e := by
+    rw [← he]
+    exact one_le_d_of_two_le (Nat.le_trans hstep.1.1
+      (Nat.le_of_lt hstep.2.1))
+  have hpack := moving_horizon_odd_quotient_normal_form hstep hpar
+  rcases hpack with ⟨q, hL, hqmod, hq2, hL'⟩
+  rw [he] at hL
+  have hsr : s ≤ r := Nat.le_of_lt hstep.2.1
+  have hsC : s ≤ C := Nat.le_of_lt hstep.1.2.2
+  have hsumr : (r - s) + s = r := Nat.sub_add_cancel hsr
+  have hsumC : (C - s) + s = C := Nat.sub_add_cancel hsC
+  have hCeq : C + 3 = r + e * q := by omega
+  have hCplus : C + 1 = (r - 2) + e * q := by omega
+  have hmap := constant_D_event_map (Nat.le_trans (by simp) hr3)
+    hstep.2.2.2.2.2.1
+  rw [if_neg (by simp [hpar])] at hmap
+  have hdivr : e ∣ r - 2 := by
+    rw [← he, hmap]
+    exact Nat.gcd_dvd_left _ _
+  have hdivC : e ∣ C + 1 := by
+    rw [← he, hmap]
+    exact Nat.gcd_dvd_right _ _
+  rcases hdivr with ⟨u, hu⟩
+  rcases hdivC with ⟨v, hv⟩
+  have hgeq : Nat.gcd (e * u) (e * v) = e := by
+    calc
+      Nat.gcd (e * u) (e * v) = Nat.gcd (r - 2) (C + 1) := by
+        rw [hu, hv]
+      _ = d r := hmap.symm
+      _ = e := he
+  have hcop : Nat.gcd u v = 1 :=
+    gcd_quotients_eq_one (Nat.lt_of_lt_of_le (by simp) hepos) hgeq
+  have hvEq : v = u + q := by
+    apply Nat.mul_left_cancel hepos
+    calc
+      e * v = C + 1 := hv.symm
+      _ = (r - 2) + e * q := hCplus
+      _ = e * u + e * q := by rw [hu]
+      _ = e * (u + q) := by rw [Nat.mul_add]
+  have hgap : v - u = q := by omega
+  have hupdate := moving_horizon_step_update hstep
+  rw [he] at hupdate
+  have hCprime : C' + 2 = e * (v + 1) := by
+    calc
+      C' + 2 = C + 1 + e := by omega
+      _ = e * v + e := by rw [hv]
+      _ = e * (v + 1) := by simp [Nat.mul_add]
+  exact ⟨u, v, hu, hv, hcop, by rw [hgap]; exact hqmod,
+    by omega, hCprime⟩
+
+theorem moving_horizon_adjacent_factor_transition
+    {s C r C' u C'' e f : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (he : d r = e) (hf : d u = f) :
+    (r % 2 = 0 ∧ u % 2 = 0 ∧
+        ∃ v w : Nat, C - 1 = e * v ∧ C' - 1 = f * w ∧
+          f * w + 1 = e * (v + 1)) ∨
+      (r % 2 = 0 ∧ u % 2 = 1 ∧
+        ∃ v w : Nat, C - 1 = e * v ∧ C' + 1 = f * w ∧
+          f * w = e * (v + 1) + 1) ∨
+      (r % 2 = 1 ∧ u % 2 = 0 ∧
+        ∃ v w : Nat, C + 1 = e * v ∧ C' - 1 = f * w ∧
+          f * w + 3 = e * (v + 1)) ∨
+      (r % 2 = 1 ∧ u % 2 = 1 ∧
+        ∃ v w : Nat, C + 1 = e * v ∧ C' + 1 = f * w ∧
+          f * w + 1 = e * (v + 1)) := by
+  have hC'pos : 1 ≤ C' := by
+    exact Nat.le_trans (Nat.le_trans (by simp) hnext.1.1)
+      (Nat.le_of_lt hnext.1.2.2)
+  have hC'sub : C' - 1 + 1 = C' := Nat.sub_add_cancel hC'pos
+  rcases Nat.mod_two_eq_zero_or_one r with hre | hro
+  · rcases moving_horizon_even_factor_pair hstep he hre with
+      ⟨_, v, _, hv, _, _, _, hC'⟩
+    rcases Nat.mod_two_eq_zero_or_one u with hue | huo
+    · rcases moving_horizon_even_factor_pair hnext hf hue with
+        ⟨_, w, _, hw, _, _, _, _⟩
+      exact Or.inl ⟨hre, hue, v, w, hv, hw, by omega⟩
+    · rcases moving_horizon_odd_factor_pair hnext hf huo with
+        ⟨_, w, _, hw, _, _, _, _⟩
+      exact Or.inr (Or.inl ⟨hre, huo, v, w, hv, hw, by omega⟩)
+  · rcases moving_horizon_odd_factor_pair hstep he hro with
+      ⟨_, v, _, hv, _, _, _, hC'⟩
+    rcases Nat.mod_two_eq_zero_or_one u with hue | huo
+    · rcases moving_horizon_even_factor_pair hnext hf hue with
+        ⟨_, w, _, hw, _, _, _, _⟩
+      exact Or.inr (Or.inr (Or.inl ⟨hro, hue, v, w, hv, hw, by omega⟩))
+    · rcases moving_horizon_odd_factor_pair hnext hf huo with
+        ⟨_, w, _, hw, _, _, _, _⟩
+      exact Or.inr (Or.inr (Or.inr ⟨hro, huo, v, w, hv, hw, by omega⟩))
+
+theorem moving_horizon_factor_pair_coprimality
+    {e f v w : Nat} (h : f * w + 1 = e * (v + 1)) :
+    Nat.gcd e f = 1 ∧ Nat.gcd e w = 1 ∧
+      Nat.gcd (v + 1) f = 1 ∧ Nat.gcd (v + 1) w = 1 := by
+  have hcommon : ∀ g : Nat, g ∣ e * (v + 1) → g ∣ f * w → g = 1 := by
+    intro g hg₁ hg₂
+    have hsub := Nat.dvd_sub hg₁ hg₂
+    have hdiff : e * (v + 1) - f * w = 1 := by omega
+    rw [hdiff] at hsub
+    exact Nat.eq_one_of_dvd_one hsub
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · apply hcommon
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_left e f) (v + 1)
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_right e f) w
+  · apply hcommon
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_left e w) (v + 1)
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_right e w) f
+  · apply hcommon
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_left (v + 1) f) e
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_right (v + 1) f) w
+  · apply hcommon
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_left (v + 1) w) e
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_right (v + 1) w) f
+
+theorem moving_horizon_factor_pair_gcd_dvd_three
+    {e f v w : Nat} (h : f * w + 3 = e * (v + 1)) :
+    Nat.gcd e f ∣ 3 ∧ Nat.gcd e w ∣ 3 ∧
+      Nat.gcd (v + 1) f ∣ 3 ∧ Nat.gcd (v + 1) w ∣ 3 := by
+  have hcommon : ∀ g : Nat, g ∣ e * (v + 1) → g ∣ f * w → g ∣ 3 := by
+    intro g hg₁ hg₂
+    have hsub := Nat.dvd_sub hg₁ hg₂
+    have hdiff : e * (v + 1) - f * w = 3 := by omega
+    rw [hdiff] at hsub
+    exact hsub
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · apply hcommon
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_left e f) (v + 1)
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_right e f) w
+  · apply hcommon
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_left e w) (v + 1)
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_right e w) f
+  · apply hcommon
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_left (v + 1) f) e
+    · exact Nat.dvd_mul_right_of_dvd (Nat.gcd_dvd_right (v + 1) f) w
+  · apply hcommon
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_left (v + 1) w) e
+    · exact Nat.dvd_mul_left_of_dvd (Nat.gcd_dvd_right (v + 1) w) f
+
+theorem moving_horizon_aba_ascent
+    {s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ e f : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hstep₂ : IsMovingHorizonStep r₁ C₁ r₂ C₂)
+    (hstep₃ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (he₁ : d r₁ = e) (he₂ : d r₂ = f) (he₃ : d r₃ = e)
+    (hpar : r₁ % 2 = r₃ % 2) :
+    e ∣ f - 2 ∧ e + 2 ≤ f := by
+  have hemin : 3 ≤ e := by
+    rw [← he₁]
+    exact moving_horizon_step_event_ge_three hstep₁
+  have hfmin : 3 ≤ f := by
+    rw [← he₂]
+    exact moving_horizon_step_event_ge_three hstep₂
+  have hu₁ := moving_horizon_step_update hstep₁
+  have hu₂ := moving_horizon_step_update hstep₂
+  have hu₃ := moving_horizon_step_update hstep₃
+  rw [he₁] at hu₁
+  rw [he₂] at hu₂
+  rw [he₃] at hu₃
+  have hCdiff : C₂ - C₀ = e + f - 2 := by
+    rw [hu₂, hu₁]
+    omega
+  have hdrift := moving_horizon_same_parity_event_drift
+    hstep₁ hstep₃ he₁ he₃ hpar
+  rw [hCdiff] at hdrift
+  have hdiv := Nat.dvd_sub hdrift.2 (Nat.dvd_refl e)
+  have hdiff : e + f - 2 - e = f - 2 := by omega
+  rw [hdiff] at hdiv
+  have hpos : 0 < f - 2 := by omega
+  have hele : e ≤ f - 2 := Nat.le_of_dvd hpos hdiv
+  exact ⟨hdiv, by omega⟩
+
 end A166944Research

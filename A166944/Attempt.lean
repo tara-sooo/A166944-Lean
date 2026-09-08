@@ -1337,4 +1337,69 @@ example :
       (13 ∣ 52 ∧ 13 ∣ 78) ∧ (7 ∣ 56 ∧ 7 ∣ 84) ∧
       (5 ∣ 55 ∧ 5 ∣ 90) := by decide
 
+example {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hpar : r % 2 = 0) :
+    ∃ u v : Nat, r = e * u ∧ C - 1 = e * v ∧
+      Nat.gcd u v = 1 ∧ (v - u) % 2 = 1 ∧ 1 ≤ v - u ∧
+      C' = e * (v + 1) :=
+  moving_horizon_even_factor_pair hstep he hpar
+
+example {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hpar : r % 2 = 1) :
+    ∃ u v : Nat, r - 2 = e * u ∧ C + 1 = e * v ∧
+      Nat.gcd u v = 1 ∧ (v - u) % 2 = 0 ∧ 2 ≤ v - u ∧
+      C' + 2 = e * (v + 1) :=
+  moving_horizon_odd_factor_pair hstep he hpar
+
+example {s C r C' u C'' e f : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (he : d r = e) (hf : d u = f) :
+    (r % 2 = 0 ∧ u % 2 = 0 ∧
+        ∃ v w : Nat, C - 1 = e * v ∧ C' - 1 = f * w ∧
+          f * w + 1 = e * (v + 1)) ∨
+      (r % 2 = 0 ∧ u % 2 = 1 ∧
+        ∃ v w : Nat, C - 1 = e * v ∧ C' + 1 = f * w ∧
+          f * w = e * (v + 1) + 1) ∨
+      (r % 2 = 1 ∧ u % 2 = 0 ∧
+        ∃ v w : Nat, C + 1 = e * v ∧ C' - 1 = f * w ∧
+          f * w + 3 = e * (v + 1)) ∨
+      (r % 2 = 1 ∧ u % 2 = 1 ∧
+        ∃ v w : Nat, C + 1 = e * v ∧ C' + 1 = f * w ∧
+          f * w + 1 = e * (v + 1)) :=
+  moving_horizon_adjacent_factor_transition hstep hnext he hf
+
+example {e f v w : Nat} (h : f * w + 1 = e * (v + 1)) :
+    Nat.gcd e f = 1 ∧ Nat.gcd e w = 1 ∧
+      Nat.gcd (v + 1) f = 1 ∧ Nat.gcd (v + 1) w = 1 :=
+  moving_horizon_factor_pair_coprimality h
+
+example {e f v w : Nat} (h : f * w + 3 = e * (v + 1)) :
+    Nat.gcd e f ∣ 3 ∧ Nat.gcd e w ∣ 3 ∧
+      Nat.gcd (v + 1) f ∣ 3 ∧ Nat.gcd (v + 1) w ∣ 3 :=
+  moving_horizon_factor_pair_gcd_dvd_three h
+
+example {s₀ C₀ r₁ C₁ r₂ C₂ r₃ C₃ e f : Nat}
+    (hstep₁ : IsMovingHorizonStep s₀ C₀ r₁ C₁)
+    (hstep₂ : IsMovingHorizonStep r₁ C₁ r₂ C₂)
+    (hstep₃ : IsMovingHorizonStep r₂ C₂ r₃ C₃)
+    (he₁ : d r₁ = e) (he₂ : d r₂ = f) (he₃ : d r₃ = e)
+    (hpar : r₁ % 2 = r₃ % 2) :
+    e ∣ f - 2 ∧ e + 2 ≤ f :=
+  moving_horizon_aba_ascent hstep₁ hstep₂ hstep₃ he₁ he₂ he₃ hpar
+
+-- The genuine M=13 odd factor pair is (e,u,v)=(5,3,5).
+example :
+    IsMovingHorizonStep 15 24 17 28 ∧
+      15 = 5 * 3 ∧ 25 = 5 * 5 ∧ Nat.gcd 3 5 = 1 ∧
+      (5 - 3) % 2 = 0 ∧ 2 ≤ 5 - 3 ∧ 30 = 5 * (5 + 1) := by
+  refine ⟨?_, by decide, by decide, by decide, by decide, by decide, by decide⟩
+  refine ⟨?_, by decide, by decide, by decide, ?_, by decide, by decide, ?_⟩
+  · simp [IsMovingHorizonState, D, a]
+  · intro j hsj hjr
+    have hj : j = 16 := by omega
+    subst j
+    decide
+  · simp [IsMovingHorizonState, D, a]
+
 end A166944Research
