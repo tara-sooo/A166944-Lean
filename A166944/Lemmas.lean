@@ -2415,6 +2415,31 @@ theorem critical_previous_maximum_canonical {k M : Nat} (hk : 2 ≤ k)
   exact ⟨p, c, hp2, hpk, hdp, hprior, hM5, hpc.1, hpc.2, hBpc, hcoord, hDp,
     hc, hcmod, hc2, hak, hD⟩
 
+theorem critical_previous_record_provenance {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ p : Nat,
+      2 ≤ p ∧ p ≤ k ∧ d p = M ∧
+      (∀ j : Nat, 2 ≤ j → j < p → d j < M) ∧
+      IsDifferenceRecord M ∧ 5 < M ∧ M % 2 = 1 ∧
+      p = M + 2 ∧ a (M + 1) = 2 * M ∧
+      B p + 2 = M ∧ D p + p = M * 3 ∧ D p = 2 * M - 2 := by
+  rcases critical_previous_maximum_canonical hk hP hIH hnew hfail henv with
+    ⟨p, _, _, _, hdp, hprior, hM5, hp, ha, hB, hcoord, hD, _, _, _, _, _⟩
+  have hrec : IsDifferenceRecord M := ⟨p, by omega, hdp, hprior⟩
+  have hodd : M % 2 = 1 :=
+    attained_previous_maximum_value_mod_two_eq_one hP hM5
+  exact ⟨p, by omega, by omega, hdp, hprior, hrec, hM5, hodd, hp, ha, hB,
+    hcoord, hD⟩
+
+theorem no_even_attained_previous_maximum {P k : Nat}
+    (hP : IsAttainedPreviousMaximum P k) (hP5 : 5 < P)
+    (hPeven : P % 2 = 0) : False := by
+  have hPodd := attained_previous_maximum_value_mod_two_eq_one hP hP5
+  omega
+
 theorem critical_endpoint_lower_bound {k M m s : Nat} (hk : 2 ≤ k)
     (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
     (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
@@ -3302,6 +3327,47 @@ theorem moving_horizon_step_update {s C r C' : Nat}
     rw [hrsucc, hDr] at h
     exact h
   exact hC'.trans hDstep
+
+theorem moving_horizon_step_unique {s C r C' u U' : Nat}
+    (hstep₁ : IsMovingHorizonStep s C r C')
+    (hstep₂ : IsMovingHorizonStep s C u U') :
+    r = u ∧ C' = U' := by
+  rcases hstep₁ with
+    ⟨hs₁, hsr₁, hr₁C, hdr₁, hfirst₁, hD₁, hC₁', hg₁, hstate₁⟩
+  rcases hstep₂ with
+    ⟨hs₂, hsu₂, hu₂C, hdu₂, hfirst₂, hD₂, hU₂', hg₂, hstate₂⟩
+  have hru : r = u := by
+    rcases Nat.lt_trichotomy r u with hlt | heq | hgt
+    · have hunit : d r = 1 := hfirst₂ r hsr₁ hlt
+      have hbad : (1 : Nat) < 1 := by simpa [hunit] using hdr₁
+      exact False.elim (Nat.lt_irrefl 1 hbad)
+    · exact heq
+    · have hunit : d u = 1 := hfirst₁ u hsu₂ hgt
+      have hbad : (1 : Nat) < 1 := by simpa [hunit] using hdu₂
+      exact False.elim (Nat.lt_irrefl 1 hbad)
+  subst u
+  exact ⟨rfl, hC₁'.trans hU₂'.symm⟩
+
+theorem moving_horizon_capped_old_path_unique
+    {M s C sf₁ Cf₁ E₁ T₁ sf₂ Cf₂ E₂ T₂ q : Nat}
+    (hpath₁ : HasMovingHorizonCappedOldPath M s C sf₁ Cf₁ E₁ T₁ q)
+    (hpath₂ : HasMovingHorizonCappedOldPath M s C sf₂ Cf₂ E₂ T₂ q) :
+    sf₁ = sf₂ ∧ Cf₁ = Cf₂ ∧ E₁ = E₂ ∧ T₁ = T₂ := by
+  induction q generalizing s C sf₁ Cf₁ E₁ T₁ sf₂ Cf₂ E₂ T₂ with
+  | zero =>
+      rcases hpath₁ with ⟨hsf₁, hCf₁, _, _, _, hE₁, hT₁⟩
+      rcases hpath₂ with ⟨hsf₂, hCf₂, _, _, _, hE₂, hT₂⟩
+      omega
+  | succ q ih =>
+      rcases hpath₁ with
+        ⟨_, _, _, r₁, C₁, E₁', T₁', hstep₁, _, _, _, hE₁, hT₁, htail₁⟩
+      rcases hpath₂ with
+        ⟨_, _, _, r₂, C₂, E₂', T₂', hstep₂, _, _, _, hE₂, hT₂, htail₂⟩
+      rcases moving_horizon_step_unique hstep₁ hstep₂ with ⟨hr, hC⟩
+      subst r₂
+      subst C₂
+      rcases ih htail₁ htail₂ with ⟨hsf, hCf, hE, hT⟩
+      exact ⟨hsf, hCf, by omega, by omega⟩
 
 theorem moving_horizon_successive_event_gcd_dvd_three
     {s C r C' u C'' : Nat}
@@ -5792,6 +5858,149 @@ theorem moving_horizon_canonical_first_old_event_factorization
     rcases hdiv.2 with ⟨v, hv⟩
     refine ⟨hrodd, ⟨v, ?_⟩⟩
     omega
+
+theorem moving_horizon_canonical_first_event_offset_sieve
+    {M t r C' e : Nat} (hM5 : 5 < M) (hModd : M % 2 = 1)
+    (hr : r = M + 2 + t)
+    (hstep : IsMovingHorizonStep (M + 2) (2 * M - 2) r C')
+    (he : d r = e) :
+    (r % 2 = 0 ∧ t % 2 = 1 ∧ e ∣ 2 * t + 7) ∨
+      (r % 2 = 1 ∧ t % 2 = 0 ∧ e ∣ 2 * t + 1) := by
+  have hM6 : 6 ≤ M := by omega
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · have hdiv := moving_horizon_event_divisibility_even hstep he hreven
+    have htodd : t % 2 = 1 := by
+      rcases Nat.mod_two_eq_zero_or_one t with ht0 | ht1
+      · have hbad : (M + 2 + t) % 2 = 1 := by
+          simp [Nat.add_mod, hModd, ht0]
+        have hbad' : (M + 2 + t) % 2 = 0 := by simpa [hr] using hreven
+        omega
+      · exact ht1
+    have hdivC : e ∣ 2 * M - 3 := by
+      have harg : (2 * M - 2) - 1 = 2 * M - 3 := by omega
+      rw [harg] at hdiv
+      exact hdiv.2
+    have hdiv2r : e ∣ 2 * r := by
+      simpa [Nat.mul_comm] using Nat.dvd_mul_right_of_dvd hdiv.1 2
+    have hdiff := Nat.dvd_sub hdiv2r hdivC
+    have harg : 2 * r - (2 * M - 3) = 2 * t + 7 := by omega
+    rw [harg] at hdiff
+    exact Or.inl ⟨hreven, htodd, hdiff⟩
+  · have hdiv := moving_horizon_event_divisibility_odd hstep he hrodd
+    have hteven : t % 2 = 0 := by
+      rcases Nat.mod_two_eq_zero_or_one t with ht0 | ht1
+      · exact ht0
+      · have hbad : (M + 2 + t) % 2 = 0 := by
+          simp [Nat.add_mod, hModd, ht1]
+        have hbad' : (M + 2 + t) % 2 = 1 := by simpa [hr] using hrodd
+        omega
+    have hdivC : e ∣ 2 * M - 1 := by
+      have harg : (2 * M - 2) + 1 = 2 * M - 1 := by omega
+      rw [harg] at hdiv
+      exact hdiv.2
+    have hdiv2r : e ∣ 2 * (r - 2) := by
+      simpa [Nat.mul_comm] using Nat.dvd_mul_right_of_dvd hdiv.1 2
+    have hdiff := Nat.dvd_sub hdiv2r hdivC
+    have harg : 2 * (r - 2) - (2 * M - 1) = 2 * t + 1 := by omega
+    rw [harg] at hdiff
+    exact Or.inr ⟨hrodd, hteven, hdiff⟩
+
+theorem moving_horizon_canonical_first_event_offset_gcd
+    {M t r C' e : Nat} (hM5 : 5 < M) (hModd : M % 2 = 1)
+    (hr : r = M + 2 + t)
+    (hstep : IsMovingHorizonStep (M + 2) (2 * M - 2) r C')
+    (he : d r = e) :
+    (r % 2 = 0 ∧ t % 2 = 1 ∧
+        e = Nat.gcd (M + 2 + t) (2 * t + 7)) ∨
+      (r % 2 = 1 ∧ t % 2 = 0 ∧
+        e = Nat.gcd (M + t) (2 * t + 1)) := by
+  have hM6 : 6 ≤ M := by omega
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · have htodd : t % 2 = 1 := by
+      rcases Nat.mod_two_eq_zero_or_one t with ht0 | ht1
+      · have hbad : (M + 2 + t) % 2 = 1 := by
+          simp [Nat.add_mod, hModd, ht0]
+        have hbad' : (M + 2 + t) % 2 = 0 := by simpa [hr] using hreven
+        omega
+      · exact ht1
+    have hmap := constant_D_event_map (r := r) (C := 2 * M - 2)
+      (by omega) hstep.2.2.2.2.2.1
+    rw [if_pos hreven] at hmap
+    have hargC : (2 * M - 2) - 1 = 2 * M - 3 := by omega
+    rw [hargC] at hmap
+    have heq0 : e = Nat.gcd r (2 * M - 3) := by
+      rw [← he]
+      exact hmap
+    have hmul : 2 * t + 7 ≤ r * 2 := by omega
+    have hg := Nat.gcd_mul_left_sub_right (m := r) (n := 2 * t + 7)
+      (k := 2) hmul
+    have hg' : Nat.gcd r (2 * r - (2 * t + 7)) =
+        Nat.gcd r (2 * t + 7) := by
+      simpa [Nat.mul_comm] using hg
+    have harg : 2 * r - (2 * t + 7) = 2 * M - 3 := by omega
+    rw [harg] at hg'
+    have heq := heq0.trans hg'
+    rw [hr] at heq
+    exact Or.inl ⟨hreven, htodd, heq⟩
+  · have hteven : t % 2 = 0 := by
+      rcases Nat.mod_two_eq_zero_or_one t with ht0 | ht1
+      · exact ht0
+      · have hbad : (M + 2 + t) % 2 = 0 := by
+          simp [Nat.add_mod, hModd, ht1]
+        have hbad' : (M + 2 + t) % 2 = 1 := by simpa [hr] using hrodd
+        omega
+    have hmap := constant_D_event_map (r := r) (C := 2 * M - 2)
+      (by omega) hstep.2.2.2.2.2.1
+    have hrne : r % 2 ≠ 0 := by simp [hrodd]
+    rw [if_neg hrne] at hmap
+    have hargC : (2 * M - 2) + 1 = 2 * M - 1 := by omega
+    rw [hargC] at hmap
+    have heq0 : e = Nat.gcd (r - 2) (2 * M - 1) := by
+      rw [← he]
+      exact hmap
+    have hmul : 2 * t + 1 ≤ (r - 2) * 2 := by omega
+    have hg := Nat.gcd_mul_left_sub_right (m := r - 2) (n := 2 * t + 1)
+      (k := 2) hmul
+    have hg' : Nat.gcd (r - 2) (2 * (r - 2) - (2 * t + 1)) =
+        Nat.gcd (r - 2) (2 * t + 1) := by
+      simpa [Nat.mul_comm] using hg
+    have harg : 2 * (r - 2) - (2 * t + 1) = 2 * M - 1 := by omega
+    rw [harg] at hg'
+    have heq := heq0.trans hg'
+    have harg_r : r - 2 = M + t := by omega
+    rw [harg_r] at heq
+    exact Or.inr ⟨hrodd, hteven, heq⟩
+
+theorem moving_horizon_canonical_first_event_offset_first_hit
+    {M t r C' : Nat} (hM : 0 < M) (hr : r = M + 2 + t)
+    (hstep : IsMovingHorizonStep (M + 2) (2 * M - 2) r C') :
+    ∀ t' : Nat, 0 < t' → t' < t →
+      ((M + 2 + t') % 2 = 0 →
+          Nat.gcd (M + 2 + t') (2 * M - 3) = 1) ∧
+        ((M + 2 + t') % 2 = 1 →
+          Nat.gcd (M + t') (2 * M - 1) = 1) := by
+  have hunit : ∀ j : Nat, M + 2 < j → j < r →
+      (j % 2 = 0 → Nat.gcd j ((2 * M - 2) - 1) = 1) ∧
+        (j % 2 = 1 → Nat.gcd (j - 2) ((2 * M - 2) + 1) = 1) := by
+    rcases moving_horizon_first_hit_map hstep with h | h
+    · exact h.2.2.2
+    · exact h.2.2.2
+  intro t' ht' htt'
+  have hsj : M + 2 < M + 2 + t' := by omega
+  have hjr : M + 2 + t' < r := by omega
+  have h := hunit (M + 2 + t') hsj hjr
+  constructor
+  · intro hpar
+    have h' := h.1 hpar
+    have harg : (2 * M - 2) - 1 = 2 * M - 3 := by omega
+    rw [harg] at h'
+    exact h'
+  · intro hpar
+    have h' := h.2 hpar
+    have harg₁ : M + 2 + t' - 2 = M + t' := by omega
+    have harg₂ : (2 * M - 2) + 1 = 2 * M - 1 := by omega
+    rw [harg₁, harg₂] at h'
+    exact h'
 
 theorem moving_horizon_canonical_event_factor_ledger
     {M s C r C' E T q e : Nat}

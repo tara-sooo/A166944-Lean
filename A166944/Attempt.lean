@@ -1483,4 +1483,42 @@ example :
 example {e f : Nat} (h : e ∣ f - 1 - 1) : e ∣ f - 2 := by
   omega
 
+example {s C r C' u U' : Nat}
+    (hstep₁ : IsMovingHorizonStep s C r C')
+    (hstep₂ : IsMovingHorizonStep s C u U') :
+    r = u ∧ C' = U' :=
+  moving_horizon_step_unique hstep₁ hstep₂
+
+example
+    {M s C sf₁ Cf₁ E₁ T₁ sf₂ Cf₂ E₂ T₂ q : Nat}
+    (hpath₁ : HasMovingHorizonCappedOldPath M s C sf₁ Cf₁ E₁ T₁ q)
+    (hpath₂ : HasMovingHorizonCappedOldPath M s C sf₂ Cf₂ E₂ T₂ q) :
+    sf₁ = sf₂ ∧ Cf₁ = Cf₂ ∧ E₁ = E₂ ∧ T₁ = T₂ :=
+  moving_horizon_capped_old_path_unique hpath₁ hpath₂
+
+-- The genuine M=13 first event passes the canonical offset sieve.
+example :
+    (17 % 2 = 0 ∧ 2 % 2 = 1 ∧ 5 ∣ 2 * 2 + 7) ∨
+      (17 % 2 = 1 ∧ 2 % 2 = 0 ∧ 5 ∣ 2 * 2 + 1) := by
+  apply moving_horizon_canonical_first_event_offset_sieve
+    (M := 13) (t := 2) (r := 17) (C' := 28) (e := 5)
+  · decide
+  · decide
+  · decide
+  · refine ⟨?_, by decide, by decide, by decide, ?_, by decide,
+      by decide, by decide, ?_⟩
+    · simp [IsMovingHorizonState, D, a]
+    · intro j hsj hjr
+      have hj : j = 16 := by omega
+      subst j
+      decide
+    · simp [IsMovingHorizonState, D, a]
+  · decide
+
+-- An even value above 5 cannot be an attained previous record.
+example : ¬ ∃ k : Nat, IsAttainedPreviousMaximum 60 k := by
+  intro h
+  rcases h with ⟨k, hP⟩
+  exact no_even_attained_previous_maximum hP (by decide) (by decide)
+
 end A166944Research
