@@ -70,6 +70,19 @@ def HasMovingHorizonChain (s C : Nat) : Nat → Prop
       ∃ r C', IsMovingHorizonStep s C r C' ∧
         HasMovingHorizonChain r C' q
 
+/- A finite old-event prefix with named endpoint, slack cap, and no
+   fundamental state. E and T record event sizes and gap-plus-one terms. -/
+def HasMovingHorizonCappedOldPath (M s C sf Cf E T : Nat) : Nat → Prop
+  | 0 =>
+      s = sf ∧ C = Cf ∧ IsMovingHorizonState s C ∧ C - s ≤ M ∧
+        B s ≠ 2 ∧ E = 0 ∧ T = 0
+  | Nat.succ q =>
+      IsMovingHorizonState s C ∧ C - s ≤ M ∧ B s ≠ 2 ∧
+        ∃ r C' E' T', IsMovingHorizonStep s C r C' ∧ d r ≤ M ∧
+          C' - r ≤ M ∧ B r ≠ 2 ∧ E = E' + d r ∧
+          T = T' + (r - s + 1) ∧
+          HasMovingHorizonCappedOldPath M r C' sf Cf E' T' q
+
 /-- A finite close-old segment with explicit envelope excess and Nat sums. -/
 def HasMovingHorizonCloseChain (P s C X E T : Nat) : Nat → Prop
   | 0 => IsMovingHorizonState s C ∧ B s + 2 = 2 * P + X ∧ E = 0 ∧ T = 0

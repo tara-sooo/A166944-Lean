@@ -1007,4 +1007,60 @@ example {M delta Y E T t : Nat} (hModd : M % 2 = 1)
     M + E = T + t + delta + 5 ∧ T + 8 ≤ E :=
   critical_entry_cumulative_compression hModd hdeltaodd hnew ht htel hentry
 
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C') :
+    (C' - r) + (r - s) + 1 = (C - s) + d r := by
+  have h := moving_horizon_slack_transition hstep
+  have hd : 1 ≤ d r := one_le_d_of_two_le
+    (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  omega
+
+example {s C r C' kappa : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hk : d r = (r - s) + 1 + kappa) :
+    C' - r = C - s + kappa := by
+  have h := moving_horizon_slack_transition hstep
+  have hd : 1 ≤ d r := one_le_d_of_two_le
+    (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  omega
+
+example {P Y Y' s C r C' kappa : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * P)
+    (hYr : B r + 2 + Y' = 2 * P)
+    (hk : d r = (r - s) + 1 + kappa) :
+    Y' + kappa = Y := by
+  exact moving_horizon_deficit_compression hstep hYs hYr hk
+
+example {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hpos : (r - s) + 1 ≤ d r) :
+    ∃ kappa : Nat, d r = (r - s) + 1 + kappa ∧
+      C' - r = C - s + kappa :=
+  moving_horizon_positive_compression_exists hstep hpos
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    IsMovingHorizonState sf Cf ∧ Cf - sf ≤ M ∧ B sf ≠ 2 :=
+  moving_horizon_capped_old_path_endpoint hpath
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    (C - s) + E = (Cf - sf) + T :=
+  moving_horizon_capped_old_path_telescope hpath
+
+example {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hET : T ≤ E) :
+    ∃ kappa : Nat, E = T + kappa ∧ Cf - sf = C - s + kappa :=
+  moving_horizon_capped_old_path_total_compression hpath hET
+
+example {M sf Cf r C' E T q : Nat} (hM : 5 < M)
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      sf Cf E T q)
+    (hstep : IsMovingHorizonStep sf Cf r C')
+    (hold : d r ≤ M) (hcross : M < C' - r) :
+    ∃ kappa : Nat,
+      d r = (r - sf) + 1 + kappa ∧ 1 ≤ kappa ∧ d r ≤ M ∧
+      C' - r = Cf - sf + kappa ∧ 5 + T ≤ E + kappa :=
+  moving_horizon_capped_old_path_first_crossing hM hpath hstep hold hcross
+
 end A166944Research

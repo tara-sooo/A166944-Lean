@@ -3512,6 +3512,108 @@ theorem moving_horizon_deficit_transition {P Y Y' s C r C' : Nat}
   have h := moving_horizon_excess_transition hstep
   omega
 
+theorem moving_horizon_compression_step {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    (C' - r) + (r - s) + 1 = (C - s) + d r := by
+  have h := moving_horizon_slack_transition hstep
+  have hd : 1 ≤ d r := one_le_d_of_two_le
+    (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  omega
+
+theorem moving_horizon_positive_compression
+    {s C r C' kappa : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hk : d r = (r - s) + 1 + kappa) :
+    C' - r = C - s + kappa := by
+  have h := moving_horizon_slack_transition hstep
+  have hd : 1 ≤ d r := one_le_d_of_two_le
+    (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  omega
+
+theorem moving_horizon_positive_compression_exists
+    {s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hpos : (r - s) + 1 ≤ d r) :
+    ∃ kappa : Nat, d r = (r - s) + 1 + kappa ∧
+      C' - r = C - s + kappa := by
+  rcases Nat.exists_eq_add_of_le hpos with ⟨kappa, hk⟩
+  exact ⟨kappa, hk, moving_horizon_positive_compression hstep hk⟩
+
+theorem moving_horizon_deficit_compression
+    {P Y Y' s C r C' kappa : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hYs : B s + 2 + Y = 2 * P)
+    (hYr : B r + 2 + Y' = 2 * P)
+    (hk : d r = (r - s) + 1 + kappa) :
+    Y' + kappa = Y := by
+  have h := moving_horizon_deficit_transition hstep hYs hYr
+  omega
+
+theorem moving_horizon_capped_old_path_endpoint
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    IsMovingHorizonState sf Cf ∧ Cf - sf ≤ M ∧ B sf ≠ 2 := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, hstate, hslack, hB, hE, hT⟩
+      subst sf
+      subst Cf
+      exact ⟨hstate, hslack, hB⟩
+  | succ q ih =>
+      rcases hpath with ⟨_, _, _, r, C', E', T', _, _, _, _, _, _, htail⟩
+      exact ih htail
+
+theorem moving_horizon_capped_old_path_telescope
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q) :
+    (C - s) + E = (Cf - sf) + T := by
+  induction q generalizing s C E T with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, _, _, _, hE, hT⟩
+      subst sf
+      subst Cf
+      omega
+  | succ q ih =>
+      rcases hpath with
+        ⟨_, _, _, r, C', E', T', hstep, _, _, _, hE, hT, htail⟩
+      have hlocal := moving_horizon_compression_step hstep
+      have htail' := ih htail
+      rw [hE, hT]
+      omega
+
+theorem moving_horizon_capped_old_path_total_compression
+    {M s C sf Cf E T q : Nat}
+    (hpath : HasMovingHorizonCappedOldPath M s C sf Cf E T q)
+    (hET : T ≤ E) :
+    ∃ kappa : Nat, E = T + kappa ∧ Cf - sf = C - s + kappa := by
+  rcases Nat.exists_eq_add_of_le hET with ⟨kappa, hk⟩
+  have htel := moving_horizon_capped_old_path_telescope hpath
+  refine ⟨kappa, hk, ?_⟩
+  rw [hk] at htel
+  omega
+
+theorem moving_horizon_capped_old_path_first_crossing
+    {M sf Cf r C' E T q : Nat} (hM : 5 < M)
+    (hpath : HasMovingHorizonCappedOldPath M (M + 2) (2 * M - 2)
+      sf Cf E T q)
+    (hstep : IsMovingHorizonStep sf Cf r C')
+    (hold : d r ≤ M) (hcross : M < C' - r) :
+    ∃ kappa : Nat,
+      d r = (r - sf) + 1 + kappa ∧ 1 ≤ kappa ∧ d r ≤ M ∧
+      C' - r = Cf - sf + kappa ∧ 5 + T ≤ E + kappa := by
+  rcases moving_horizon_capped_old_path_endpoint hpath with
+    ⟨hsf, hslack, hB⟩
+  have htrans := moving_horizon_slack_transition hstep
+  have hdanger : r - sf + 2 ≤ d r := by omega
+  have hpos : (r - sf) + 1 ≤ d r := by omega
+  rcases moving_horizon_positive_compression_exists hstep hpos with
+    ⟨kappa, hk, hκslack⟩
+  have hκpos : 1 ≤ kappa := by omega
+  have htel := moving_horizon_capped_old_path_telescope hpath
+  have hstart : (2 * M - 2) - (M + 2) = M - 4 := by omega
+  have hbudget : 5 + T ≤ E + kappa := by
+    rw [hstart] at htel
+    omega
+  exact ⟨kappa, hk, hκpos, hold, hκslack, hbudget⟩
+
 theorem moving_horizon_normalized_close_old_excess
     {P s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
     (hnorm : C - s = 2 * P)
