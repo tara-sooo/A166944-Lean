@@ -1120,4 +1120,110 @@ example {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
         (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1)) :=
   moving_horizon_critical_predecessor_first_hit hstep hcrit
 
+example {M delta sf Cf rf Cf' c : Nat}
+    (hpath : HasMovingHorizonTerminalDangerousExcursion
+      M delta sf Cf rf Cf' c) :
+    ∃ s C r C' e,
+      IsMovingHorizonStep s C r C' ∧ d r = e ∧
+      ((r % 2 = 0 ∧
+          Nat.gcd e (delta * c) ∣ rf - r ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r ∧ Nat.gcd e delta ∣ Cf - C) ∨
+        (r % 2 = 1 ∧
+          Nat.gcd e (delta * c) ∣ rf - r + 2 ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C - 2 ∧
+          2 ≤ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r + 2 ∧
+            Nat.gcd e delta ∣ Cf - C - 2)) :=
+  moving_horizon_terminal_crossing_debt_pullback hpath
+
+/-- Abstract event-map/history witnesses only; these do not assert `D s = C`. -/
+def IsAbstractFirstEvent (s C r e : Nat) : Prop :=
+  2 ≤ s ∧ s < r ∧ r ≤ C ∧ 1 < e ∧
+    ((r % 2 = 0 ∧ e = Nat.gcd r (C - 1)) ∨
+      (r % 2 = 1 ∧ e = Nat.gcd (r - 2) (C + 1))) ∧
+    (∀ j : Nat, s < j → j < r →
+      (j % 2 = 0 → Nat.gcd j (C - 1) = 1) ∧
+      (j % 2 = 1 → Nat.gcd (j - 2) (C + 1) = 1))
+
+example :
+    IsAbstractFirstEvent 41 50 42 7 ∧
+      50 + 7 - 1 = 56 ∧ 9 < 56 - 42 ∧ 56 - 42 ≤ 2 * 9 - 4 ∧
+      IsAbstractFirstEvent 42 56 44 11 ∧
+      44 = 11 * 4 ∧ 56 - 1 = 11 * (4 + 1) ∧ 56 + 11 - 1 = 11 * 6 := by
+  refine ⟨?_, by decide, by decide, by decide, ?_, by decide, by decide, by decide⟩
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      omega
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      have hj : j = 43 := by omega
+      subst j
+      decide
+
+example :
+    IsAbstractFirstEvent 33 46 36 9 ∧
+      46 + 9 - 1 = 54 ∧ 13 < 54 - 36 ∧ 54 - 36 ≤ 2 * 13 - 4 ∧
+      IsAbstractFirstEvent 36 54 37 5 ∧
+      54 + 5 - 1 = 58 ∧ 13 < 58 - 37 ∧ 58 - 37 ≤ 2 * 13 - 4 ∧
+      IsAbstractFirstEvent 37 58 38 19 ∧
+      38 = 19 * 2 ∧ 58 - 1 = 19 * (2 + 1) ∧ 58 + 19 - 1 = 19 * 4 := by
+  refine ⟨?_, by decide, by decide, by decide, ?_, by decide, by decide,
+    by decide, ?_, by decide, by decide, by decide⟩
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      have hj : j = 34 ∨ j = 35 := by omega
+      rcases hj with rfl | rfl <;> decide
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inr ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      omega
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      have hj : j = 51 := by omega
+      subst j
+      decide
+
+example :
+    IsAbstractFirstEvent 50 66 52 13 ∧
+      66 + 13 - 1 = 78 ∧ 19 < 78 - 52 ∧ 78 - 52 ≤ 2 * 19 - 4 ∧
+      IsAbstractFirstEvent 52 78 56 7 ∧
+      78 + 7 - 1 = 84 ∧ 19 < 84 - 56 ∧ 84 - 56 ≤ 2 * 19 - 4 ∧
+      IsAbstractFirstEvent 56 84 57 5 ∧
+      84 + 5 - 1 = 88 ∧ 19 < 88 - 57 ∧ 88 - 57 ≤ 2 * 19 - 4 ∧
+      IsAbstractFirstEvent 57 88 58 29 ∧
+      58 = 29 * 2 ∧ 88 - 1 = 29 * (2 + 1) ∧ 88 + 29 - 1 = 29 * 4 := by
+  refine ⟨?_, by decide, by decide, by decide, ?_, by decide, by decide,
+    by decide, ?_, by decide, by decide, by decide, ?_, by decide, by decide,
+    by decide⟩
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      have hj : j = 51 := by omega
+      subst j
+      decide
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      have hj : j = 53 ∨ j = 54 ∨ j = 55 := by omega
+      rcases hj with rfl | rfl | rfl <;> decide
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inr ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      omega
+  · refine ⟨by decide, by decide, by decide, by decide, ?_, ?_⟩
+    · exact Or.inl ⟨by decide, by decide⟩
+    · intro j hsj hjr
+      omega
+
+example : D 41 = 42 ∧ D 33 ≠ 46 ∧ D 50 ≠ 66 := by decide
+
+example :
+    D 15 = 24 ∧ d 17 = 5 ∧ D 17 = 28 ∧ d 18 = 9 ∧ D 18 = 36 ∧
+      B 15 = 11 ∧ B 17 = 13 ∧ B 18 = 20 := by decide
+
 end A166944Research

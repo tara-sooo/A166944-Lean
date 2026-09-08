@@ -5473,4 +5473,177 @@ theorem moving_horizon_critical_predecessor_first_hit
     have hone := hodd.1
     omega
 
+theorem moving_horizon_event_divisibility_even
+    {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hr : r % 2 = 0) :
+    e ∣ r ∧ e ∣ C - 1 := by
+  rcases moving_horizon_first_hit_map hstep with h | h
+  · rw [← he, h.2.1]
+    exact ⟨Nat.gcd_dvd_left _ _, Nat.gcd_dvd_right _ _⟩
+  · omega
+
+theorem moving_horizon_event_divisibility_odd
+    {s C r C' e : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (he : d r = e) (hr : r % 2 = 1) :
+    e ∣ r - 2 ∧ e ∣ C + 1 := by
+  rcases moving_horizon_first_hit_map hstep with h | h
+  · omega
+  · rw [← he, h.2.1]
+    exact ⟨Nat.gcd_dvd_left _ _, Nat.gcd_dvd_right _ _⟩
+
+theorem moving_horizon_terminal_debt_pullback
+    {s C r C' e delta c rf Cf H U : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (he : d r = e)
+    (hfinal : rf = delta * c ∧ Cf - 1 = delta * (c + 1))
+    (hH : H = rf - r) (hU : U = Cf - C)
+    (hfuture : r ≤ rf) (hCfuture : C + 2 ≤ Cf) :
+    (r % 2 = 0 ∧
+        Nat.gcd e (delta * c) ∣ H ∧
+        Nat.gcd e (delta * (c + 1)) ∣ U ∧
+        Nat.gcd e delta ∣ H ∧ Nat.gcd e delta ∣ U) ∨
+      (r % 2 = 1 ∧
+        Nat.gcd e (delta * c) ∣ H + 2 ∧
+        Nat.gcd e (delta * (c + 1)) ∣ U - 2 ∧
+        2 ≤ U ∧
+        Nat.gcd e delta ∣ H + 2 ∧ Nat.gcd e delta ∣ U - 2) := by
+  rcases Nat.mod_two_eq_zero_or_one r with hreven | hrodd
+  · have hdiv := moving_horizon_event_divisibility_even hstep he hreven
+    have hrf : Nat.gcd e (delta * c) ∣ rf := by
+      rw [hfinal.1]
+      exact Nat.gcd_dvd_right _ _
+    have hr : Nat.gcd e (delta * c) ∣ r :=
+      Nat.dvd_trans (Nat.gcd_dvd_left _ _) hdiv.1
+    have hHdiv : Nat.gcd e (delta * c) ∣ H := by
+      have hsub := Nat.dvd_sub hrf hr
+      have hdiff : rf - r = H := hH.symm
+      rw [hdiff] at hsub
+      exact hsub
+    have hCf : Nat.gcd e (delta * (c + 1)) ∣ Cf - 1 := by
+      rw [hfinal.2]
+      exact Nat.gcd_dvd_right _ _
+    have hC : Nat.gcd e (delta * (c + 1)) ∣ C - 1 :=
+      Nat.dvd_trans (Nat.gcd_dvd_left _ _) hdiv.2
+    have hUdiv : Nat.gcd e (delta * (c + 1)) ∣ U := by
+      have hsub := Nat.dvd_sub hCf hC
+      have hC2 : 2 ≤ C := by
+        rw [← hstep.1.2.1]
+        calc
+          2 = D 2 := by simp [D, a]
+          _ ≤ D s := D_le_of_le hstep.1.1
+      have hdiff : (Cf - 1) - (C - 1) = U := by omega
+      rw [hdiff] at hsub
+      exact hsub
+    let g := Nat.gcd e delta
+    have hge : g ∣ e := Nat.gcd_dvd_left _ _
+    have hgd : g ∣ delta := Nat.gcd_dvd_right _ _
+    have hgc : g ∣ delta * c := Nat.dvd_mul_right_of_dvd hgd c
+    have hgcp : g ∣ delta * (c + 1) :=
+      Nat.dvd_mul_right_of_dvd hgd (c + 1)
+    have hga : g ∣ Nat.gcd e (delta * c) := Nat.dvd_gcd hge hgc
+    have hgb : g ∣ Nat.gcd e (delta * (c + 1)) := Nat.dvd_gcd hge hgcp
+    exact Or.inl ⟨hreven, hHdiv, hUdiv,
+      Nat.dvd_trans hga hHdiv, Nat.dvd_trans hgb hUdiv⟩
+  · have hdiv := moving_horizon_event_divisibility_odd hstep he hrodd
+    have hr2 : 2 ≤ r := Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1)
+    have hrf : Nat.gcd e (delta * c) ∣ rf := by
+      rw [hfinal.1]
+      exact Nat.gcd_dvd_right _ _
+    have hrshift : Nat.gcd e (delta * c) ∣ r - 2 :=
+      Nat.dvd_trans (Nat.gcd_dvd_left _ _) hdiv.1
+    have hHdiv : Nat.gcd e (delta * c) ∣ H + 2 := by
+      have hsub := Nat.dvd_sub hrf hrshift
+      have hdiff : rf - (r - 2) = H + 2 := by omega
+      rw [hdiff] at hsub
+      exact hsub
+    have hCf : Nat.gcd e (delta * (c + 1)) ∣ Cf - 1 := by
+      rw [hfinal.2]
+      exact Nat.gcd_dvd_right _ _
+    have hCshift : Nat.gcd e (delta * (c + 1)) ∣ C + 1 :=
+      Nat.dvd_trans (Nat.gcd_dvd_left _ _) hdiv.2
+    have hUdiv : Nat.gcd e (delta * (c + 1)) ∣ U - 2 := by
+      have hsub := Nat.dvd_sub hCf hCshift
+      have hC2 : 2 ≤ C := by
+        rw [← hstep.1.2.1]
+        calc
+          2 = D 2 := by simp [D, a]
+          _ ≤ D s := D_le_of_le hstep.1.1
+      have hdiff : (Cf - 1) - (C + 1) = U - 2 := by omega
+      rw [hdiff] at hsub
+      exact hsub
+    have hU2 : 2 ≤ U := by omega
+    let g := Nat.gcd e delta
+    have hge : g ∣ e := Nat.gcd_dvd_left _ _
+    have hgd : g ∣ delta := Nat.gcd_dvd_right _ _
+    have hgc : g ∣ delta * c := Nat.dvd_mul_right_of_dvd hgd c
+    have hgcp : g ∣ delta * (c + 1) :=
+      Nat.dvd_mul_right_of_dvd hgd (c + 1)
+    have hga : g ∣ Nat.gcd e (delta * c) := Nat.dvd_gcd hge hgc
+    have hgb : g ∣ Nat.gcd e (delta * (c + 1)) := Nat.dvd_gcd hge hgcp
+    exact Or.inr ⟨hrodd, hHdiv, hUdiv, hU2,
+      Nat.dvd_trans hga hHdiv, Nat.dvd_trans hgb hUdiv⟩
+
+theorem moving_horizon_dangerous_suffix_horizon_le
+    {M s C sf Cf q : Nat}
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    C ≤ Cf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hsuffix with ⟨hsf, hCf, _, _, _⟩
+      omega
+  | succ q ih =>
+      rcases hsuffix with
+        ⟨_, _, _, _, r, C', hstep, _, _, _, _, htail⟩
+      rcases hstep with ⟨_, _, _, _, _, _, _, hgrowth, _⟩
+      have hrest : C' ≤ Cf := ih htail
+      omega
+
+theorem moving_horizon_dangerous_suffix_index_le
+    {M s C sf Cf q : Nat}
+    (hsuffix : HasMovingHorizonDangerousSuffix M s C sf Cf q) :
+    s ≤ sf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hsuffix with ⟨hsf, _, _, _, _⟩
+      omega
+  | succ q ih =>
+      rcases hsuffix with
+        ⟨_, _, _, _, r, C', hstep, _, _, _, _, htail⟩
+      have hsr : s ≤ r := Nat.le_of_lt hstep.2.1
+      have hrest : r ≤ sf := ih htail
+      exact Nat.le_trans hsr hrest
+
+theorem moving_horizon_terminal_crossing_debt_pullback
+    {M delta sf Cf rf Cf' c : Nat}
+    (hpath : HasMovingHorizonTerminalDangerousExcursion
+      M delta sf Cf rf Cf' c) :
+    ∃ s C r C' e,
+      IsMovingHorizonStep s C r C' ∧ d r = e ∧
+      ((r % 2 = 0 ∧
+          Nat.gcd e (delta * c) ∣ rf - r ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r ∧ Nat.gcd e delta ∣ Cf - C) ∨
+        (r % 2 = 1 ∧
+          Nat.gcd e (delta * c) ∣ rf - r + 2 ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C - 2 ∧
+          2 ≤ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r + 2 ∧
+            Nat.gcd e delta ∣ Cf - C - 2)) := by
+  rcases hpath with ⟨s, C, r, C', E, T, q₀, q₁, hrest⟩
+  rcases hrest with
+    ⟨hprefix, hsstate, hsbound, hsB, hcross, hold, hcrossM, hBr,
+      hBneq, hsuffix, hfinal, hnew, hdelta, hrf, hcmod, hc2, hCf'⟩
+  have hfactor := moving_horizon_critical_predecessor_factorization
+    hfinal ⟨hdelta, hrf, hcmod, hc2, hCf'⟩
+  have hsuffixC : C' ≤ Cf := moving_horizon_dangerous_suffix_horizon_le hsuffix
+  have hCstep : C + 2 ≤ C' := by
+    rcases hcross with ⟨_, _, _, _, _, _, _, hgrowth, _⟩
+    exact hgrowth
+  have hCfuture : C + 2 ≤ Cf := Nat.le_trans hCstep hsuffixC
+  have hsuffixr : r ≤ sf := moving_horizon_dangerous_suffix_index_le hsuffix
+  have hsf_rf : sf < rf := hfinal.2.1
+  have hrfuture : r ≤ rf := by omega
+  have hdebt := moving_horizon_terminal_debt_pullback
+    hcross rfl ⟨hrf, hfactor.2.2.1⟩ rfl rfl hrfuture hCfuture
+  exact ⟨s, C, r, C', d r, hcross, rfl, hdebt⟩
+
 end A166944Research
