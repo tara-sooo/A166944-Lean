@@ -6999,4 +6999,353 @@ theorem moving_horizon_same_parity_return_ledger
   have hele : e ≤ E - q - 1 := Nat.le_of_dvd hpos hdiv1
   exact ⟨hdiv1, by omega⟩
 
+theorem moving_horizon_path_endpoint {s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q) :
+    IsMovingHorizonState sf Cf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, hstate⟩
+      simpa [hsf, hCf] using hstate
+  | succ q ih =>
+      rcases hpath with ⟨_, r, C', _, htail⟩
+      exact ih htail
+
+theorem moving_horizon_path_ledger {s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q) :
+    ∃ E T, Cf + q = C + E ∧ sf + q = s + T := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, _⟩
+      subst sf
+      subst Cf
+      exact ⟨0, 0, by simp, by simp⟩
+  | succ q ih =>
+      rcases hpath with ⟨_, r, C', hstep, htail⟩
+      rcases ih htail with ⟨E, T, hCf, hsf⟩
+      have hupdate := moving_horizon_step_update hstep
+      have hdpos : 1 ≤ d r := one_le_d_of_two_le
+        (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+      have hsr : s < r := hstep.2.1
+      refine ⟨E + d r, T + (r - s + 1), ?_, ?_⟩
+      · omega
+      · omega
+
+theorem moving_horizon_path_telescope {s C sf Cf q E T : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q)
+    (hledger : Cf + q = C + E ∧ sf + q = s + T) :
+    (C - s) + E = (Cf - sf) + T := by
+  have hstateS : IsMovingHorizonState s C := by
+    induction q generalizing s C with
+    | zero =>
+        rcases hpath with ⟨_, _, hstate⟩
+        exact hstate
+    | succ q ih =>
+        exact (by
+          rcases hpath with ⟨hstate, _, _, _, _⟩
+          exact hstate)
+  have hstateF := moving_horizon_path_endpoint hpath
+  have hsle : s ≤ C := Nat.le_of_lt hstateS.2.2
+  have hfle : sf ≤ Cf := Nat.le_of_lt hstateF.2.2
+  omega
+
+theorem moving_horizon_dangerous_path_start_dangerous
+    {M s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonDangerousPath M s C sf Cf q) :
+    M < C - s := by
+  cases q with
+  | zero => exact hpath.2.2.2
+  | succ q => exact hpath.2.1
+
+theorem moving_horizon_dangerous_path_index_le
+    {M s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonDangerousPath M s C sf Cf q) :
+    s ≤ sf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf, _, _, _⟩
+      omega
+  | succ q ih =>
+      rcases hpath with ⟨_, _, r, C', hstep, _, htail⟩
+      have hsr : s ≤ r := Nat.le_of_lt hstep.2.1
+      exact Nat.le_trans hsr (ih htail)
+
+theorem moving_horizon_path_dangerous_or_last_safe
+    {M s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q)
+    (hend : M < Cf - sf) :
+    HasMovingHorizonDangerousPath M s C sf Cf q ∨
+      ∃ sp Cp r C' q₀ q₁,
+        HasMovingHorizonPathTo s C sp Cp q₀ ∧
+        IsMovingHorizonStep sp Cp r C' ∧ Cp - sp ≤ M ∧
+        M < C' - r ∧
+        HasMovingHorizonDangerousPath M r C' sf Cf q₁ := by
+  induction q generalizing s C with
+  | zero =>
+      left
+      rcases hpath with ⟨hsf, hCf, hstate⟩
+      subst sf
+      subst Cf
+      exact ⟨rfl, rfl, hstate, hend⟩
+  | succ q ih =>
+      rcases hpath with ⟨hstate, r, C', hstep, htail⟩
+      rcases ih htail with htaildanger | hsplit
+      · by_cases hsafe : C - s ≤ M
+        · right
+          refine ⟨s, C, r, C', 0, q, ?_, hstep, hsafe, ?_, htaildanger⟩
+          exact ⟨rfl, rfl, hstate⟩
+          exact moving_horizon_dangerous_path_start_dangerous htaildanger
+        · left
+          have hdanger : M < C - s := Nat.lt_of_not_ge hsafe
+          have hnext := moving_horizon_dangerous_path_start_dangerous htaildanger
+          exact ⟨hstate, hdanger, r, C', hstep, hnext, htaildanger⟩
+      · right
+        rcases hsplit with
+          ⟨sp, Cp, r', C'', q₀, q₁, hprefix, hcross, hsafe,
+            hcrossdanger, htaildanger⟩
+        refine ⟨sp, Cp, r', C'', q₀ + 1, q₁, ?_, hcross, hsafe,
+          hcrossdanger, htaildanger⟩
+        exact ⟨hstate, r, C', hstep, hprefix⟩
+
+theorem moving_horizon_path_last_safe_split
+    {M s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q)
+    (hstart : C - s ≤ M) (hend : M < Cf - sf) :
+    ∃ sp Cp r C' q₀ q₁,
+      HasMovingHorizonPathTo s C sp Cp q₀ ∧
+      IsMovingHorizonStep sp Cp r C' ∧ Cp - sp ≤ M ∧
+      M < C' - r ∧
+      HasMovingHorizonDangerousPath M r C' sf Cf q₁ := by
+  rcases moving_horizon_path_dangerous_or_last_safe hpath hend with
+    hdanger | hsplit
+  · have hbad := moving_horizon_dangerous_path_start_dangerous hdanger
+    omega
+  · exact hsplit
+
+theorem moving_horizon_dangerous_path_to_suffix
+    {M k s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonDangerousPath M s C sf Cf q)
+    (hstart : M + 2 ≤ s) (hsf : sf < k + 1)
+    (hold : ∀ j : Nat, 2 ≤ j → j < k + 1 → d j ≤ M)
+    (hBenv : ∀ j : Nat, 2 ≤ j → j < k + 1 → B j + 2 ≤ 2 * M)
+    (hBneq : ∀ j : Nat, M + 2 ≤ j → j < k + 1 → B j ≠ 2) :
+    HasMovingHorizonDangerousSuffix M s C sf Cf q := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf_eq, hCf_eq, hstate, hdanger⟩
+      subst sf
+      subst Cf
+      have hsk : s < k + 1 := hsf
+      exact ⟨rfl, rfl, hstate, hdanger,
+        hBenv s hstate.1 hsk, hBneq s hstart hsk⟩
+  | succ q ih =>
+      rcases hpath with
+        ⟨hstate, hdanger, r, C', hstep, hnext, htail⟩
+      have hr2 : 2 ≤ r := Nat.le_trans hstate.1
+        (Nat.le_of_lt hstep.2.1)
+      have hrfidx := moving_horizon_dangerous_path_index_le htail
+      have hrk : r < k + 1 := Nat.lt_of_le_of_lt hrfidx hsf
+      have hsr : s < r := hstep.2.1
+      have hsk : s < k + 1 := Nat.lt_trans hsr hrk
+      have hstart' : M + 2 ≤ r := by omega
+      have htail' := ih htail hstart'
+      refine ⟨hstate, hdanger, hBenv s hstate.1 hsk,
+        hBneq s hstart hsk, r, C', hstep, hold r hr2 hrk, hnext,
+        hBenv r hr2 hrk, hBneq r (by omega) hrk, htail'⟩
+
+theorem critical_replay_terminal_dangerous_block
+    {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ sf Cf c,
+      HasMovingHorizonTerminalDangerousBlock
+        M (d (k + 1)) sf Cf (k + 1) (D (k + 1)) c := by
+  rcases critical_previous_record_provenance hk hP hIH hnew hfail henv with
+    ⟨p, hp2, hpk, hdp, hprior, _, hM5, _, hp, _, _, _, _⟩
+  have hpath := critical_replay_terminal_predecessor hk hP hIH hnew hfail henv
+  rcases hpath with ⟨sf, Cf, q, hprefix, hfinal, hdanger⟩
+  have hcap : (2 * M - 2) - (M + 2) ≤ M := by omega
+  rcases moving_horizon_path_last_safe_split hprefix hcap hdanger with
+    ⟨s, C, r, C', q₀, q₁, hprefix', hcross, hscap,
+      hcrossdanger, hdangerpath⟩
+  have hBenv : ∀ j : Nat, 2 ≤ j → j < k + 1 → B j + 2 ≤ 2 * M :=
+    attained_previous_maximum_history_B_envelope hP henv
+  have hBneq : ∀ j : Nat, M + 2 ≤ j → j < k + 1 → B j ≠ 2 :=
+    critical_no_fundamental_before_final hk hM5 hP hIH hnew hfail
+  have hold : ∀ j : Nat, 2 ≤ j → j < k + 1 → d j ≤ M := by
+    intro j hj2 hjk
+    exact hP.1 j hj2 (by omega)
+  have hprefixidx := moving_horizon_path_index_le hprefix'
+  have hsr : s < r := hcross.2.1
+  have hstartcross : M + 2 ≤ r := by omega
+  have hfinaldangerous := moving_horizon_dangerous_path_to_suffix
+    hdangerpath hstartcross hfinal.2.1 hold hBenv hBneq
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, _, hDfinal, _, _⟩
+  have hrfidx := moving_horizon_dangerous_path_index_le hdangerpath
+  have hrk : r < k + 1 := Nat.lt_of_le_of_lt hrfidx hfinal.2.1
+  have hsidx : s ≤ sf := by omega
+  have hsk : s < k + 1 := Nat.lt_of_le_of_lt hsidx hfinal.2.1
+  have hr2 : 2 ≤ r := Nat.le_trans hcross.1.1
+    (Nat.le_of_lt hcross.2.1)
+  refine ⟨sf, Cf, c, ?_⟩
+  exact ⟨s, C, r, C', q₀, q₁, hprefix', hcross.1, hscap,
+    hBneq s hprefixidx hsk, hcross, hold r hr2 hrk, hcrossdanger,
+    hfinaldangerous, hfinal, hnew, rfl, hc, hcmod, hc2, hDfinal⟩
+
+theorem moving_horizon_terminal_dangerous_block_endpoint_band
+    {M delta sf Cf rf Cf' c : Nat} (hM5 : 5 < M)
+    (hblock : HasMovingHorizonTerminalDangerousBlock
+      M delta sf Cf rf Cf' c) :
+    IsMovingHorizonState sf Cf ∧ M < Cf - sf ∧
+      Cf - sf ≤ 2 * M - 4 ∧ B sf ≠ 2 := by
+  rcases hblock with
+    ⟨s, C, r, C', q₀, q₁, hprefix, hs, hsafe, hBs, hcross,
+      hold, hcrossM, hsuffix, hfinal, hnew, hdelta, hrf, hcmod, hc2,
+      hCf'⟩
+  exact moving_horizon_dangerous_suffix_endpoint_band hM5 hsuffix
+
+theorem moving_horizon_terminal_dangerous_block_crossing_threshold
+    {M delta sf Cf rf Cf' c : Nat}
+    (hblock : HasMovingHorizonTerminalDangerousBlock
+      M delta sf Cf rf Cf' c) :
+    ∃ (s C r C' q₀ q₁ : Nat),
+      HasMovingHorizonPathTo (M + 2) (2 * M - 2) s C q₀ ∧
+      IsMovingHorizonStep s C r C' ∧
+      ((r % 2 = 0 ∧
+          ∃ q : Nat, C - s = (r - s) + 1 + d r * q ∧
+            q % 2 = 1 ∧ 1 ≤ q ∧ C' - r = d r * (q + 1) ∧
+            d r * q + 2 ≤ M ∧ M < d r * (q + 1)) ∨
+        (r % 2 = 1 ∧
+          ∃ q : Nat, C - s + 3 = (r - s) + d r * q ∧
+            q % 2 = 0 ∧ 2 ≤ q ∧ C' - r + 4 = d r * (q + 1) ∧
+            d r * q ≤ M + 2 ∧ M + 4 < d r * (q + 1))) := by
+  rcases hblock with
+    ⟨s, C, r, C', q₀, q₁, hprefix, hs, hsafe, hBs, hcross,
+      hold, hcrossM, hsuffix, hfinal, hnew, hdelta, hrf, hcmod, hc2,
+      hCf'⟩
+  refine ⟨s, C, r, C', q₀, q₁, hprefix, hcross, ?_⟩
+  exact moving_horizon_terminal_crossing_threshold hcross hsafe hcrossM
+
+theorem moving_horizon_terminal_dangerous_block_debt_pullback
+    {M delta sf Cf rf Cf' c : Nat}
+    (hblock : HasMovingHorizonTerminalDangerousBlock
+      M delta sf Cf rf Cf' c) :
+    ∃ s C r C' e,
+      IsMovingHorizonStep s C r C' ∧ d r = e ∧
+      ((r % 2 = 0 ∧
+          Nat.gcd e (delta * c) ∣ rf - r ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r ∧ Nat.gcd e delta ∣ Cf - C) ∨
+        (r % 2 = 1 ∧
+          Nat.gcd e (delta * c) ∣ rf - r + 2 ∧
+          Nat.gcd e (delta * (c + 1)) ∣ Cf - C - 2 ∧
+          2 ≤ Cf - C ∧
+          Nat.gcd e delta ∣ rf - r + 2 ∧
+            Nat.gcd e delta ∣ Cf - C - 2)) := by
+  rcases hblock with
+    ⟨s, C, r, C', q₀, q₁, hprefix, hs, hsafe, hBs, hcross,
+      hold, hcrossM, hsuffix, hfinal, hnew, hdelta, hrf, hcmod, hc2,
+      hCf'⟩
+  have hfactor := moving_horizon_critical_predecessor_factorization
+    hfinal ⟨hdelta, hrf, hcmod, hc2, hCf'⟩
+  have hsuffixC : C' ≤ Cf := moving_horizon_dangerous_suffix_horizon_le hsuffix
+  have hCstep : C + 2 ≤ C' := by
+    rcases hcross with ⟨_, _, _, _, _, _, _, hgrowth, _⟩
+    exact hgrowth
+  have hCfuture : C + 2 ≤ Cf := Nat.le_trans hCstep hsuffixC
+  have hsuffixr : r ≤ sf := moving_horizon_dangerous_suffix_index_le hsuffix
+  have hsf_rf : sf < rf := hfinal.2.1
+  have hrfuture : r ≤ rf := by omega
+  have hdebt := moving_horizon_terminal_debt_pullback
+    hcross rfl ⟨hrf, hfactor.2.2.1⟩ rfl rfl hrfuture hCfuture
+  exact ⟨s, C, r, C', d r, hcross, rfl, hdebt⟩
+
+theorem moving_horizon_safe_reentry_debt
+    {M s C r C' : Nat} (hstep : IsMovingHorizonStep s C r C')
+    (hfrom : M < C - s) (hto : C' - r ≤ M) :
+    ∃ lambda : Nat,
+      1 ≤ lambda ∧ C - s = (C' - r) + lambda ∧
+        (r - s) + 1 = d r + lambda := by
+  have htrans := moving_horizon_slack_transition hstep
+  have hlt : C' - r < C - s := Nat.lt_of_le_of_lt hto hfrom
+  let lambda := C - s - (C' - r)
+  have hsum : (C' - r) + lambda = C - s := by
+    dsimp [lambda]
+    omega
+  have hlambda : 1 ≤ lambda := by
+    dsimp [lambda]
+    omega
+  have hdpos : 1 ≤ d r := one_le_d_of_two_le
+    (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  refine ⟨lambda, hlambda, hsum.symm, ?_⟩
+  omega
+
+theorem critical_mixed_replay_total_compression
+    {k M delta sf Cf c q : Nat}
+    (hM5 : 5 < M) (hModd : M % 2 = 1) (hnew : M < delta)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf q)
+    (hstep : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hcrit : d (k + 1) = delta ∧ k + 1 = delta * c ∧
+      c % 2 = 0 ∧ 2 ≤ c ∧ D (k + 1) = delta * (c + 2))
+    (hBenv : B sf + 2 ≤ 2 * M) :
+    ∃ t E T kappa : Nat,
+      t = (k + 1) - sf ∧
+      E = T + kappa ∧ 8 ≤ kappa ∧ kappa ≤ M ∧
+      Cf - sf = t + delta + 1 ∧
+      M + E = T + t + delta + 5 ∧
+      Cf - sf = (M - 4) + kappa := by
+  have hfactor := moving_horizon_critical_predecessor_factorization hstep hcrit
+  have hfinal : Cf - sf = (k + 1 - sf) + delta + 1 := by
+    have hsf : sf < k + 1 := hstep.2.1
+    have hCf : Cf - 1 = (k + 1) + delta := hfactor.2.1
+    omega
+  rcases moving_horizon_path_ledger hpath with ⟨E, T, hE, hT⟩
+  have htel := moving_horizon_path_telescope hpath ⟨hE, hT⟩
+  have hstart : (2 * M - 2) - (M + 2) = M - 4 := by omega
+  have hM4 : 4 ≤ M := by omega
+  have hMsub : (M - 4) + 4 = M := Nat.sub_add_cancel hM4
+  have hglobal : M + E = T + (k + 1 - sf) + delta + 5 := by
+    rw [hstart, hfinal] at htel
+    omega
+  have ht : 1 ≤ (k + 1) - sf := by
+    apply Nat.le_sub_of_add_le
+    simpa [Nat.add_comm] using Nat.succ_le_of_lt hstep.2.1
+  have hdeltaodd : delta % 2 = 1 := by
+    rw [← hcrit.1]
+    have hkplus3 : 3 ≤ k + 1 := Nat.le_trans
+      (Nat.succ_le_succ hstep.1.1) (Nat.succ_le_of_lt hstep.2.1)
+    exact d_mod_two_eq_one_of_three_le hkplus3
+  have hdelta2 : M + 2 ≤ delta := by omega
+  have hET : T + 8 ≤ E := by omega
+  have hTle : T ≤ E := Nat.le_trans (by omega) hET
+  rcases Nat.exists_eq_add_of_le hTle with ⟨kappa, hkappa⟩
+  have hcoord := moving_horizon_slack_coordinate hstep.1
+  have hband : Cf - sf ≤ 2 * M - 4 := by omega
+  have hkcoord : Cf - sf = (M - 4) + kappa := by
+    rw [hstart, hkappa] at htel
+    omega
+  have hkappale : kappa ≤ M := by
+    omega
+  refine ⟨(k + 1) - sf, E, T, kappa, rfl, hkappa, ?_, hkappale,
+    hfinal, hglobal, hkcoord⟩
+  · omega
+
+theorem critical_actual_next_difference_record {k M : Nat}
+    (hP : IsAttainedPreviousMaximum M k) (hnew : M < d (k + 1)) :
+    IsDifferenceRecord (d (k + 1)) := by
+  rcases hP.2 with ⟨r, hr2, hrk, _⟩
+  refine ⟨k + 1, by omega, rfl, ?_⟩
+  intro j hj2 hjlt
+  have hjk : j ≤ k := by omega
+  exact Nat.lt_of_le_of_lt (hP.1 j hj2 hjk) hnew
+
+theorem critical_actual_next_difference_record_prior {k M : Nat}
+    (hP : IsAttainedPreviousMaximum M k) (hnew : M < d (k + 1)) :
+    ∀ j : Nat, 2 ≤ j → j < k + 1 → d j < d (k + 1) := by
+  intro j hj2 hjlt
+  have hjk : j ≤ k := by omega
+  exact Nat.lt_of_le_of_lt (hP.1 j hj2 hjk) hnew
+
 end A166944Research

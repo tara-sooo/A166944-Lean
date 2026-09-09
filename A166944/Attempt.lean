@@ -1683,4 +1683,41 @@ example :
     have hj : j = 61 ∨ j = 62 ∨ j = 63 ∨ j = 64 ∨ j = 65 := by omega
     rcases hj with rfl | rfl | rfl | rfl | rfl <;> decide
 
+-- The generic path ledger and safe re-entry debt both pass the mandatory
+-- M=43 positive control at 51 -> 60.
+example :
+    (∃ E T, 100 + 1 = 96 + E ∧ 60 + 1 = 51 + T) ∧
+      (∃ lambda : Nat, 1 ≤ lambda ∧
+        96 - 51 = (100 - 60) + lambda ∧
+        (60 - 51) + 1 = 5 + lambda) := by
+  have hstep : IsMovingHorizonStep 51 96 60 100 := by
+    refine ⟨by simp [IsMovingHorizonState, D, a], by decide, by decide,
+      by decide, ?_, by decide, by decide, by decide,
+      by simp [IsMovingHorizonState, D, a]⟩
+    intro j hsj hjr
+    have hj : j = 52 ∨ j = 53 ∨ j = 54 ∨ j = 55 ∨ j = 56 ∨
+        j = 57 ∨ j = 58 ∨ j = 59 := by omega
+    rcases hj with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> decide
+  have hpath : HasMovingHorizonPathTo 51 96 60 100 1 := by
+    refine ⟨by simp [IsMovingHorizonState, D, a], 60, 100, hstep, ?_⟩
+    exact ⟨rfl, rfl, by simp [IsMovingHorizonState, D, a]⟩
+  constructor
+  · exact moving_horizon_path_ledger hpath
+  · have hdebt := moving_horizon_safe_reentry_debt
+      (M := 43) hstep (by decide) (by decide)
+    have hd : d 60 = 5 := by decide
+    simpa [hd] using hdebt
+
+-- The new global bound kappa <= M does not by itself remove the two old
+-- quotient families: these are arithmetic survivors, not recurrence paths.
+example :
+    (55 % 2 = 1 ∧ 35 % 2 = 1 ∧ 32 < 35 ∧ 35 < 55 ∧
+      55 + 6 ≤ 2 * 32 ∧ 4 ≤ 35 + 2 ∧
+      2 * 55 = 4 + 1 + 35 * 3 ∧
+      8 ≤ 55 + 4 + 5 - 32 ∧ 55 + 4 + 5 - 32 ≤ 32) ∧
+    (11 < 13 ∧ 13 + 6 ≤ 2 * 11 ∧
+      2 * 13 + 3 = 3 + 13 * 2 ∧
+      8 ≤ 13 + 3 + 5 - 11 ∧ 13 + 3 + 5 - 11 ≤ 11) := by
+  decide
+
 end A166944Research

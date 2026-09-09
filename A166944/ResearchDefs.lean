@@ -78,6 +78,15 @@ def HasMovingHorizonPathTo (s C sf Cf : Nat) : Nat → Prop
         ∃ r C', IsMovingHorizonStep s C r C' ∧
           HasMovingHorizonPathTo r C' sf Cf q
 
+/- A path whose every state, including the endpoint, is in the dangerous band.
+   This deliberately carries no event, envelope, or parity side conditions. -/
+def HasMovingHorizonDangerousPath (M s C sf Cf : Nat) : Nat → Prop
+  | 0 => s = sf ∧ C = Cf ∧ IsMovingHorizonState s C ∧ M < C - s
+  | Nat.succ q =>
+      IsMovingHorizonState s C ∧ M < C - s ∧
+        ∃ r C', IsMovingHorizonStep s C r C' ∧ M < C' - r ∧
+          HasMovingHorizonDangerousPath M r C' sf Cf q
+
 /- A finite old-event prefix with named endpoint, slack cap, and no
    fundamental state. E and T record event sizes and gap-plus-one terms. -/
 def HasMovingHorizonCappedOldPath (M s C sf Cf E T : Nat) : Nat → Prop
@@ -116,6 +125,19 @@ def HasMovingHorizonTerminalDangerousExcursion
     IsMovingHorizonStep sf Cf rf Cf' ∧ M < delta ∧
     d rf = delta ∧ rf = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
     Cf' = delta * (c + 2)
+
+/- A final dangerous block after an arbitrary mixed prefix.  The prefix is
+   intentionally an ordinary path; the stronger legacy excursion predicate
+   remains available when the prefix is known to be capped-old. -/
+def HasMovingHorizonTerminalDangerousBlock
+    (M delta sf Cf rf Cf' c : Nat) : Prop :=
+  ∃ s C r C' q₀ q₁,
+    HasMovingHorizonPathTo (M + 2) (2 * M - 2) s C q₀ ∧
+    IsMovingHorizonState s C ∧ C - s ≤ M ∧ B s ≠ 2 ∧
+    IsMovingHorizonStep s C r C' ∧ d r ≤ M ∧ M < C' - r ∧
+    HasMovingHorizonDangerousSuffix M r C' sf Cf q₁ ∧
+    IsMovingHorizonStep sf Cf rf Cf' ∧ M < delta ∧ d rf = delta ∧
+    rf = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧ Cf' = delta * (c + 2)
 
 /-- A finite close-old segment with explicit envelope excess and Nat sums. -/
 def HasMovingHorizonCloseChain (P s C X E T : Nat) : Nat → Prop
