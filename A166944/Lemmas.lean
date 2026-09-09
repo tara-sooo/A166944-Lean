@@ -5655,6 +5655,203 @@ theorem fundamental_reset_coordinate {m : Nat} (hm : 2 ≤ m)
     have hrel := B_add_index_eq_D_add_two (n := m + 5) (by omega)
     omega
 
+theorem critical_no_fundamental_before_final {k M : Nat} (hk : 2 ≤ k)
+    (hM5 : 5 < M) (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∀ m : Nat, M + 2 ≤ m → m < k + 1 → B m ≠ 2 := by
+  intro m hm hmk hfund
+  have hm2 : 2 ≤ m := by omega
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, hak, hD, _, _⟩
+  rcases fundamental_reset hm2 hfund with hleft | hright
+  · rcases hleft with ⟨hd1, hd2, hB2, hdreset, hBreset⟩
+    have hDreset : D (m + 3) = 2 * (m + 1) - 2 := by
+      have hrel := B_add_index_eq_D_add_two (n := m + 3) (by omega)
+      omega
+    by_cases hbefore : m + 3 < k + 1
+    · have hcap := hP.1 (m + 3) (by omega) (by omega)
+      rw [hdreset] at hcap
+      omega
+    · by_cases heq : m + 3 = k + 1
+      · have hdelta : d (k + 1) = m + 1 := by
+          simpa [heq] using hdreset
+        have hDreset' : D (k + 1) = 2 * (m + 1) - 2 := by
+          simpa [heq] using hDreset
+        have hfour : 4 * d (k + 1) ≤ D (k + 1) := by
+          rw [hD]
+          have hmul := Nat.mul_le_mul_left (d (k + 1))
+            (show 4 ≤ c + 2 by omega)
+          simpa [Nat.mul_comm] using hmul
+        rw [hdelta, hDreset'] at hfour
+        omega
+      · have hafter : k + 1 < m + 3 := by omega
+        have hcases : k + 1 = m + 1 ∨ k + 1 = m + 2 := by omega
+        rcases hcases with hcase | hcase
+        · rw [hcase, hd1] at hnew
+          omega
+        · rw [hcase, hd2] at hnew
+          omega
+  · rcases hright with
+      ⟨hd1, hd3, hB2, hd4, hd5, hB4, hdreset, hBreset⟩
+    have hDreset : D (m + 5) = 2 * (m + 3) - 2 := by
+      have hrel := B_add_index_eq_D_add_two (n := m + 5) (by omega)
+      omega
+    by_cases hbefore : m + 5 < k + 1
+    · have hcap := hP.1 (m + 5) (by omega) (by omega)
+      rw [hdreset] at hcap
+      omega
+    · by_cases heq : m + 5 = k + 1
+      · have hdelta : d (k + 1) = m + 3 := by
+          simpa [heq] using hdreset
+        have hDreset' : D (k + 1) = 2 * (m + 3) - 2 := by
+          simpa [heq] using hDreset
+        have hfour : 4 * d (k + 1) ≤ D (k + 1) := by
+          rw [hD]
+          have hmul := Nat.mul_le_mul_left (d (k + 1))
+            (show 4 ≤ c + 2 by omega)
+          simpa [Nat.mul_comm] using hmul
+        rw [hdelta, hDreset'] at hfour
+        omega
+      · have hafter : k + 1 < m + 5 := by omega
+        have hcases : k + 1 = m + 1 ∨ k + 1 = m + 2 ∨
+            k + 1 = m + 3 ∨ k + 1 = m + 4 := by omega
+        rcases hcases with hcase | hcase | hcase | hcase
+        · rw [hcase, hd1] at hnew
+          omega
+        · rw [hcase, hd3] at hnew
+          omega
+        · rw [hcase, hd4] at hnew
+          omega
+        · rw [hcase, hd5] at hnew
+          omega
+
+theorem critical_replay_progress {k M s C : Nat} (hk : 2 ≤ k)
+    (hM5 : 5 < M) (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hstate : IsMovingHorizonState s C)
+    (hs : M + 2 ≤ s) (hsfinal : s < k + 1) :
+    ∃ r C', IsMovingHorizonStep s C r C' ∧ r ≤ k + 1 := by
+  rcases moving_horizon_dichotomy hstate with hno | hstep
+  · have htel := moving_horizon_no_event_telescope hstate hno
+    rcases htel with ⟨hDC, hBCtel⟩
+    have hBC : B C = 2 := by
+      have hrel := B_add_index_eq_D_add_two hstate.1
+      have hcoord := moving_horizon_slack_coordinate hstate
+      omega
+    by_cases hCfinal : C < k + 1
+    · have hsc : s < C := hstate.2.2
+      have hMC : M + 2 ≤ C := by omega
+      exact False.elim
+        (critical_no_fundamental_before_final hk hM5 hP hIH hnew hfail
+          C hMC hCfinal hBC)
+    · have hCge : k + 1 ≤ C := Nat.le_of_not_gt hCfinal
+      have hbad := hno (k + 1) (by omega) hCge
+      omega
+  · rcases hstep with ⟨r, C', hstep⟩
+    rcases hstep with
+      ⟨hstate', hsr, hrC, hdr, hfirst, hDr, hC', hgrowth, hstateR⟩
+    refine ⟨r, C', ⟨hstate', hsr, hrC, hdr, hfirst, hDr, hC', hgrowth,
+      hstateR⟩, ?_⟩
+    by_cases hle : r ≤ k + 1
+    · exact hle
+    · have hfinal_lt : k + 1 < r := Nat.lt_of_not_ge hle
+      have hunit := hfirst (k + 1) (by omega) hfinal_lt
+      omega
+
+theorem critical_replay_path {k M s C : Nat} (hk : 2 ≤ k)
+    (hM5 : 5 < M) (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hstate : IsMovingHorizonState s C)
+    (hs : M + 2 ≤ s) (hsfinal : s < k + 1) :
+    ∃ q, HasMovingHorizonPathTo s C (k + 1) (D (k + 1)) q := by
+  let N := k + 1
+  have aux : ∀ n s C : Nat, N - s = n →
+      IsMovingHorizonState s C → M + 2 ≤ s → s < N →
+      ∃ q, HasMovingHorizonPathTo s C N (D N) q := by
+    intro n
+    induction n using Nat.strongRecOn with
+    | ind n ih =>
+        intro s C hn hstate hs hsfinal
+        rcases critical_replay_progress hk hM5 hP hIH hnew hfail
+          hstate hs (by simpa [N] using hsfinal) with ⟨r, C', hstep, hrN⟩
+        by_cases hfinal : r = N
+        · have hC' : C' = D N := by
+            simpa [N, hfinal] using hstep.2.2.2.2.2.2.1
+          have hstepfinal : IsMovingHorizonStep s C N (D N) := by
+            subst r
+            subst C'
+            exact hstep
+          refine ⟨1, hstate, ?_⟩
+          refine ⟨N, D N, hstepfinal, ?_⟩
+          exact ⟨rfl, rfl, hstepfinal.2.2.2.2.2.2.2.2⟩
+        · have hlt : r < N := Nat.lt_of_le_of_ne hrN hfinal
+          have hmeasure : N - r < n := by
+            have hsr : s < r := hstep.2.1
+            omega
+          have hnext : M + 2 ≤ r := by omega
+          have hpath := ih (N - r) hmeasure r C'
+            (by rfl) hstep.2.2.2.2.2.2.2.2 hnext hlt
+          rcases hpath with ⟨q, hpath⟩
+          refine ⟨q + 1, hstate, ⟨r, C', hstep, hpath⟩⟩
+  exact aux (N - s) s C rfl hstate hs (by simpa [N] using hsfinal)
+
+theorem attained_previous_maximum_history_B_envelope {k M : Nat}
+    (hP : IsAttainedPreviousMaximum M k)
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∀ j : Nat, 2 ≤ j → j < k + 1 → B j + 2 ≤ 2 * M := by
+  intro j hj2 hjN
+  have hjk : j ≤ k := by omega
+  have hAj := henv j M hj2 hjN
+    (fun i hi2 hij => hP.1 i hi2 (Nat.le_trans hij hjk))
+  exact excess_le_of_envelope hj2 hAj
+
+theorem moving_horizon_path_index_le {s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q) : s ≤ sf := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf, _, _⟩
+      omega
+  | succ q ih =>
+      rcases hpath with ⟨_, r, C', hstep, htail⟩
+      have hrest := ih htail
+      have hsr : s < r := hstep.2.1
+      omega
+
+theorem moving_horizon_path_index_lt {s C sf Cf q : Nat} (hq : 1 ≤ q)
+    (hpath : HasMovingHorizonPathTo s C sf Cf q) : s < sf := by
+  cases q with
+  | zero => omega
+  | succ q =>
+      rcases hpath with ⟨_, r, C', hstep, htail⟩
+      have hrest := moving_horizon_path_index_le htail
+      have hsr : s < r := hstep.2.1
+      omega
+
+theorem moving_horizon_path_last_step {s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q) (hstart : s < sf) :
+    ∃ sp Cp q₀, HasMovingHorizonPathTo s C sp Cp q₀ ∧
+      IsMovingHorizonStep sp Cp sf Cf := by
+  induction q generalizing s C sf Cf with
+  | zero =>
+      rcases hpath with ⟨hsf, _, _⟩
+      omega
+  | succ q ih =>
+      rcases hpath with ⟨hstate, r, C', hstep, htail⟩
+      cases q with
+      | zero =>
+          rcases htail with ⟨hrf, hCf, _⟩
+          subst sf
+          subst Cf
+          exact ⟨s, C, 0, ⟨rfl, rfl, hstate⟩, hstep⟩
+      | succ q =>
+          have hrlt : r < sf := moving_horizon_path_index_lt (by omega) htail
+          rcases ih htail hrlt with ⟨sp, Cp, q₀, hprefix, hlast⟩
+          exact ⟨sp, Cp, q₀ + 1,
+            ⟨hstate, r, C', hstep, hprefix⟩, hlast⟩
+
 theorem moving_horizon_critical_even_q_one
     {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')
     (hcrit : d r = delta ∧ r = delta * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
@@ -5835,6 +6032,53 @@ theorem moving_horizon_critical_short_tail
   refine ⟨hdelta2, ?_, ?_⟩
   · omega
   · omega
+
+theorem critical_final_predecessor_dangerous
+    {k M delta sf Cf c : Nat} (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hBenv : B sf + 2 ≤ 2 * M)
+    (hstep : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hcrit : d (k + 1) = delta ∧ k + 1 = delta * c ∧
+      c % 2 = 0 ∧ 2 ≤ c ∧ D (k + 1) = delta * (c + 2)) :
+    M < Cf - sf := by
+  rcases Nat.exists_eq_add_of_le hBenv with ⟨Y, hY⟩
+  have hYs : B sf + 2 + Y = 2 * M := hY.symm
+  have hshort := moving_horizon_critical_short_tail hstep hYs hModd hnew hcrit
+  have hcoord := moving_horizon_slack_coordinate hstep.1
+  omega
+
+theorem critical_replay_terminal_predecessor {k M : Nat} (hk : 2 ≤ k)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1)) :
+    ∃ sf Cf q₀, HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf q₀ ∧
+      IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)) ∧
+      M < Cf - sf := by
+  rcases critical_previous_record_provenance_with_fundamental hk hP hIH hnew hfail henv with
+    ⟨p, _, _, _, _, _, hM5, hModd, hp, _, _, _, hD,
+      _, _, _, _, _, _, _⟩
+  have hDstart : D (M + 2) = 2 * M - 2 := by simpa [hp] using hD
+  have hstart : IsMovingHorizonState (M + 2) (2 * M - 2) := by
+    refine ⟨by omega, hDstart, ?_⟩
+    omega
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, _, hDfinal, _, _⟩
+  have hstartlt : M + 2 < k + 1 := by
+    have hdelta : M + 1 ≤ d (k + 1) := Nat.succ_le_of_lt hnew
+    omega
+  have hpath := critical_replay_path hk hM5 hP hIH hnew hfail
+    hstart (by omega) hstartlt
+  rcases hpath with ⟨q, hpath⟩
+  rcases moving_horizon_path_last_step hpath hstartlt with
+    ⟨sf, Cf, q₀, hprefix, hfinal⟩
+  have hBsf : B sf + 2 ≤ 2 * M := by
+    have hsf2 : 2 ≤ sf := hfinal.1.1
+    have hsfN : sf < k + 1 := hfinal.2.1
+    exact attained_previous_maximum_history_B_envelope hP henv sf hsf2 hsfN
+  have hdanger := critical_final_predecessor_dangerous hModd hnew hBsf hfinal
+    ⟨rfl, hc, hcmod, hc2, hDfinal⟩
+  exact ⟨sf, Cf, q₀, hprefix, hfinal, hdanger⟩
 
 theorem moving_horizon_critical_predecessor_first_hit
     {delta s C r C' c : Nat} (hstep : IsMovingHorizonStep s C r C')

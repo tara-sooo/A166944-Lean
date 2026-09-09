@@ -70,6 +70,14 @@ def HasMovingHorizonChain (s C : Nat) : Nat → Prop
       ∃ r C', IsMovingHorizonStep s C r C' ∧
         HasMovingHorizonChain r C' q
 
+/-- A finite first-hit path with an explicitly named endpoint. -/
+def HasMovingHorizonPathTo (s C sf Cf : Nat) : Nat → Prop
+  | 0 => s = sf ∧ C = Cf ∧ IsMovingHorizonState s C
+  | Nat.succ q =>
+      IsMovingHorizonState s C ∧
+        ∃ r C', IsMovingHorizonStep s C r C' ∧
+          HasMovingHorizonPathTo r C' sf Cf q
+
 /- A finite old-event prefix with named endpoint, slack cap, and no
    fundamental state. E and T record event sizes and gap-plus-one terms. -/
 def HasMovingHorizonCappedOldPath (M s C sf Cf E T : Nat) : Nat → Prop

@@ -1533,4 +1533,154 @@ example :
   exact canonical_record_fundamental_predecessor
     (M := 13) (by decide) (by decide) (by decide) (by decide) (by decide)
 
+-- No fundamental state can occur between the canonical previous record and
+-- the actual critical edge.  This is the first replay-extraction gate.
+theorem attempt_no_fundamental_before_final {k M : Nat} (hk : 2 ≤ k) (hM5 : 5 < M)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∀ m : Nat, M + 2 ≤ m → m < k + 1 → B m ≠ 2 := by
+  intro m hm hmk hfund
+  have hm2 : 2 ≤ m := by omega
+  rcases critical_even_quotient_normal_form hk hIH hnew hfail with
+    ⟨c, hc, hcmod, hc2, hak, hD, _, _⟩
+  rcases fundamental_reset hm2 hfund with hleft | hright
+  · rcases hleft with ⟨hd1, hd2, hB2, hdreset, hBreset⟩
+    have hDreset : D (m + 3) = 2 * (m + 1) - 2 := by
+      have hrel := B_add_index_eq_D_add_two (n := m + 3) (by omega)
+      omega
+    by_cases hbefore : m + 3 < k + 1
+    · have hcap := hP.1 (m + 3) (by omega) (by omega)
+      rw [hdreset] at hcap
+      omega
+    · by_cases heq : m + 3 = k + 1
+      · have hdelta : d (k + 1) = m + 1 := by
+          simpa [heq] using hdreset
+        have hDreset' : D (k + 1) = 2 * (m + 1) - 2 := by
+          simpa [heq] using hDreset
+        have hfour : 4 * d (k + 1) ≤ D (k + 1) := by
+          rw [hD]
+          have hmul := Nat.mul_le_mul_left (d (k + 1)) (show 4 ≤ c + 2 by omega)
+          simpa [Nat.mul_comm] using hmul
+        rw [hdelta, hDreset'] at hfour
+        omega
+      · have hafter : k + 1 < m + 3 := by omega
+        have hcases : k + 1 = m + 1 ∨ k + 1 = m + 2 := by omega
+        rcases hcases with hcase | hcase
+        · rw [hcase, hd1] at hnew
+          omega
+        · rw [hcase, hd2] at hnew
+          omega
+  · rcases hright with
+      ⟨hd1, hd3, hB2, hd4, hd5, hB4, hdreset, hBreset⟩
+    have hDreset : D (m + 5) = 2 * (m + 3) - 2 := by
+      have hrel := B_add_index_eq_D_add_two (n := m + 5) (by omega)
+      omega
+    by_cases hbefore : m + 5 < k + 1
+    · have hcap := hP.1 (m + 5) (by omega) (by omega)
+      rw [hdreset] at hcap
+      omega
+    · by_cases heq : m + 5 = k + 1
+      · have hdelta : d (k + 1) = m + 3 := by
+          simpa [heq] using hdreset
+        have hDreset' : D (k + 1) = 2 * (m + 3) - 2 := by
+          simpa [heq] using hDreset
+        have hfour : 4 * d (k + 1) ≤ D (k + 1) := by
+          rw [hD]
+          have hmul := Nat.mul_le_mul_left (d (k + 1)) (show 4 ≤ c + 2 by omega)
+          simpa [Nat.mul_comm] using hmul
+        rw [hdelta, hDreset'] at hfour
+        omega
+      · have hafter : k + 1 < m + 5 := by omega
+        have hcases : k + 1 = m + 1 ∨ k + 1 = m + 2 ∨
+            k + 1 = m + 3 ∨ k + 1 = m + 4 := by omega
+        rcases hcases with hcase | hcase | hcase | hcase
+        · rw [hcase, hd1] at hnew
+          omega
+        · rw [hcase, hd3] at hnew
+          omega
+        · rw [hcase, hd4] at hnew
+          omega
+        · rw [hcase, hd5] at hnew
+          omega
+
+-- An actual moving-horizon state before the critical edge always has a next
+-- first-hit event at or before that edge.
+example {k M s C : Nat} (hk : 2 ≤ k) (hM5 : 5 < M)
+    (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (hstate : IsMovingHorizonState s C)
+    (hs : M + 2 ≤ s) (hsfinal : s < k + 1) :
+    ∃ r C', IsMovingHorizonStep s C r C' ∧ r ≤ k + 1 := by
+  rcases moving_horizon_dichotomy hstate with hno | hstep
+  · have htel := moving_horizon_no_event_telescope hstate hno
+    rcases htel with ⟨hDC, hBCtel⟩
+    have hBC : B C = 2 := by
+      have hrel := B_add_index_eq_D_add_two hstate.1
+      have hcoord := moving_horizon_slack_coordinate hstate
+      omega
+    by_cases hCfinal : C < k + 1
+    · have hsc : s < C := hstate.2.2
+      have hMC : M + 2 ≤ C := by omega
+      exact False.elim
+        (attempt_no_fundamental_before_final hk hM5 hP hIH hnew hfail
+          C hMC hCfinal hBC)
+    · have hCge : k + 1 ≤ C := Nat.le_of_not_gt hCfinal
+      have hbad := hno (k + 1) (by omega) hCge
+      omega
+  · rcases hstep with ⟨r, C', hstep⟩
+    rcases hstep with
+      ⟨hstate', hsr, hrC, hdr, hfirst, hDr, hC', hgrowth, hstateR⟩
+    refine ⟨r, C', ⟨hstate', hsr, hrC, hdr, hfirst, hDr, hC', hgrowth, hstateR⟩, ?_⟩
+    by_cases hle : r ≤ k + 1
+    · exact hle
+    · have hfinal_lt : k + 1 < r := Nat.lt_of_not_ge hle
+      have hunit := hfirst (k + 1) (by omega) hfinal_lt
+      omega
+
+-- The final predecessor is dangerous once the transported B-envelope is
+-- combined with the critical short-tail inequality.
+example {k M delta sf Cf c : Nat} (hM5 : 5 < M)
+    (hBenv : B sf + 2 ≤ 2 * M) (hModd : M % 2 = 1)
+    (hnew : M < delta)
+    (hstep : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hcrit : d (k + 1) = delta ∧ k + 1 = delta * c ∧
+      c % 2 = 0 ∧ 2 ≤ c ∧ D (k + 1) = delta * (c + 2)) :
+    M < Cf - sf := by
+  rcases Nat.exists_eq_add_of_le hBenv with ⟨Y, hY⟩
+  have hYs : B sf + 2 + Y = 2 * M := hY.symm
+  have hshort := moving_horizon_critical_short_tail hstep hYs hModd hnew hcrit
+  have hcoord := moving_horizon_slack_coordinate hstep.1
+  omega
+
+-- A genuine replay can leave and later re-enter the capped band; the single
+-- terminal-suffix package therefore needs an additional no-reentry argument.
+example :
+    IsMovingHorizonStep 48 90 51 96 ∧
+      IsMovingHorizonStep 51 96 60 100 ∧
+      IsMovingHorizonStep 60 100 66 132 ∧
+      90 - 48 ≤ 43 ∧ 43 < 96 - 51 ∧
+      100 - 60 ≤ 43 ∧ 43 < 132 - 66 := by
+  refine ⟨?_, ?_, ?_, by decide, by decide, by decide, by decide⟩
+  · refine ⟨by simp [IsMovingHorizonState, D, a], by decide, by decide,
+      by decide, ?_, by decide, by decide, by decide,
+      by simp [IsMovingHorizonState, D, a]⟩
+    intro j hsj hjr
+    have hj : j = 49 ∨ j = 50 := by omega
+    rcases hj with rfl | rfl <;> decide
+  · refine ⟨by simp [IsMovingHorizonState, D, a], by decide, by decide,
+      by decide, ?_, by decide, by decide, by decide,
+      by simp [IsMovingHorizonState, D, a]⟩
+    intro j hsj hjr
+    have hj : j = 52 ∨ j = 53 ∨ j = 54 ∨ j = 55 ∨ j = 56 ∨
+        j = 57 ∨ j = 58 ∨ j = 59 := by omega
+    rcases hj with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> decide
+  · refine ⟨by simp [IsMovingHorizonState, D, a], by decide, by decide,
+      by decide, ?_, by decide, by decide, by decide,
+      by simp [IsMovingHorizonState, D, a]⟩
+    intro j hsj hjr
+    have hj : j = 61 ∨ j = 62 ∨ j = 63 ∨ j = 64 ∨ j = 65 := by omega
+    rcases hj with rfl | rfl | rfl | rfl | rfl <;> decide
+
 end A166944Research
