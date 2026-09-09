@@ -1720,4 +1720,152 @@ example :
       8 ≤ 13 + 3 + 5 - 11 ∧ 13 + 3 + 5 - 11 ≤ 11) := by
   decide
 
+example {M k s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q)
+    (hend : sf < k + 1)
+    (hold : ∀ j : Nat, 2 ≤ j → j < k + 1 → d j ≤ M) :
+    ∃ E T, Cf + q = C + E ∧ sf + q = s + T ∧
+      3 * q ≤ E ∧ E ≤ M * q ∧ 2 * q ≤ T :=
+  moving_horizon_path_count_bounds hpath hend hold
+
+example {k M delta sf Cf c p : Nat}
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hstep : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hcrit : d (k + 1) = delta ∧ k + 1 = delta * c ∧
+      c % 2 = 0 ∧ 2 ≤ c ∧ D (k + 1) = delta * (c + 2)) :
+    ∃ E T,
+      delta * (c + 1) + 1 + p = (2 * M - 2) + E ∧
+      delta * c + p = (M + 2) + T + ((k + 1) - sf) :=
+  critical_mixed_replay_occurrence_ledger hpath hstep hcrit
+
+example {M t delta kappa E T : Nat}
+    (hE : E = T + kappa)
+    (hglobal : M + E = T + t + delta + 5)
+    (hkappa : kappa ≤ M) (ht : 1 ≤ t) :
+    1 ≤ t ∧ t + delta + 5 ≤ 2 * M :=
+  critical_mixed_replay_gap_budget
+    (critical_mixed_replay_kappa_relation hE hglobal) hkappa ht
+
+example {M delta c r C' e : Nat}
+    (hdeltaodd : delta % 2 = 1) (hbound : delta + 6 ≤ 2 * M)
+    (hMe : M < e) (hEd : e < delta)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 0)
+    (hclose : r - delta * c ≤ e + 2) :
+    ∃ tplus u v,
+      tplus = r - delta * c ∧ r % 2 = 0 ∧
+      e * u = delta * c + tplus ∧
+      e * v + 1 = delta * (c + 2) ∧
+      Nat.gcd u v = 1 ∧ v - u = 3 :=
+  critical_postrecord_even_q_three_factor_package
+    hdeltaodd hbound hMe hEd hstep he hrpar hclose
+
+example {M delta c r C' e : Nat}
+    (hbound : delta + 6 ≤ 2 * M) (hMe : M < e)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 1) :
+    ∃ tplus u v,
+      tplus = r - delta * c ∧ r % 2 = 1 ∧
+      e * u + 2 = delta * c + tplus ∧
+      e * v = delta * (c + 2) + 1 ∧
+      Nat.gcd u v = 1 ∧ v - u = 2 :=
+  critical_postrecord_odd_q_two_factor_package hbound hMe hstep he hrpar
+
+example {M delta c r C' e : Nat}
+    (hdeltaodd : delta % 2 = 1) (hbound : delta + 6 ≤ 2 * M)
+    (hMe : M < e) (hEd : e < delta)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 0)
+    (hclose : r - delta * c ≤ e + 2) :
+    2 * delta = (r - delta * c) + 1 + 3 * e :=
+  critical_postrecord_even_q_three_scalar
+    hdeltaodd hbound hMe hEd hstep he hrpar hclose
+
+example {M delta c r C' e : Nat}
+    (hbound : delta + 6 ≤ 2 * M) (hMe : M < e)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 1) :
+    2 * delta + 3 = (r - delta * c) + 2 * e :=
+  critical_postrecord_odd_q_two_scalar hbound hMe hstep he hrpar
+
+example {M delta c p E T tminus e u v tplus : Nat}
+    (hM2 : 2 ≤ M)
+    (hpre₁ : delta * (c + 1) + 1 + p = (2 * M - 2) + E)
+    (hpre₂ : delta * c + p = (M + 2) + T + tminus)
+    (hpost₁ : e * u = delta * c + tplus)
+    (hpost₂ : e * v + 1 = delta * (c + 2)) :
+    e * u + p = M + 2 + T + tminus + tplus ∧
+      e * v + p + 4 = 2 * M + E + delta :=
+  critical_q_three_global_local_coupling
+    hM2 hpre₁ hpre₂ hpost₁ hpost₂
+
+example {M delta c p E T tminus e u v tplus : Nat}
+    (hM2 : 2 ≤ M)
+    (hpre₁ : delta * (c + 1) + 1 + p = (2 * M - 2) + E)
+    (hpre₂ : delta * c + p = (M + 2) + T + tminus)
+    (hpost₁ : e * u + 2 = delta * c + tplus)
+    (hpost₂ : e * v = delta * (c + 2) + 1) :
+    e * u + p + 2 = M + 2 + T + tminus + tplus ∧
+      e * v + p + 2 = 2 * M + E + delta :=
+  critical_q_two_global_local_coupling
+    hM2 hpre₁ hpre₂ hpost₁ hpost₂
+
+example {M k delta sf Cf r C' e p kappa : Nat}
+    (hM5 : 5 < M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hendpoint : Cf - sf = (M - 4) + kappa)
+    (hold : d sf ≤ M)
+    (hcritical : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hdelta : d (k + 1) = delta)
+    (hpost : IsMovingHorizonStep (k + 1) (D (k + 1)) r C')
+    (he : d r = e) :
+    p = 0 ∨
+      ∃ sp Cp q₀ f,
+        HasMovingHorizonPathTo (M + 2) (2 * M - 2) sp Cp q₀ ∧
+        ∃ hlast : IsMovingHorizonStep sp Cp sf Cf,
+          d sf = f ∧ 3 ≤ f ∧ f ≤ M ∧
+          ((sf % 2 = 0 ∧ f ∣ (M - 4) + kappa) ∨
+            (sf % 2 = 1 ∧ f ∣ M + kappa)) ∧
+          MovingHorizonAdjacentFactorTransition Cp sf Cf (k + 1)
+            (d sf) delta ∧
+          MovingHorizonAdjacentFactorTransition Cf (k + 1) (D (k + 1)) r
+            delta e :=
+  critical_record_straddling_factor_transitions
+    hM5 hpath hendpoint hold hcritical hdelta hpost he
+
+-- Smallest complete scalar survivor under the explicit diagnostic ceilings.
+-- It satisfies every retained q=3 ledger/coupling condition, but is not a
+-- recurrence path witness.
+example :
+    (39 % 2 = 1 ∧ 32 % 2 = 0 ∧ 2 ≤ 32 ∧
+      3 * 57 ≤ 1301 ∧ 1301 ≤ 23 * 57 ∧ 2 * 57 ≤ 1279 ∧
+      39 * (32 + 1) + 1 + 57 = (2 * 23 - 2) + 1301 ∧
+      39 * 32 + 57 = (23 + 2) + 1279 + 1 ∧
+      1301 = 1279 + 22 ∧ 8 ≤ 22 ∧ 22 ≤ 23 ∧
+      23 + 22 = 1 + 39 + 5 ∧ 39 + 6 ≤ 2 * 23 ∧
+      23 < 25 ∧ 25 < 39 ∧ 1250 = 39 * 32 + 2 ∧ 1250 % 2 = 0 ∧
+      25 * 50 = 39 * 32 + 2 ∧ 25 * 53 + 1 = 39 * (32 + 2) ∧
+      Nat.gcd 50 53 = 1 ∧ 53 - 50 = 3 ∧
+      25 * 50 + 57 = 23 + 2 + 1279 + 1 + 2 ∧
+      25 * 53 + 57 + 4 = 2 * 23 + 1301 + 39 ∧
+      2 * 39 = 2 + 1 + 3 * 25) := by
+  decide
+
+-- Smallest complete scalar survivor under the same diagnostic ceilings for
+-- q=2; it is also only an arithmetic diagnostic.
+example :
+    (15 % 2 = 1 ∧ 4 % 2 = 0 ∧ 2 ≤ 4 ∧
+      3 * 6 ≤ 62 ∧ 62 ≤ 11 * 6 ∧ 2 * 6 ≤ 52 ∧
+      15 * (4 + 1) + 1 + 6 = (2 * 11 - 2) + 62 ∧
+      15 * 4 + 6 = (11 + 2) + 52 + 1 ∧
+      62 = 52 + 10 ∧ 8 ≤ 10 ∧ 10 ≤ 11 ∧
+      11 + 10 = 1 + 15 + 5 ∧ 15 + 6 ≤ 2 * 11 ∧
+      11 < 13 ∧ 67 = 15 * 4 + 7 ∧ 67 % 2 = 1 ∧
+      67 - 2 = 13 * 5 ∧ 13 * 7 = 15 * (4 + 2) + 1 ∧
+      Nat.gcd 5 7 = 1 ∧ 7 - 5 = 2 ∧
+      13 * 5 + 6 + 2 = 11 + 2 + 52 + 1 + 7 ∧
+      13 * 7 + 6 + 2 = 2 * 11 + 62 + 15 ∧
+      2 * 15 + 3 = 7 + 2 * 13) := by
+  decide
+
 end A166944Research

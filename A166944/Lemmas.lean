@@ -6666,11 +6666,8 @@ theorem moving_horizon_odd_factor_pair
   exact ⟨u, v, hu, hv, hcop, by rw [hgap]; exact hqmod,
     by omega, hCprime⟩
 
-theorem moving_horizon_adjacent_factor_transition
-    {s C r C' u C'' e f : Nat}
-    (hstep : IsMovingHorizonStep s C r C')
-    (hnext : IsMovingHorizonStep r C' u C'')
-    (he : d r = e) (hf : d u = f) :
+def MovingHorizonAdjacentFactorTransition
+    (C r C' u e f : Nat) : Prop :=
     (r % 2 = 0 ∧ u % 2 = 0 ∧
         ∃ v w : Nat, C - 1 = e * v ∧ C' - 1 = f * w ∧
           f * w + 1 = e * (v + 1)) ∨
@@ -6682,7 +6679,14 @@ theorem moving_horizon_adjacent_factor_transition
           f * w + 3 = e * (v + 1)) ∨
       (r % 2 = 1 ∧ u % 2 = 1 ∧
         ∃ v w : Nat, C + 1 = e * v ∧ C' + 1 = f * w ∧
-          f * w + 1 = e * (v + 1)) := by
+          f * w + 1 = e * (v + 1))
+
+theorem moving_horizon_adjacent_factor_transition
+    {s C r C' u C'' e f : Nat}
+    (hstep : IsMovingHorizonStep s C r C')
+    (hnext : IsMovingHorizonStep r C' u C'')
+    (he : d r = e) (hf : d u = f) :
+    MovingHorizonAdjacentFactorTransition C r C' u e f := by
   have hC'pos : 1 ≤ C' := by
     exact Nat.le_trans (Nat.le_trans (by simp) hnext.1.1)
       (Nat.le_of_lt hnext.1.2.2)
@@ -7347,5 +7351,382 @@ theorem critical_actual_next_difference_record_prior {k M : Nat}
   intro j hj2 hjlt
   have hjk : j ≤ k := by omega
   exact Nat.lt_of_le_of_lt (hP.1 j hj2 hjk) hnew
+
+theorem moving_horizon_path_count_bounds
+    {M k s C sf Cf q : Nat}
+    (hpath : HasMovingHorizonPathTo s C sf Cf q)
+    (hend : sf < k + 1)
+    (hold : ∀ j : Nat, 2 ≤ j → j < k + 1 → d j ≤ M) :
+    ∃ E T, Cf + q = C + E ∧ sf + q = s + T ∧
+      3 * q ≤ E ∧ E ≤ M * q ∧ 2 * q ≤ T := by
+  induction q generalizing s C with
+  | zero =>
+      rcases hpath with ⟨hsf, hCf, _⟩
+      subst sf
+      subst Cf
+      exact ⟨0, 0, by simp, by simp, by simp, by simp, by simp⟩
+  | succ q ih =>
+      rcases hpath with ⟨_, r, C', hstep, htail⟩
+      rcases ih htail with ⟨E, T, hCf, hsf, h3, hEM, h2T⟩
+      have hrle : r ≤ sf := moving_horizon_path_index_le htail
+      have hridx : r < k + 1 := by omega
+      have hr2 : 2 ≤ r := Nat.le_trans hstep.1.1
+        (Nat.le_of_lt hstep.2.1)
+      have hEr : d r ≤ M := hold r hr2 hridx
+      have hdr3 : 3 ≤ d r := moving_horizon_step_event_ge_three hstep
+      have hgap0 : 0 < r - s := Nat.sub_pos_of_lt hstep.2.1
+      have hgap : 2 ≤ r - s + 1 := by omega
+      have hupdate := moving_horizon_step_update hstep
+      refine ⟨E + d r, T + (r - s + 1), ?_, ?_, ?_, ?_, ?_⟩
+      · omega
+      · omega
+      · rw [Nat.mul_succ]
+        omega
+      · rw [Nat.mul_succ]
+        omega
+      · rw [Nat.mul_succ]
+        omega
+
+theorem critical_mixed_replay_occurrence_ledger
+    {k M delta sf Cf c p : Nat}
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hstep : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hcrit : d (k + 1) = delta ∧ k + 1 = delta * c ∧
+      c % 2 = 0 ∧ 2 ≤ c ∧ D (k + 1) = delta * (c + 2)) :
+    ∃ E T,
+      delta * (c + 1) + 1 + p = (2 * M - 2) + E ∧
+      delta * c + p = (M + 2) + T + ((k + 1) - sf) := by
+  rcases moving_horizon_path_ledger hpath with ⟨E, T, hC, hS⟩
+  have hfactor := moving_horizon_critical_predecessor_factorization
+    hstep hcrit
+  have hCf : Cf = delta * (c + 1) + 1 := by
+    omega
+  have hsf : sf < k + 1 := hstep.2.1
+  refine ⟨E, T, ?_, ?_⟩
+  · omega
+  · omega
+
+theorem critical_mixed_replay_kappa_relation
+    {M t delta E T kappa : Nat}
+    (hE : E = T + kappa)
+    (hglobal : M + E = T + t + delta + 5) :
+    M + kappa = t + delta + 5 := by
+  omega
+
+theorem critical_mixed_replay_gap_budget
+    {M t delta kappa : Nat}
+    (hrel : M + kappa = t + delta + 5)
+    (hkappa : kappa ≤ M) (ht : 1 ≤ t) :
+    1 ≤ t ∧ t + delta + 5 ≤ 2 * M := by
+  constructor
+  · exact ht
+  · omega
+
+theorem critical_postrecord_even_q_three_factor_package
+    {M delta c r C' e : Nat}
+    (hdeltaodd : delta % 2 = 1)
+    (hbound : delta + 6 ≤ 2 * M)
+    (hMe : M < e) (hEd : e < delta)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 0)
+    (hclose : r - delta * c ≤ e + 2) :
+    ∃ tplus u v,
+      tplus = r - delta * c ∧ r % 2 = 0 ∧
+      e * u = delta * c + tplus ∧
+      e * v + 1 = delta * (c + 2) ∧
+      Nat.gcd u v = 1 ∧ v - u = 3 := by
+  rcases moving_horizon_even_quotient_normal_form hstep hrpar with
+    ⟨q, hL, hqmod, hq1, hL'⟩
+  have hslack : delta * (c + 2) - delta * c = 2 * delta := by
+    have hsum : delta * c + 2 * delta = delta * (c + 2) := by
+      rw [Nat.mul_add, Nat.mul_two]
+      omega
+    omega
+  rw [hslack, he] at hL
+  have hr3 : 3 ≤ r := Nat.le_trans (Nat.succ_le_succ hstep.1.1)
+    (Nat.succ_le_of_lt hstep.2.1)
+  have heodd : e % 2 = 1 := by
+    rw [← he]
+    exact d_mod_two_eq_one_of_three_le hr3
+  have hqeq := critical_intermediate_even_quotient_eq_three
+    hdeltaodd heodd hMe hEd hbound hclose hL hqmod
+  rcases moving_horizon_even_factor_pair hstep he hrpar with
+    ⟨u, v, hur, hCv, hcop, _, _, hC'⟩
+  have hsumC :
+      (delta * (c + 2) - delta * c) + delta * c = delta * (c + 2) :=
+    by
+      apply Nat.sub_add_cancel
+      have hsum : delta * c + 2 * delta = delta * (c + 2) := by
+        rw [Nat.mul_add, Nat.mul_two]
+        omega
+      omega
+  have hrs : (r - delta * c) + delta * c = r :=
+    Nat.sub_add_cancel (Nat.le_of_lt hstep.2.1)
+  have hLq := hL
+  rw [hqeq] at hLq
+  have hCeq : delta * (c + 2) = r + 1 + e * 3 := by
+    omega
+  have hrdiff : r = delta * c + (r - delta * c) := by
+    calc
+      r = (r - delta * c) + delta * c := hrs.symm
+      _ = delta * c + (r - delta * c) := Nat.add_comm _ _
+  have hu : e * u = delta * c + (r - delta * c) := by
+    omega
+  have hCv' : e * v = r + e * 3 := by
+    calc
+      e * v = delta * (c + 2) - 1 := hCv.symm
+      _ = r + e * 3 := by omega
+  have hepos : 1 ≤ e := by
+    rw [← he]
+    exact one_le_d_of_two_le
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  have hmul : e * v = e * (u + 3) := by
+    calc
+      e * v = r + e * 3 := hCv'
+      _ = e * u + e * 3 := by rw [hur]
+      _ = e * (u + 3) := by rw [Nat.mul_add]
+  have hvEq : v = u + 3 := Nat.mul_left_cancel hepos hmul
+  have hgap : v - u = 3 := by omega
+  have hvplus : e * v + 1 = delta * (c + 2) := by
+    omega
+  exact ⟨r - delta * c, u, v, rfl, hrpar, hu, hvplus, hcop, hgap⟩
+
+theorem critical_postrecord_odd_q_two_factor_package
+    {M delta c r C' e : Nat}
+    (hbound : delta + 6 ≤ 2 * M) (hMe : M < e)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 1) :
+    ∃ tplus u v,
+      tplus = r - delta * c ∧ r % 2 = 1 ∧
+      e * u + 2 = delta * c + tplus ∧
+      e * v = delta * (c + 2) + 1 ∧
+      Nat.gcd u v = 1 ∧ v - u = 2 := by
+  rcases moving_horizon_odd_quotient_normal_form hstep hrpar with
+    ⟨q, hL, hqmod, hq2, hL'⟩
+  have hslack : delta * (c + 2) - delta * c = 2 * delta := by
+    have hsum : delta * c + 2 * delta = delta * (c + 2) := by
+      rw [Nat.mul_add, Nat.mul_two]
+      omega
+    omega
+  have hform : 2 * delta + 3 = (r - delta * c) + e * q := by
+    rw [hslack, he] at hL
+    exact hL
+  have hqeq := critical_intermediate_odd_quotient_eq_two
+    hMe hbound hform hqmod hq2
+  rcases moving_horizon_odd_factor_pair hstep he hrpar with
+    ⟨u, v, hur, hCv, hcop, _, _, hC'⟩
+  have hsumC :
+      (delta * (c + 2) - delta * c) + delta * c = delta * (c + 2) :=
+    by
+      apply Nat.sub_add_cancel
+      have hsum : delta * c + 2 * delta = delta * (c + 2) := by
+        rw [Nat.mul_add, Nat.mul_two]
+        omega
+      omega
+  have hrs : (r - delta * c) + delta * c = r :=
+    Nat.sub_add_cancel (Nat.le_of_lt hstep.2.1)
+  have hrdiff : r = delta * c + (r - delta * c) := by
+    calc
+      r = (r - delta * c) + delta * c := hrs.symm
+      _ = delta * c + (r - delta * c) := Nat.add_comm _ _
+  have hr2 : 2 ≤ r := Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1)
+  have hrsub2 : r - 2 + 2 = r := Nat.sub_add_cancel hr2
+  have hdelta_expand : delta * (c + 2) = delta * c + 2 * delta := by
+    rw [Nat.mul_add, Nat.mul_two]
+    omega
+  have hLq := hL
+  rw [hqeq] at hLq
+  have hCeq : delta * (c + 2) + 1 = (r - 2) + e * 2 := by
+    rw [hdelta_expand]
+    omega
+  have hu : e * u + 2 = delta * c + (r - delta * c) := by
+    calc
+      e * u + 2 = r := by omega
+      _ = delta * c + (r - delta * c) := hrdiff
+  have hepos : 1 ≤ e := by
+    rw [← he]
+    exact one_le_d_of_two_le
+      (Nat.le_trans hstep.1.1 (Nat.le_of_lt hstep.2.1))
+  have hmul : e * v = e * (u + 2) := by
+    calc
+      e * v = delta * (c + 2) + 1 := hCv.symm
+      _ = (r - 2) + e * 2 := hCeq
+      _ = e * u + e * 2 := by rw [hur]
+      _ = e * (u + 2) := by rw [Nat.mul_add]
+  have hvEq : v = u + 2 := Nat.mul_left_cancel hepos hmul
+  have hgap : v - u = 2 := by omega
+  have hvplus : e * v = delta * (c + 2) + 1 := by
+    omega
+  exact ⟨r - delta * c, u, v, rfl, hrpar, hu, hvplus, hcop, hgap⟩
+
+theorem critical_postrecord_even_q_three_scalar
+    {M delta c r C' e : Nat}
+    (hdeltaodd : delta % 2 = 1)
+    (hbound : delta + 6 ≤ 2 * M) (hMe : M < e) (hEd : e < delta)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 0)
+    (hclose : r - delta * c ≤ e + 2) :
+    2 * delta = (r - delta * c) + 1 + 3 * e := by
+  rcases critical_postrecord_even_q_three_factor_package
+      hdeltaodd hbound hMe hEd hstep he hrpar hclose with
+    ⟨tplus, u, v, htplus, _, hu, hv, _, hgap⟩
+  have hvEq : v = u + 3 := by omega
+  have hmul : e * v = e * (u + 3) := by
+    rw [hvEq, Nat.mul_add]
+  have hmul' : e * v = e * u + e * 3 := by
+    calc
+      e * v = e * (u + 3) := hmul
+      _ = e * u + e * 3 := by rw [Nat.mul_add]
+  have hdelta_expand : delta * (c + 2) = delta * c + 2 * delta := by
+    rw [Nat.mul_add, Nat.mul_two]
+    omega
+  rw [htplus] at hu
+  omega
+
+theorem critical_postrecord_odd_q_two_scalar
+    {M delta c r C' e : Nat}
+    (hbound : delta + 6 ≤ 2 * M) (hMe : M < e)
+    (hstep : IsMovingHorizonStep (delta * c) (delta * (c + 2)) r C')
+    (he : d r = e) (hrpar : r % 2 = 1) :
+    2 * delta + 3 = (r - delta * c) + 2 * e := by
+  rcases critical_postrecord_odd_q_two_factor_package
+      hbound hMe hstep he hrpar with
+    ⟨tplus, u, v, htplus, _, hu, hv, _, hgap⟩
+  have hvEq : v = u + 2 := by omega
+  have hmul : e * v = e * (u + 2) := by
+    rw [hvEq, Nat.mul_add]
+  have hmul' : e * v = e * u + e * 2 := by
+    calc
+      e * v = e * (u + 2) := hmul
+      _ = e * u + e * 2 := by rw [Nat.mul_add]
+  have hdelta_expand : delta * (c + 2) = delta * c + 2 * delta := by
+    rw [Nat.mul_add, Nat.mul_two]
+    omega
+  rw [htplus] at hu
+  omega
+
+theorem critical_q_three_global_local_coupling
+    {M delta c p E T tminus e u v tplus : Nat}
+    (hM2 : 2 ≤ M)
+    (hpre₁ : delta * (c + 1) + 1 + p = (2 * M - 2) + E)
+    (hpre₂ : delta * c + p = (M + 2) + T + tminus)
+    (hpost₁ : e * u = delta * c + tplus)
+    (hpost₂ : e * v + 1 = delta * (c + 2)) :
+    e * u + p = M + 2 + T + tminus + tplus ∧
+      e * v + p + 4 = 2 * M + E + delta := by
+  have hpre₁' : delta * c + delta + 1 + p + 2 = 2 * M + E := by
+    have h2M : 2 ≤ 2 * M := by omega
+    have hsub : 2 * M - 2 + 2 = 2 * M := Nat.sub_add_cancel h2M
+    have hdelta : delta * (c + 1) = delta * c + delta := by
+      rw [Nat.mul_add]
+      simp
+    rw [hdelta] at hpre₁
+    omega
+  have hpost₂' : e * v + 1 = delta * c + 2 * delta := by
+    calc
+      e * v + 1 = delta * (c + 2) := hpost₂
+      _ = delta * c + 2 * delta := by
+        rw [Nat.mul_add, Nat.mul_two]
+        omega
+  constructor <;> omega
+
+theorem critical_q_two_global_local_coupling
+    {M delta c p E T tminus e u v tplus : Nat}
+    (hM2 : 2 ≤ M)
+    (hpre₁ : delta * (c + 1) + 1 + p = (2 * M - 2) + E)
+    (hpre₂ : delta * c + p = (M + 2) + T + tminus)
+    (hpost₁ : e * u + 2 = delta * c + tplus)
+    (hpost₂ : e * v = delta * (c + 2) + 1) :
+    e * u + p + 2 = M + 2 + T + tminus + tplus ∧
+      e * v + p + 2 = 2 * M + E + delta := by
+  have hpre₁' : delta * c + delta + 1 + p + 2 = 2 * M + E := by
+    have h2M : 2 ≤ 2 * M := by omega
+    have hsub : 2 * M - 2 + 2 = 2 * M := Nat.sub_add_cancel h2M
+    have hdelta : delta * (c + 1) = delta * c + delta := by
+      rw [Nat.mul_add]
+      simp
+    rw [hdelta] at hpre₁
+    omega
+  have hpost₂' : e * v = delta * c + 2 * delta + 1 := by
+    calc
+      e * v = delta * (c + 2) + 1 := hpost₂
+      _ = delta * c + 2 * delta + 1 := by
+        rw [Nat.mul_add, Nat.mul_two]
+        omega
+  constructor <;> omega
+
+theorem critical_mixed_replay_last_old_event_or_zero
+    {M sf Cf p kappa : Nat}
+    (hM5 : 5 < M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hendpoint : Cf - sf = (M - 4) + kappa)
+    (hold : d sf ≤ M) :
+    p = 0 ∨
+      ∃ sp Cp q₀ f,
+        HasMovingHorizonPathTo (M + 2) (2 * M - 2) sp Cp q₀ ∧
+        IsMovingHorizonStep sp Cp sf Cf ∧ d sf = f ∧
+        3 ≤ f ∧ f ≤ M ∧
+        ((sf % 2 = 0 ∧ f ∣ (M - 4) + kappa) ∨
+          (sf % 2 = 1 ∧ f ∣ M + kappa)) := by
+  by_cases hp : p = 0
+  · exact Or.inl hp
+  · right
+    have hp1 : 1 ≤ p := Nat.one_le_iff_ne_zero.2 hp
+    have hsf_lt := moving_horizon_path_index_lt hp1 hpath
+    rcases moving_horizon_path_last_step hpath hsf_lt with
+      ⟨sp, Cp, q₀, hprefix, hlast⟩
+    have hanchor := moving_horizon_step_endpoint_anchor hlast rfl
+    have hstatef := moving_horizon_path_endpoint hpath
+    have hsfle : sf ≤ Cf := Nat.le_of_lt hstatef.2.2
+    have hf3 : 3 ≤ d sf := moving_horizon_step_event_ge_three hlast
+    refine ⟨sp, Cp, q₀, d sf, hprefix, hlast, rfl, hf3, hold, ?_⟩
+    rcases hanchor with hEven | hOdd
+    · left
+      refine ⟨hEven.1, ?_⟩
+      have hdiv := Nat.dvd_sub hEven.2.2 hEven.2.1
+      simpa [hendpoint] using hdiv
+    · right
+      refine ⟨hOdd.1, ?_⟩
+      have hdiv := Nat.dvd_sub hOdd.2.2 hOdd.2.1
+      have hdiff : (Cf + 2) - (sf - 2) = (Cf - sf) + 4 := by
+        omega
+      have hM4 : 4 ≤ M := by omega
+      rw [hdiff, hendpoint] at hdiv
+      have hcollapse : (M - 4) + kappa + 4 = M + kappa := by
+        omega
+      rw [hcollapse] at hdiv
+      exact hdiv
+
+theorem critical_record_straddling_factor_transitions
+    {M k delta sf Cf r C' e p kappa : Nat}
+    (hM5 : 5 < M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hendpoint : Cf - sf = (M - 4) + kappa)
+    (hold : d sf ≤ M)
+    (hcritical : IsMovingHorizonStep sf Cf (k + 1) (D (k + 1)))
+    (hdelta : d (k + 1) = delta)
+    (hpost : IsMovingHorizonStep (k + 1) (D (k + 1)) r C')
+    (he : d r = e) :
+    p = 0 ∨
+      ∃ sp Cp q₀ f,
+        HasMovingHorizonPathTo (M + 2) (2 * M - 2) sp Cp q₀ ∧
+        ∃ hlast : IsMovingHorizonStep sp Cp sf Cf,
+          d sf = f ∧ 3 ≤ f ∧ f ≤ M ∧
+          ((sf % 2 = 0 ∧ f ∣ (M - 4) + kappa) ∨
+            (sf % 2 = 1 ∧ f ∣ M + kappa)) ∧
+          MovingHorizonAdjacentFactorTransition Cp sf Cf (k + 1) (d sf) delta ∧
+          MovingHorizonAdjacentFactorTransition Cf (k + 1) (D (k + 1)) r delta e := by
+  rcases critical_mixed_replay_last_old_event_or_zero
+      hM5 hpath hendpoint hold with hp | hlast
+  · exact Or.inl hp
+  · right
+    rcases hlast with
+      ⟨sp, Cp, q₀, f, hprefix, hlast, hfs, hf3, hfM, hanchor⟩
+    have hfd := moving_horizon_adjacent_factor_transition
+      hlast hcritical rfl hdelta
+    have hde := moving_horizon_adjacent_factor_transition
+      hcritical hpost hdelta he
+    exact ⟨sp, Cp, q₀, f, hprefix, ⟨hlast, hfs, hf3, hfM,
+      hanchor, hfd, hde⟩⟩
 
 end A166944Research
