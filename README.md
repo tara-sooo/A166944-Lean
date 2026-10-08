@@ -7,7 +7,8 @@ The long-term target is the conjecture formalized as `OeisA166944.conjecture` in
 This repository is **research in progress**: it contains kernel-checked partial
 results and reproducible experiments, not a claimed proof of the open conjecture.
 
-Public tracker: https://github.com/tara-sooo/A166944-Lean/issues/1
+Parent research tracker and final integration gate: [Issue #1](https://github.com/tara-sooo/A166944-Lean/issues/1).
+Focused research tasks will use separately assigned child Issues as they are created. **No child Issue is implied to exist merely because a lane is proposed below.**
 
 ## Current structure
 
@@ -32,17 +33,72 @@ The current attack studies the recurrence through
 with particular attention to difference records, fundamental points, constant-`D`
 intervals, and moving-horizon first-event dynamics.
 
-The latest verified layer packages an iterable moving-horizon state/step chain,
-the constant-`D` `C±1` event arithmetic, attained-maximum transfer, cumulative
-`D` growth, and the recurrence-specific local bound
+The latest canonically verified milestone is **5E.3.20**, on
+[commit `003e77780ce84a76bbd65811348f2d94f6e19c30`](https://github.com/tara-sooo/A166944-Lean/commit/003e77780ce84a76bbd65811348f2d94f6e19c30)
+([successful Actions run 34339879873](https://github.com/tara-sooo/A166944-Lean/actions/runs/34339879873)).
+Verified infrastructure includes moving-horizon first-event paths; a mixed
+event/gap ledger with exact event count, sum and displacement bounds;
+canonical pre-record and post-record factor/coupling identities;
+the last-old-event / critical-record / first-post-record transition package;
+and conditional fundamental-point regeneration. The basic event bound
+`d(r) ≤ C - s` also remains available for a first event from state `(s,C)`.
 
-`d(r) ≤ C - s`
+The remaining **5E.3 critical obstruction** is to rule out the `q = 3` and
+`q = 2` quotient families using **ordered, actual canonical-origin recurrence
+ancestry**, beyond aggregate scalar identities and local factor conditions.
+Known scalar survivors are diagnostic arithmetic assignments, **not** actual
+A166944 recurrence paths. No quotient family has been universally eliminated.
 
-for a first event `r` from moving-horizon state `(s,C)`.
+The history envelope, record-index theorem `n = R + 2`, unconditional
+fundamental-point infinitude/record unboundedness, the original A166944
+twin-primality conjecture, and the Twin Prime Conjecture all remain unproved.
 
-This is not yet a termination/regeneration theorem. The history envelope,
-the record-index theorem `n = R + 2`, and the original twin-prime conclusion
-remain open.
+## Issue-scoped parallel research workflow
+
+**Parent / child ownership.** Issue #1 retains the overall conjecture, verified
+milestone record, cross-Issue dependencies, cumulative integration, canonical
+verification, and final-solution gate. A focused child Issue, once created and
+assigned, is the executable specification for exactly **one** research target:
+its hypotheses, exclusions, baseline commit, counterexample controls,
+deliverables, acceptance criteria, worktree, and next handoff. Keep the child
+self-contained; use #1 for common provenance rather than duplicating history.
+
+**Proposed research lanes (planning only; not yet created Issues):**
+
+- **A — ordered canonical-origin replay:** retain actual ordered event ancestry
+  and connect the last old event to the critical record and post-record event.
+- **B — q=3 elimination:** exclude the even first-post-record quotient branch,
+  using true recurrence history; do not silently assume the result of A.
+- **C — q=2 elimination:** exclude the odd first-post-record quotient branch,
+  including divisibility and first-hit constraints.
+- **F — first-hit arithmetic toolkit:** formally audit and, if valid, prove
+  reusable divisor/gap, composite-event slack, and exact stopping criteria.
+- **D — fundamental-point regeneration:** investigate composable genuine
+  returns to `a(m)=2m`; distinguish finite diagnostics from an infinitude proof.
+- **E — renormalized growth:** study ordered event excess/displacement and
+  proposed global growth constraints, retaining counterexamples to false bounds.
+
+Lane names and boundaries are planning labels, **not GitHub Issue numbers**.
+Issue creation, scheduling, and ownership are explicit follow-up actions; this
+README does not automatically start a Codex task. The currently verified common
+starting point is the 5E.3.20 commit above; **recheck the desired shared base
+against the public repository before launching parallel work**.
+
+**Branching and integration.** Give each active child its own linked Git
+worktree/branch. Codex may perform scoped research, compile, and push checked
+child commits; it must not merge sibling results or independently declare parent
+milestone closure. Issue #1 owns the final cumulative integration into `main`,
+including conflicts, post-integration regression builds, and canonical GitHub
+Actions verification. Do not assume a child result is integrated merely because
+its branch or local build passed.
+
+**Completion states.** Report `PROVED`, `REFUTED`, `PARTIAL`, or
+`OPEN/BLOCKED`, including actual-vs-abstract counterexample classification,
+exact theorem statements, local build/axiom results, remote SHA, and remaining
+goals. A narrow, finite diagnostic task may close once its stated acceptance
+criteria are met; an unresolved universal theorem remains open despite useful
+partial progress. Child closure **never** means the overarching A166944
+conjecture was solved. See `AGENTS.md` for the execution rules.
 
 ## Pinned environment
 
@@ -81,7 +137,12 @@ statement under the repository's trust policy. Do not use `sorry`, `admit`,
 new axioms, hidden proof gaps, or a weakened replacement of the target.
 
 Computational evidence, literature facts, conjectural lemmas, and Lean-verified
-lemmas must remain explicitly distinguished.
+lemmas must remain explicitly distinguished. For every promoted child result,
+record the exact theorem, focused build commands, `#print axioms` result,
+remote commit, and (after integration) canonical verification status. Only the
+full conjecture is subject to the separate final-solution gate in
+`RESEARCH_PROTOCOL.md`; individual child Issues follow their narrower stated
+acceptance criteria without implying that the open conjecture is solved.
 
 ## Repository split
 
