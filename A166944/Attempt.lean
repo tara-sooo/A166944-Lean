@@ -1,5 +1,4 @@
-import A166944.ResearchDefs
-import A166944.Lemmas
+import A166944.RecordIndex
 
 /-!
 # A166944 active proof attempt
