@@ -453,5 +453,56 @@ Verified with Lean 4.33.1, `lake build A166944.Attempt`,
 The new results use only subsets of `propext`, `Classical.choice`, and
 `Quot.sound`.
 
+## Residue budgets for blocks of increments dividing 210, 2026-11-11 JST
+
+Codex continued from `2e3ec8b`. For a supported event, `d(r)∣210`.
+There is then a divisor of the increment between 2 and 7, so its
+first-hit gap is at most 14. Clipping the parity-specific gcd to 210
+preserves the supported increment and every unit increment in the gap.
+It depends only on the index and horizon modulo 210. This proves that
+the clipped search finds the exact step on every supported block.
+
+`TravelMod210Data.lean` contains 105 rows of periodic tables for the
+22,050 pairs of index residue and even horizon residue. A row stores
+its period and the entries for one period, packing the block excess
+cap and potential in two 11-bit fields per entry. `TravelMod210.lean`
+checks both caps and both one-step inequalities for every state in
+seven bands using kernel `decide`. Each supported step is charged
+`max(0,24*g-(e-1))` in the table, an upper bound on its actual excess.
+The block cap is at most 1316 and the potential `V` is at most 1260;
+both table values attain these caps at residues `(23,110)`. The result
+`moving_horizon_supported210_block_excess_le_1316` bounds actual block
+excess. To regenerate and compare the data, run:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_mod210_probe.py --lean-data \
+  | cmp - A166944/TravelMod210Data.lean
+```
+
+For a separating event `e∤210`, the charge is the positive part of
+`E_i+V(after)-V(before)-2*(e-1)`. Supported steps have nonpositive net
+cost and zero charge. `moving_horizon_excess_by_separator_charges210`
+proves `E+V(end)≤2*G+V(start)+B` with `B` the exact sum of separating
+charges. A positive charge requires `e≤630` or a long gap at a reused
+prime within the earlier cofactor range. At a first crossing,
+`canonical_first_crossing_requires_separator_charges210` gives
+`12*M+V(end)<24*(F+g)+11*G+V(start)+B`, hence
+`M<24*(F+g)+1315+B`. The uniform upper bound on `B` remains open.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_mod210_probe.py`
+for the exact integer diagnostics, including independent generation by
+scanning one entire period at each residue state. At `M=22933441`,
+there are 93 separating events, with `B=23736`. Long reused-prime gaps
+contribute 16308 and short gaps contribute 6792. At `M=45895573`,
+the integer replay from the certified start gives 16 separators and
+`B=1550`, of which 664 is short and zero is long reused-prime charge.
+The two synthetic starts `23613589` and `23619049` give `B=138180`
+and `128714`, respectively.
+
+Verified with Lean 4.33.1, `lake build A166944.TravelMod210`, and
+`#print axioms` on the block, potential, separator, and crossing results.
+The dependencies are subsets of `propext`, `Classical.choice`, and
+`Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.

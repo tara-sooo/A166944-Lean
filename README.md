@@ -71,8 +71,11 @@ sublinear travel before the cutoff. For sufficiently large records, a
 first crossing needs more than `M/12` from short gaps and long gaps
 ending at reused primes. `TravelExcess.lean` charges those gaps against
 horizon growth, gives a finite first-crossing inequality, and bounds
-overlap of reuse windows within a factor-two width band. The ordinary
-`A166944.Attempt` build stays on the recurrence-side imports.
+overlap of reuse windows within a factor-two width band. `lake build
+A166944.TravelMod210` checks a residue table that bounds excess on
+blocks of increments dividing 210 and reduces the overall budget to
+separating-event charges. The ordinary `A166944.Attempt` build stays on
+the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality
