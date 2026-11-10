@@ -34,7 +34,7 @@ private theorem unusedPrimesLE_sum_cons_add {L e : Nat} {seen : List Nat}
   rw [Finset.sum_insert hnot, add_comm] at hsum
   exact hsum
 
-private theorem moving_horizon_large_increment_gap {s C r C' L U : Nat}
+theorem moving_horizon_large_increment_gap {s C r C' L U : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hL : L < d r) (hU : C ≤ U) :
     (L * (L + 1)) * (r - s) ≤ 2 * (U + 1) * (C' - C) := by
   have hge := (moving_horizon_step_gap_mul_increment_le_twice_horizon hstep).trans
@@ -161,17 +161,17 @@ private theorem prime_counting_mul_le_add (n k : Nat) :
   rw [← hcard, Nat.mul_add]
   exact Nat.add_le_add hlarge (Nat.mul_le_mul_left k hsmall)
 
-/-- Uniform sublinearity of first-use prime travel on all short
-canonical prefixes. The threshold may depend on the requested factor. -/
-theorem canonical_first_use_travel_sublinear (k : Nat) (hk : 0 < k) :
-    ∃ threshold : Nat, ∀ {M sf Cf q first : Nat}, threshold ≤ M → d (M + 2) = M →
-      HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) sf Cf [] q first →
-      2 * (sf - (M + 2)) ≤ M → k * first ≤ M := by
+/-- A cutoff makes the sum of the small-prime and cofactor budgets
+uniformly sublinear when the endpoint horizon is at most `3*M+4`. -/
+theorem canonical_prime_gap_budget_sublinear (k : Nat) (hk : 0 < k) :
+    ∃ threshold : Nat, ∀ {M Cf : Nat}, threshold ≤ M → Cf ≤ 3 * M + 4 →
+      ∃ L : Nat, 0 < L ∧ k * (2 * (∑ p ∈ Nat.primesLE L, p) +
+        2 * (3 * M + 4) * (Cf - (2 * M - 2)) / (L * (L + 1))) ≤ M := by
   let A := 32 * k
   let K := A * (A * A)
   let B := K * 4 ^ K
   refine ⟨max 6 (B * B), ?_⟩
-  intro M sf Cf q first hM hcanon hcost hshort
+  intro M Cf hM hCf
   have hM6 : 6 ≤ M := le_trans (le_max_left _ _) hM
   have hA : 0 < A := by omega
   let root := Nat.sqrt M
@@ -196,8 +196,6 @@ theorem canonical_first_use_travel_sublinear (k : Nat) (hk : 0 < k) :
       A * M ≤ A * ((root + 1) * (root + 1)) := Nat.mul_le_mul_left _ hroot'.le
       _ = L * (root + 1) := (Nat.mul_assoc A (root + 1) (root + 1)).symm
       _ ≤ W := Nat.mul_le_mul_left L (by omega : root + 1 ≤ L + 1)
-  have hpath := moving_horizon_first_use_travel_path hcost
-  have hCf := canonical_horizon_bound_of_short_travel hpath hshort
   have hG : G ≤ 16 * (M * M) := by
     change (2 * (3 * M + 4)) * (Cf - (2 * M - 2)) ≤ 16 * (M * M)
     calc
@@ -260,11 +258,24 @@ theorem canonical_first_use_travel_sublinear (k : Nat) (hk : 0 < k) :
       rw [show A = 32 * k by rfl, show (32 : Nat) = 8 * 2 * 2 by decide]
       ac_rfl
     omega
-  have hF := canonical_first_use_travel_bound hcanon hcost hshort hL
-  change first ≤ 2 * (∑ p ∈ Nat.primesLE L, p) + G / W at hF
-  have h := Nat.mul_le_mul_left (2 * k) hF
-  rw [Nat.mul_add, Nat.mul_assoc] at h
+  refine ⟨L, hL, ?_⟩
+  change k * (2 * (∑ p ∈ Nat.primesLE L, p) + G / W) ≤ M
+  have h := Nat.add_le_add hsmall hlarge
+  rw [← Nat.mul_add, Nat.mul_assoc] at h
   omega
+
+/-- Uniform sublinearity of first-use prime travel on all short
+canonical prefixes. The threshold may depend on the requested factor. -/
+theorem canonical_first_use_travel_sublinear (k : Nat) (hk : 0 < k) :
+    ∃ threshold : Nat, ∀ {M sf Cf q first : Nat}, threshold ≤ M → d (M + 2) = M →
+      HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) sf Cf [] q first →
+      2 * (sf - (M + 2)) ≤ M → k * first ≤ M := by
+  obtain ⟨threshold, hbudget⟩ := canonical_prime_gap_budget_sublinear k hk
+  refine ⟨threshold, ?_⟩
+  intro M sf Cf q first hM hcanon hcost hshort
+  have hpath := moving_horizon_first_use_travel_path hcost
+  obtain ⟨L, hL, hbound⟩ := hbudget hM (canonical_horizon_bound_of_short_travel hpath hshort)
+  exact (Nat.mul_le_mul_left k (canonical_first_use_travel_bound hcanon hcost hshort hL)).trans hbound
 
 private theorem forty_eight_mul_crossing_gap_bound {M : Nat} (hM : 36864 ≤ M) :
     48 * Nat.sqrt (4 * (3 * M + 4)) ≤ M := by

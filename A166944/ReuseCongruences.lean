@@ -143,4 +143,49 @@ theorem moving_horizon_one_step_reuse_middle_increment {s C r C' t H u H' p : Na
   · omega
   · exact Or.inr ⟨hr, hu, by omega⟩
 
+/-- Two uses in the same parity and horizon residue cross a full period
+of the combined modulus. If the earlier increment is exactly `p`, a
+strictly intervening increment must break divisibility by that modulus. -/
+theorem moving_horizon_same_phase_reuse_requires_separator
+    {s C r C' t H u H' P p : Nat}
+    (hfirst : IsMovingHorizonStep s C r C') (hlater : IsMovingHorizonStep t H u H')
+    (horder : r ≤ t) (hP : 0 < P) (hp : 2 < p) (he : d r = p) (hdiv : p ∣ d u)
+    (hparity : r % 2 = u % 2) (hphase : C % P = H % P) :
+    Nat.lcm P (2 * p) ∣ H - C ∧ Nat.lcm P (2 * p) ≤ H - C ∧
+      ∃ j : Nat, r < j ∧ j < u ∧ ¬ d j ∣ Nat.lcm P (2 * p) := by
+  let period := Nat.lcm P (2 * p)
+  have hperiod : 0 < period := Nat.lcm_pos hP (by omega)
+  have hC'H := D_le_of_le horder
+  rw [← hfirst.2.2.2.2.2.2.1, hlater.1.2.1] at hC'H
+  have hCG := hfirst.2.2.2.2.2.2.2.1
+  have hCH : C < H := by omega
+  have hmod : P ∣ H - C := Nat.dvd_of_mod_eq_zero
+    (mod_sub_of_residue_sum hP (Nat.le_of_lt hCH) rfl hphase.symm hP (by simp))
+  have htwo : 2 * p ∣ H - C := by
+    rcases moving_horizon_factor_reuse_drift_residues hfirst hlater horder hp
+      (he.symm ▸ Nat.dvd_refl p) hdiv with h | h | h
+    · exact h.2.2
+    · omega
+    · omega
+  have hdiff : period ∣ H - C := Nat.lcm_dvd hmod htwo
+  have hle := Nat.le_of_dvd (by omega : 0 < H - C) hdiff
+  refine ⟨hdiff, hle, ?_⟩
+  by_cases hex : ∃ j : Nat, r < j ∧ j < u ∧ ¬ d j ∣ period
+  · exact hex
+  exfalso
+  have hpPeriod : p ∣ period :=
+    Nat.dvd_trans (by exact ⟨2, Nat.mul_comm 2 p⟩) (Nat.dvd_lcm_right P (2 * p))
+  have hperiodEven : period % 2 = 0 := Nat.mod_eq_zero_of_dvd
+    (Nat.dvd_trans ⟨p, rfl⟩ (Nat.dvd_lcm_right P (2 * p)))
+  have hr := hfirst.2.1
+  have hs := hfirst.1.1
+  have hu := hlater.2.1
+  have hbound := D_growth_lt_of_common_even_multiple (s := r - 1) (n := u - 1)
+    (by omega) (by omega) hperiod hperiodEven (fun j hj hj' => by
+      by_cases hjr : j = r
+      · simpa only [hjr, he] using hpPeriod
+      · exact Classical.byContradiction (fun hn => hex ⟨j, by omega, by omega, hn⟩))
+  rw [hfirst.2.2.2.2.2.1, hlater.2.2.2.2.2.1] at hbound
+  omega
+
 end A166944Research

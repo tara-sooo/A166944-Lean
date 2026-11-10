@@ -554,3 +554,66 @@ are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
 
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.
+
+## First long gaps by phase and intervening credit, 2026-11-11 JST
+
+Codex continued from `e25f5e0`. `TravelPhases210.lean` moves the first
+long gap for each `(prime, phase)` into a separate distance `F_phase`.
+The phase can be any fixed finite labeling of the pre-event horizon and
+the hit index. For a labeling with `k` values, the small-prime part of
+the finite budget is at most `2*k*sum(primesLE L)` and the large-prime
+part still uses the cofactor bound against total horizon growth.
+`canonical_first_prime_phase_travel_sublinear` proves uniform
+sublinearity for every fixed labeling size. The new signed separator
+sum `S_phase` uses zero excess at a first long gap of a phase.
+`canonical_first_crossing_requires_phase_balances210` proves
+`M<24*(F_phase+g)+1315+S_phase` before a first crossing.
+`canonical_travel_bound_of_prime_phase_budget210` gives the reverse
+sufficient budget with the square-root upper bound on `g`.
+
+`moving_horizon_same_phase_reuse_requires_separator` shows that two
+uses of a factor `p>2` with the same hit parity and the same pre-event
+horizon residue modulo `P` have positive horizon drift divisible by
+`lcm(P,2*p)`. If the earlier increment equals `p`, an intervening
+increment must fail to divide that modulus. In the modulo-210 case,
+for `p≥11` coprime to 210 and exactly one intervening increment `e`
+outside the divisors of 210, `moving_horizon_prime_phase_pair_budget210`
+proves `209*p≤e+416`. If the middle event has zero excess, its signed
+balance plus the later balance is at most `3357-373*p<0`. In the
+separator subsequence the credited event immediately precedes the
+target, so two positive targets of this form cannot use the same
+credit. The general multiple-separator case is open.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_phase_probe.py`
+to reproduce the integer checks. The direct scan from the initial
+recurrence confirms the `M=355723` replay. The chain beginning with
+`M=22933441` uses the Lean-certified start and exact first-hit replay;
+an independent term-by-term scan to index 91793061 agrees on the first
+two intervals (209 and 37 nonunit hits). The later intervals are integer
+diagnostics from this chain. The synthetic starts are not recurrence
+certificates.
+
+| Previous record or synthetic start | Old peak | Phase peak | Phase final sum | Positive same-phase reuse charge | Assigned credit |
+|---|---:|---:|---:|---:|---:|
+| 355723, direct recurrence | 3066 | 862 | -748 | 0 | 0 |
+| 22933441, certified replay | 60 | 60 | -44088 | 0 | 0 |
+| 45895573, replay from a certified start | 582 | 582 | -1742 | 0 | 0 |
+| 367232911, exact replay chain | 212 | 212 | -23014 | 1386 | 1386 |
+| 1786441, synthetic | 3640 | 1288 | -11194 | 666 | 666 |
+| 23613589, synthetic | 1272 | 978 | -137528 | 7542 | 7542 |
+| 23619049, synthetic | 12758 | 6944 | -117482 | 6978 | 6978 |
+
+The earlier `p=19` example at 22940203 loses 294 in gap excess, so
+its balance falls from 738 to 444. In the replay from 367232911 the
+positive same-phase balances 558 and 828 for 11 and 13 have 13 and
+9 intervening separators. The positive use of 11 at 367241820 itself
+breaks divisibility by 2730 in the reuse interval for 13. The synthetic
+start 1786441 exercises the single-separator theorem with `p=11`,
+`e=2293` and middle and final balances -4584 and 666.
+
+Verified with `lake build A166944.Attempt A166944.TravelTarget
+A166944.TravelPhases210` and `#print axioms` on Lean 4.33.1. The
+dependencies of the new theorems are subsets of `propext`,
+`Classical.choice`, and `Quot.sound`. The uniform signed-prefix bound,
+including small positive separator balances and repeated phases with
+several intervening separators, remains open.

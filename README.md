@@ -76,7 +76,10 @@ A166944.TravelMod210` checks a residue table that bounds excess on
 blocks of increments dividing 210 and reduces the overall budget to
 separating-event charges. `TravelSigned210.lean` keeps their signed
 balance, and `ReuseCongruences.lean` checks the index and horizon
-residues at repeated uses of an increment factor. The ordinary
+residues at repeated uses of an increment factor. `TravelPhases210.lean`
+gives a sublinear budget for the first long gap in each prime phase
+and pays for a repeated phase when a single zero-excess separator
+intervenes. The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
