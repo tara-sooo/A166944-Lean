@@ -1,4 +1,4 @@
-import A166944.ResearchDefs
+import A166944.RecordBarrier
 import Mathlib.Data.Nat.Prime.Defs
 
 /-!
@@ -17,5 +17,11 @@ def IsGreaterTwinPrime (p : ℕ) : Prop := p.Prime ∧ (p - 2).Prime
 
 def Target : Prop :=
   ∀ R : ℕ, 5 < R → IsDifferenceRecord R → IsGreaterTwinPrime R
+
+/-- The original conjecture would imply arbitrarily large twin-prime pairs. -/
+theorem unbounded_greater_twin_primes_of_target (hTarget : Target) (M : ℕ) :
+    ∃ R : ℕ, M < R ∧ IsGreaterTwinPrime R := by
+  obtain ⟨R, hlarge, hrecord⟩ := difference_records_unbounded (M + 5)
+  exact ⟨R, by omega, hTarget R (by omega) hrecord⟩
 
 end A166944Research

@@ -69,3 +69,53 @@ bound `p ≤ M` for canonical starts would need information about the origin.
 
 The universal exclusions of the two branches and the unconditional record
 index remain open.
+
+## Even horizon bounds and canonical returns, 2026-11-10
+
+Codex continued from the verified record-index branch commit `654e40d`.
+The barrier proof uses the original recurrence. If `D(n) ≤ H`, `H` is
+even, and `d(n+1) ∣ H`, then `D(n+1) ≤ H`. In the even-index case,
+`D(n)-1` and `H` are multiples of the increment. In the odd-index case,
+`D(n)+1` is the preceding odd multiple, and the update also stays below
+the next even multiple. A unit increment leaves `D` fixed.
+
+- `difference_records_unbounded` and `exists_difference_record_above_by_bound`
+  prove an unconditional larger record for every threshold `M`, by index
+  `H(M)+3`, where `H(M)` is the lcm of 2 and the odd positive integers at
+  most `M`. The proof combines the barrier with the existing
+  `D(n) ≥ n-2` bound. In particular the A166944 twin-primality conjecture,
+  if proved, would imply unbounded twin-prime pairs.
+- `capped_moving_horizon_eventual_exit` proves finite exit from an actual
+  capped replay, at a fundamental point or at a larger first hit. Any
+  critical quotient satisfies `delta*(c+1)+1 ≤ H(M)`. Either intermediate
+  post-record branch forces every positive even common multiple of the
+  old increments after the canonical start to be at least `21*M+27`.
+- `a_le_three_mul` gives the unconditional upper bound `a(n) ≤ 3*n`.
+  A large increment has `n = d(n)+2` exactly when `D(n-1) < n`.
+  Every fundamental point `m ≥ 6` is divisible by 6 and has its
+  canonical reset `d(m+3)=m+1`.
+- `record_index_iff_no_canonical_escape` gives an equivalent proof
+  target on actual capped replays from canonical records. With the
+  initial range `M < 968` checked in Lean, a bound of `3*M+4` on the
+  remaining capped replay horizons would suffice. The low-residue
+  barrier lemmas give a way to certify such bounds on individual paths.
+
+Integer diagnostics distinguish the remaining uniform bound from the
+theorems above. For odd `7 ≤ M ≤ 2000001`, starting at the synthetic
+`(M+2, 2*M-2)` and taking exact first hits until none remained, all
+999998 cases reached the no-hit exit within 311 events. For `M ≥ 969`,
+the largest observed horizon ratio was `3120/1331`. These computations
+use the minimum parity-specific trigger from the odd prime divisors of
+`C-1` and `C+1`, with the increment evaluated by gcd at that index.
+A single low-residue barrier below `3*M+5` for all old increments does
+not always exist. The actual record `M=355723` returns at `C=713832`,
+and its old increment sizes exclude every such barrier in
+`[713832, 3*M+4]`.
+
+`lake build A166944.Attempt A166944.TargetDefs` passed with the pinned
+4.33.1 toolchain. The new results listed above and their exported
+supporting lemmas were checked with `#print axioms`. Their dependencies
+are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
+
+The unconditional index theorem and the universal exclusions of the
+two quotient branches are open.

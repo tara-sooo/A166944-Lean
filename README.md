@@ -49,9 +49,16 @@ ancestry**, beyond aggregate scalar identities and local factor conditions.
 Known scalar survivors are diagnostic arithmetic assignments, **not** actual
 A166944 recurrence paths. No quotient family has been universally eliminated.
 
+The record-index work branch proves that difference records are unbounded.
+`A166944/RecordBarrier.lean` bounds the index of a record above any threshold
+by an explicit least common multiple. `A166944/CanonicalRecord.lean` proves
+that the full index theorem is equivalent to excluding a larger first hit
+inside the horizon of a capped replay from a canonical record.
+
 The history envelope, record-index theorem `n = R + 2`, unconditional
-fundamental-point infinitude/record unboundedness, the original A166944
-twin-primality conjecture, and the Twin Prime Conjecture all remain unproved.
+fundamental-point infinitude, and the original A166944 twin-primality
+conjecture remain open. Unbounded records imply that the original A166944
+conjecture would yield infinitely many twin primes.
 
 ## Issue-scoped parallel research workflow
 

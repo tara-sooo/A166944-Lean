@@ -1,4 +1,4 @@
-import A166944.Lemmas
+import A166944.CanonicalRecord
 
 /-!
 # First-hit bounds for the critical record-index branches
@@ -494,8 +494,68 @@ every increment before its first subsequent record. -/
 private theorem small_canonical_next_record :
     ∀ M : Fin 968, 5 < M.val → d (M.val + 2) = M.val →
       let n := smallRecordNext M.val
-      2 ≤ n ∧ n % 2 = 1 ∧ M.val < d n ∧ ∀ j : Fin n, d j.val ≤ M.val := by
+      2 ≤ n ∧ n = d n + 2 ∧ M.val < d n ∧ ∀ j : Fin n, d j.val ≤ M.val := by
   decide
+
+/-- The checked initial records also settle the full next-index condition
+for every canonical previous record below 968. -/
+theorem next_record_index_of_canonical_previous_lt_968 {k M : Nat}
+    (hM : 5 < M) (hsmall : M < 968) (hcanon : d (M + 2) = M)
+    (hP : IsAttainedPreviousMaximum M k) (hnew : M < d (k + 1)) :
+    k + 1 = d (k + 1) + 2 := by
+  obtain ⟨hn, hindex, hrecord, hprior⟩ :=
+    small_canonical_next_record ⟨M, hsmall⟩ hM hcanon
+  rcases Nat.lt_trichotomy (k + 1) (smallRecordNext M) with h | h | h
+  · have hbefore := hprior ⟨k + 1, h⟩
+    change d (k + 1) ≤ M at hbefore
+    omega
+  · simpa only [h] using hindex
+  · have hbefore := hP.1 (smallRecordNext M) hn (by omega)
+    exact False.elim (Nat.not_lt_of_ge hbefore hrecord)
+
+/-- For the verified initial record range, a first hit inside the
+horizon cannot increase the previous canonical maximum. -/
+theorem canonical_path_no_escape_of_previous_lt_968 {M s C r C' : Nat}
+    (hM : 5 < M) (hsmall : M < 968) (hcanon : d (M + 2) = M)
+    (hP : IsAttainedPreviousMaximum M s) (hstep : IsMovingHorizonStep s C r C') :
+    d r ≤ M := by
+  by_cases hlarge : M < d r
+  · obtain ⟨hs, hsr, hrC, _, hunit, hD, _, _, _⟩ := hstep
+    have hr3 : 3 ≤ r := by have := hs.1; omega
+    have hPpre : IsAttainedPreviousMaximum M (r - 1) := by
+      obtain ⟨q, hq, hqs, hdq⟩ := hP.2
+      refine ⟨?_, ⟨q, hq, by omega, hdq⟩⟩
+      intro j hj hle
+      by_cases h : j ≤ s
+      · exact hP.1 j hj h
+      · rw [hunit j (by omega) (by omega)]
+        omega
+    have hsucc : r - 1 + 1 = r := by omega
+    have hnew : M < d (r - 1 + 1) := by rwa [hsucc]
+    have hidx := next_record_index_of_canonical_previous_lt_968 hM hsmall hcanon hPpre hnew
+    rw [hsucc] at hidx
+    have hbelow := (large_increment_index_iff_beyond_horizon hr3 (by omega)).1 hidx
+    omega
+  · omega
+
+/-- A bound of `3*M+4` on large canonical replays would suffice for the
+full record-index theorem. The initial range is handled by the checked
+next-record certificates. -/
+theorem record_index_of_large_canonical_horizon_bound
+    (hbound : ∀ {M sf Cf p : Nat}, 968 ≤ M → d (M + 2) = M →
+      HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p →
+      IsAttainedPreviousMaximum M sf → Cf ≤ 3 * M + 4) :
+    ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
+      (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 := by
+  apply record_index_iff_no_canonical_escape.2
+  intro M sf Cf p r C' hM hcanon hpath hP hstep
+  by_cases h : 968 ≤ M
+  · have hcap := hbound h hcanon hpath hP
+    by_cases hlarge : M < d r
+    · have hhigh := moving_horizon_new_record_horizon_lower_bound hM hP hstep hlarge
+      omega
+    · omega
+  · exact canonical_path_no_escape_of_previous_lt_968 hM (by omega) hcanon hP hstep
 
 /-- A first critical failure already forces the previous record to be large,
 independently of the post-record event. -/
@@ -510,19 +570,12 @@ theorem critical_previous_max_ge_968 {k M : Nat} (hk : 2 ≤ k)
   obtain ⟨p, c, _, _, hp, _, hM5, hidx, _, _, _, _, hcrit, hceven, _⟩ :=
     critical_previous_maximum_canonical hk hP hIH hnew hfail henv
   rw [hidx] at hp
-  obtain ⟨hn, hnodd, hrecord, hprior⟩ :=
-    small_canonical_next_record ⟨M, by omega⟩ hM5 hp
+  have hindex := next_record_index_of_canonical_previous_lt_968 hM5 (by omega) hp hP hnew
   have hcrit_even : (k + 1) % 2 = 0 := by
     rw [hcrit]
     simp [Nat.mul_mod, hceven]
-  rcases Nat.lt_trichotomy (k + 1) (smallRecordNext M) with h | h | h
-  · have hbefore := hprior ⟨k + 1, h⟩
-    change d (k + 1) ≤ M at hbefore
-    omega
-  · have hodd : (k + 1) % 2 = 1 := by rw [h]; exact hnodd
-    omega
-  · have hbefore := hP.1 (smallRecordNext M) hn (by omega)
-    exact False.elim (Nat.not_lt_of_ge hbefore hrecord)
+  have hdodd := d_mod_two_eq_one_of_three_le (by omega : 3 ≤ k + 1)
+  omega
 
 /-- Actual first failures followed by either intermediate branch require
 a large record quotient and a correspondingly distant pre-record horizon. -/
@@ -562,6 +615,45 @@ theorem critical_intermediate_postrecord_replay_bounds {k M r C' e : Nat}
     (show 23 ≤ c + 1 by omega)
   refine ⟨c, hidx, hceven, hc, ?_⟩
   rw [hDpre, Nat.mul_comm 23 (M + 1)]
+  omega
+
+/-- For a fixed previous maximum there is now a proved finite upper
+bound on the critical record quotient, before any post-record analysis. -/
+theorem critical_record_quotient_bounded_by_horizon {k M : Nat}
+    (hk : 2 ≤ k) (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1)) :
+    ∃ c : Nat, k + 1 = d (k + 1) * c ∧ c % 2 = 0 ∧ 2 ≤ c ∧
+      d (k + 1) * (c + 1) + 1 ≤ recordHorizonBound M := by
+  obtain ⟨c, hidx, hceven, hcmin, _, hD, _, _⟩ :=
+    critical_even_quotient_normal_form hk hIH hnew hfail
+  have hpre := critical_previous_D_coordinate hD (rfl : d (k + 1) = d (k + 1))
+  refine ⟨c, hidx, hceven, hcmin, ?_⟩
+  rw [← hpre]
+  exact D_le_recordHorizonBound_of_cap hk hP.1
+
+/-- The two intermediate branches force the old increments after the
+canonical start to have a large even common multiple. -/
+theorem critical_intermediate_postrecord_common_multiple_bound {k M r C' e P : Nat}
+    (hk : 2 ≤ k) (hP : IsAttainedPreviousMaximum M k)
+    (hIH : B k + 2 ≤ 2 * M) (hnew : M < d (k + 1))
+    (hfail : ¬ B (k + 1) + 2 ≤ 2 * d (k + 1))
+    (henv : HasHistoryEnvelopeBefore (k + 1))
+    (hstep : IsMovingHorizonStep (k + 1) (D (k + 1)) r C')
+    (he : d r = e) (hMe : M < e) (hEd : e < d (k + 1))
+    (hbranch : r % 2 = 1 ∨ (r % 2 = 0 ∧ r - (k + 1) ≤ e + 2))
+    (hpos : 0 < P) (hPeven : P % 2 = 0)
+    (hdiv : ∀ j : Nat, M + 2 < j → j ≤ k → d j ∣ P) :
+    21 * M + 27 ≤ P := by
+  obtain ⟨p, _, _, hpk, _, _, _, hp, _, _, _, hDp, _⟩ :=
+    critical_previous_maximum_canonical hk hP hIH hnew hfail henv
+  have hspan : M + 2 ≤ k := by omega
+  have hDstart : D (M + 2) = 2 * M - 2 := by simpa only [hp] using hDp
+  have hgrowth := D_growth_lt_of_common_even_multiple (by omega : 2 ≤ M + 2)
+    hspan hpos hPeven hdiv
+  rw [hDstart] at hgrowth
+  obtain ⟨_, _, _, _, hDlower⟩ := critical_intermediate_postrecord_replay_bounds
+    hk hP hIH hnew hfail henv hstep he hMe hEd hbranch
   omega
 
 end A166944Research
