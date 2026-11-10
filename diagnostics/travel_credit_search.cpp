@@ -70,8 +70,14 @@ int next_hit(int index, int horizon, const std::vector<uint16_t>& factor) {
 }
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::cerr << "Usage: travel_credit_search LIMIT | --table\n";
+    const bool funded = argc == 4 && std::string(argv[2]) == "--funded";
+    if (argc != 2 && !funded) {
+        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER] | --table\n";
+        return 2;
+    }
+    const int multiplier = funded ? std::stoi(argv[3]) : 0;
+    if (multiplier < 0 || multiplier > 24) {
+        std::cerr << "MULTIPLIER must be between 0 and 24\n";
         return 2;
     }
     const auto potential = residue_potentials();
@@ -92,13 +98,16 @@ int main(int argc, char** argv) {
         return potential[(horizon % 210) / 2 * 210 + index % 210];
     };
     int starts = 0, demands = 0, cutoff_stops = 0, event_limit_stops = 0;
+    int64_t maximum_startup = 0;
     for (int record = 13; record <= limit; record += 6) {
         if (!is_prime(record) || !is_prime(record - 2)) continue;
         ++starts;
         int index = record + 2, horizon = 2 * record - 2;
         std::unordered_map<int64_t, int> previous_phase;
+        std::unordered_map<int64_t, int> previous_positive;
         std::vector<Event> history;
         std::vector<std::pair<int, int>> credits;
+        int64_t first = 0, startup = 0, signed_sum = 0;
         while (true) {
             if (history.size() >= 3000) {
                 ++event_limit_stops;
@@ -118,39 +127,54 @@ int main(int argc, char** argv) {
             const int previous = long_prime && found != previous_phase.end() ? found->second : -1;
             const int excess = gap <= 10 || previous >= 0 ? std::max(0, 24 * gap - (increment - 1)) : 0;
             const int balance = excess + value(hit, updated) - value(index, horizon) - 2 * (increment - 1);
+            const auto positive_found = previous_positive.find(key);
+            const int prior_positive = positive_found != previous_positive.end() ? positive_found->second : -1;
+            const int anchor = previous >= 0 ? previous : prior_positive;
+            if (long_prime && previous < 0) {
+                first += gap;
+                if (funded) credits.emplace_back(2 * history.size() + 1, multiplier * gap);
+            }
             if (210 % increment) {
+                signed_sum += balance;
                 if (balance < 0) {
-                    credits.emplace_back(history.size(), -balance);
-                } else if (balance > 0 && previous >= 0) {
+                    credits.emplace_back(2 * history.size(), -balance);
+                } else if (balance > 0 && anchor >= 0) {
                     ++demands;
                     int owed = balance;
                     for (auto& credit : credits) {
-                        if (credit.first <= previous) continue;
+                        if (credit.first <= 2 * anchor) continue;
                         const int used = std::min(owed, credit.second);
                         owed -= used;
                         credit.second -= used;
                         if (owed == 0) break;
                     }
                     if (owed) {
-                        std::cout << "Unpaid synthetic start " << record << ", prime " << increment
-                                  << ", earlier hit " << history[previous].hit << ", hit " << hit
+                        std::cout << "Unpaid synthetic start " << record << ", increment " << increment
+                                  << ", earlier hit " << history[anchor].hit << ", hit " << hit
                                   << ", balance " << balance << ", unpaid " << owed << '\n';
-                        for (int j = previous; j < int(history.size()); ++j) {
+                        for (int j = anchor; j < int(history.size()); ++j) {
                             const auto& event = history[j];
                             std::cout << event.hit << ' ' << event.horizon << ' ' << event.increment
                                       << ' ' << event.excess << ' ' << event.balance << '\n';
                         }
                         return 1;
                     }
+                } else if (funded && balance > 0) {
+                    assert(increment <= 630 && balance <= 29613);
+                    startup += balance;
                 }
+                if (funded && balance > 0) previous_positive[key] = history.size();
             }
+            if (funded) assert(signed_sum <= startup + multiplier * first);
             if (long_prime) previous_phase[key] = history.size();
             history.push_back({hit, horizon, increment, excess, balance});
             index = hit;
             horizon = updated;
         }
+        maximum_startup = std::max(maximum_startup, startup);
     }
     std::cout << "synthetic starts=" << starts << " paid demands=" << demands
               << " cutoff stops=" << cutoff_stops << " event-limit stops=" << event_limit_stops
               << " through=" << limit << '\n';
+    if (funded) std::cout << "multiplier=" << multiplier << " maximum startup=" << maximum_startup << '\n';
 }

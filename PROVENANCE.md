@@ -691,3 +691,67 @@ the independent table comparison and native bounded search.
 `#print axioms` on the new theorems uses only subsets of `propext`,
 `Classical.choice` and `Quot.sound`. The main A166944 theorem and the
 uniform signed-prefix estimate remain open.
+
+## Small positive costs and first-phase funding, 2026-11-11 JST
+
+Codex continued from `e979b55`. Extending the negative-only allocation
+to repeated positive costs from small increments has a counterexample
+at the synthetic canonical start `M=4394191`. The positive increment 9
+at 4394988 repeats the same phase from 4394232. Its balance is 378;
+the total strictly intervening negative separator capacity is 90, so
+288 cannot be allocated within that interval. This is an abstract
+first-hit replay, not an initial-sequence counterexample. Even adding
+one unit of first-phase-gap funding per unit of gap is insufficient
+at synthetic `M=7874413`: the corresponding increment 9 has demand
+1062 and eligible total capacity 1027, leaving 35.
+
+`FundedPhaseCredits210.lean` proves the pointwise bound
+`balance≤45*e+1263`, hence positive balance at most 29613 for an
+increment `e≤630`. Charging at most once for each small increment and
+the 420-valued horizon/parity phase gives the conservative fixed bound
+`B=(631*420)*29613=7848037260`.
+
+`FundedPhaseCreditAllocation210` explicitly records startup events,
+distinct startup keys, eligible sources, allocation amounts, source
+capacities and the total funding bound. Row bounds pay the remaining
+positive costs; column bounds prevent spending a unit twice. If source
+funding is bounded by negative balances plus `c*F_phase`, Lean proves
+`S_phase≤B+c*F_phase`. It then proves uniform sublinearity of
+`S_phase.toNat` for fixed `c` and fixed phase-label count, conditional
+on this certificate. `canonical_travel_of_funded_prefix_allocations210`
+proves short travel on capped replays at all sufficiently large canonical
+starts if every short capped prefix has such a certificate. The existence hypothesis
+is explicit and remains unproved. Current recurrence diagnostics use
+the actual separator balances and startup keys from those replays.
+
+The native search keeps its original mode. The additional funded mode
+also pays repeated positive small-increment costs. A first positive
+cost without an earlier eligible use becomes a small startup charge.
+Eligible ordinary negative credit must lie strictly after the chosen
+earlier use. Extra funding from a first long phase can be used at its
+own event or later. The coefficient 24 matches the travel coefficient
+already present in the crossing budget.
+
+```sh
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 24
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_funded_probe.py
+```
+
+The funded native search through `M=100000000` checks 440310 synthetic
+twin-prime-shaped starts and pays 131257 demands, with maximum observed
+startup 39118. There are two cap/travel cutoff stops and no 3000-event
+stops. The original negative-only long-reuse mode still reports 36616
+paid demands. Independent Python trial-factorization comparison through
+2000000 agrees on 14869 starts, 1064 funded demands, two cutoff stops
+and maximum startup 18920. `travel_funded_probe.py` independently checks
+the row amounts, source capacities, source eligibility and startup
+uniqueness for actual-replay controls and the synthetic failures above.
+
+Verified on Lean 4.33.1 with `lake build A166944.Attempt
+A166944.TravelTarget A166944.FundedPhaseCredits210`, the standard-axiom
+audit and the diagnostics above. Conditional balance and short-travel
+theorems depend only on subsets of `propext`, `Classical.choice` and
+`Quot.sound`. Universal construction of the funded allocation and the
+bridge from the verified finite record range to the eventual threshold
+remain open.

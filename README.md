@@ -81,6 +81,9 @@ gives a sublinear budget for the first long gap in each prime phase
 and pays for a repeated phase when a single zero-excess separator
 intervenes. `SeparatorBlocks210.lean` bounds complete intervals with
 several separators and checks the summation of disjoint credited blocks.
+`FundedPhaseCredits210.lean` bounds small startup charges and proves
+conditional sublinear balance and short travel from a credit allocation
+funded by first-phase gaps.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
