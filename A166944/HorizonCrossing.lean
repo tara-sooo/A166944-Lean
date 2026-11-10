@@ -116,46 +116,6 @@ private theorem large_old_event_gap_mod_three {s C r C' e : Nat}
     exact Nat.dvd_of_mod_eq_zero (by omega)
   exact ⟨ht6, ht2, ht4⟩
 
-theorem moving_horizon_large_old_event_predecessor {sp Cp s C r C' e : Nat}
-    (hprev : IsMovingHorizonStep sp Cp s C) (hstep : IsMovingHorizonStep s C r C')
-    (hr : r = 2 * e) (hC : C = 3 * e + 1) :
-    LargeOldEventPredecessor (r - s) (d s) := by
-  let t := r - s
-  let f := d s
-  have hsr := hstep.2.1
-  have hs3 : 3 ≤ s := by have := hprev.1.1; have := hprev.2.1; omega
-  have htpos : 1 ≤ t := by omega
-  have hf3 : 3 ≤ f := moving_horizon_step_event_ge_three hprev
-  have hfodd : f % 2 = 1 := d_mod_two_eq_one_of_three_le hs3
-  obtain ⟨ht6, ht2, ht4⟩ := large_old_event_gap_mod_three hstep hr hC
-  have hanchor := moving_horizon_step_endpoint_anchor hprev (rfl : d s = f)
-  have hdivEven (ht : t % 2 = 0) : f ∣ 3 * t + 2 := by
-    rcases hanchor with ⟨_, hfs, hfC⟩ | ⟨hs, _, _⟩
-    · have h := Nat.dvd_sub (Nat.dvd_trans hfC (Nat.dvd_mul_left C 2))
-        (Nat.dvd_trans hfs (Nat.dvd_mul_left s 3))
-      rwa [show 2 * C - 3 * s = 3 * t + 2 by omega] at h
-    · omega
-  have hdivOdd (ht : t % 2 = 1) : f ∣ 3 * t + 12 := by
-    rcases hanchor with ⟨hs, _, _⟩ | ⟨_, hfs, hfC⟩
-    · omega
-    · have h := Nat.dvd_sub (Nat.dvd_trans hfC (Nat.dvd_mul_left (C + 2) 2))
-        (Nat.dvd_trans hfs (Nat.dvd_mul_left (s - 2) 3))
-      rwa [show 2 * (C + 2) - 3 * (s - 2) = 3 * t + 12 by omega] at h
-  have hmodOdd (ht : t % 2 = 1) (hf : f % 3 = 0) :
-      (2 * (e % 3)) % 3 = (t + 2) % 3 := by
-    rcases hanchor with ⟨hs, _, _⟩ | ⟨_, hfs, _⟩
-    · omega
-    · have h := Nat.mod_eq_zero_of_dvd (Nat.dvd_trans (Nat.dvd_of_mod_eq_zero hf) hfs)
-      omega
-  have hf28 : f < 28 := by
-    rcases Nat.mod_two_eq_zero_or_one t with h | h
-    · have hle := Nat.le_of_dvd (by omega : 0 < 3 * t + 2) (hdivEven h)
-      omega
-    · have hle := Nat.le_of_dvd (by omega : 0 < 3 * t + 12) (hdivOdd h)
-      omega
-  exact large_old_event_predecessor_finite ⟨e % 3, Nat.mod_lt _ (by decide)⟩
-    ⟨t, by omega⟩ ⟨f, hf28⟩ htpos hf3 hfodd ht2 ht4 hdivEven hdivOdd hmodOdd
-
 /-- The endpoint determines the two numbers whose common divisors are
 possible increments. The gcd with the increment subtracted tests the
 exact preceding transition, including a unit increment. -/
@@ -183,6 +143,63 @@ theorem D_backward_gcd {n : Nat} (hn : 3 ≤ n) :
     refine ⟨hmap.symm ▸ Nat.gcd_dvd_left _ _, ?_, by rw [hsub, ← hmap], hD.symm⟩
     rw [show D n + 2 = (D n + 2 - d n) + d n by omega]
     exact Nat.dvd_add hdiv (Nat.dvd_refl _)
+
+private theorem D_endpoint_divisibility {s C : Nat} (hs : 3 ≤ s) (hC : D s = C) :
+    (s % 2 = 0 ∧ d s ∣ s ∧ d s ∣ C) ∨
+      (s % 2 = 1 ∧ d s ∣ s - 2 ∧ d s ∣ C + 2) := by
+  have hb := D_backward_gcd hs
+  dsimp at hb
+  rcases Nat.mod_two_eq_zero_or_one s with h | h
+  · simp only [h, if_pos, hC] at hb
+    exact Or.inl ⟨h, hb.1, hb.2.1⟩
+  · simp only [h, Nat.one_ne_zero, if_false, hC] at hb
+    exact Or.inr ⟨h, hb.1, hb.2.1⟩
+
+private theorem large_old_event_predecessor_of_nonunit {s C r C' e : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hs3 : 3 ≤ s) (hf3 : 3 ≤ d s)
+    (hr : r = 2 * e) (hC : C = 3 * e + 1) :
+    LargeOldEventPredecessor (r - s) (d s) := by
+  let t := r - s
+  let f := d s
+  have hsr := hstep.2.1
+  have htpos : 1 ≤ t := by omega
+  have hfodd : f % 2 = 1 := d_mod_two_eq_one_of_three_le hs3
+  obtain ⟨ht6, ht2, ht4⟩ := large_old_event_gap_mod_three hstep hr hC
+  have hanchor := D_endpoint_divisibility hs3 hstep.1.2.1
+  change (s % 2 = 0 ∧ f ∣ s ∧ f ∣ C) ∨ (s % 2 = 1 ∧ f ∣ s - 2 ∧ f ∣ C + 2) at hanchor
+  have hdivEven (ht : t % 2 = 0) : f ∣ 3 * t + 2 := by
+    rcases hanchor with ⟨_, hfs, hfC⟩ | ⟨hs, _, _⟩
+    · have h := Nat.dvd_sub (Nat.dvd_trans hfC (Nat.dvd_mul_left C 2))
+        (Nat.dvd_trans hfs (Nat.dvd_mul_left s 3))
+      rwa [show 2 * C - 3 * s = 3 * t + 2 by omega] at h
+    · omega
+  have hdivOdd (ht : t % 2 = 1) : f ∣ 3 * t + 12 := by
+    rcases hanchor with ⟨hs, _, _⟩ | ⟨_, hfs, hfC⟩
+    · omega
+    · have h := Nat.dvd_sub (Nat.dvd_trans hfC (Nat.dvd_mul_left (C + 2) 2))
+        (Nat.dvd_trans hfs (Nat.dvd_mul_left (s - 2) 3))
+      rwa [show 2 * (C + 2) - 3 * (s - 2) = 3 * t + 12 by omega] at h
+  have hmodOdd (ht : t % 2 = 1) (hf : f % 3 = 0) :
+      (2 * (e % 3)) % 3 = (t + 2) % 3 := by
+    rcases hanchor with ⟨hs, _, _⟩ | ⟨_, hfs, _⟩
+    · omega
+    · have h := Nat.mod_eq_zero_of_dvd (Nat.dvd_trans (Nat.dvd_of_mod_eq_zero hf) hfs)
+      omega
+  have hf28 : f < 28 := by
+    rcases Nat.mod_two_eq_zero_or_one t with h | h
+    · have hle := Nat.le_of_dvd (by omega : 0 < 3 * t + 2) (hdivEven h)
+      omega
+    · have hle := Nat.le_of_dvd (by omega : 0 < 3 * t + 12) (hdivOdd h)
+      omega
+  exact large_old_event_predecessor_finite ⟨e % 3, Nat.mod_lt _ (by decide)⟩
+    ⟨t, by omega⟩ ⟨f, hf28⟩ htpos hf3 hfodd ht2 ht4 hdivEven hdivOdd hmodOdd
+
+theorem moving_horizon_large_old_event_predecessor {sp Cp s C r C' e : Nat}
+    (hprev : IsMovingHorizonStep sp Cp s C) (hstep : IsMovingHorizonStep s C r C')
+    (hr : r = 2 * e) (hC : C = 3 * e + 1) :
+    LargeOldEventPredecessor (r - s) (d s) :=
+  large_old_event_predecessor_of_nonunit hstep (by have := hprev.1.1; have := hprev.2.1; omega)
+    (moving_horizon_step_event_ge_three hprev) hr hC
 
 /-- In the one-index gap with preceding increment 5, the earlier horizon
 is `3*(e-1)` at index `2*(e-1)`. Every odd divisor of `e-1` is a possible
@@ -398,16 +415,14 @@ abbrev LargeOldEventRemaining (e t f : Nat) : Prop :=
   (t = 1 ∧ f = 3 ∧ e % 3 = 0) ∨ (t = 1 ∧ f = 5 ∧ e % 5 = 4) ∨
     (t = 6 ∧ f = 5 ∧ e % 3 = 0 ∧ e % 5 = 3)
 
-/-- Exact backward transitions eliminate both preceding increments 7
-and the preceding increment 15 from the large case. -/
-theorem moving_horizon_large_old_event_three_predecessors {sp Cp s C r C' e : Nat}
-    (hprev : IsMovingHorizonStep sp Cp s C) (hstep : IsMovingHorizonStep s C r C')
+private theorem large_old_event_remaining_of_nonunit {s C r C' e : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hs3 : 3 ≤ s) (hf3 : 3 ≤ d s)
     (he : 20 ≤ e) (hr : r = 2 * e) (hC : C = 3 * e + 1) :
     LargeOldEventRemaining e (r - s) (d s) := by
   have hsr := hstep.2.1
   have hDs : D s = 3 * e + 1 := hstep.1.2.1.trans hC
-  have hanchor := moving_horizon_step_endpoint_anchor hprev (rfl : d s = d s)
-  rcases moving_horizon_large_old_event_predecessor hprev hstep hr hC with
+  have hanchor := D_endpoint_divisibility hs3 hstep.1.2.1
+  rcases large_old_event_predecessor_of_nonunit hstep hs3 hf3 hr hC with
     ⟨ht, hf | hf | hf⟩ | ⟨ht, hf⟩ | ⟨ht, hf⟩ | ⟨ht, hf⟩
   · refine Or.inl ⟨ht, hf, ?_⟩
     rcases hanchor with ⟨hs, _, _⟩ | ⟨_, hdiv, _⟩
@@ -441,6 +456,90 @@ theorem moving_horizon_large_old_event_three_predecessors {sp Cp s C r C' e : Na
       have hmod := Nat.mod_eq_zero_of_dvd hdiv
       omega
     · omega
+
+/-- Exact backward transitions eliminate both preceding increments 7
+and the preceding increment 15 from the large case. -/
+theorem moving_horizon_large_old_event_three_predecessors {sp Cp s C r C' e : Nat}
+    (hprev : IsMovingHorizonStep sp Cp s C) (hstep : IsMovingHorizonStep s C r C')
+    (he : 20 ≤ e) (hr : r = 2 * e) (hC : C = 3 * e + 1) :
+    LargeOldEventRemaining e (r - s) (d s) :=
+  large_old_event_remaining_of_nonunit hstep (by have := hprev.1.1; have := hprev.2.1; omega)
+    (moving_horizon_step_event_ge_three hprev) he hr hC
+
+/-- A half-index increment in the original recurrence is equivalent to
+a single exact horizon value, without a previous-record assumption. -/
+theorem half_index_increment_iff {e : Nat} (he : 5 ≤ e) :
+    d (2 * e) = e ↔ D (2 * e - 1) = 3 * e + 1 := by
+  have hmap : d (2 * e) = Nat.gcd (2 * e) (D (2 * e - 1) - 1) := by
+    have h := constant_D_event_map (by omega : 2 ≤ 2 * e)
+      (rfl : D (2 * e - 1) = D (2 * e - 1))
+    simpa only [show (2 * e) % 2 = 0 by omega, if_pos] using h
+  constructor
+  · intro hd
+    have hpar := D_mod_two_eq_zero_of_two_le (by omega : 2 ≤ 2 * e - 1)
+    have heodd := hd ▸ d_mod_two_eq_one_of_three_le (by omega : 3 ≤ 2 * e)
+    have hdiv : e ∣ D (2 * e - 1) - 1 := by
+      have h : d (2 * e) ∣ D (2 * e - 1) - 1 := hmap.symm ▸ Nat.gcd_dvd_right _ _
+      simpa only [hd] using h
+    have hlower := two_mul_le_a_add_two (by omega : 2 ≤ 2 * e - 1)
+    have hupper := a_le_three_mul (2 * e - 1)
+    have hsum : D (2 * e - 1) + (2 * e - 1) = a (2 * e - 1) :=
+      Nat.sub_add_cancel (index_le_a _)
+    obtain ⟨q, hq⟩ := hdiv
+    have hqodd : q % 2 = 1 := by
+      rw [quotient_mod_two_of_left_odd heodd, ← hq]
+      omega
+    have hqlo : 3 ≤ q := by
+      by_cases h : 3 ≤ q
+      · exact h
+      · have hm := Nat.mul_le_mul_left e (show q ≤ 1 by omega)
+        rw [← hq, Nat.mul_one] at hm
+        omega
+    have hqhi : q < 4 := by
+      by_cases h : q < 4
+      · exact h
+      · have hm := Nat.mul_le_mul_left e (show 4 ≤ q by omega)
+        rw [← hq, Nat.mul_comm e 4] at hm
+        omega
+    have hqthree : q = 3 := by omega
+    rw [hqthree, Nat.mul_comm e 3] at hq
+    omega
+  · intro hD
+    rw [hmap, hD, show 3 * e + 1 - 1 = 3 * e by omega,
+      Nat.mul_comm 2 e, Nat.mul_comm 3 e, Nat.gcd_mul_left]
+    simp [show Nat.gcd 2 3 = 1 by decide]
+
+/-- The three preceding forms are necessary for any sufficiently large
+half-index increment, even when no canonical replay is assumed. -/
+theorem half_index_increment_predecessor {e : Nat} (he : 20 ≤ e) (hd : d (2 * e) = e) :
+    ∃ s : Nat, s < 2 * e ∧ D s = 3 * e + 1 ∧
+      (∀ j : Nat, s < j → j < 2 * e → d j = 1) ∧
+      LargeOldEventRemaining e (2 * e - s) (d s) := by
+  have hC := (half_index_increment_iff (by omega)).1 hd
+  have hlast : ∃ s : Nat, 2 ≤ s ∧ s < 2 * e ∧ 1 < d s ∧
+      ∀ j : Nat, s < j → j < 2 * e → d j = 1 := by
+    by_cases h : d (2 * e - 1) = 1
+    · obtain ⟨s, hs, hlt, hf, htail⟩ := exists_last_nontrivial_before h
+        ⟨2, by decide, by omega, by decide⟩
+      exact ⟨s, hs, by omega, hf, fun j hsj hj => htail j hsj (by omega)⟩
+    · have hone := one_le_d_of_two_le (by omega : 2 ≤ 2 * e - 1)
+      exact ⟨2 * e - 1, by omega, by omega, by omega, fun j hj hjr => False.elim (by omega)⟩
+  obtain ⟨s, hs, hsr, hf, hunit⟩ := hlast
+  have hDs := (first_later_event_D_eq hs (rfl : D s = D s) hsr hunit).symm.trans hC
+  have hs3 : 3 ≤ s := by
+    by_cases h : s = 2
+    · rw [h, show D 2 = 2 by decide] at hDs
+      omega
+    · omega
+  have hf3 : 3 ≤ d s := by have := d_mod_two_eq_one_of_three_le hs3; omega
+  have hD' : D (2 * e) = 4 * e := by
+    have hup := D_succ_add_one_eq_add_d (2 * e - 1)
+    rw [show 2 * e - 1 + 1 = 2 * e by omega, hC, hd] at hup
+    omega
+  have hstep : IsMovingHorizonStep s (3 * e + 1) (2 * e) (4 * e) :=
+    ⟨⟨hs, hDs, by omega⟩, hsr, by omega, by omega, hunit, hC, hD'.symm, by omega,
+      ⟨by omega, hD', by omega⟩⟩
+  exact ⟨s, hsr, hDs, hunit, large_old_event_remaining_of_nonunit hstep hs3 hf3 he rfl rfl⟩
 
 /-- The first crossing of `3*M+4` by an old increment begins in this band. -/
 theorem moving_horizon_old_crossing_band {M s C r C' : Nat}

@@ -159,3 +159,43 @@ exclusion yet.
 
 `lake build A166944.Attempt` passed on Lean 4.33.1. The exported
 crossing theorems were audited with `#print axioms`.
+
+## Canonical growth with a bounded number of exceptional increments
+
+`A166944/CanonicalGrowth.lean` uses the whole prefix from the canonical
+origin. At a first hit, the increment divides the parity-specific
+difference of twice the index and the horizon term. This difference
+is nonzero by parity. The elapsed index distance on a prefix is at
+most three times its horizon growth. The cofactor of the next increment
+also bounds the last gap. These facts give the Lean-checked bound
+`e ≤ 7 + 5*(C-(2*M-2)) + Q` if `4*(C+1) ≤ Q*Q`.
+
+For a positive even `P`, every interval of increments dividing `P`
+grows by less than `P`. Combining such intervals with the step bound
+gives `C < 2*M-2 + 7^k*(P+Q+6)` on any actual canonical prefix whose
+increments outside `P` are covered by a list of length `k`. In particular,
+a large old crossing with `M ≥ 65536` needs at least two preceding
+increments that do not divide 210. For any old first crossing, if the
+exception list includes the crossing index, set `A=7^k`. Then necessarily
+`M < max (128*A*A) (2*A*(P+6))`. This also applies to the small final
+increment case.
+
+The diagnostic reproduces a limitation of a single choice of `P`. The
+actual replay for `M=355723` reaches its fundamental return at `C=713832`
+after 57 old nonunit increments. Even with the smallest square bound
+for that horizon, every even `P ≤ M+7` gives a list budget larger than
+`M+7`. This finite check concerns the budget formula, while the
+three large-crossing forms still require a general reachability proof.
+
+There is also a direct target on the original recurrence.
+`half_index_increment_iff` proves `d(2*e)=e` iff `D(2*e-1)=3*e+1`
+for `e ≥ 5`. For `e ≥ 20`, `half_index_increment_predecessor` gives the
+same three preceding forms even without a canonical-origin assumption.
+A direct integer scan through index 30,000,000 found only the half-index
+increments at indices 6, 18, and 66. This scan updates `a` from 2 by
+the exact gcd in the recurrence at each index and tests `2*d(n)=n`
+at even indices. The exclusion at arbitrary large indices is open.
+
+Verified with `lake build A166944.Attempt` on Lean 4.33.1 and
+`#print axioms` for the exported theorems. The reported dependencies
+are subsets of `propext`, `Classical.choice`, and `Quot.sound`.

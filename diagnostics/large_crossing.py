@@ -4,6 +4,7 @@ This inverts the gcd recurrence from a hypothetical crossing. The prefix
 constraints are necessary for real canonical-origin paths. The numerical
 search is separate from the Lean proofs.
 """
+from collections import Counter
 from math import gcd, isqrt
 
 
@@ -68,6 +69,36 @@ def check_synthetic_suffix():
     assert value - 2317 == 2658
 
 
+def check_single_multiple_budget():
+    record, endpoint = 355723, 713832
+    value, old = 2, Counter()
+    for index in range(2, endpoint + 1):
+        increment = gcd(index if index % 2 == 0 else index - 2, value)
+        value += increment
+        if index == record + 2:
+            assert increment == record
+        if index > record + 2 and increment > 1:
+            assert increment <= record
+            old[increment] += 1
+    assert value - endpoint == endpoint
+    count = sum(old.values())
+    assert count == 57
+    # Use the smallest square bound for this endpoint and all even
+    # multiples that could fit in the sufficient budget.
+    root = isqrt(4 * (endpoint + 1) - 1) + 1
+    covered = [0] * (1 + (record + 7) // 2)
+    for increment, frequency in old.items():
+        for half in range(increment, len(covered), increment):
+            covered[half] += frequency
+    weights = [7**k for k in range(count + 1)]
+    best = min(
+        (weights[count - covered[half]] * (2 * half + root + 6), 2 * half, count - covered[half])
+        for half in range(1, len(covered))
+    )
+    assert best[0] > record + 7
+    return best
+
+
 if __name__ == "__main__":
     for e in range(729, 20_002, 2):
         matches, exhausted_at = backward(e)
@@ -76,3 +107,4 @@ if __name__ == "__main__":
     print("9637 odd e from 729 to 20001: all frontiers exhausted before an origin index")
     check_synthetic_suffix()
     print("M=1321 synthetic suffix reproduced. Actual D(2317)=2658.")
+    print("M=355723 best single-multiple (budget, P, exceptions):", check_single_multiple_budget())
