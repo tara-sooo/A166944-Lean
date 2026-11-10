@@ -755,3 +755,79 @@ theorems depend only on subsets of `propext`, `Classical.choice` and
 `Quot.sound`. Universal construction of the funded allocation and the
 bridge from the verified finite record range to the eventual threshold
 remain open.
+
+## Weighted Hall and endpoint-window obligations, 2026-11-11 JST
+
+Codex continued from `93cdbcf`. `CreditHall210.lean` expands each
+integer demand and capacity into individual units and applies the
+existing finite Hall theorem in the pinned Mathlib, then counts the
+matching by rows and columns. This is an application of Hall's theorem,
+not a new combinatorial principle. The imported theorem is
+`Finset.all_card_le_biUnion_card_iff_existsInjective'` from
+`Mathlib/Combinatorics/Hall/Finite.lean` in Mathlib commit
+`0df444a360eaa60ab8c11dca51a86af692955474`.
+
+`credit_hall_iff_allocation210` proves that a natural-number allocation
+with exact row payments and bounded column use exists if and only if
+every set of requests has total demand at most the total capacity of
+the union of its eligible sources. It includes competition between
+requests; checking each request separately does not suffice.
+`funded_phase_credit_allocation_of_hall210` constructs the previously
+defined funded certificate from these inequalities, the startup bounds
+and the total funding bound.
+
+For requests with closed timestamp windows `[left_i,right_i]`,
+`CreditWindows210.lean` proves an equivalent criterion: for every
+contiguous window `[a,b]`, sum the demands of requests whose entire
+eligible interval is contained in `[a,b]`; this must not exceed the
+capacity of sources timestamped in `[a,b]`. Source timestamps may
+repeat, capacities may vanish, and each request must have a nonempty
+window. In the proof, an uncovered source timestamp splits a request
+family into two smaller families with disjoint source sets. Otherwise
+the hull itself is covered and its window inequality applies.
+
+Only request endpoints need testing. The theorem
+`credit_endpoint_windows_iff_allocation210` makes the at most `n*n`
+endpoint inequalities equivalent to allocation existence.
+`funded_phase_balance_of_endpoint_windows210` consequently proves
+`S_phase<=B+c*F_phase` directly from those inequalities and the startup
+and funding assumptions. These results supply a finite, explicit
+criterion; they do not establish the inequalities on all actual
+canonical recurrence prefixes. That recurrence estimate and the
+finite-range bridge to the eventual threshold remain open.
+
+The diagnostic `travel_credit_windows.py` reconstructs complete finite
+integer replay ledgers without consuming sources. For each endpoint
+window it records demand `D`, negative supply `N` and first-phase-gap
+mass `F`; if `F>0`, that window requires coefficient at least
+`ceil(max(0,D-N)/F)`. Positive deficiency with `F=0` rules out all
+coefficients for that fixed eligibility policy. Its result agrees with
+the existing chronological allocation probe on seven actual/replayed
+or synthetic controls and four coefficients. A separate exhaustive
+small-instance comparison with direct subset Hall enumeration passes
+2187 checks, including duplicate timestamps and zero demands/capacities.
+
+At the synthetic canonical start `M=56837371`, increment 9 at 56837844
+repeats its positive phase from 56837484. The timestamp window `[17,93]`
+has demand 1062, negative supply 470 and first-phase-gap mass 234.
+Coefficient 2 leaves `1062-470-2*234=124` unpaid; coefficient 3 suffices
+on that complete replay. This is not an initial-sequence counterexample.
+The native exhaustive run with coefficient 3 through 100000000 pays
+131257 demands from 440310 synthetic starts, maximum startup39118,
+with two cap/travel cutoff stops and no 3000-event stops. Events after
+those cutoffs are not tested by the native run.
+
+```sh
+lake build A166944.Attempt A166944.TravelTarget A166944.CreditWindows210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_windows.py
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 3
+```
+
+Lean 4.33.1 accepts the new equivalences, allocation constructors and
+signed-balance corollary. `#print axioms` on all twelve new theorems
+and the existing eventual-short-travel theorem reports only subsets
+of `propext`, `Classical.choice` and `Quot.sound`. The ordinary Attempt
+import boundary and original A166944 target are unchanged. No new
+unconditional infinite-recurrence estimate or twin-prime theorem is
+claimed by this checkpoint.

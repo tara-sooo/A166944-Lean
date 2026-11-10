@@ -84,6 +84,11 @@ several separators and checks the summation of disjoint credited blocks.
 `FundedPhaseCredits210.lean` bounds small startup charges and proves
 conditional sublinear balance and short travel from a credit allocation
 funded by first-phase gaps.
+`CreditHall210.lean` characterizes allocation existence by weighted Hall
+inequalities. `CreditWindows210.lean` reduces interval eligibility to
+contiguous-window inequalities; it suffices to test the at most `n*n`
+windows with endpoints drawn from `n` requests. The window inequalities
+on arbitrary actual recurrence prefixes remain open.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
