@@ -119,3 +119,43 @@ are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
 
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.
+
+## First crossing by a large old increment, 2026-11-10
+
+Codex continued from `75eccd7` on the record-index work branch. If an
+old increment `e ≤ M` takes the horizon past `3*M+4` for the first time,
+the preceding horizon lies in `[2*M+6, 3*M+3]`. In the large case
+`4*e > 3*M+3`, `canonical_path_large_old_crossing` forces
+`r=2*e`, `C=3*e+1`, `C'=4*e`, and `a(r)=3*r`.
+
+The first-hit test and the preceding endpoint's divisibility initially
+give six pairs `(gap, preceding increment)`. `D_backward_gcd` gives
+the exact inverse transition, including unit increments. Both pairs
+with preceding increment 7 are incompatible with the gcd at `2*e-4`.
+The pair with preceding increment 15 is impossible by a seven-index
+backward calculation with a finite table of offsets, checked by Lean
+for arbitrary `e ≥ 20`. The remaining pairs and necessary residues are
+`(1,3)` with `e % 3 = 0`, `(1,5)` with `e % 5 = 4`, and `(6,5)` with
+`e % 3 = 0` and `e % 5 = 3`.
+
+The `(1,5)` branch has a local inverse state `(2*(e-1), 3*(e-1))`.
+Every odd divisor of `e-1` satisfies the inverse gcd equation there.
+The prefix from the canonical origin also matters. Every positive even
+common multiple `P` of the earlier increments has `4*P > M+21`.
+In particular, for `M ≥ 968` some earlier increment must be at least 9.
+
+Run `python3 diagnostics/large_crossing.py` for the finite reverse check.
+It starts at `(2*e-1,3*e+1)` and enumerates exact gcd predecessors with
+the necessary cap, horizon, and `D(n) ≤ 2*n` conditions. The 9637 odd
+values `729 ≤ e ≤ 20001` exhaust all such predecessors before any
+possible canonical origin index. For a separate local control, take
+`M=1321` and the synthetic state `(2317,3510)`. Its exact local gcd
+replay reaches `(2518,5036)` with final increments 5 and 1259 and passes
+200 indices before the crossing. The original sequence has
+`D(2317)=2658`, so this is a local suffix rather than an actual
+canonical-origin replay. The reverse scan and the control are integer
+diagnostics. The three remaining forms have no universal reachability
+exclusion yet.
+
+`lake build A166944.Attempt` passed on Lean 4.33.1. The exported
+crossing theorems were audited with `#print axioms`.

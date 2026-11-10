@@ -1,4 +1,4 @@
-import A166944.RecordIndex
+import A166944.HorizonCrossing
 
 /-!
 # A166944 active proof attempt
