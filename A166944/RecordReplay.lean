@@ -86,7 +86,7 @@ theorem recordReplayCheck_sound {M s C finish : Nat} (hits : List Nat)
       obtain ⟨sf, hpath, hfmax⟩ := ih hstep.2.2.2.2.2.2.2.2 hmax' hrest
       exact ⟨sf, ⟨hstate, r, C + replayGcd r C - 1, hstep, hpath⟩, hfmax⟩
 
-private abbrev NoSmallFactor (N root : Nat) : Prop :=
+abbrev NoSmallFactor (N root : Nat) : Prop :=
   ∀ f : Fin (root + 1), 2 ≤ f.val → ¬ f.val ∣ N
 
 private def noSmallFactorCheck (N root : Nat) : Bool :=
@@ -158,23 +158,15 @@ private theorem recordReturnCheck_sound {s C root : Nat} (hstate : IsMovingHoriz
   · rw [if_neg hj]
     exact gcd_eq_one_of_no_small_factor (by omega) (by omega) hterms.2.2 hterms.1
 
-/-- An accepted replay and return check determine the next strict
-record and bound every preceding increment by the old record. -/
-theorem canonical_replay_next_record {M finish root : Nat} (hits : List Nat)
-    (hM : 5 < M) (hcanon : d (M + 2) = M)
-    (hmax : IsAttainedPreviousMaximum M (M + 2))
-    (hcheck : recordReplayCheck M (M + 2) (2 * M - 2) hits finish = true)
-    (hreturn : recordReturnCheck finish root = true) :
+/-- A quiet return at a horizon of at least the starting canonical
+horizon determines the next strict record. -/
+theorem canonical_quiet_return_next_record {M sf finish : Nat}
+    (hM : 5 < M) (hF : 2 * M - 2 ≤ finish)
+    (hstate : IsMovingHorizonState sf finish) (hfmax : IsAttainedPreviousMaximum M sf)
+    (hquiet : ∀ j : Nat, sf < j → j ≤ finish → d j = 1) :
     M < finish + 1 ∧ IsAttainedPreviousMaximum M (finish + 2) ∧
       d (finish + 3) = finish + 1 ∧ D (finish + 2) = finish := by
-  have hstart : IsMovingHorizonState (M + 2) (2 * M - 2) :=
-    ⟨by omega, (canonical_increment_coordinates hM hcanon).2.1, by omega⟩
-  obtain ⟨sf, hpath, hfmax⟩ := recordReplayCheck_sound hits hstart hmax hcheck
-  have hstate := moving_horizon_path_endpoint hpath
   have hsf := hstate.2.2
-  have hF := D_le_of_le (moving_horizon_path_index_le hpath)
-  rw [hstart.2.1, hstate.2.1] at hF
-  have hquiet := recordReturnCheck_sound hstate hreturn
   have hD := (moving_horizon_no_event_telescope hstate hquiet).1
   have hB := B_add_index_eq_D_add_two (by omega : 2 ≤ finish)
   have hfund : B finish = 2 := by omega
@@ -196,12 +188,29 @@ theorem canonical_replay_next_record {M finish root : Nat} (hits : List Nat)
       · rw [heq, hd2]
         omega
 
+/-- An accepted replay and return check determine the next strict
+record and bound every preceding increment by the old record. -/
+theorem canonical_replay_next_record {M finish root : Nat} (hits : List Nat)
+    (hM : 5 < M) (hcanon : d (M + 2) = M)
+    (hmax : IsAttainedPreviousMaximum M (M + 2))
+    (hcheck : recordReplayCheck M (M + 2) (2 * M - 2) hits finish = true)
+    (hreturn : recordReturnCheck finish root = true) :
+    M < finish + 1 ∧ IsAttainedPreviousMaximum M (finish + 2) ∧
+      d (finish + 3) = finish + 1 ∧ D (finish + 2) = finish := by
+  have hstart : IsMovingHorizonState (M + 2) (2 * M - 2) :=
+    ⟨by omega, (canonical_increment_coordinates hM hcanon).2.1, by omega⟩
+  obtain ⟨sf, hpath, hfmax⟩ := recordReplayCheck_sound hits hstart hmax hcheck
+  have hstate := moving_horizon_path_endpoint hpath
+  have hF := D_le_of_le (moving_horizon_path_index_le hpath)
+  rw [hstart.2.1, hstate.2.1] at hF
+  exact canonical_quiet_return_next_record hM hF hstate hfmax (recordReturnCheck_sound hstate hreturn)
+
 /-- For a number at least two, this is the proper-divisor condition for
 primality. It keeps the replay checker on the recurrence-side imports. -/
 abbrev NoProperFactor (N : Nat) : Prop :=
   ∀ f : Fin N, 2 ≤ f.val → ¬ f.val ∣ N
 
-private theorem no_proper_factor_of_no_small_factor {N root : Nat}
+theorem no_proper_factor_of_no_small_factor {N root : Nat}
     (hcheck : NoSmallFactor N root) (hroot : N < (root + 1) * (root + 1)) : NoProperFactor N := by
   intro f hf hdiv
   have h := gcd_eq_one_of_no_small_factor (by omega : 0 < f.val) f.isLt hcheck hroot

@@ -281,7 +281,7 @@ theorem next_record_index_iff_fundamental {M k : Nat} (hM : 5 < M)
       · rw [h, hd2] at hnew; omega
     rw [heq, hd3]
 
-private theorem attained_previous_maximum_exists (k : Nat) (hk : 2 ≤ k) :
+theorem attained_previous_maximum_exists (k : Nat) (hk : 2 ≤ k) :
     ∃ M : Nat, IsAttainedPreviousMaximum M k := by
   obtain ⟨j, rfl⟩ := Nat.le.dest hk
   clear hk

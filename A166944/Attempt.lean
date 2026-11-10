@@ -1,4 +1,4 @@
-import A166944.CanonicalTravel
+import A166944.QuietReturn
 
 /-!
 # A166944 active proof attempt

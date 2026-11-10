@@ -238,5 +238,30 @@ on Lean 4.33.1 and `#print axioms` for the exported results. The proof
 dependencies are subsets of `propext`, `Classical.choice`, and
 `Quot.sound`. The universal index and twin-primality targets are open.
 
+## A travel hypothesis for both unrestricted targets, 2026-11-10
+
+Codex continued from `65d36ca`. On a genuine quiet return, a divisor
+`f≥2` of `C-1` would force an even hit at `C-1-f`. A divisor of `C+1`
+would force an odd hit at `C+3-2*f`. If `C-s > 2*sqrt(C+1)`, both
+indices are inside the quiet interval for every such divisor up to
+the square root. `quiet_return_no_proper_factors` proves both factor
+certificates in the recurrence-side environment.
+
+For a capped canonical prefix, `2*(s-(M+2)) ≤ M` gives `C ≤ 2*s ≤ 3*M+4`.
+This excludes the inside-horizon larger-hit exit. At the quiet exit
+`C ≥ 2*M-2`, so the same travel bound gives enough quiet length for
+the factor theorem. The next record is `C+1` at `C+3`.
+
+`TravelTarget.lean` discharges the finite initial range with the
+verified prefix. From `M≥22933441`, a joint induction proves both full
+conclusions assuming travel only from a genuine canonical previous
+record `M` whose twin-primality is already known. The existing count
+criterion `48*p*p+1 < M` implies short travel as well. These are exact
+reductions, with the uniform travel bound still open.
+
+Verified with `lake build A166944.Attempt A166944.TravelTarget` and
+`#print axioms` on Lean 4.33.1. The dependencies are subsets of
+`propext`, `Classical.choice`, and `Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.

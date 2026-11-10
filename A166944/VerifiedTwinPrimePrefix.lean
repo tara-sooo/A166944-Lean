@@ -10,7 +10,7 @@ prime predicate of the project's A166944 target.
 
 namespace A166944Research
 
-private theorem prime_of_no_proper_factor {N : Nat} (hN : 2 ≤ N)
+theorem prime_of_no_proper_factor {N : Nat} (hN : 2 ≤ N)
     (hfree : NoProperFactor N) : N.Prime :=
   Nat.prime_def_lt'.2 ⟨hN, fun f hf hlt => hfree ⟨f, hlt⟩ hf⟩
 

@@ -141,6 +141,9 @@ theorem records_verified_through_22933443 : RecordsVerifiedThrough 22933443 :=
 theorem last_verified_record_value : d 22933443 = 22933441 :=
   verified_prefix_result.1
 
+theorem last_verified_prefix_maximum : IsAttainedPreviousMaximum 22933441 22933443 :=
+  verified_prefix_result.2.1
+
 /-- The bound can be stated by record value, with no assumption on
 its index. A later strict record already has to exceed the last one. -/
 theorem record_index_and_factors_of_le_22933441 {R n : Nat}

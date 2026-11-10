@@ -75,20 +75,12 @@ theorem canonical_old_crossing_travel {M s C p r C' : Nat}
   rw [Nat.add_mul, Nat.one_mul]
   omega
 
-/-- With `p+1` events through the crossing, a first old crossing requires
-`M ≤ 48*(p+1)^2+1`. This applies to either size of final increment. -/
-theorem canonical_old_crossing_event_count {M s C p r C' : Nat}
-    (hM : 5 < M) (hcanon : d (M + 2) = M)
-    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) s C p)
-    (hstep : IsMovingHorizonStep s C r C') (hcap : d r ≤ M)
-    (hbelow : C ≤ 3 * M + 4) (hcross : 3 * M + 4 < C') :
-    M ≤ 48 * ((p + 1) * (p + 1)) + 1 := by
-  let k := p + 1
+private theorem previous_record_le_of_long_travel {M k : Nat} (hM : 0 < M)
+    (htravel : M < 2 * (k * Nat.sqrt (4 * (3 * M + 4)))) : M ≤ 48 * (k * k) + 1 := by
   let Q := Nat.sqrt (4 * (3 * M + 4))
-  have htravel : M < 2 * (k * Q) :=
-    canonical_old_crossing_travel hM hcanon hpath hstep hcap hbelow hcross
+  change M < 2 * (k * Q) at htravel
   have hsquare : M * M < (2 * (k * Q)) * (2 * (k * Q)) := by
-    have hlt := Nat.mul_lt_mul_of_pos_right htravel (by omega : 0 < M)
+    have hlt := Nat.mul_lt_mul_of_pos_right htravel hM
     exact Nat.lt_of_lt_of_le hlt (Nat.mul_le_mul_left _ (Nat.le_of_lt htravel))
   have hQ : Q * Q ≤ 4 * (3 * M + 4) := Nat.sqrt_le _
   have hup : M * M < 48 * (k * k) * M + 64 * (k * k) := by
@@ -112,12 +104,22 @@ theorem canonical_old_crossing_event_count {M s C p r C' : Nat}
         · calc
             (16 * (k * k)) * 4 = (16 * 4) * (k * k) := by ac_rfl
             _ = 64 * (k * k) := rfl
-  change M ≤ 48 * (k * k) + 1
   by_cases h : M ≤ 48 * (k * k) + 1
   · exact h
   · have hlow := Nat.mul_le_mul_right M (show 48 * (k * k) + 2 ≤ M by omega)
     rw [Nat.add_mul] at hlow
     omega
+
+/-- With `p+1` events through the crossing, a first old crossing requires
+`M ≤ 48*(p+1)^2+1`. This applies to either size of final increment. -/
+theorem canonical_old_crossing_event_count {M s C p r C' : Nat}
+    (hM : 5 < M) (hcanon : d (M + 2) = M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) s C p)
+    (hstep : IsMovingHorizonStep s C r C') (hcap : d r ≤ M)
+    (hbelow : C ≤ 3 * M + 4) (hcross : 3 * M + 4 < C') :
+    M ≤ 48 * ((p + 1) * (p + 1)) + 1 :=
+  previous_record_le_of_long_travel (by omega)
+    (canonical_old_crossing_travel hM hcanon hpath hstep hcap hbelow hcross)
 
 private theorem moving_horizon_path_first_crossing {s C sf Cf p H : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) (hbelow : C ≤ H) (hcross : H < Cf) :
@@ -152,6 +154,42 @@ theorem canonical_horizon_bound_of_event_count {M sf Cf p : Nat}
     have hMbound := canonical_old_crossing_event_count hM hcanon hpre hstep hcap hbelow hcross
     have hmul := Nat.mul_le_mul_left 48 (Nat.mul_le_mul hq hq)
     omega
+
+/-- A bound on the index of the last old event bounds the horizon. -/
+theorem canonical_horizon_bound_of_short_travel {M sf Cf p : Nat}
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (htravel : 2 * (sf - (M + 2)) ≤ M) : Cf ≤ 3 * M + 4 := by
+  have hD := (moving_horizon_path_endpoint hpath).2.1
+  have hsf := moving_horizon_path_index_le hpath
+  have ha := a_le_three_mul sf
+  have hsum : D sf + sf = a sf := Nat.sub_add_cancel (index_le_a _)
+  omega
+
+/-- The event-count criterion gives a bound on travel as well as on the
+horizon. -/
+theorem canonical_travel_bound_of_event_count {M sf Cf p : Nat}
+    (hM : 5 < M) (hcanon : d (M + 2) = M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
+    (hmax : IsAttainedPreviousMaximum M sf) (hcount : 48 * (p * p) + 1 < M) :
+    2 * (sf - (M + 2)) ≤ M := by
+  have hC := canonical_horizon_bound_of_event_count hM hcanon hpath hmax hcount
+  have hstate := moving_horizon_path_endpoint hpath
+  have hCe : Cf % 2 = 0 := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
+  have hModd : M % 2 = 1 := hcanon ▸ d_mod_two_eq_one_of_three_le (by omega)
+  have hCU : Cf ≤ 3 * M + 3 := by omega
+  have hgap := moving_horizon_path_travel_bound hpath hCU
+  change sf - (M + 2) ≤ p * Nat.sqrt (4 * (3 * M + 4)) at hgap
+  by_cases h : 2 * (sf - (M + 2)) ≤ M
+  · exact h
+  · have hlong : M < 2 * (p * Nat.sqrt (4 * (3 * M + 4))) := by omega
+    have hb := previous_record_le_of_long_travel (by omega) hlong
+    omega
+
+/-- The uniform travel hypothesis used in the return and primality proof. -/
+def CanonicalTravelBoundFrom (lower : Nat) : Prop :=
+  ∀ {M sf Cf p : Nat}, lower ≤ M → d (M + 2) = M →
+    HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p →
+    IsAttainedPreviousMaximum M sf → 2 * (sf - (M + 2)) ≤ M
 
 private theorem moving_horizon_path_start_state {s C sf Cf p : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) : IsMovingHorizonState s C := by
