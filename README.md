@@ -79,7 +79,9 @@ balance, and `ReuseCongruences.lean` checks the index and horizon
 residues at repeated uses of an increment factor. `TravelPhases210.lean`
 gives a sublinear budget for the first long gap in each prime phase
 and pays for a repeated phase when a single zero-excess separator
-intervenes. The ordinary
+intervenes. `SeparatorBlocks210.lean` bounds complete intervals with
+several separators and checks the summation of disjoint credited blocks.
+The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional

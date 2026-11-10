@@ -617,3 +617,77 @@ dependencies of the new theorems are subsets of `propext`,
 `Classical.choice`, and `Quot.sound`. The uniform signed-prefix bound,
 including small positive separator balances and repeated phases with
 several intervening separators, remains open.
+
+## Several separating events and disjoint credit blocks, 2026-11-11 JST
+
+Codex continued from `00c42b6`. `SeparatorBlocks210.lean` records the
+exact separator excesses and signed balances in chronological lists.
+The supported-step identity
+`(C'-C)+(C-1)%210=(C'-1)%210` keeps track of growth below the next
+multiple of 210. If a path has `k` separators with total excess `A`
+and signed sum `S`, the resulting block inequality is
+`S≤A+1678*k+418-2*G`, where `G` is its horizon growth.
+
+For two equal prime phases modulo any fixed positive `P`, let
+`L=lcm(P,2*p)`. The signed sum `B` from strictly after the earlier
+increment `p` through the later increment `p` satisfies
+`B≤A+1678*k+1679+47*p-2*L`. Here `A` and `k` concern the strictly
+intervening separators. For `P=210` and `p` coprime to 210 this gives
+`B≤A+1678*k+1679-373*p`. In particular, `A=0` and `5*(k+1)≤p`
+suffice for `B≤0`, for any number of intervening separators.
+
+`HasPhaseSeparatorCreditCover210` partitions a separator list into
+contiguous nonpositive blocks and uncredited single events.
+`phase_separator_credit_cover_bound210` proves that the complete signed
+sum is at most the sum of the uncredited positive parts. Concatenation
+ensures that these credited blocks do not share any event. A universal
+cover with a sufficiently small residual budget remains open.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_block_probe.py`
+for the block inequalities and disjoint covers. The synthetic canonical
+start `M=15609199` has two long uses of 23 at 15609389 and 15611827,
+with three intervening separators and zero intervening separator
+excess. Their balances total -8970 and the final balance is 774, giving
+`B=-8196≤-1866`. This is an abstract replay from a synthetic start,
+not an initial-sequence certificate. In the exact recurrence replay
+from `M=367232911`, the disjoint cover using numerically checked
+nonpositive reuse blocks leaves a positive-part budget 5348. The
+general block upper bound is too coarse to certify those particular
+blocks automatically. The synthetic 23613589 and 23619049 controls
+leave budgets 6094 and 5474 under the same numeric cover algorithm.
+
+`diagnostics/travel_credit_search.cpp` implements an independent exact
+bounded search. Compile and run with
+
+```sh
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000
+```
+
+It examines every twin-prime-shaped canonical start `13≤M≤100000000`,
+using exact small-factor sieving and first-hit jumps. For each positive
+same-phase long-prime balance it assigns the oldest eligible unused
+negative separator balance strictly between its two long uses.
+All 36616 such demands from 440310 synthetic starts were assigned.
+Two paths stop at their first failure of the cap or short-travel
+condition; their later events are outside this diagnostic. No path
+reached the imposed 3000-event limit. The native `--table` output
+matches all 22050 independently computed Python potential entries.
+An independent Python trial-factorization search through 2000000
+also agrees on all 14869 starts, 194 paid demands and two cutoff stops.
+This finite computation establishes neither the universal allocation
+claim nor the remaining small-positive-budget estimate.
+
+Changing a fixed phase modulus preserves the sublinear first-phase
+theorem. In the sample replay at 367232911, modulus 840 removes the
+remaining long same-phase demands but increases the first-phase
+distance from 13781 to 13832. Enlarging the phase modulus can increase
+the finite combined budget `24*F_phase+S_phase`; its benefit here is
+the stronger structural constraint on subsequent repeated phases.
+
+Verified on Lean 4.33.1 with `lake build A166944.Attempt
+A166944.TravelTarget A166944.SeparatorBlocks210`, the sample probes,
+the independent table comparison and native bounded search.
+`#print axioms` on the new theorems uses only subsets of `propext`,
+`Classical.choice` and `Quot.sound`. The main A166944 theorem and the
+uniform signed-prefix estimate remain open.
