@@ -74,8 +74,10 @@ horizon growth, gives a finite first-crossing inequality, and bounds
 overlap of reuse windows within a factor-two width band. `lake build
 A166944.TravelMod210` checks a residue table that bounds excess on
 blocks of increments dividing 210 and reduces the overall budget to
-separating-event charges. The ordinary `A166944.Attempt` build stays on
-the recurrence-side imports.
+separating-event charges. `TravelSigned210.lean` keeps their signed
+balance, and `ReuseCongruences.lean` checks the index and horizon
+residues at repeated uses of an increment factor. The ordinary
+`A166944.Attempt` build stays on the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality

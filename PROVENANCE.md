@@ -504,5 +504,53 @@ Verified with Lean 4.33.1, `lake build A166944.TravelMod210`, and
 The dependencies are subsets of `propext`, `Classical.choice`, and
 `Quot.sound`.
 
+## Signed separating balances and factor reuse congruences, 2026-11-11 JST
+
+Codex continued from `2e11eb1`. The integer balance of a step is
+`E_i+V(after)-V(before)-2*(e-1)`. The previous separating charge is
+the positive part of this balance at a separator. If `E_i=0`, the
+balance is at most `1260-2*(e-1)`. On a genuine path the signed
+supported sum `A` and signed separating sum `S` satisfy the exact
+identity `E+V(end)=2*G+V(start)+A+S`, with `A≤0`. Thus the new finite
+first-crossing theorem gives `M<24*(F+g)+1315+S` using the signed sum on
+the prefix before the crossing. The necessary estimate concerns every
+such prefix.
+
+For any factor `p>2` of a genuine increment, the pre-event horizon
+and hit have fixed residues modulo `2*p`. In hit and horizon order,
+the pair is `(0,p+1)` at an even hit and `(p+2,p-1)` at an odd hit.
+For two ordered uses, the elapsed index and horizon growth residues
+are `(0,0)` for equal parity, `(p+2,2*p-2)` for even to odd, and
+`(p-2,2)` for odd to even. If the earlier increment is exactly `p≥5`
+and there is one intervening event with increment below `3*p`, that
+increment is `p+2` for equal parity or `p+4` for odd to even.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_signed_reuse_probe.py`
+to reproduce the integer comparisons. Each positive long reused-prime
+balance is assigned unused negative separator balances strictly between
+the preceding use and the current event, taking the earliest eligible
+credit first. The independent total ignores overlapping claims on the
+same credit. The assigned total uses each credit at most once.
+
+| Previous record or synthetic start | Final signed sum | Peak signed prefix | Long reuse charge | Independent credit | Assigned credit |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 22933441, certified replay | -29464 | 60 | 16308 | 10766 | 10766 |
+| 45895573, replay from a certified start | -1742 | 582 | 0 | 0 | 0 |
+| 23613589, synthetic | -47864 | 1272 | 109074 | 88060 | 80208 |
+| 23619049, synthetic | -36378 | 12758 | 99672 | 78940 | 76808 |
+
+For the actual replay from 22933441, the increment 19 at index 22940203
+reuses 19 from index 22940182. The index and horizon drifts are 21 and
+36. The four intervening balances are 138, 0, 0, and 0, including the
+supported events. The reuse incurs a positive balance of 738, with
+zero negative credit strictly between its two uses. This rules out
+paying every positive reuse solely within its own interval. The signed
+prefix bound at arbitrary canonical records is open.
+
+Verified on Lean 4.33.1 with `lake build A166944.Attempt
+A166944.ReuseCongruences A166944.TravelSigned210` and `#print axioms` on
+the congruence, signed-balance and crossing results. The dependencies
+are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.
