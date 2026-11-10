@@ -146,6 +146,50 @@ theorem moving_horizon_residual_travel_bound {s C sf Cf q total : Nat}
     · simp only [residualGap, if_neg h] at hsum
       omega
 
+/-- None of the preceding nonunit increments was divisible by `f`. -/
+abbrev IsNewIncrementFactor (seen : List Nat) (f : Nat) : Prop :=
+  ∀ e ∈ seen, ¬ f ∣ e
+
+def firstUseTravelGap (seen : List Nat) (gap e : Nat) : Nat :=
+  if 10 < gap ∧ NoProperFactor e ∧ IsNewIncrementFactor seen e then gap else 0
+
+/-- The distance from long gaps ending in primes which have not divided
+an earlier increment. `seen` contains the increments before the start
+of this part of the path. Start a new replay with an empty list. -/
+def HasMovingHorizonFirstUseTravel (s C sf Cf : Nat) (seen : List Nat) : Nat → Nat → Prop
+  | 0, total => HasMovingHorizonPathTo s C sf Cf 0 ∧ total = 0
+  | q + 1, total =>
+      ∃ r C' rest, IsMovingHorizonStep s C r C' ∧
+        HasMovingHorizonFirstUseTravel r C' sf Cf (d r :: seen) q rest ∧
+        total = firstUseTravelGap seen (r - s) (d r) + rest
+
+theorem moving_horizon_first_use_travel_path {s C sf Cf q total : Nat} {seen : List Nat}
+    (hcost : HasMovingHorizonFirstUseTravel s C sf Cf seen q total) :
+    HasMovingHorizonPathTo s C sf Cf q := by
+  induction q generalizing s C seen total with
+  | zero => exact hcost.1
+  | succ q ih =>
+    obtain ⟨r, C', _, hstep, hrest, _⟩ := hcost
+    exact ⟨hstep.1, r, C', hstep, ih hrest⟩
+
+theorem moving_horizon_residual_travel_first_use {s C sf Cf q total : Nat}
+    (hcost : HasMovingHorizonResidualTravel s C sf Cf q total) (seen : List Nat) :
+    ∃ first, HasMovingHorizonFirstUseTravel s C sf Cf seen q first ∧ first ≤ total := by
+  induction q generalizing s C seen total with
+  | zero => exact ⟨0, ⟨hcost.1, rfl⟩, Nat.zero_le _⟩
+  | succ q ih =>
+    obtain ⟨r, C', rest, hstep, hrest, hsum⟩ := hcost
+    obtain ⟨first, hfirst, hle⟩ := ih hrest (d r :: seen)
+    have hgap : firstUseTravelGap seen (r - s) (d r) ≤ residualGap (r - s) (d r) := by
+      by_cases h : 10 < r - s ∧ NoProperFactor (d r) ∧ IsNewIncrementFactor seen (d r)
+      · have hnot : ¬ (10 < r - s ∧ ¬ NoProperFactor (d r)) := fun hn => hn.2 h.2.1
+        simp only [firstUseTravelGap, residualGap, if_pos h, if_neg hnot, Nat.le_refl]
+      · rw [firstUseTravelGap, if_neg h]
+        exact Nat.zero_le _
+    refine ⟨_, ⟨r, C', first, hstep, hfirst, rfl⟩, ?_⟩
+    rw [hsum]
+    exact Nat.add_le_add hgap hle
+
 /-- Before the first step across the short-travel cutoff, the horizon
 has at most `M+5` growth. Consequently the residual travel before that
 step and the bound for the crossing gap have a combined lower bound. -/

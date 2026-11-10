@@ -65,8 +65,12 @@ twin primes suffices for both unrestricted targets. `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in
 composite increments by horizon growth and gives a necessary amount of
-remaining travel at a first crossing. The ordinary `A166944.Attempt`
-build stays on the recurrence-side imports.
+remaining travel at a first crossing. `lake build A166944.TravelFirstUse`
+checks that long gaps ending at first-used primes contribute uniformly
+sublinear travel before the cutoff. For sufficiently large records, a
+first crossing needs more than `M/12` from short gaps and long gaps
+ending at reused primes. The ordinary `A166944.Attempt` build stays on
+the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality

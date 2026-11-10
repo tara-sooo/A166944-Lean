@@ -351,5 +351,48 @@ Verified with `lake build A166944.Attempt A166944.TravelTarget` on Lean
 conditional results. The dependencies are subsets of `propext`,
 `Classical.choice`, and `Quot.sound`. The uniform residual budget is open.
 
+## Uniformly sublinear travel at first-used primes, 2026-11-10
+
+Codex continued from `10b0aff`. `HasMovingHorizonFirstUseTravel` records
+the exact distance `F` from long gaps ending in a prime that has not
+divided any earlier nonunit increment in the replay. The history includes
+short and composite events. The ledger is obtained from the same path
+as the residual distance `T`, with `F≤T`. Thus `T-F` measures short gaps
+and long gaps ending in reused primes.
+
+At any cutoff `L>0`, each prime at most `L` is charged at most once, by
+twice that prime. Above `L`, a step ending at increment `e` has
+`g*e≤2*(C+1)` by the cofactor bound and grows the horizon by `e-1`.
+On a short canonical prefix with horizon growth `G`, the result is
+`F≤2*sum(primesLE L)+2*(3*M+4)*G/(L*(L+1))`, with natural division.
+This is `canonical_first_use_travel_bound`.
+
+For any natural `j`, the primes at least `4^j` have product at most the
+primorial, which Mathlib bounds by `4^L`. Comparing exponents and adding
+the smaller primes proves `j*primeCounting L≤L+j*4^j`. With
+`A=32*k`, `j=A^3`, and `L=A*(sqrt M+1)`, the small and large terms each
+contribute at most `M/(2*k)` for sufficiently large `M`. This gives
+`canonical_first_use_travel_sublinear`: for every positive `k`, one
+threshold works for `k*F≤M` on every short canonical prefix. The proof
+uses natural-number arithmetic and the primorial bound. Its threshold
+`max 6 ((j*4^j)^2)` is an explicit, coarse asymptotic threshold.
+
+`canonical_travel_crossing_requires_short_or_reused` uses `k=48` and
+the square-root bound for the crossing step. For sufficiently large `M`,
+a first travel crossing would require `M<12*(T-F)` immediately before
+that step. The uniform bound on this remaining travel and the range
+between the verified finite prefix and the asymptotic threshold are open.
+
+The two actual rows from `diagnostics/travel_factor_probe.py` have
+`G=28692` and `G=1914`, respectively. Substituting `L=2332` and `L=1422`
+into the finite formula gives bounds `1456866` and `543823` for the
+observed first-use distances `13107` and `858`. These are evaluations
+of the bound on the two specific replays.
+
+Verified on Lean 4.33.1 with `lake build A166944.Attempt` (14 jobs),
+`lake build A166944.TravelTarget A166944.TravelFirstUse`, and `#print axioms`
+on the first-use ledger, finite bound, and asymptotic results. The axiom
+dependencies are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.
