@@ -55,6 +55,12 @@ by an explicit least common multiple. `A166944/CanonicalRecord.lean` proves
 that the full index theorem is equivalent to excluding a larger first hit
 inside the horizon of a capped replay from a canonical record.
 
+On that branch, `lake build A166944.VerifiedTwinPrimePrefix` checks the
+position and twin-primality theorems for all strict records
+`5 < R ≤ 22933441`. The same replay certificates establish the horizon
+bound for canonical previous records `968 ≤ M < 22933441`. The ordinary
+`A166944.Attempt` build stays on the recurrence-side imports.
+
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality
 conjecture remain open. Unbounded records imply that the original A166944

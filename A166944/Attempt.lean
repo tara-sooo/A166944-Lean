@@ -1,4 +1,4 @@
-import A166944.CanonicalGrowth
+import A166944.CanonicalTravel
 
 /-!
 # A166944 active proof attempt

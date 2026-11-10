@@ -117,9 +117,6 @@ and its old increment sizes exclude every such barrier in
 supporting lemmas were checked with `#print axioms`. Their dependencies
 are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
 
-The unconditional index theorem and the universal exclusions of the
-two quotient branches are open.
-
 ## First crossing by a large old increment, 2026-11-10
 
 Codex continued from `75eccd7` on the record-index work branch. If an
@@ -199,3 +196,47 @@ at even indices. The exclusion at arbitrary large indices is open.
 Verified with `lake build A166944.Attempt` on Lean 4.33.1 and
 `#print axioms` for the exported theorems. The reported dependencies
 are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
+
+## First-hit travel and the verified finite prefix, 2026-11-10
+
+Codex continued from `f65e07b`. For an event with increment `e` and
+cofactor `v`, the gap is at most both `2*e` and `2*v`. Thus its square
+is at most `4*(C+1)`. A first crossing of `3*M+4` needs index
+displacement greater than `M/2` from the canonical start, because
+`D(r) ≤ 2*r`. With `k` first hits through the crossing, this proves
+`M ≤ 48*k*k+1` for either size of final old increment. In particular, an actual capped
+replay with `p` events and `48*p*p+1 < M` satisfies the horizon bound. The
+travel cover also allows different positive even multiples on contiguous
+segments. Within a run supported on `P` the travel is at most
+`3*(P-1)`, and an exceptional event costs at most the square-root
+gap bound. A large crossing after a cover of cost `B` requires
+`M < 2*B+13`.
+
+`diagnostics/generate_record_replays.py` proposes 20 segments from record
+7 to record 22933441. The table contains 622 old nonunit indices, the
+terminal horizons, and integer root bounds. `RecordReplay.lean` checks
+the exact gcd at each hit and every intervening shorter gap. For each
+long final quiet interval it checks divisors up to the supplied root
+bound for both horizon terms, and verifies the root bound itself.
+The soundness theorem propagates the actual previous maximum and the
+next strict record from the starting value. No numerical search output
+is assumed in the theorem. The finite table is accepted by kernel
+`decide`, with the segments checked separately.
+
+- `records_verified_through_22933443` proves that every strict record
+  above 5 through that index occurs at `R+2` and both twin candidates
+  have no proper factors. `target_for_records_le_22933441` proves the
+  exact twin-primality predicate for all strict record values in that
+  range, without assuming an index bound.
+- `canonical_horizon_bound_before_22933441` proves `D(s)≤3*M+4`
+  for actual capped states with canonical `968≤M<22933441`.
+  `record_index_of_horizon_bound_from_22933441` reduces the universal
+  index theorem to the same bound from `M=22933441` onward.
+
+Verified with `lake build A166944.Attempt A166944.VerifiedTwinPrimePrefix`
+on Lean 4.33.1 and `#print axioms` for the exported results. The proof
+dependencies are subsets of `propext`, `Classical.choice`, and
+`Quot.sound`. The universal index and twin-primality targets are open.
+
+The unconditional index theorem and the universal exclusions of the
+two quotient branches are open.

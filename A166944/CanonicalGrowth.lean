@@ -11,7 +11,7 @@ even common multiple.
 
 namespace A166944Research
 
-private theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
+theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') :
     ∃ v : Nat, d r * v ≤ C + 1 ∧ r - s ≤ 2 * v := by
   rcases moving_horizon_step_event_package hstep with ⟨_, hdiv, hproper, _⟩ | ⟨_, hdiv, hproper, _⟩
@@ -34,14 +34,18 @@ private theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
     have hdiv' : v ∣ C + 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
     exact ⟨v, by omega, moving_horizon_gap_le_twice_odd_factor hstep hv1 hdiv'⟩
 
+theorem moving_horizon_step_gap_le_twice_increment {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') : r - s ≤ 2 * d r := by
+  have he := hstep.2.2.2.1
+  rcases moving_horizon_step_event_package hstep with ⟨_, hd, _, _⟩ | ⟨_, hd, _, _⟩
+  · exact moving_horizon_gap_le_twice_even_factor hstep he hd
+  · exact moving_horizon_gap_le_twice_odd_factor hstep he hd
+
 private theorem moving_horizon_step_gap_le_three_growth {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') : r - s ≤ 3 * (C' - C) := by
   have he3 := moving_horizon_step_event_ge_three hstep
   have hup := moving_horizon_step_update hstep
-  have hgap : r - s ≤ 2 * d r := by
-    rcases moving_horizon_step_event_package hstep with ⟨_, hd, _, _⟩ | ⟨_, hd, _, _⟩
-    · exact moving_horizon_gap_le_twice_even_factor hstep (by omega) hd
-    · exact moving_horizon_gap_le_twice_odd_factor hstep (by omega) hd
+  have hgap := moving_horizon_step_gap_le_twice_increment hstep
   omega
 
 /-- A first-hit path travels at most three indices per unit of horizon growth. -/
@@ -107,11 +111,12 @@ theorem canonical_path_step_square_bound {M s C r C' p Q : Nat} (hM : 5 < M)
     have hb := canonical_path_step_offset_bound hM hpath hstep
     omega
 
-private theorem moving_horizon_path_before_nonunit {s C sf Cf p j : Nat}
+/-- A nonunit index on a first-hit path splits the path at its exact step. -/
+theorem moving_horizon_path_split_at_nonunit {s C sf Cf p j : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p)
     (hsj : s < j) (hj : j ≤ sf) (he : d j ≠ 1) :
-    ∃ sp Cp Cj q : Nat, HasMovingHorizonPathTo s C sp Cp q ∧
-      IsMovingHorizonStep sp Cp j Cj := by
+    ∃ sp Cp Cj q u : Nat, HasMovingHorizonPathTo s C sp Cp q ∧
+      IsMovingHorizonStep sp Cp j Cj ∧ HasMovingHorizonPathTo j Cj sf Cf u := by
   induction p generalizing s C with
   | zero =>
       obtain ⟨heq, _, _⟩ := hpath
@@ -122,11 +127,11 @@ private theorem moving_horizon_path_before_nonunit {s C sf Cf p j : Nat}
       · exact False.elim (he (hstep.2.2.2.2.1 j hsj h))
       · by_cases hjr : j = r
         · subst j
-          exact ⟨s, C, C', 0, ⟨rfl, rfl, hstart⟩, hstep⟩
-        · obtain ⟨sp, Cp, Cj, q, hprefix, hlast⟩ := ih htail (by omega)
-          exact ⟨sp, Cp, Cj, q + 1, ⟨hstart, r, C', hstep, hprefix⟩, hlast⟩
+          exact ⟨s, C, C', 0, p, ⟨rfl, rfl, hstart⟩, hstep, htail⟩
+        · obtain ⟨sp, Cp, Cj, q, u, hprefix, hlast, hend⟩ := ih htail (by omega)
+          exact ⟨sp, Cp, Cj, q + 1, u, ⟨hstart, r, C', hstep, hprefix⟩, hlast, hend⟩
 
-private theorem exists_last_nondvd {P s n : Nat}
+theorem exists_last_nondvd {P s n : Nat}
     (hex : ∃ j : Nat, s < j ∧ j ≤ n ∧ ¬ d j ∣ P) :
     ∃ j : Nat, s < j ∧ j ≤ n ∧ ¬ d j ∣ P ∧
       ∀ i : Nat, j < i → i ≤ n → d i ∣ P := by
@@ -175,8 +180,8 @@ theorem canonical_path_growth_by_exception_list {M P Q s C p : Nat} (hM : 5 < M)
         have hjunit : d j ≠ 1 := by
           intro h
           exact hnd (h.symm ▸ Nat.one_dvd P)
-        obtain ⟨sp, Cp, Cj, q, hprefix, hstep⟩ :=
-          moving_horizon_path_before_nonunit hpath hj hjs hjunit
+        obtain ⟨sp, Cp, Cj, q, _, hprefix, hstep, _⟩ :=
+          moving_horizon_path_split_at_nonunit hpath hj hjs hjunit
         have hspj := hstep.2.1
         have hCp : Cp ≤ C := by
           rw [← hstep.1.2.1, ← hDend]
