@@ -394,5 +394,64 @@ Verified on Lean 4.33.1 with `lake build A166944.Attempt` (14 jobs),
 on the first-use ledger, finite bound, and asymptotic results. The axiom
 dependencies are subsets of `propext`, `Classical.choice`, and `Quot.sound`.
 
+## Excess travel and overlap of reuse windows, 2026-11-11 JST
+
+Codex continued from `472ca2d`. For a step contributing to short gaps
+or long gaps ending at reused primes, charge `max(0, 24*g-(e-1))`
+to excess `E`. The exact ledger for the remaining distance `R=T-F`
+proves `24*R≤G+E`, where `G` is the horizon growth of the prefix.
+For short gaps an excess requires `e≤240`. For a long gap an excess
+requires a reused prime increment `p` with `p*(p-1)<48*(U+1)` when
+the starting horizon is at most `U`. On a block whose increments
+all divide a fixed positive even `P`, the common-multiple travel
+theorem gives `E≤72*(P-1)`.
+
+At a first crossing of `M/2`, let `g` be the crossing step's gap and
+let `F`, `G`, and `E` refer to the prefix immediately before it.
+`canonical_first_travel_crossing_excess` proves the finite inequality
+`12*M<24*(F+g)+9*G+E`, with `G≤M+5` and
+`g≤Q=sqrt(4*(3*M+4))`. This uses the earlier sharper first-crossing
+inequality `3*M<6*(T+g)+2*G`, retaining actual growth.
+`record_index_and_twin_prime_of_excess_budget_from_45895573` connects
+`24*(F+Q)+9*G+E≤12*M` on short capped actual prefixes from canonical
+greater twin records to both unrestricted targets. The sufficient
+budget uses no asymptotic threshold. For sufficiently large `M`,
+`canonical_travel_crossing_requires_excess` also proves
+`2*M<G+E`, `M-5<E`, and `2*M<E+45` at a first crossing, using the
+uniform bounds `48*F≤M` and `48*Q≤M`. The uniform budget remains open.
+
+The minimum reuse window is `[C-(p-1),C)` immediately before the later
+use of a factor `p≥5`. It lies after the previous event's end by the
+reuse growth bound. If the first and third windows of ordered events
+contain a common point, the third width exceeds the sum of the first
+two widths. Thus any width band `[B,2*B)` has overlap at most two.
+This holds for actual ordered steps even without requiring each window
+to be a prime reuse.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_excess_probe.py`
+for the integer diagnostics. Short runs below consist of consecutive
+short events with positive excess. `P=210` runs consist of consecutive
+events whose increments divide 210. Reported maxima are over each replay.
+
+| Previous record or synthetic start | Growth | Short excess | Reuse excess | Max short run | Max `P=210` run | Max window overlap |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 22933441, certified replay | 28692 | 12312 | 15590 | 1212 | 694 | 2 |
+| 45895573, replay from a certified start | 1914 | 2140 | 0 | 1012 | 352 | 0 |
+| 23613589, synthetic | 97614 | 46322 | 101078 | 1542 | 1030 | 3 |
+| 23619049, synthetic | 86694 | 44836 | 92258 | 1542 | 1030 | 3 |
+
+Both synthetic replays have three reuse windows containing 47279388,
+for factors 13, 101, and 241. Their widths are 12, 100, and 240, so
+this is a control against a global overlap-two bound. The two actual
+replays agree on all event indices with a direct recurrence scan to
+91793061. Their finite scores `24*(F+Q)+9*G+E` are 998834 and 603166,
+respectively. These scores use the exact integer replays, with `F` from
+`diagnostics/travel_factor_probe.py`.
+
+Verified with Lean 4.33.1, `lake build A166944.Attempt`,
+`lake build A166944.TravelTarget A166944.TravelFirstUse`, and `#print axioms`.
+The new results use only subsets of `propext`, `Classical.choice`, and
+`Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.

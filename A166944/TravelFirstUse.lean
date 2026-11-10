@@ -1,4 +1,4 @@
-import A166944.TravelFactors
+import A166944.TravelExcess
 import Mathlib.NumberTheory.Primorial
 
 /-!
@@ -37,12 +37,8 @@ private theorem unusedPrimesLE_sum_cons_add {L e : Nat} {seen : List Nat}
 private theorem moving_horizon_large_increment_gap {s C r C' L U : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hL : L < d r) (hU : C ≤ U) :
     (L * (L + 1)) * (r - s) ≤ 2 * (U + 1) * (C' - C) := by
-  obtain ⟨v, hv, hgap⟩ := moving_horizon_step_cofactor_gap hstep
-  have hge : (r - s) * d r ≤ 2 * (U + 1) := by
-    calc
-      (r - s) * d r ≤ (2 * v) * d r := Nat.mul_le_mul_right _ hgap
-      _ = 2 * (d r * v) := by ac_rfl
-      _ ≤ 2 * (U + 1) := Nat.mul_le_mul_left _ (by omega)
+  have hge := (moving_horizon_step_gap_mul_increment_le_twice_horizon hstep).trans
+    (Nat.mul_le_mul_left 2 (by omega : C + 1 ≤ U + 1))
   have hsize := Nat.mul_le_mul (by omega : L ≤ d r - 1) (by omega : L + 1 ≤ d r)
   have hupdate := moving_horizon_step_update hstep
   calc
@@ -304,5 +300,28 @@ theorem canonical_travel_crossing_requires_short_or_reused :
   have hQ := forty_eight_mul_crossing_gap_bound hMlarge
   refine ⟨s, C, r, C', p, total, first, hres, hfirst, hstep, hr, hp, hshort, hcross, ?_⟩
   omega
+
+/-- At an asymptotic first crossing, even the excess alone must exceed
+twice the previous record up to the constant 45. -/
+theorem canonical_travel_crossing_requires_excess :
+    ∃ threshold : Nat, ∀ {M sf Cf q : Nat}, threshold ≤ M → d (M + 2) = M →
+      HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf q → M < 2 * (sf - (M + 2)) →
+      ∃ s C r C' p total first excess : Nat,
+        HasMovingHorizonTravelExcess (M + 2) (2 * M - 2) s C [] p (total - first) excess ∧
+        HasMovingHorizonResidualTravel (M + 2) (2 * M - 2) s C p total ∧
+        HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) s C [] p first ∧
+        IsMovingHorizonStep s C r C' ∧ r ≤ sf ∧ p + 1 ≤ q ∧
+        2 * (s - (M + 2)) ≤ M ∧ M < 2 * (r - (M + 2)) ∧
+        2 * M < C - (2 * M - 2) + excess ∧ M - 5 < excess ∧ 2 * M < excess + 45 := by
+  obtain ⟨threshold, hbound⟩ := canonical_first_use_travel_sublinear 48 (by decide)
+  refine ⟨max threshold 36864, ?_⟩
+  intro M sf Cf q hM hcanon hpath hlong
+  obtain ⟨s, C, r, C', p, total, first, excess, hledger, hres, hfirst, hstep, hr, hp,
+    hshort, hcross, hgrowth, hgap, hdist⟩ := canonical_first_travel_crossing_excess hcanon hpath hlong
+  have hF := hbound (le_trans (le_max_left _ _) hM) hcanon hfirst hshort
+  have hMlarge : 36864 ≤ M := le_trans (le_max_right _ _) hM
+  have hQ := forty_eight_mul_crossing_gap_bound hMlarge
+  refine ⟨s, C, r, C', p, total, first, excess, hledger, hres, hfirst, hstep, hr, hp,
+    hshort, hcross, ?_, ?_, ?_⟩ <;> omega
 
 end A166944Research

@@ -1,5 +1,5 @@
 import A166944.QuietReturn
-import A166944.TravelFactors
+import A166944.TravelExcess
 import A166944.VerifiedTwinPrimePrefix
 import A166944.VerifiedTravelExtension
 
@@ -150,6 +150,30 @@ theorem record_index_and_twin_prime_of_residual_travel_from_45895573
     have hmax' : IsAttainedPreviousMaximum M s :=
       ⟨fun j hj hjs => hmax.1 j hj (by omega), ⟨M + 2, by omega, hstart, hcanon⟩⟩
     have hle := hbudget hM htwin hcanon hcost hmax' hshort
+    omega
+
+/-- The finite first-use and excess budget suffices at every short
+capped prefix. This route has no asymptotic threshold. -/
+theorem record_index_and_twin_prime_of_excess_budget_from_45895573
+    (hbudget : ∀ {M s C p first remaining excess : Nat},
+      45895573 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
+      HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) s C [] p first →
+      HasMovingHorizonTravelExcess (M + 2) (2 * M - 2) s C [] p remaining excess →
+      IsAttainedPreviousMaximum M s → 2 * (s - (M + 2)) ≤ M →
+      24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 9 * (C - (2 * M - 2)) + excess ≤ 12 * M) :
+    ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
+      (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
+  apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573
+  intro M sf Cf q hM htwin hcanon hpath hmax
+  by_cases h : 2 * (sf - (M + 2)) ≤ M
+  · exact h
+  · obtain ⟨s, C, r, C', p, total, first, excess, hledger, _, hfirst, hstep, hr, _,
+      hshort, _, _, hgap, hcross⟩ := canonical_first_travel_crossing_excess hcanon hpath (by omega)
+    have hstart := (moving_horizon_travel_excess_bounds hledger).1
+    have hsr := hstep.2.1
+    have hmax' : IsAttainedPreviousMaximum M s :=
+      ⟨fun j hj hjs => hmax.1 j hj (by omega), ⟨M + 2, by omega, hstart, hcanon⟩⟩
+    have hle := hbudget hM htwin hcanon hfirst hledger hmax' hshort
     omega
 
 end A166944Research

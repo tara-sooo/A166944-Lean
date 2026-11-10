@@ -105,7 +105,7 @@ theorem moving_horizon_factor_reuse_gap {s C r C' t H u H' f : Nat}
   have hup := moving_horizon_step_update hstep
   omega
 
-private def residualGap (gap increment : Nat) : Nat :=
+def residualTravelGap (gap increment : Nat) : Nat :=
   if 10 < gap ∧ ¬ NoProperFactor increment then 0 else gap
 
 /-- The total distance from the short gaps and the long gaps ending in
@@ -115,7 +115,7 @@ def HasMovingHorizonResidualTravel (s C sf Cf : Nat) : Nat → Nat → Prop
   | q + 1, total =>
       ∃ r C' rest, IsMovingHorizonStep s C r C' ∧
         HasMovingHorizonResidualTravel r C' sf Cf q rest ∧
-        total = residualGap (r - s) (d r) + rest
+        total = residualTravelGap (r - s) (d r) + rest
 
 theorem moving_horizon_path_residual_travel_exists {s C sf Cf q : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf q) :
@@ -141,9 +141,9 @@ theorem moving_horizon_residual_travel_bound {s C sf Cf q total : Nat}
     have hup := moving_horizon_step_update hstep
     by_cases h : 10 < r - s ∧ ¬ NoProperFactor (d r)
     · have hgap := moving_horizon_long_composite_gap_le_growth hstep h.1 h.2
-      simp only [residualGap, if_pos h, Nat.zero_add] at hsum
+      simp only [residualTravelGap, if_pos h, Nat.zero_add] at hsum
       omega
-    · simp only [residualGap, if_neg h] at hsum
+    · simp only [residualTravelGap, if_neg h] at hsum
       omega
 
 /-- None of the preceding nonunit increments was divisible by `f`. -/
@@ -180,10 +180,10 @@ theorem moving_horizon_residual_travel_first_use {s C sf Cf q total : Nat}
   | succ q ih =>
     obtain ⟨r, C', rest, hstep, hrest, hsum⟩ := hcost
     obtain ⟨first, hfirst, hle⟩ := ih hrest (d r :: seen)
-    have hgap : firstUseTravelGap seen (r - s) (d r) ≤ residualGap (r - s) (d r) := by
+    have hgap : firstUseTravelGap seen (r - s) (d r) ≤ residualTravelGap (r - s) (d r) := by
       by_cases h : 10 < r - s ∧ NoProperFactor (d r) ∧ IsNewIncrementFactor seen (d r)
       · have hnot : ¬ (10 < r - s ∧ ¬ NoProperFactor (d r)) := fun hn => hn.2 h.2.1
-        simp only [firstUseTravelGap, residualGap, if_pos h, if_neg hnot, Nat.le_refl]
+        simp only [firstUseTravelGap, residualTravelGap, if_pos h, if_neg hnot, Nat.le_refl]
       · rw [firstUseTravelGap, if_neg h]
         exact Nat.zero_le _
     refine ⟨_, ⟨r, C', first, hstep, hfirst, rfl⟩, ?_⟩

@@ -34,6 +34,14 @@ theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
     have hdiv' : v ∣ C + 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
     exact ⟨v, by omega, moving_horizon_gap_le_twice_odd_factor hstep hv1 hdiv'⟩
 
+theorem moving_horizon_step_gap_mul_increment_le_twice_horizon {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') : (r - s) * d r ≤ 2 * (C + 1) := by
+  obtain ⟨v, hv, hgap⟩ := moving_horizon_step_cofactor_gap hstep
+  calc
+    (r - s) * d r ≤ (2 * v) * d r := Nat.mul_le_mul_right _ hgap
+    _ = 2 * (d r * v) := by ac_rfl
+    _ ≤ 2 * (C + 1) := Nat.mul_le_mul_left _ hv
+
 theorem moving_horizon_step_gap_le_twice_increment_factor {s C r C' f : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hf : 1 < f) (hdiv : f ∣ d r) :
     r - s ≤ 2 * f := by

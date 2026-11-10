@@ -69,8 +69,10 @@ remaining travel at a first crossing. `lake build A166944.TravelFirstUse`
 checks that long gaps ending at first-used primes contribute uniformly
 sublinear travel before the cutoff. For sufficiently large records, a
 first crossing needs more than `M/12` from short gaps and long gaps
-ending at reused primes. The ordinary `A166944.Attempt` build stays on
-the recurrence-side imports.
+ending at reused primes. `TravelExcess.lean` charges those gaps against
+horizon growth, gives a finite first-crossing inequality, and bounds
+overlap of reuse windows within a factor-two width band. The ordinary
+`A166944.Attempt` build stays on the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality
