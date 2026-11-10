@@ -301,5 +301,55 @@ Verified with `lake build A166944.Attempt A166944.TravelTarget` on Lean
 joint conditional results reports only `propext`, `Classical.choice`,
 and `Quot.sound`.
 
+## Long composite gaps and reuse of an increment factor, 2026-11-10
+
+Codex continued from `b6b2288`. Any nonunit divisor `f` of an increment
+`e` bounds the preceding first-hit gap `g` by `2*f`. If `g>10` and
+`e` is composite, take a factor with `f*f≤e`. The first-hit bound and
+oddness give `f≥7`, hence `3*g≤6*f≤e-1`. The exact sum `T` of gaps of
+length at most ten and long gaps ending in primes satisfies
+`3*(s-s0)≤3*T+(C-C0)` on a path from `(s0,C0)` to `(s,C)`.
+
+`canonical_first_travel_crossing_residual` takes the first step `s→r`
+across `2*(s-s0)≤M`, with canonical start `(s0,C0)=(M+2,2*M-2)`.
+It proves `3*M<6*(T+(r-s))+2*(C-C0)`. At that start, `C-C0≤M+5` and
+the crossing gap is at most `Q=sqrt(4*(3*M+4))`, giving
+`M<6*(T+Q)+10`. `record_index_and_twin_prime_of_residual_travel_from_45895573`
+therefore reduces the joint theorem to `6*(T+Q)+10≤M` on actual capped
+prefixes with short travel from already canonical greater twin records
+`M≥45895573`.
+
+For any factor `f≥5` used at two ordered events, the growth from the
+first end to the second start is at least `f-1`. The first end is zero
+or minus two modulo `f`, while the second start is plus or minus one.
+Evenness rules out smaller growth. Including the first jump, the second
+gap is at most the growth between the two starts plus two. These are
+`moving_horizon_factor_reuse_growth` and `moving_horizon_factor_reuse_gap`.
+
+Run `PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_factor_probe.py`
+for the exact integer diagnostics. A prime is first-used when it divides
+no earlier increment in that replay, including increments at short gaps.
+
+| Previous record or synthetic start | Short | Long, first-used prime | Long, reused prime | Long, composite |
+| --- | ---: | ---: | ---: | ---: |
+| 22933441, certified replay | 565 | 13107 | 671 | 0 |
+| 45895573, replay from a certified start | 99 | 858 | 0 | 0 |
+| 23613589, synthetic | 2114 | 49215 | 4385 | 65 |
+| 23619049, synthetic | 2046 | 44201 | 4007 | 65 |
+
+In the first actual replay the last `f-1` units of required growth before
+reuse overlap for factors 7 and 31. The two horizon windows are
+`[45883362,45883368]` and `[45883350,45883380]`. Summing these windows
+requires controlling overlap across different primes. The second actual
+row is an integer replay from a certified starting state. A direct
+recurrence scan to index 91793061 agrees on the event lists in both actual
+rows. It can be reproduced with `record_segments(91793061)` from
+`diagnostics/generate_record_replays.py`.
+
+Verified with `lake build A166944.Attempt A166944.TravelTarget` on Lean
+4.33.1 and `#print axioms` on the factor, residual-travel, and joint
+conditional results. The dependencies are subsets of `propext`,
+`Classical.choice`, and `Quot.sound`. The uniform residual budget is open.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.

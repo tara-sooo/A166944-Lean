@@ -63,8 +63,10 @@ bound on the interval from `M=22933441` to its next record. Beyond this
 prefix, short travel from canonical records already known to be greater
 twin primes suffices for both unrestricted targets. `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
-by six separately. The ordinary `A166944.Attempt` build stays on the
-recurrence-side imports.
+by six separately. `TravelFactors.lean` bounds long gaps ending in
+composite increments by horizon growth and gives a necessary amount of
+remaining travel at a first crossing. The ordinary `A166944.Attempt`
+build stays on the recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality

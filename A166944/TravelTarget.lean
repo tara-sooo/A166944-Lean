@@ -1,5 +1,5 @@
 import A166944.QuietReturn
-import A166944.TravelResidues
+import A166944.TravelFactors
 import A166944.VerifiedTwinPrimePrefix
 import A166944.VerifiedTravelExtension
 
@@ -129,5 +129,27 @@ theorem record_index_and_twin_prime_of_six_cover_from_45895573
   intro M sf Cf p hM htwin hcanon hpath hmax
   obtain ⟨cover, hlist, hbudget⟩ := hcover hM htwin hcanon hpath hmax
   exact canonical_travel_bound_of_six_cover (by omega) hcanon hpath cover hlist hbudget
+
+/-- It suffices to bound the short gaps and the long prime gaps on
+prefixes that have not yet crossed the short-travel cutoff. -/
+theorem record_index_and_twin_prime_of_residual_travel_from_45895573
+    (hbudget : ∀ {M s C p total : Nat}, 45895573 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
+      HasMovingHorizonResidualTravel (M + 2) (2 * M - 2) s C p total →
+      IsAttainedPreviousMaximum M s → 2 * (s - (M + 2)) ≤ M →
+      6 * (total + Nat.sqrt (4 * (3 * M + 4))) + 10 ≤ M) :
+    ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
+      (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
+  apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573
+  intro M sf Cf q hM htwin hcanon hpath hmax
+  by_cases h : 2 * (sf - (M + 2)) ≤ M
+  · exact h
+  · obtain ⟨s, C, r, C', p, total, hcost, hstep, hr, _, hshort, _, _, hcross⟩ :=
+      canonical_first_travel_crossing_residual hcanon hpath (by omega)
+    have hstart := (moving_horizon_residual_travel_bound hcost).1
+    have hsr := hstep.2.1
+    have hmax' : IsAttainedPreviousMaximum M s :=
+      ⟨fun j hj hjs => hmax.1 j hj (by omega), ⟨M + 2, by omega, hstart, hcanon⟩⟩
+    have hle := hbudget hM htwin hcanon hcost hmax' hshort
+    omega
 
 end A166944Research

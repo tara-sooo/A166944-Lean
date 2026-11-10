@@ -1,5 +1,5 @@
 import A166944.QuietReturn
-import A166944.TravelResidues
+import A166944.TravelFactors
 
 /-!
 # A166944 active proof attempt

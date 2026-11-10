@@ -34,12 +34,16 @@ theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
     have hdiv' : v ∣ C + 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
     exact ⟨v, by omega, moving_horizon_gap_le_twice_odd_factor hstep hv1 hdiv'⟩
 
-theorem moving_horizon_step_gap_le_twice_increment {s C r C' : Nat}
-    (hstep : IsMovingHorizonStep s C r C') : r - s ≤ 2 * d r := by
-  have he := hstep.2.2.2.1
+theorem moving_horizon_step_gap_le_twice_increment_factor {s C r C' f : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hf : 1 < f) (hdiv : f ∣ d r) :
+    r - s ≤ 2 * f := by
   rcases moving_horizon_step_event_package hstep with ⟨_, hd, _, _⟩ | ⟨_, hd, _, _⟩
-  · exact moving_horizon_gap_le_twice_even_factor hstep he hd
-  · exact moving_horizon_gap_le_twice_odd_factor hstep he hd
+  · exact moving_horizon_gap_le_twice_even_factor hstep hf (Nat.dvd_trans hdiv hd)
+  · exact moving_horizon_gap_le_twice_odd_factor hstep hf (Nat.dvd_trans hdiv hd)
+
+theorem moving_horizon_step_gap_le_twice_increment {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') : r - s ≤ 2 * d r :=
+  moving_horizon_step_gap_le_twice_increment_factor hstep hstep.2.2.2.1 (Nat.dvd_refl _)
 
 private theorem moving_horizon_step_gap_le_three_growth {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') : r - s ≤ 3 * (C' - C) := by

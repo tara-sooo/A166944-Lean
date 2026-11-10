@@ -71,7 +71,7 @@ theorem moving_horizon_path_travel_by_six_cover {s C sf Cf p U : Nat}
         rw [Nat.mul_succ 6 p]
         omega
 
-private theorem moving_horizon_path_first_index_crossing {s C sf Cf p cutoff : Nat}
+theorem moving_horizon_path_first_index_crossing {s C sf Cf p cutoff : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) (hstart : s ≤ cutoff) (hcross : cutoff < sf) :
     ∃ sp Cp r Cr q : Nat, HasMovingHorizonPathTo s C sp Cp q ∧
       IsMovingHorizonStep sp Cp r Cr ∧ sp ≤ cutoff ∧ cutoff < r ∧ q + 1 ≤ p ∧ r ≤ sf := by
