@@ -277,7 +277,7 @@ theorem canonical_large_old_crossing_two_nondvd_210 {M s C p r C' : Nat}
     simp only [List.length_cons, List.length_nil, Nat.zero_add, Nat.pow_one] at hb
     omega
 
-private theorem moving_horizon_path_append_step {s C sf Cf r C' p : Nat}
+theorem moving_horizon_path_append_step {s C sf Cf r C' p : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) (hstep : IsMovingHorizonStep sf Cf r C') :
     HasMovingHorizonPathTo s C r C' (p + 1) := by
   induction p generalizing s C with

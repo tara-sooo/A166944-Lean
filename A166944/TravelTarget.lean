@@ -1,5 +1,7 @@
 import A166944.QuietReturn
+import A166944.TravelResidues
 import A166944.VerifiedTwinPrimePrefix
+import A166944.VerifiedTravelExtension
 
 /-!
 # A common travel hypothesis for the full index and primality targets
@@ -92,5 +94,40 @@ theorem target_of_event_count_bound_from_22933441
   intro M sf Cf p hM hcanon hpath hmax
   exact canonical_travel_bound_of_event_count (by omega) hcanon hpath hmax
     (hcount hM hcanon hpath hmax)
+
+theorem target_for_records_le_45895573 {R : Nat}
+    (hR : 5 < R) (hbound : R ≤ 45895573) (hrecord : IsDifferenceRecord R) :
+    IsGreaterTwinPrime R := by
+  obtain ⟨n, hn, hd, hprior⟩ := hrecord
+  obtain ⟨_, hminus, hplus⟩ := record_index_and_factors_of_le_45895573 hR hbound hn hd hprior
+  exact ⟨prime_of_no_proper_factor (by omega) hplus, prime_of_no_proper_factor (by omega) hminus⟩
+
+/-- The first interval of the travel hypothesis is discharged by the
+verified extension. Only previous records from `45895573` remain. -/
+theorem record_index_and_twin_prime_of_twin_travel_bound_from_45895573
+    (htravel : TwinPrimeTravelBoundFrom 45895573) :
+    ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
+      (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
+  apply record_index_and_twin_prime_of_twin_travel_bound_from_22933441
+  intro M sf Cf p hM htwin hcanon hpath hmax
+  by_cases h : M < 45895573
+  · exact canonical_travel_bound_on_verified_extension hM h hcanon hpath hmax
+  · exact htravel (by omega) htwin hcanon hpath hmax
+
+/-- A bound on the number of starts at horizons divisible by six can
+replace a uniform bound on the total event count. -/
+theorem record_index_and_twin_prime_of_six_cover_from_45895573
+    (hcover : ∀ {M sf Cf p : Nat}, 45895573 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
+      HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p →
+      IsAttainedPreviousMaximum M sf →
+      ∃ cover : List Nat,
+        (∀ j : Nat, IsReplayEventStart (M + 2) sf j → 6 ∣ D j → j ∈ cover) ∧
+        2 * (6 * p + cover.length * (Nat.sqrt (4 * (3 * M + 4)) - 6)) ≤ M) :
+    ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
+      (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
+  apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573
+  intro M sf Cf p hM htwin hcanon hpath hmax
+  obtain ⟨cover, hlist, hbudget⟩ := hcover hM htwin hcanon hpath hmax
+  exact canonical_travel_bound_of_six_cover (by omega) hcanon hpath cover hlist hbudget
 
 end A166944Research

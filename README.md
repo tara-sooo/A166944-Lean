@@ -55,11 +55,16 @@ by an explicit least common multiple. `A166944/CanonicalRecord.lean` proves
 that the full index theorem is equivalent to excluding a larger first hit
 inside the horizon of a capped replay from a canonical record.
 
-On that branch, `lake build A166944.VerifiedTwinPrimePrefix` checks the
-position and twin-primality theorems for all strict records
-`5 < R ≤ 22933441`. The same replay certificates establish the horizon
-bound for canonical previous records `968 ≤ M < 22933441`. The ordinary
-`A166944.Attempt` build stays on the recurrence-side imports.
+On that branch, `lake build A166944.TravelTarget` checks the position and
+twin-primality theorems for all strict record values `5 < R ≤ 45895573`.
+The replay certificates establish the horizon bound for canonical
+previous records `968 ≤ M < 22933441` and the stronger short-travel
+bound on the interval from `M=22933441` to its next record. Beyond this
+prefix, short travel from canonical records already known to be greater
+twin primes suffices for both unrestricted targets. `TravelResidues.lean`
+gives a sufficient budget that treats event starts at horizons divisible
+by six separately. The ordinary `A166944.Attempt` build stays on the
+recurrence-side imports.
 
 The history envelope, record-index theorem `n = R + 2`, unconditional
 fundamental-point infinitude, and the original A166944 twin-primality

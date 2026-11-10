@@ -64,16 +64,18 @@ def recordReplayCheck (M s C : Nat) (hits : List Nat) (finish : Nat) : Bool :=
       (decide (s < r ∧ r ≤ C ∧ 1 < e ∧ e ≤ M) && replayQuietCheck s C r) &&
       recordReplayCheck M r (C + e - 1) rest finish
 
-theorem recordReplayCheck_sound {M s C finish : Nat} (hits : List Nat)
+/-- The checked list determines the exact endpoint, including an empty
+list whose endpoint is the starting index. -/
+theorem recordReplayCheck_sound_last {M s C finish : Nat} (hits : List Nat)
     (hstate : IsMovingHorizonState s C) (hmax : IsAttainedPreviousMaximum M s)
     (hcheck : recordReplayCheck M s C hits finish = true) :
-    ∃ sf : Nat, HasMovingHorizonPathTo s C sf finish hits.length ∧
-      IsAttainedPreviousMaximum M sf := by
+    HasMovingHorizonPathTo s C (hits.getLastD s) finish hits.length ∧
+      IsAttainedPreviousMaximum M (hits.getLastD s) := by
   induction hits generalizing s C with
   | nil =>
       have hfinish : C = finish := by simpa [recordReplayCheck] using hcheck
       subst finish
-      exact ⟨s, ⟨rfl, rfl, hstate⟩, hmax⟩
+      exact ⟨⟨rfl, rfl, hstate⟩, hmax⟩
   | cons r rest ih =>
       simp only [recordReplayCheck, Bool.and_eq_true, decide_eq_true_eq] at hcheck
       obtain ⟨⟨⟨hsr, hrC, he, hcap⟩, hquiet⟩, hrest⟩ := hcheck
@@ -83,8 +85,16 @@ theorem recordReplayCheck_sound {M s C finish : Nat} (hits : List Nat)
         · exact h.2
         · have := h.1
           omega
-      obtain ⟨sf, hpath, hfmax⟩ := ih hstep.2.2.2.2.2.2.2.2 hmax' hrest
-      exact ⟨sf, ⟨hstate, r, C + replayGcd r C - 1, hstep, hpath⟩, hfmax⟩
+      obtain ⟨hpath, hfmax⟩ := ih hstep.2.2.2.2.2.2.2.2 hmax' hrest
+      rw [List.getLastD_cons]
+      exact ⟨⟨hstate, r, C + replayGcd r C - 1, hstep, hpath⟩, hfmax⟩
+
+theorem recordReplayCheck_sound {M s C finish : Nat} (hits : List Nat)
+    (hstate : IsMovingHorizonState s C) (hmax : IsAttainedPreviousMaximum M s)
+    (hcheck : recordReplayCheck M s C hits finish = true) :
+    ∃ sf : Nat, HasMovingHorizonPathTo s C sf finish hits.length ∧
+      IsAttainedPreviousMaximum M sf :=
+  ⟨hits.getLastD s, recordReplayCheck_sound_last hits hstate hmax hcheck⟩
 
 abbrev NoSmallFactor (N root : Nat) : Prop :=
   ∀ f : Fin (root + 1), 2 ≤ f.val → ¬ f.val ∣ N
@@ -204,6 +214,52 @@ theorem canonical_replay_next_record {M finish root : Nat} (hits : List Nat)
   have hF := D_le_of_le (moving_horizon_path_index_le hpath)
   rw [hstart.2.1, hstate.2.1] at hF
   exact canonical_quiet_return_next_record hM hF hstate hfmax (recordReturnCheck_sound hstate hreturn)
+
+/-- A complete checked replay bounds travel on every capped prefix,
+not just on the path supplied to the checker. -/
+theorem canonical_replay_travel_bound {M finish root : Nat} (hits : List Nat)
+    (hM : 5 < M) (hcanon : d (M + 2) = M)
+    (hmax : IsAttainedPreviousMaximum M (M + 2))
+    (hcheck : recordReplayCheck M (M + 2) (2 * M - 2) hits finish = true)
+    (hreturn : recordReturnCheck finish root = true)
+    (hlast : 2 * (hits.getLastD (M + 2) - (M + 2)) ≤ M) :
+    ∀ {sf Cf p : Nat}, HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p →
+      IsAttainedPreviousMaximum M sf → 2 * (sf - (M + 2)) ≤ M := by
+  let last := hits.getLastD (M + 2)
+  have hstart : IsMovingHorizonState (M + 2) (2 * M - 2) :=
+    ⟨by omega, (canonical_increment_coordinates hM hcanon).2.1, by omega⟩
+  obtain ⟨hreplay, hmaxLast⟩ := recordReplayCheck_sound_last hits hstart hmax hcheck
+  have hstate := moving_horizon_path_endpoint hreplay
+  have hstartLast : M + 2 ≤ last := moving_horizon_path_index_le hreplay
+  have hF := D_le_of_le hstartLast
+  have hDlast : D last = finish := hstate.2.1
+  rw [hstart.2.1, hDlast] at hF
+  have hquiet := recordReturnCheck_sound hstate hreturn
+  obtain ⟨hnew, _, hd, hD⟩ := canonical_quiet_return_next_record hM hF hstate hmaxLast hquiet
+  intro sf Cf p hpath hmaxSf
+  have hsfFinish : sf ≤ finish + 2 := by
+    by_cases h : sf ≤ finish + 2
+    · exact h
+    · have hcap := hmaxSf.1 (finish + 3) (by omega) (by omega)
+      omega
+  have hsfLast : sf ≤ last := by
+    by_cases h : sf ≤ last
+    · exact h
+    · obtain ⟨sp, Cp, q, _, hstep⟩ := moving_horizon_path_last_step hpath (by omega)
+      have hnonunit := hstep.2.2.2.1
+      have hlo := D_le_of_le (by omega : last ≤ sf - 1)
+      have hmid := D_le_of_le (by omega : sf - 1 ≤ sf)
+      have hhi := D_le_of_le hsfFinish
+      rw [hDlast] at hlo
+      rw [hD] at hhi
+      have heq : D sf = D (sf - 1) := by omega
+      have hunit : d sf = 1 := by
+        have hindex : sf - 1 + 1 = sf := by omega
+        have h := (D_succ_eq_self_iff_d_succ_eq_one (sf - 1)).1 (by rwa [hindex])
+        simpa only [hindex] using h
+      omega
+  change 2 * (last - (M + 2)) ≤ M at hlast
+  omega
 
 /-- For a number at least two, this is the proper-divisor condition for
 primality. It keeps the replay checker on the recurrence-side imports. -/

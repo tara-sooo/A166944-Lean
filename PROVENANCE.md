@@ -263,5 +263,43 @@ Verified with `lake build A166944.Attempt A166944.TravelTarget` and
 `#print axioms` on Lean 4.33.1. The dependencies are subsets of
 `propext`, `Classical.choice`, and `Quot.sound`.
 
+## One more verified interval and a residue-sensitive travel bound, 2026-11-10
+
+Codex continued from `84ce964`. A complete replay bounds the travel of
+every actual capped prefix by the travel to the last listed nonunit
+event (`canonical_replay_travel_bound`). The certificate in
+`VerifiedTravelExtension.lean` starts at the canonical record
+`M=22933441`, checks 209 old nonunit events, and ends those events at
+index 22947786, just 14343 indices after the start. The quiet horizon is
+45895572. The next strict record is 45895573 at index 45895575. The
+record-index and twin-prime theorems now cover all strict record values
+`5 < R ≤ 45895573`. The same certificate discharges short travel for
+every actual capped prefix with canonical `22933441 ≤ M < 45895573`.
+
+`moving_horizon_gap_le_six_of_six_not_dvd` uses the divisor 3 of one
+horizon term whenever `6 ∤ C`. For `p` events and a cover of length `k`
+of the starts with `6 ∣ C`, the sufficient short-travel inequality is
+`2*(6*p + k*(sqrt(4*(3*M+4))-6)) ≤ M`. The proof tests the first index
+that would exceed short travel. All event starts through that crossing
+still satisfy the horizon bound used in the square root. The joint
+conditional theorem in `TravelTarget.lean` now requires either short
+travel or this sufficient budget only from actual canonical greater twin
+records with `M ≥ 45895573`.
+
+Run `python3 diagnostics/travel_residue_probe.py` to reproduce the
+integer comparison. The actual interval has `p=209`, `k=125`. The two
+synthetic canonical-coordinate starts `M=23613589` and `M=23619049`
+both have `M` and `M-2` prime. They fail `48*p*p+1 < M` with `p=740`
+and `p=721`, respectively. Their travel is 55779 and 50319, and the
+weighted budgets pass with `k=445` and `k=432`. The two starts lie
+between consecutive certified records and are not actual recurrence
+histories. Regenerate the extension data with
+`record_segments(45895575)[1][-1]` from `diagnostics/generate_record_replays.py`.
+
+Verified with `lake build A166944.Attempt A166944.TravelTarget` on Lean
+4.33.1. `#print axioms` on the replay, finite-prefix, residue-bound, and
+joint conditional results reports only `propext`, `Classical.choice`,
+and `Quot.sound`.
+
 The unconditional index theorem and the universal exclusions of the
 two quotient branches are open.
