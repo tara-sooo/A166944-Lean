@@ -70,11 +70,12 @@ int next_hit(int index, int horizon, const std::vector<uint16_t>& factor) {
 }
 
 int main(int argc, char** argv) {
-    const bool residual = argc == 5 && std::string(argv[4]) == "--residual";
+    const bool check_half_reserve = argc == 5 && std::string(argv[4]) == "--residual-reserve";
+    const bool residual = argc == 5 && (std::string(argv[4]) == "--residual" || check_half_reserve);
     const bool funded = (argc == 4 || argc == 5 || argc == 6) && std::string(argv[2]) == "--funded";
     if ((argc != 2 && !funded) || (argc == 5 && !residual) ||
         (argc == 6 && std::string(argv[4]) != "--growth-charge")) {
-        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER [--growth-charge 2|4 | --residual]] | --table\n";
+        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER [--growth-charge 2|4 | --residual | --residual-reserve]] | --table\n";
         return 2;
     }
     const int multiplier = funded ? std::stoi(argv[3]) : 0;
@@ -106,6 +107,8 @@ int main(int argc, char** argv) {
     };
     int starts = 0, demands = 0, cutoff_stops = 0, event_limit_stops = 0;
     int64_t maximum_startup = 0;
+    int64_t reserve_checks = 0, minimum_reserve_margin = INT64_MAX;
+    int reserve_record = 0, reserve_hit = 0;
     for (int record = 13; record <= limit; record += 6) {
         if (!is_prime(record) || !is_prime(record - 2)) continue;
         ++starts;
@@ -115,6 +118,24 @@ int main(int argc, char** argv) {
         std::vector<Event> history;
         std::vector<std::pair<int, int>> credits;
         int64_t first = 0, startup = 0, signed_sum = 0;
+        int64_t unused_credit = 0;
+        auto reserve_ok = [&](int hit) {
+            if (!check_half_reserve || record < 50000000) return true;
+            ++reserve_checks;
+            const int64_t margin = record + 2 * unused_credit - 2 * (24 + multiplier) * first;
+            if (margin < minimum_reserve_margin) {
+                minimum_reserve_margin = margin;
+                reserve_record = record;
+                reserve_hit = hit;
+            }
+            if (margin < 0) {
+                std::cout << "Half-reserve failure record=" << record << " hit=" << hit
+                          << " margin=" << margin << '\n';
+                return false;
+            }
+            return true;
+        };
+        if (!reserve_ok(index)) return 1;
         while (true) {
             if (history.size() >= 3000) {
                 ++event_limit_stops;
@@ -142,12 +163,16 @@ int main(int argc, char** argv) {
             const int anchor = previous >= 0 ? previous : prior_positive;
             if (long_prime && previous < 0) {
                 first += gap;
-                if (funded) credits.emplace_back(2 * history.size() + 1, multiplier * gap);
+                if (funded) {
+                    credits.emplace_back(2 * history.size() + 1, multiplier * gap);
+                    unused_credit += multiplier * gap;
+                }
             }
             if (210 % increment) {
                 signed_sum += balance;
                 if (balance < 0) {
                     credits.emplace_back(2 * history.size(), -balance);
+                    unused_credit -= balance;
                 } else if (balance > 0 && anchor >= 0) {
                     ++demands;
                     int owed = balance;
@@ -156,6 +181,7 @@ int main(int argc, char** argv) {
                         const int used = std::min(owed, credit.second);
                         owed -= used;
                         credit.second -= used;
+                        unused_credit -= used;
                         if (owed == 0) break;
                     }
                     if (owed) {
@@ -177,7 +203,11 @@ int main(int argc, char** argv) {
                 }
                 if (funded && balance > 0) previous_positive[key] = history.size();
             }
-            if (funded) assert(signed_sum <= startup + multiplier * first);
+            if (funded) {
+                assert(signed_sum + unused_credit == startup + multiplier * first);
+                assert(unused_credit >= 0);
+            }
+            if (!reserve_ok(hit)) return 1;
             if (long_prime) previous_phase[key] = history.size();
             history.push_back({hit, horizon, increment, excess, balance});
             index = hit;
@@ -191,4 +221,8 @@ int main(int argc, char** argv) {
     if (funded) std::cout << "multiplier=" << multiplier << " maximum startup=" << maximum_startup << '\n';
     if (growth_charge != 2) std::cout << "growth charge=" << growth_charge << '\n';
     if (residual) std::cout << "balance=residual\n";
+    if (check_half_reserve && reserve_checks) {
+        std::cout << "half-reserve checks=" << reserve_checks << " minimum margin=" << minimum_reserve_margin
+                  << " record=" << reserve_record << " hit=" << reserve_hit << '\n';
+    }
 }

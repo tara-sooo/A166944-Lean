@@ -56,6 +56,17 @@ private theorem extension_next_record :
   canonical_replay_next_record extensionHits (by decide) last_verified_record_value
     last_verified_prefix_maximum extensionReplay_accepted extensionReturn_accepted
 
+theorem verified_record_at_45895573 : d 45895575 = 45895573 :=
+  extension_next_record.2.2.1
+
+theorem verified_maximum_at_45895573 : IsAttainedPreviousMaximum 45895573 45895575 := by
+  have hnew : 22933441 < d 45895575 := by
+    rw [verified_record_at_45895573]
+    decide
+  have h := attained_previous_maximum_extend (by decide : 2 ≤ 45895575)
+    extension_next_record.2.1 hnew
+  simpa only [verified_record_at_45895573] using h
+
 theorem canonical_travel_bound_at_22933441 {sf Cf p : Nat}
     (hpath : HasMovingHorizonPathTo (22933441 + 2) (2 * 22933441 - 2) sf Cf p)
     (hmax : IsAttainedPreviousMaximum 22933441 sf) :

@@ -55,13 +55,15 @@ by an explicit least common multiple. `A166944/CanonicalRecord.lean` proves
 that the full index theorem is equivalent to excluding a larger first hit
 inside the horizon of a capped replay from a canonical record.
 
-On that branch, `lake build A166944.TravelTarget` checks the position and
-twin-primality theorems for all strict record values `5 < R ≤ 45895573`.
+On that branch, `lake build A166944.TwinReserveTarget210` checks the position
+and twin-primality theorems for all strict record values `5 < R ≤ 91793059`.
 The replay certificates establish the horizon bound for canonical
 previous records `968 ≤ M < 22933441` and the stronger short-travel
-bound on the interval from `M=22933441` to its next record. Beyond this
-prefix, short travel from canonical records already known to be greater
-twin primes suffices for both unrestricted targets. `TravelResidues.lean`
+bound on the interval from `M=22933441` to its next record.
+`VerifiedFiftyMillionBridge.lean` checks the 37-event replay from that
+next record, `45895573`, to `91793059` at index `91793061`. Together
+these certificates reduce the unrestricted targets to short travel
+from canonical greater twin primes `M ≥ 50000000`. `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in
 composite increments by horizon growth and gives a necessary amount of
@@ -99,10 +101,22 @@ existence is still open.
 `ResidualPhaseCredits210.lean` integrates the tighter residual cost into
 the full path and first-crossing budgets. `ResidualStartup210.lean`
 bounds each startup charge by 1478 and the distinct-key total by
-23899260. `ResidualAllocation210.lean` retains unused credit in the net
-budget; `CreditDeficits210.lean` reduces allocation failure to a minimal
-deficient window. Excluding such windows on arbitrary actual prefixes
-and proving a usable uniform net bound remain open.
+23899260. `ResidualAllocation210.lean` retains unused credit `U` in the
+net budget. `CreditDeficits210.lean` reduces allocation failure to a minimal
+deficient window. `CreditDeficitStructure210.lean` proves that positive
+requests attain its endpoints and cross every interior cut.
+`RecurrenceDeficit210.lean` attaches same-phase reuse constraints to
+these witnesses when the requests are indexed by actual recurrence
+events. Excluding such windows on arbitrary actual prefixes remains open.
+
+`ResidualThreshold210.lean` proves that an admissible allocation and
+`2*(24+c)*F_phase ≤ M+2*U` suffice for the crossing budget when
+`M ≥ 50000000`, where `c` is the funding multiplier.
+`TwinReserveTarget210.lean` proves the original A166944 target and
+unbounded twin primes **conditional on** `ResidualReserveCondition210 c`,
+which supplies these certificates on every actual short capped prefix
+in that range. The certificate existence and reserve inequality are
+still open. The finite bridge below this threshold is proved.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

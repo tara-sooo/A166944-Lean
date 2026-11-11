@@ -999,3 +999,77 @@ only propext, Classical.choice and Quot.sound. Attempt's imports and
 the original target remain unchanged. Universal allocation existence,
 the uniform net bound, a usable threshold and the finite-range bridge
 remain open.
+
+## The fifty-million bridge and minimal deficient windows, 2026-11-11 JST
+
+Codex continued from `bea9fc28b2038c0cd442b6d5c604b56f74d24f11`.
+`VerifiedTravelExtension.lean` exposes the already checked record and
+previous maximum at index 45895575. `VerifiedFiftyMillionBridge.lean`
+checks 37 capped events from that record, starting with horizon 91791144
+and ending at index 45896532 with horizon 91793058. The event travel is
+957. The kernel checks the replay and the quiet return with square root
+9580. The next strict record is 91793059 at index 91793061. This proves
+the index and twin-primality results for every strict record
+`5 < R ≤ 91793059`, and short travel for actual capped canonical starts
+`45895573 ≤ M < 50000000`. It closes the finite bridge for this route.
+`generate_fifty_million_bridge.py` regenerates the replay by integer trial
+division. The range theorem uses the Lean checks.
+
+`ResidualThreshold210.lean` proves the explicit arithmetic implication
+from `2*(24+c)*F_phase ≤ M+2*U` at `M ≥ 50000000` to the previous
+net crossing budget. For `Q(M)=sqrt(4*(3*M+4))`, it proves
+`1536*Q(M) ≤ M` and uses `64*(23899260+1315) ≤ 31*M`.
+A `ResidualReserveCertificate210` contains the exact signed sum,
+the funded allocation, admissible startup keys with individual cost at
+most 1478, and the reserve inequality. Such a certificate on every
+short capped prefix rules out the first crossing.
+`TwinReserveTarget210.lean` combines that implication with the finite
+bridge: for any fixed funding multiplier `c`,
+`ResidualReserveCondition210 c` implies the unrestricted record index,
+the original A166944 `Target`, and unbounded greater twin primes.
+The reserve condition itself is open. In particular, a threshold for the
+implication does not establish existence of the certificates.
+
+`CreditDeficitStructure210.lean` proves two consequences of minimality:
+both endpoints are attained by positive requests, and each interior cut
+is crossed by a positive request confined to the window. The cut proof
+splits supply and, if no positive request crosses, splits all demand
+between two proper subwindows. `RecurrenceDeficit210.lean` uses actual
+hit timestamps `2*r+1` and `2*u+1` for an annotated same-phase reuse of
+increment `e`. The cut witness satisfies `2*e ∣ u-r`, and the horizon
+drift is a positive multiple of `L=lcm(210,2*e)`. An intervening increment
+does not divide `L`. The endpoint witnesses are also actual hit times
+under this annotation hypothesis. The uniform construction of the
+annotated residual interval problem and exclusion of deficient windows
+on arbitrary actual prefixes remain open.
+
+The native `--residual-reserve` run at multiplier zero covered 440310
+synthetic canonical-shaped starts through 100000000. It paid 107076
+requests, with maximum startup 20096, two cap/travel cutoff stops, and
+no event-limit stops. For starts at or above 50000000 it checked 12139762
+prefixes and found minimum half-reserve margin 48558783, at start
+50026063 and hit 50079773. The Python trial replay independently checks
+the reported witness and the balances along that start, not the minimum
+over all starts. The smaller through-2000000 regression retains the
+1064 default, 1049 four-growth, and 927 residual requests. These runs
+use synthetic origins and stop at the configured cutoff.
+
+`travel_relaxed_cycle_probe.py` checks a separate obstruction in the
+clipped modulo-210 model. Its 25-event cycle has travel 210, horizon
+growth 420 and repeated full residual balance +420. It cannot be an
+actual recurrence cycle: the two same-phase uses of increment 77 have
+horizon drift 210, below their required period 2310. The cycle shows
+why the clipped transition table alone cannot imply a uniform reserve.
+
+```sh
+lake build A166944.Attempt A166944.TwinReserveTarget210 A166944.RecurrenceDeficit210
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 0 --residual-reserve > /tmp/travel_reserve.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/generate_fifty_million_bridge.py
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_half_reserve_probe.py /tmp/travel_reserve.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_relaxed_cycle_probe.py
+```
+
+Lean 4.33.1 accepts the 23 new public theorems. Their `#print axioms`
+results are contained in `propext`, `Classical.choice`, and `Quot.sound`.
+The original target and the imports of `A166944.Attempt` are unchanged.
