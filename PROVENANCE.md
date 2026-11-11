@@ -1580,3 +1580,76 @@ Lean 4.33.1 accepts the eight added theorems. The axiom audit reports
 only `propext`, `Classical.choice`, and `Quot.sound`. The composition
 with the existing position, primality and unboundedness theorems is
 also checked.
+
+## First-payment phases and duplicate demand width, 2026-11-12 JST
+
+From `7b35561133bfc0d24c05709a39772780d191f1a8`,
+`RebalancedFirstPaymentBudget210.lean` counts positive first-payment
+keys. A gap longer than ten excludes the two residues ±1 modulo 3 and 5
+for the even horizon. For increments at least 127, positive net cost
+forces a gap longer than fourteen and excludes ±1 modulo 7 as well.
+This gives 21 or 15 horizon residues, each with two hit parities.
+At increments at least 339, positive first payments require
+`e-1 < 3*(gap+1)`. The cutoff at `L ≥ 338` uses the resulting 42 or 30
+phase counts below the cutoff and the growth `H` for the tail.
+
+For every positive repeat demand `P_i`, the interval of width
+`ceil(3*P_i/2)` ending at its event horizon lies in its original
+request interval. The intervals on the same key are disjoint. Let
+`U` be the union, `O` the sum of widths minus `|U|`, and
+`Q = sum (P_i mod 2)`. Then `3*sum P_i + Q = 2*(|U|+O)`.
+`rebalanced_overlap_width_le_prior_different` bounds `O` by the
+sum of each interval's length before the latest earlier positive
+request of another key.
+
+Let `N_in` be the negative residual costs at coordinates `C_i-1`
+inside `U`. At an outside event with `e ≥ 339` and
+`3*(gap+1) ≤ e-1`, the cost is at most `1012-3*(e-1)`.
+Sum that guaranteed credit as `N_out`. For the same gap condition
+and `e ≥ 507`, the credit from either location covers at least the
+event's growth. With `E = 2*O-2*(G-|U|)-Q-3*(N_in+N_out)`, the
+verified bound is `3*W ≤ 3*Phi+12163536+2*G+E`. The exact sufficient
+prefix budget is
+`3*Phi_upper+12163536+35*G+72*g+3*V_start+E < 36*(M+1)+3*V_end`.
+The uniform sufficient estimate is
+`64*(3*Phi_upper+12166819+E) ≤ 61*M` under the existing short-prefix
+and crossing-gap bounds. `target_of_rebalanced_overlap_crossings210`
+uses the exact prefix budget on actual crossing candidates. Its
+universal hypothesis remains open.
+
+Trial division with the independently generated rebalanced potential
+reproduced all 22,050 packed potential values and checked the terminal
+width and credit identities on eight synthetic controls. The scans on
+`[7163911,7263911]` and `[367232911,367332911]` used 533 and 328
+twin-shaped starts and inspected 7 and 29 prefixes with overlapping
+terminal intervals. The synthetic prefix at `M=367264309` ending
+after the request at horizon `734547102` has `O=45`, `|U|=1017`,
+`G=18502`, and `Q=N_in=N_out=0`. Its terminal union alone is short
+by 90 budget units, while unused growth contributes 34,970.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedOverlapBudget210 A166944.ResidualRebalancedPairOffsets210
+python3 diagnostics/rebalanced_pair_probe.py
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=diagnostics python3 - <<'PY'
+from rebalanced_potential_probe import rebalanced_potential
+from travel_mod210_probe import residue_tables
+from travel_residue_probe import increment_at
+from travel_reuse_overlap_probe import replay
+
+M, cut = 367264309, 734547102
+windows, costs = replay(M, residue_tables(), rebalanced=rebalanced_potential())
+requests = [w for w in windows if w.right <= cut]
+assert [(w.increment, w.cost) for w in requests] == [(29, 30), (17, 678)]
+widths = [(3*w.cost + 1)//2 for w in requests]
+U = set().union(*(range(w.right - length, w.right) for w, length in zip(requests, widths)))
+assert (len(U), sum(widths) - len(U)) == (1017, 45)
+assert sum(max(0, -cost) for C, cost in costs if C - 1 in U) == 0
+assert cut + increment_at(367273576, cut) - 1 - (2*M - 2) == 18502
+print("Synthetic overlap witness checked")
+PY
+```
+
+Lean 4.33.1 accepts the new proofs, including the composition with
+the verified finite prefix and the unbounded greater-twin-prime
+theorem. The audit of 21 public theorems uses only `propext`,
+`Classical.choice`, and `Quot.sound`.

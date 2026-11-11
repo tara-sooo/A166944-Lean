@@ -34,7 +34,7 @@ theorem capped_first_payment_le_increment (event : ResidualPhaseEvent210) :
     exact (hp.trans (min_le_left _ _)).trans (by omega)
   · exact (min_le_right _ _).trans event.rebalanced_net_cost_positive_part_le
 
-private theorem capped_first_payment_large_weighted (event : ResidualPhaseEvent210) {L U : Nat}
+theorem capped_first_payment_large_weighted (event : ResidualPhaseEvent210) {L U : Nat}
     (large : L < d event.hit) (horizon : event.horizon ≤ U) :
     (L * (L + 1)) * event.cappedFirstPayment ≤
       (48 * (U + 1) + 1036 * (L + 1) - 11 * (L * (L + 1))) * (d event.hit - 1) := by
@@ -74,6 +74,18 @@ namespace ResidualPhaseTrace210
 
 variable {s sf n first : Nat} {balance : Int}
 variable (trace : ResidualPhaseTrace210 s sf [] n first balance)
+
+theorem positive_first_payment_key_unique {i j : Fin n}
+    (hi : 0 < (trace.event i).cappedFirstPayment) (hj : 0 < (trace.event j).cappedFirstPayment)
+    (key : (trace.event i).phaseKey = (trace.event j).phaseKey) : i = j := by
+  have hphaseI := (trace.event i).first_phase_of_positive_capped_payment hi
+  have hphaseJ := (trace.event j).first_phase_of_positive_capped_payment hj
+  rcases lt_trichotomy i j with hij | h | hji
+  · have hseen := (trace.seen_iff j _).mpr (Or.inr ⟨i, hij, ⟨hphaseI.1, hphaseI.2.1⟩, key.symm⟩)
+    exact (hphaseJ.2.2 hseen).elim
+  · exact h
+  · have hseen := (trace.seen_iff i _).mpr (Or.inr ⟨j, hji, ⟨hphaseJ.1, hphaseJ.2.1⟩, key⟩)
+    exact (hphaseI.2.2 hseen).elim
 
 theorem sum_horizon_growth_of_delta210
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f sf - f s) :
@@ -120,13 +132,8 @@ theorem rebalanced_first_payment_bound210 (L U : Nat) (hL : 0 < L)
       exact Nat.mem_primesLE.mpr ⟨(Finset.mem_filter.mp hi).2.2,
         prime_of_no_proper_factor (by omega) (hphase hi).2.1⟩
     · intro i hi j hj hkey
-      change (trace.event i).phaseKey = (trace.event j).phaseKey at hkey
-      rcases lt_trichotomy i j with hij | h | hji
-      · have hs := (trace.seen_iff j _).mpr (Or.inr ⟨i, hij, ⟨(hphase hi).1, (hphase hi).2.1⟩, hkey.symm⟩)
-        exact ((hphase hj).2.2 hs).elim
-      · exact h
-      · have hs := (trace.seen_iff i _).mpr (Or.inr ⟨j, hji, ⟨(hphase hj).1, (hphase hj).2.1⟩, hkey⟩)
-        exact ((hphase hi).2.2 hs).elim
+      exact trace.positive_first_payment_key_unique (Finset.mem_filter.mp hi).2.1
+        (Finset.mem_filter.mp hj).2.1 hkey
     · intro i _
       exact (trace.event i).capped_first_payment_le_increment
   have hhigh : (∑ i ∈ high, payment i) ≤ A * (D sf - D s) / W := by

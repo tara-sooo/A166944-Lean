@@ -217,6 +217,22 @@ meeting these constraints from `M ≥ 367232911`. The existing finite
 travel bridge and the new reduction give `Target` from this bound.
 The signed bound on the remaining crossings is open.
 
+`RebalancedFirstPaymentBudget210.lean` reduces the positive first
+payments to at most 42 phase keys per prime below 127 and 30 at or
+above 127. Increments dividing 210 contribute zero. With a cutoff
+of at least 338, the tail is bounded using only `H`.
+`RebalancedOverlapBudget210.lean` puts each positive repeat demand
+`P_i` in a terminal interval of width `ceil(3*P_i/2)`. Intervals on
+the same phase key are disjoint. Let `U` be their union, `O` the
+duplicate width, and `Q = sum (P_i mod 2)`. The prefix budget
+charges `2*O` and subtracts `2*(G-|U|)`, `Q`, the negative costs
+inside `U`, and guaranteed negative costs outside `U` from large
+increments with small relative gaps. The latest earlier request on
+a different key bounds each interval's contribution to `O`.
+`target_of_rebalanced_overlap_crossings210` reduces the target to
+this budget on the remaining actual crossing candidates. Establishing
+the budget uniformly on those candidates remains open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

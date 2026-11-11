@@ -65,7 +65,7 @@ private theorem moving_horizon_step_gap_potential6 {s C r C' : Nat}
 
 namespace ResidualPhaseEvent210
 
-private def growthWithLargeGap (event : ResidualPhaseEvent210) : Nat :=
+def growthWithLargeGap (event : ResidualPhaseEvent210) : Nat :=
   if d event.hit - 1 < 3 * (event.hit - event.start + 1) then d event.hit - 1 else 0
 
 /-- A large gap relative to its horizon growth is either short with
