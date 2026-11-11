@@ -66,6 +66,32 @@ theorem rebalanced_net_cost_exception_le (event : ResidualPhaseEvent210)
     rw [potentialNetCost, if_neg hd]
     omega
 
+/-- The signed net cost, including the first payment, is at most 146 times
+the horizon growth at the event. -/
+theorem rebalanced_net_cost_le_growth210 (event : ResidualPhaseEvent210) :
+    event.rebalancedNetCost ≤ 146 * ((d event.hit - 1 : Nat) : Int) := by
+  by_cases hlarge : 11 ≤ d event.hit
+  · have hcost := event.rebalanced_net_cost_positive_part_le
+    omega
+  have hhit : 3 ≤ event.hit := by
+    have := event.step.1.1
+    have := event.step.2.1
+    omega
+  have hodd := d_mod_two_eq_one_of_three_le hhit
+  have hnonunit := event.step.2.2.2.1
+  by_cases h9 : d event.hit = 9
+  · have hexception : d event.hit ∈ rebalancedExceptions210 := by
+      rw [h9]
+      decide
+    have hcost := event.rebalanced_net_cost_exception_le hexception
+    rw [h9, show rebalancedAllowance210 9 = 315 by decide] at hcost
+    omega
+  · have hdiv : d event.hit ∣ 210 := by
+      have hsmall : d event.hit = 3 ∨ d event.hit = 5 ∨ d event.hit = 7 := by omega
+      rcases hsmall with h | h | h <;> rw [h] <;> decide
+    have hzero : event.rebalancedNetCost = 0 := by simp [potentialNetCost, hdiv]
+    omega
+
 theorem capped_first_payment_le_gap_cost (event : ResidualPhaseEvent210) :
     event.cappedFirstPayment ≤ 24 * (event.hit - event.start) + 1036 - 11 * (d event.hit - 1) := by
   by_cases hd : d event.hit ∣ 210

@@ -90,6 +90,14 @@ theorem sum_horizon_growth_of_delta210
   rw [← Nat.cast_sum] at h
   omega
 
+theorem sum_rebalanced_net_cost_le_growth210
+    (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f sf - f s) :
+    (∑ i, (trace.event i).rebalancedNetCost) ≤ 146 * ((D sf - D s : Nat) : Int) := by
+  calc
+    _ ≤ ∑ i, (146 : Int) * ((d (trace.event i).hit - 1 : Nat) : Int) :=
+      Finset.sum_le_sum fun i _ => (trace.event i).rebalanced_net_cost_le_growth210
+    _ = _ := by rw [← Finset.mul_sum, ← Nat.cast_sum, trace.sum_horizon_growth_of_delta210 delta]
+
 /-- Low increments are counted once per reachable phase. For the tail,
 the event's own growth is subtracted before allocating the remaining
 cost to the total horizon growth. -/
@@ -145,6 +153,27 @@ theorem rebalanced_first_payment_bound210 (L U : Nat) (hL : 0 < L)
   omega
 
 end ResidualPhaseTrace210
+
+/-- Small actual horizon growth pays the full net cost on a crossing prefix. -/
+theorem rebalanced_crossing_budget_of_small_growth210 {M s C r p first : Nat} {balance : Int}
+    (hM : 50000000 ≤ M)
+    (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
+      (M + 2) (2 * M - 2) s C [] p first balance)
+    (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
+    (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
+    (growth : 150 * (C - (2 * M - 2)) ≤ M) :
+    (∑ i, (trace.event i).rebalancedNetCost) + (24 * (r - s) + 1091 : Nat) ≤ (M : Int) := by
+  have path := residual_phase_balances210_path ledger
+  have hstart : D (M + 2) = 2 * M - 2 := by
+    cases p with
+    | zero => exact path.2.2.2.1
+    | succ _ => exact path.1.2.1
+  have hend := (moving_horizon_path_endpoint path).2.1
+  have hcost := trace.sum_rebalanced_net_cost_le_growth210 delta
+  rw [hstart, hend] at hcost
+  have hgap := (Nat.mul_le_mul_left 1536 gap).trans (fifty_million_sqrt_budget hM)
+  omega
 
 /-- The cutoff estimate can be evaluated using just the record and
 endpoint horizon of a short prefix. -/

@@ -1517,3 +1517,22 @@ through index 367232913 reproduces both terminal horizons and all 58
 nonunit indices. `lake build A166944.VerifiedRecordExtension` and the
 audit of the six added declarations pass on Lean 4.33.1 with only
 `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Crossing budget for small actual horizon growth, 2026-11-12 JST
+
+`rebalanced_net_cost_le_growth210` bounds each signed net cost by
+`146*(e-1)`, using the existing cost cap for `e ≥ 11`, the cap 315 at
+`e=9`, and zero cost at `e=3,5,7`. Summation gives `W ≤ 146*G` with
+the first payments included in `W`. For `M ≥ 50000000` and `150*G ≤ M`,
+`rebalanced_crossing_budget_of_small_growth210` combines this estimate
+with the square-root gap bound to prove `W+24*g+1091 ≤ M`.
+
+Lean 4.33.1 checks the new proofs and the existing pair-offset module.
+
+```sh
+lake build A166944.TravelMod210 A166944.VerifiedRecordExtension A166944.Attempt
+lake build A166944.Attempt A166944.ResidualFirstPayment210 A166944.VerifiedRecordExtension A166944.ResidualRebalancedPairOffsets210
+```
+
+The audit of all nine declarations from the two changes uses only
+`propext`, `Classical.choice`, and `Quot.sound`.

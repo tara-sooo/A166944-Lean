@@ -201,6 +201,13 @@ of at least 295 also rules out a two-request deficit. The
 remaining mixed-key cases require further control of the
 enclosed credit.
 
+`ResidualFirstPayment210.lean` bounds the full rebalanced net cost by
+`W ≤ 146*G`, where `G` is the actual horizon growth along the prefix.
+For `M ≥ 50000000`, `rebalanced_crossing_budget_of_small_growth210`
+proves the crossing inequality whenever `150*G ≤ M`. With the finite
+travel bridge, the direct crossing route now needs the case
+`M ≥ 367232911` and `150*G > M`.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
