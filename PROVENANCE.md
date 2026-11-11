@@ -831,3 +831,83 @@ of `propext`, `Classical.choice` and `Quot.sound`. The ordinary Attempt
 import boundary and original A166944 target are unchanged. No new
 unconditional infinite-recurrence estimate or twin-prime theorem is
 claimed by this checkpoint.
+
+## Composite-gap savings and four-growth balances, 2026-11-11 JST
+
+Codex continued from `2bf0ed3`. The recurrence-side theorem
+`moving_horizon_long_composite_seven_growth` strengthens the long
+composite-gap estimate to `24*g≤7*G`, for gap `g>10` and event growth
+`G=e-1`. A nonunit small factor `f` satisfies `g≤2*f` and `f*f≤e`;
+oddness and `g>10` force `f≥7`. Then `48*f≤7*(f*f-1)`. The previous
+theorem `3*g≤G` is retained with the same statement as a corollary.
+
+The previous travel estimate reserved nine growth units for those
+gaps. The stronger estimate needs seven, leaving two more units for
+separating-event credits. `TravelCharged210.lean` defines
+`b4=E_phase+V(after)-V(before)-4*(e-1)` at a separator and zero at a
+supported event. At every separator this is exactly `b2-2*(e-1)`.
+The total coefficient in the checked path budget remains `7+4=11`:
+
+`24*T+V(end)≤24*F_phase+11*G+V(start)+S4`.
+
+The new ledger retains the identical first-phase-gap mass; its
+projection into the earlier ledger is proved. The resulting first
+crossing still needs `M<24*(F_phase+g)+1315+S4`, now with the smaller
+signed balance. Its pointwise bound is `b4≤43*e+1265`. A positive
+balance above e315 must be a reused long-prime phase. A positive event
+whose phase key is not yet seen has e at most315 and positive part
+at most14810. The existing funded certificate, including its
+conservative fixed startup bound, is reused without changing its
+fields or weakening the original target.
+
+`ChargedPhaseCredits210.lean` proves eventual short travel from
+allocation existence on every short capped prefix using these
+improved balances. This includes multiplier0: all nonstartup demand
+can then be paid only from ordinary negative balances. The original
+`24*F_phase` travel term is still present and is handled by the proved
+first-phase sublinearity theorem; multiplier0 removes only additional
+funding from that term. Allocation existence on all actual prefixes
+and the finite-range/eventual-threshold bridge remain open.
+
+The native diagnostic preserves its original default growth charge2
+and accepts the additional `--growth-charge 4` option. For this new
+cost and zero additional funding, exhaustive replay through100000000
+pays127504 requests from440310 synthetic twin-shaped starts, with
+maximum startup32580, two cap/travel cutoff stops and no3000-event
+stops. The three former small-e9 shortage controls at M4394191,
+M7874413 and M56837371 all admit zero-funded interval allocations
+under the new costs. Their shortages for the old costs remain valid.
+These starts are not original-sequence certificates, and events after
+the two cutoffs are outside the native test.
+
+The Python interval checker now tests both growth coefficients and
+agrees with the row/column allocation probe on seven controls at four
+funding coefficients. Its2187 direct-subset Hall checks still pass.
+`travel_credit_prefix.py` independently chooses starts and first hits
+by trial division, checks quiet indices, and checks all row, column,
+eligibility and startup conditions. Through2000000 its totals agree
+exactly with the native sieve:14869 starts,1049 requests, two cutoff
+stops, zero event-limit stops, maximum startup15688. The unchanged
+default native mode with funding3 retains the previous2000000 totals
+of1064 requests and maximum startup18920.
+
+There is a further local refinement available for subsequent work:
+`residualPhaseSeparatorBalance210` uses
+`24*(g-first_gap)+V(after)-V(before)-11*G` at unsupported events.
+Lean proves it is at most b4 and that it supports the same one-step
+travel budget. Its complete path ledger and allocation experiment are
+not yet implemented; the current exhaustive allocation result uses b4.
+
+```sh
+lake build A166944.Attempt A166944.TravelTarget A166944.CreditWindows210 A166944.ChargedPhaseCredits210
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 0 --growth-charge 4
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_windows.py
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --native /tmp/travel_credit_search
+```
+
+On Lean4.33.1, the twelve new public theorems and the retained
+one-third composite bound pass the axiom audit using only propext,
+Classical.choice and Quot.sound. The existing endpoint-Hall equivalence
+also passes. Attempt retains its prior imports and the canonical
+A166944 theorem remains open.

@@ -89,6 +89,14 @@ inequalities. `CreditWindows210.lean` reduces interval eligibility to
 contiguous-window inequalities; it suffices to test the at most `n*n`
 windows with endpoints drawn from `n` requests. The window inequalities
 on arbitrary actual recurrence prefixes remain open.
+`TravelCharged210.lean` sharpens long composite gaps to `24*g≤7*G`,
+allowing a four-growth separating balance while preserving the travel
+coefficient eleven. `ChargedPhaseCredits210.lean` proves eventual short
+travel conditional on allocations for these improved costs. The bounded
+search through 100000000 assigns every tested nonstartup request using negative
+balances alone, with no extra first-phase funding; universal allocation
+existence is still open. A tighter residual-travel balance and its local
+budget are also checked for further use.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

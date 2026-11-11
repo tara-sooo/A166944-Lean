@@ -21,11 +21,11 @@ private theorem exists_small_factor_of_composite {e : Nat} (he : ¬ NoProperFact
     have hroot : f.val ≤ Nat.sqrt e := Nat.le_of_lt_succ f.isLt
     exact h ⟨f.val, hf, hdiv, Nat.le_trans (Nat.mul_le_mul hroot hroot) (Nat.sqrt_le e)⟩
 
-/-- A gap greater than ten ending at a composite increment costs at
-most one third of the growth caused by that increment. -/
-theorem moving_horizon_long_composite_gap_le_growth {s C r C' : Nat}
+/-- A long composite gap has a factor at least seven. Its square pays
+for all 24 units of travel at a cost of only seven units of growth. -/
+theorem moving_horizon_long_composite_seven_growth {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hgap : 10 < r - s)
-    (hcomposite : ¬ NoProperFactor (d r)) : 3 * (r - s) ≤ C' - C := by
+    (hcomposite : ¬ NoProperFactor (d r)) : 24 * (r - s) ≤ 7 * (C' - C) := by
   obtain ⟨f, hf, hdiv, hsq⟩ := exists_small_factor_of_composite hcomposite
   have hbound := moving_horizon_step_gap_le_twice_increment_factor hstep hf hdiv
   have hodd : f % 2 = 1 := by
@@ -38,7 +38,17 @@ theorem moving_horizon_long_composite_gap_le_growth {s C r C' : Nat}
     · omega
   have hf7 : 7 ≤ f := by omega
   have h7 := Nat.mul_le_mul_right f hf7
+  have h49 := Nat.mul_le_mul_left 7 h7
+  have hsq7 := Nat.mul_le_mul_left 7 hsq
+  have hgap24 := Nat.mul_le_mul_left 24 hbound
   have hup := moving_horizon_step_update hstep
+  omega
+
+/-- The earlier one-third estimate follows from the sharper coefficient. -/
+theorem moving_horizon_long_composite_gap_le_growth {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hgap : 10 < r - s)
+    (hcomposite : ¬ NoProperFactor (d r)) : 3 * (r - s) ≤ C' - C := by
+  have h := moving_horizon_long_composite_seven_growth hstep hgap hcomposite
   omega
 
 private theorem add_mod_of_dvd {f n k : Nat} (hdiv : f ∣ n) (hk : k < f) :

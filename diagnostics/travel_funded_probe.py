@@ -6,8 +6,10 @@ from travel_mod210_probe import P, residue_tables
 from travel_residue_probe import increment_at, odd_prime_divisors, travel_probe
 
 
-def funded_summary(record, table, multiplier):
-    _, hits, _ = travel_probe(record)
+def funded_summary(record, table, multiplier, growth_charge=2, *, hits=None):
+    assert growth_charge in (2, 4)
+    if hits is None:
+        _, hits, _ = travel_probe(record)
     index, horizon = record + 2, 2 * record - 2
     last_long, last_positive, startup_keys = {}, {}, set()
     sources, allocations, demands = [], [], []
@@ -24,7 +26,7 @@ def funded_summary(record, table, multiplier):
         previous = last_long.get(key) if long_prime else None
         anchor = previous if previous is not None else last_positive.get(key)
         excess = max(0, 24 * gap - growth) if gap <= 10 or previous is not None else 0
-        balance = excess + table[hit % P, updated % P][1] - table[index % P, horizon % P][1] - 2 * growth
+        balance = excess + table[hit % P, updated % P][1] - table[index % P, horizon % P][1] - growth_charge * growth
 
         if long_prime and previous is None:
             first += gap
@@ -55,6 +57,8 @@ def funded_summary(record, table, multiplier):
                     break
             elif balance > 0:
                 assert increment <= 630 and balance <= 29613
+                if growth_charge == 4:
+                    assert increment <= 315 and balance <= 14810
                 assert key not in startup_keys
                 startup_keys.add(key)
                 startup += balance

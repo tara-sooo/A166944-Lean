@@ -70,14 +70,19 @@ int next_hit(int index, int horizon, const std::vector<uint16_t>& factor) {
 }
 
 int main(int argc, char** argv) {
-    const bool funded = argc == 4 && std::string(argv[2]) == "--funded";
-    if (argc != 2 && !funded) {
-        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER] | --table\n";
+    const bool funded = (argc == 4 || argc == 6) && std::string(argv[2]) == "--funded";
+    if ((argc != 2 && !funded) || (argc == 6 && std::string(argv[4]) != "--growth-charge")) {
+        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER [--growth-charge 2|4]] | --table\n";
         return 2;
     }
     const int multiplier = funded ? std::stoi(argv[3]) : 0;
+    const int growth_charge = argc == 6 ? std::stoi(argv[5]) : 2;
     if (multiplier < 0 || multiplier > 24) {
         std::cerr << "MULTIPLIER must be between 0 and 24\n";
+        return 2;
+    }
+    if (growth_charge != 2 && growth_charge != 4) {
+        std::cerr << "GROWTH_CHARGE must be 2 or 4\n";
         return 2;
     }
     const auto potential = residue_potentials();
@@ -126,7 +131,7 @@ int main(int argc, char** argv) {
             const auto found = previous_phase.find(key);
             const int previous = long_prime && found != previous_phase.end() ? found->second : -1;
             const int excess = gap <= 10 || previous >= 0 ? std::max(0, 24 * gap - (increment - 1)) : 0;
-            const int balance = excess + value(hit, updated) - value(index, horizon) - 2 * (increment - 1);
+            const int balance = excess + value(hit, updated) - value(index, horizon) - growth_charge * (increment - 1);
             const auto positive_found = previous_positive.find(key);
             const int prior_positive = positive_found != previous_positive.end() ? positive_found->second : -1;
             const int anchor = previous >= 0 ? previous : prior_positive;
@@ -161,6 +166,7 @@ int main(int argc, char** argv) {
                     }
                 } else if (funded && balance > 0) {
                     assert(increment <= 630 && balance <= 29613);
+                    if (growth_charge == 4) assert(increment <= 315 && balance <= 14810);
                     startup += balance;
                 }
                 if (funded && balance > 0) previous_positive[key] = history.size();
@@ -177,4 +183,5 @@ int main(int argc, char** argv) {
               << " cutoff stops=" << cutoff_stops << " event-limit stops=" << event_limit_stops
               << " through=" << limit << '\n';
     if (funded) std::cout << "multiplier=" << multiplier << " maximum startup=" << maximum_startup << '\n';
+    if (growth_charge != 2) std::cout << "growth charge=" << growth_charge << '\n';
 }

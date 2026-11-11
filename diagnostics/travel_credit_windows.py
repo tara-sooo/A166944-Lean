@@ -38,7 +38,8 @@ class Source:
     first: int
 
 
-def replay_ledger(record, table):
+def replay_ledger(record, table, growth_charge=2):
+    assert growth_charge in (2, 4)
     _, hits, _ = travel_probe(record)
     index, horizon = record + 2, 2 * record - 2
     last_long, last_positive, startup_keys = {}, {}, set()
@@ -53,7 +54,7 @@ def replay_ledger(record, table):
         previous = last_long.get(key) if long_prime else None
         anchor = previous if previous is not None else last_positive.get(key)
         excess = max(0, 24 * gap - growth) if gap <= 10 or previous is not None else 0
-        balance = excess + table[hit % P, updated % P][1] - table[index % P, horizon % P][1] - 2 * growth
+        balance = excess + table[hit % P, updated % P][1] - table[index % P, horizon % P][1] - growth_charge * growth
         if long_prime and previous is None:
             sources.append(Source(2 * ordinal + 1, 0, gap))
         if P % increment:
@@ -65,6 +66,8 @@ def replay_ledger(record, table):
                 requests.append(Request(ordinal, anchor, balance, increment))
             elif balance > 0:
                 assert increment <= 630 and balance <= 29613 and key not in startup_keys
+                if growth_charge == 4:
+                    assert increment <= 315 and balance <= 14810
                 startup_keys.add(key)
                 startup += balance
             if balance > 0:
@@ -151,20 +154,21 @@ def main():
                           ("replayed", 367_232_911), ("synthetic", 4_394_191),
                           ("synthetic", 7_874_413), ("synthetic", 23_619_049),
                           ("synthetic", 56_837_371)):
-        hits, requests, sources, startup = replay_ledger(record, table)
-        required, witness = minimum_multiplier(requests, sources)
-        for multiplier in (0, 1, 2, 24):
-            failure = funded_summary(record, table, multiplier)[-1]
-            assert (failure is None) == (required is not None and required <= multiplier)
-        print(f"{label:10} {record=:10} events={len(hits):4} requests={len(requests):3} "
-              f"{startup=:5} minimum_multiplier={required}")
-        if witness is not None:
-            left, right, demand, negative, first = witness
-            confined = [request for request in requests if left <= request.left and request.right <= right]
-            print(f"  window timestamps=[{left},{right}] demand={demand} negative={negative} "
-                  f"first={first} increments={[request.increment for request in confined]}")
-            print(f"  event hits=[{hits[(left - 1) // 2]},{hits[(right - 1) // 2]}] "
-                  f"coefficient-2 deficit={max(0, demand - negative - 2 * first)}")
+        for growth_charge in (2, 4):
+            hits, requests, sources, startup = replay_ledger(record, table, growth_charge)
+            required, witness = minimum_multiplier(requests, sources)
+            for multiplier in (0, 1, 2, 24):
+                failure = funded_summary(record, table, multiplier, growth_charge)[-1]
+                assert (failure is None) == (required is not None and required <= multiplier)
+            print(f"{label:10} {record=:10} {growth_charge=} events={len(hits):4} "
+                  f"requests={len(requests):3} {startup=:5} minimum_multiplier={required}")
+            if witness is not None:
+                left, right, demand, negative, first = witness
+                confined = [request for request in requests if left <= request.left and request.right <= right]
+                print(f"  window timestamps=[{left},{right}] demand={demand} negative={negative} "
+                      f"first={first} increments={[request.increment for request in confined]}")
+                print(f"  event hits=[{hits[(left - 1) // 2]},{hits[(right - 1) // 2]}] "
+                      f"coefficient-2 deficit={max(0, demand - negative - 2 * first)}")
 
 
 if __name__ == "__main__":
