@@ -52,18 +52,18 @@ structure ResidualPhaseTrace210 (s sf : Nat) (initialSeen : List (Nat × Fin 420
   sum_first : (∑ i, (event i).firstGap) = first
   sum_cost : (∑ i, (event i).cost) = balance
 
-/-- Read each residual cost and first gap from the actual ordered events.
-The phase history at any event is exactly the initial history plus the
-keys of earlier long prime events. -/
-theorem residual_phase_trace210 {s C sf Cf n first : Nat} {balance : Int}
+/-- The extracted trace also telescopes any integer-valued function of
+the actual indices, including potentials that depend on `D`. -/
+theorem residual_phase_trace_with_delta210 {s C sf Cf n first : Nat} {balance : Int}
     {seen : List (Nat × Fin 420)}
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       s C sf Cf seen n first balance) :
-    Nonempty (ResidualPhaseTrace210 s sf seen n first balance) := by
+    ∃ trace : ResidualPhaseTrace210 s sf seen n first balance,
+      ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f sf - f s := by
   induction n generalizing s C seen first balance with
   | zero =>
-    obtain ⟨_, rfl, rfl⟩ := ledger
-    exact ⟨{
+    obtain ⟨hpath, rfl, rfl⟩ := ledger
+    refine ⟨{
       event := Fin.elim0
       start_ge := fun i => i.elim0
       hit_le := fun i => i.elim0
@@ -73,10 +73,12 @@ theorem residual_phase_trace210 {s C sf Cf n first : Nat} {balance : Int}
       seen_iff := fun i => i.elim0
       sum_first := by simp
       sum_cost := by simp
-    }⟩
+    }, ?_⟩
+    intro f
+    simp [hpath.1]
   | succ n ih =>
     obtain ⟨r, C', tailFirst, tailCost, step, tail, rfl, rfl⟩ := ledger
-    obtain ⟨history⟩ := ih tail
+    obtain ⟨history, hdelta⟩ := ih tail
     let head : ResidualPhaseEvent210 := ⟨s, C, r, C', seen, step⟩
     let events := Fin.cons (α := fun _ => ResidualPhaseEvent210) head history.event
     have hhead (key : Nat × Fin 420) :
@@ -90,7 +92,7 @@ theorem residual_phase_trace210 {s C sf Cf n first : Nat} {balance : Int}
           fun h => h.elim Or.inr (fun hk => Or.inl hk.2)⟩
       · rw [if_neg hl]
         exact ⟨Or.inl, fun h => h.elim id (fun hk => (hl hk.1).elim)⟩
-    refine ⟨⟨events, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩⟩
+    refine ⟨⟨events, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ?_⟩
     · intro i
       refine Fin.cases ?_ (fun j => ?_) i
       · simp [events, head]
@@ -139,5 +141,19 @@ theorem residual_phase_trace210 {s C sf Cf n first : Nat} {balance : Int}
       rfl
     · simp only [Fin.sum_univ_succ, events, Fin.cons_zero, Fin.cons_succ, history.sum_cost]
       rfl
+    · intro f
+      simp only [Fin.sum_univ_succ, events, Fin.cons_zero, Fin.cons_succ, hdelta f, head]
+      omega
+
+/-- Read each residual cost and first gap from the actual ordered events.
+The phase history at any event is exactly the initial history plus the
+keys of earlier long prime events. -/
+theorem residual_phase_trace210 {s C sf Cf n first : Nat} {balance : Int}
+    {seen : List (Nat × Fin 420)}
+    (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
+      s C sf Cf seen n first balance) :
+    Nonempty (ResidualPhaseTrace210 s sf seen n first balance) := by
+  obtain ⟨trace, _⟩ := residual_phase_trace_with_delta210 ledger
+  exact ⟨trace⟩
 
 end A166944Research

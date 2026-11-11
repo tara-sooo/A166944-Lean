@@ -1,8 +1,10 @@
-"""Reproduce native overlap witnesses by trial division on capped replays."""
+"""Check overlap budgets by trial division on capped replays."""
 
 import argparse
+from bisect import bisect_right
 from dataclasses import dataclass
 from fractions import Fraction
+from itertools import accumulate
 from pathlib import Path
 import re
 
@@ -23,7 +25,7 @@ class Window:
         return self.right - self.left
 
 
-def replay(record, table):
+def replay(record, table, *, scaled=False):
     hits, _ = capped_hits(record)
     index, horizon = record + 2, 2 * record - 2
     previous = {}
@@ -36,16 +38,20 @@ def replay(record, table):
         key = (increment, horizon % P, hit % 2)
         old = previous.get(key) if long_prime else None
         first_gap = gap if long_prime and old is None else 0
-        net = 24 * first_gap
+        net = 0 if scaled else 24 * first_gap
+        before = table[index % P, horizon % P][1]
+        after = table[hit % P, updated % P][1]
+        if scaled:
+            before, after = 8 * before // 9, 8 * after // 9
         if P % increment:
-            before = table[index % P, horizon % P][1]
-            after = table[hit % P, updated % P][1]
             net = 24 * gap + after - before - 11 * (increment - 1)
             if old is not None and net > 0:
                 earlier, earlier_hit = old
                 assert (hit - earlier_hit) % (2 * increment) == 0
                 assert horizon > earlier and (horizon - earlier) % (P * increment) == 0
                 windows.append(Window(earlier, horizon, increment, net))
+        elif scaled:
+            assert 24 * gap + after - before <= 11 * (increment - 1)
         if long_prime:
             previous[key] = (horizon, hit)
         costs.append((horizon, net))
@@ -94,12 +100,60 @@ def prefix_remainders(windows, costs):
         yield 3 * (net - covered)
 
 
+def contained_window_margins(windows, costs):
+    """Check all contained requests against growth and enclosed negative costs."""
+    horizons = [horizon for horizon, _ in costs]
+    negative = list(accumulate((max(0, -value) for _, value in costs), initial=0))
+    for left in sorted({window.left for window in windows}):
+        before = negative[bisect_right(horizons, left)]
+        demand = 0
+        for window in windows:
+            if window.left < left:
+                continue
+            demand += window.cost
+            right = window.right
+            supply = negative[bisect_right(horizons, right)] - before
+            growth_margin = 2 * (right - left) - 3 * demand
+            yield growth_margin, growth_margin + 3 * supply, left, right
+
+
+def scaled_overlap_summary(limit, controls, table):
+    twin_starts = {record for record in range(13, limit + 1, 6)
+                   if is_prime(record) and is_prime(record - 2)}
+    starts = requests = intervals = growth_failures = signed_failures = 0
+    least_growth = least_signed = None
+    for record in sorted(twin_starts.union(controls)):
+        starts += 1
+        windows, costs = replay(record, table, scaled=True)
+        requests += len(windows)
+        assert all(3 * window.cost <= 2 * window.width for window in windows)
+        for growth, signed, left, right in contained_window_margins(windows, costs):
+            intervals += 1
+            growth_failures += growth < 0
+            signed_failures += signed < 0
+            candidate = (growth, record, left, right)
+            least_growth = candidate if least_growth is None else min(least_growth, candidate)
+            candidate = (signed, record, left, right)
+            least_signed = candidate if least_signed is None else min(least_signed, candidate)
+    print(f"Scaled potential: {starts=} {requests=} {intervals=} {growth_failures=} {signed_failures=}")
+    print(f"Minimum margins (margin, record, left, right): {least_growth=} {least_signed=}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("native_output")
+    parser.add_argument("native_output", nargs="?")
+    parser.add_argument("--scaled-limit", type=int)
+    parser.add_argument("--control", type=int, action="append", default=[])
     args = parser.parse_args()
-    output = Path(args.native_output).read_text()
     table = residue_tables()
+    if args.scaled_limit is not None:
+        if args.native_output is not None:
+            parser.error("supply a native output or a scaled search limit")
+        scaled_overlap_summary(args.scaled_limit, args.control, table)
+        return
+    if args.native_output is None:
+        parser.error("supply a native output or a scaled search limit")
+    output = Path(args.native_output).read_text()
 
     pair_match = re.search(r"minimum overlap pair margin=(-?\d+) record=(\d+) horizon=(\d+)", output)
     assert pair_match

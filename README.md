@@ -144,6 +144,21 @@ on the applicable prefixes with `M ≥ 50000000`. A sufficient
 construction would bound selected signed reuse costs by two thirds
 of their disjoint block widths and bound the remainder. Both
 general bounds remain open.
+
+`ResidualStartupWeights210.lean` sharpens the startup cost bound
+from 23,899,260 to 6,181,254 by counting reachable phases at each
+increment and using a factor-dependent cost. `ResidualScaledPotential210.lean`
+proves a second crossing reduction with potential `floor(8*V/9)`.
+Every individual unsupported prime reuse, including increment 11,
+fits in two thirds of its growth window. The windows to the latest
+occurrences of one long prime phase key are disjoint, so the same
+bound holds for their union. For mixed keys, a largest-increment
+reuse and sufficient enclosed negative cost give a finite-set bound.
+`signed_budget_iff_block_slack` uses the actual block widths and
+slack when comparing the remaining signed sum to the first-crossing
+budget. The mixed-key bound and the remaining signed sum on arbitrary
+actual crossing prefixes are open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

@@ -164,12 +164,10 @@ theorem supported_budgets210_attained :
     supportedExcessCap210 23 110 = 1316 ∧ supportedPotential210 23 110 = 1260 := by
   decide +kernel
 
-/-- Both table bounds apply to a genuine supported step. The table
-charges even prime increments that are being used for the first time. -/
-theorem moving_horizon_supported210_step_budgets {s C r C' : Nat} {seen : List Nat}
+private theorem moving_horizon_supported210_table_budgets {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hdiv : d r ∣ 210) :
-    shortOrReusedTravelExcess seen (r - s) (d r) + supportedExcessCap210 r C' ≤ supportedExcessCap210 s C ∧
-    shortOrReusedTravelExcess seen (r - s) (d r) + supportedPotential210 r C' ≤
+    upperStepExcess (r - s) (d r) + supportedExcessCap210 r C' ≤ supportedExcessCap210 s C ∧
+    upperStepExcess (r - s) (d r) + supportedPotential210 r C' ≤
       2 * (d r - 1) + supportedPotential210 s C := by
   have hce : C % 2 = 0 := hstep.1.2.1 ▸ D_mod_two_eq_zero_of_two_le hstep.1.1
   have hhit := first_clipped_hit210_of_supported hstep hdiv
@@ -181,9 +179,24 @@ theorem moving_horizon_supported210_step_budgets {s C r C' : Nat} {seen : List N
   have hsm : (s % 210 + (r - s)) % 210 = r % 210 := by omega
   have hcm : (C % 210 + d r - 1) % 210 = C' % 210 := by omega
   rw [hsm, hcm] at h
-  have hcap : upperStepExcess (r - s) (d r) + supportedExcessCap210 r C' ≤ supportedExcessCap210 s C := h.2.1
-  have hpot : upperStepExcess (r - s) (d r) + supportedPotential210 r C' ≤
-      2 * (d r - 1) + supportedPotential210 s C := h.2.2
+  exact h.2
+
+/-- The potential accounts for the full gap of a supported first hit. -/
+theorem moving_horizon_supported210_travel_potential {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hdiv : d r ∣ 210) :
+    24 * (r - s) + supportedPotential210 r C' ≤ 3 * (d r - 1) + supportedPotential210 s C := by
+  have hpot := (moving_horizon_supported210_table_budgets hstep hdiv).2
+  unfold upperStepExcess at hpot
+  omega
+
+/-- Both table bounds apply to a genuine supported step. The table
+charges even prime increments that are being used for the first time. -/
+theorem moving_horizon_supported210_step_budgets {s C r C' : Nat} {seen : List Nat}
+    (hstep : IsMovingHorizonStep s C r C') (hdiv : d r ∣ 210) :
+    shortOrReusedTravelExcess seen (r - s) (d r) + supportedExcessCap210 r C' ≤ supportedExcessCap210 s C ∧
+    shortOrReusedTravelExcess seen (r - s) (d r) + supportedPotential210 r C' ≤
+      2 * (d r - 1) + supportedPotential210 s C := by
+  obtain ⟨hcap, hpot⟩ := moving_horizon_supported210_table_budgets hstep hdiv
   have hgap : shortOrReusedTravelGap seen (r - s) (d r) ≤ r - s := by
     unfold shortOrReusedTravelGap
     split <;> omega

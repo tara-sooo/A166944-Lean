@@ -19,6 +19,17 @@ structure PrimeReuse (earlier later : Fin n) : Prop where
 def growthWindow (earlier later : Fin n) : Finset Nat :=
   Finset.Ico (trace.event earlier).horizon (trace.event later).horizon
 
+/-- Windows to the latest long anchor of the same key do not overlap. -/
+theorem same_key_long_reuse_growth_disjoint {i j : Fin n} (hij : i < j)
+    (hi : (trace.event i).LongPrime) (hj : (trace.event j).LongPrime)
+    (hkey : (trace.event i).phaseKey = (trace.event j).phaseKey) :
+    Disjoint (trace.growthWindow (trace.anchor i) i) (trace.growthWindow (trace.anchor j) j) := by
+  have hC := trace.horizon_strict_mono.monotone (trace.earlier_long_le_anchor hij hi hj hkey)
+  rw [Finset.disjoint_left]
+  intro x hx hy
+  simp only [growthWindow, Finset.mem_Ico] at hx hy
+  omega
+
 theorem prime_reuse_drift {i j : Fin n} (reuse : trace.PrimeReuse i j) :
     (210 * d (trace.event j).hit) ∣ (trace.event j).horizon - (trace.event i).horizon ∧
     210 * d (trace.event j).hit ≤ (trace.event j).horizon - (trace.event i).horizon := by

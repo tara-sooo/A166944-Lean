@@ -61,6 +61,27 @@ private theorem candidate_lt_and_key {i j : Fin n} (h : j ∈ trace.anchorCandid
   · simp only [priorPositive, mem_filter, mem_univ, true_and] at h
     exact ⟨h.1, h.2.2⟩
 
+theorem earlier_long_le_anchor {i j : Fin n} (hij : i < j)
+    (hi : (trace.event i).LongPrime) (hj : (trace.event j).LongPrime)
+    (hkey : (trace.event i).phaseKey = (trace.event j).phaseKey) :
+    i ≤ trace.anchor j := by
+  have hm : i ∈ trace.priorLong j := Finset.mem_filter.mpr ⟨mem_univ _, hij, hi, hkey⟩
+  have hc : i ∈ trace.anchorCandidates j := by
+    rw [anchorCandidates, if_pos ⟨hj, i, hm⟩]
+    exact hm
+  rw [anchor, dif_pos ⟨i, hc⟩]
+  exact Finset.le_max' _ _ hc
+
+theorem anchor_of_seen_long {i : Fin n} (hl : (trace.event i).LongPrime)
+    (hs : (trace.event i).phaseKey ∈ (trace.event i).seen) :
+    trace.anchor i < i ∧ (trace.event (trace.anchor i)).phaseKey = (trace.event i).phaseKey := by
+  obtain ⟨j, hj, hjlong, hjkey⟩ := ((trace.seen_iff i _).mp hs).resolve_left (by simp)
+  have hm : j ∈ trace.priorLong i := Finset.mem_filter.mpr ⟨mem_univ _, hj, hjlong, hjkey.symm⟩
+  have hc : (trace.anchorCandidates i).Nonempty := by
+    rw [anchorCandidates, if_pos ⟨hl, j, hm⟩]
+    exact ⟨j, hm⟩
+  exact trace.candidate_lt_and_key (trace.anchor_mem hc)
+
 theorem left_le_right (i : Fin n) : trace.left i ≤ trace.right i := by
   by_cases h : (trace.anchorCandidates i).Nonempty
   · have hji := (trace.candidate_lt_and_key (trace.anchor_mem h)).1
@@ -100,10 +121,10 @@ def samePhaseInterval {i j : Fin n} (ordered : i < j)
 def reuse (i : Fin n) (h : 0 < trace.demand i) : SamePhaseCreditInterval210 :=
   trace.samePhaseInterval (trace.demand_anchor_lt_key h).1 (trace.demand_anchor_lt_key h).2
 
-private theorem startup_positive {i : Fin n} (hi : i ∈ trace.startup) :
+theorem startup_positive {i : Fin n} (hi : i ∈ trace.startup) :
     0 < (trace.event i).cost := (Finset.mem_filter.mp hi).2.1
 
-private theorem startup_not_reused_long {i : Fin n} (hi : i ∈ trace.startup) :
+theorem startup_not_reused_long {i : Fin n} (hi : i ∈ trace.startup) :
     ¬ ((trace.event i).LongPrime ∧ (trace.event i).phaseKey ∈ (trace.event i).seen) := by
   rintro ⟨hl, hseen⟩
   obtain ⟨j, hj, hjlong, hjkey⟩ := ((trace.seen_iff i _).mp hseen).resolve_left (by simp)
@@ -123,7 +144,7 @@ private theorem startup_no_prior_positive {i j : Fin n} (hi : i ∈ trace.startu
     exact hlong.2
   · exact ⟨j, by simp [priorPositive, hlt, hpos, hkey]⟩
 
-private theorem startup_bounds {i : Fin n} (hi : i ∈ trace.startup) :
+theorem startup_bounds {i : Fin n} (hi : i ∈ trace.startup) :
     d (trace.event i).hit ≤ 169 ∧ (trace.event i).cost.toNat ≤ 1478 := by
   apply residual_phase_startup_bounds210 (trace.event i).step
   · rintro ⟨hg, hp, hs⟩

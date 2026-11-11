@@ -1230,3 +1230,71 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --
 
 Lean 4.33.1 builds the selected modules and the audit of 35
 declarations uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Refined startup and scaled reuse costs, 2026-11-11 JST
+
+Codex continued from `da7953780f66c0664cfe8e994ecfbe1596240201`.
+`ResidualStartupWeights210.lean` bounds the positive startup cost
+at increment `e` by `min(1478, 1326 + K(e) - 11*e)`, with natural
+subtraction. Here `K(e)=48*f` for the first proper divisor in
+`[3,5,7,11,13]`, or 240 if there is no such divisor. In the latter
+case the eligible odd increment at most 169 is prime, so a first
+long gap is already deducted and the remaining gap is at most 10.
+For `gcd(e,210)=h`, the parity of the hit fixes the pre-event horizon
+modulo `2*h`, including the even-horizon constraint when `h=1`.
+Each increment therefore has at most `2*(210/(2*h))` startup keys.
+The weighted finite sum is 6,181,254, checked with `decide +kernel`.
+For the original ledger this yields the sufficient bound
+`3*(24*F_phase + S_nonstartup) ≤ 2*G + 29108531`, with all first
+gaps and all signed non-startup costs included.
+
+`ResidualScaledPotential210.lean` uses `V'=floor(8*V/9)≤1120`.
+For supported events the full gap satisfies
+`24*g + V'(after) ≤ 11*(e-1) + V'(before)`. For other events keep the
+signed cost `w'=24*g+ΔV'-11*(e-1)` with positive part at most
+`37*e+1131`. A reused unsupported prime of increment `e` has at least
+`210*e` growth, and its whole positive cost fits in two thirds of
+that interval. In particular the bound for 11 is 1538 against 1540.
+Latest-long-anchor windows of the same key are disjoint, so the
+bound also covers an arbitrary selected set of those reuses together.
+Two reuses with maximum increment at least 35 fit in two thirds of
+their union. The bound `k*(37*e+1131)≤140*e+credit` also works for
+`k` selected events of increments at most the largest reuse `e`
+using the negative credit in the union. For two costs, 1536 of
+enclosed negative credit always suffices. One short-gap event of
+increment at least 265, or a composite event of increment at least
+665, supplies that much credit.
+
+The exact ordered trace telescopes `V'` together with travel and
+horizon growth. The scaled signed sum `W'` only needs to obey
+`W'+24*g+1175≤M` at actual capped first crossings. Lean verifies that
+this condition implies the original target and unbounded greater
+twin primes. `signed_budget_iff_block_slack` works with either
+ledger. For the scaled condition, if `A` is the sum of selected
+disjoint block widths, `D` their total slack `2*width-3*cost`,
+and `R` the remaining signed sum, the budget is equivalent to
+`3*R≤3*M-72*g-3525-2*A+D`. The unrestricted mixed-key overlap and
+signed remainder bounds on actual crossing prefixes are open.
+
+The trial-division diagnostic checks 14,877 capped synthetic replays
+through 2,000,000 and at eight controls, with 222 positive scaled
+reuse windows and 394 endpoint-window checks. With growth alone one
+window fails. At synthetic `M=69921739`, its width is 2940 and it
+contains costs 1170, 306, 1169 for increments 11, 11, 13. The
+margin `2*width-3*demand` is -2055. Including negative costs of
+-17794 gives margin 51327. These include a gap of 26 with composite
+increment 1157, whose scaled cost is -11532. With enclosed negative
+credit all 394 checks pass, with minimum margin 1464 at
+`M=89666641` on `[179333802,179336112)`. These are bounded tests on
+canonical-shaped starts.
+
+```sh
+lake build A166944.Attempt A166944.ResidualStartupWeights210 A166944.ResidualScaledPotential210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --scaled-limit 2000000 \
+  --control 22933441 --control 23613589 --control 23619049 --control 41453053 \
+  --control 45895573 --control 69921739 --control 86278501 --control 89666641
+```
+
+The original native/Python overlap comparison through 2,000,000 also
+agrees. The Lean 4.33.1 build and audit of 34 declarations pass with
+only `propext`, `Classical.choice`, and `Quot.sound`.

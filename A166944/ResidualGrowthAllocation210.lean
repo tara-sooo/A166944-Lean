@@ -108,6 +108,27 @@ theorem growth_block_events_disjoint {a b c e : Nat}
     Finset.mem_Ico.mpr ⟨by omega, by omega⟩
   exact (Finset.disjoint_left.mp h) hx hy
 
+/-- Express a bound on the full signed sum using the actual widths and
+the unused capacity of the selected blocks. A negative block slack is
+allowed and consumes part of the budget. -/
+theorem signed_budget_iff_block_slack {ι : Type*} [DecidableEq ι]
+    (blocks : Finset ι) (left right : ι → Nat) (events : ι → Finset (Fin n))
+    (disjoint : (blocks : Set ι).PairwiseDisjoint (fun b => Finset.Ico (left b) (right b)))
+    (eventInside : ∀ b ∈ blocks, events b ⊆ trace.eventsInGrowthBlock (left b) (right b))
+    (cost : Fin n → Int) (budget : Int) :
+    (∑ i, cost i) ≤ budget ↔
+      3 * (∑ i ∈ Finset.univ \ blocks.biUnion events, cost i) ≤
+        3 * budget - 2 * (∑ b ∈ blocks, ((right b - left b : Nat) : Int)) +
+          ∑ b ∈ blocks, (2 * ((right b - left b : Nat) : Int) - 3 * (∑ i ∈ events b, cost i)) := by
+  have hevents : (blocks : Set ι).PairwiseDisjoint events := by
+    intro b hb b' hb' hne
+    exact (trace.growth_block_events_disjoint (disjoint hb hb' hne)).mono
+      (eventInside b hb) (eventInside b' hb')
+  have hsplit := Finset.sum_sdiff (f := cost) (Finset.subset_univ (blocks.biUnion events))
+  rw [Finset.sum_biUnion hevents] at hsplit
+  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Finset.mul_sum]
+  omega
+
 /-- Use [left,right) for growth and a subset of (left,right] for costs.
 Both are disjoint across the same blocks, including when endpoints
 touch. The selected costs retain their negative terms. -/
