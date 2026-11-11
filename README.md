@@ -233,6 +233,20 @@ a different key bounds each interval's contribution to `O`.
 this budget on the remaining actual crossing candidates. Establishing
 the budget uniformly on those candidates remains open.
 
+`RebalancedCreditIntervals210.lean` measures a demand of size `P_i`
+as an interval of width `3*P_i` in cumulative credit. The right
+endpoint counts twice the growth through the event and three times
+all negative residual costs through it. The cost units shared by
+several intervals are counted at each later interval that uses
+them, with an upper bound from its earlier pairwise intersections.
+A small-relative-gap increment of at least 595 between two requests
+separates their intervals when the later request is outside long
+prime phase reuse. Let `E` be the resulting duplicate width bound
+minus credit outside the union. On crossing candidates,
+`10*(3*Phi_upper+E) ≤ 9*M` suffices. For sufficiently large records
+the first-phase estimate leaves an allowance of `27*M/80` for `E`.
+The uniform signed budget remains open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

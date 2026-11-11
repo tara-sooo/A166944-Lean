@@ -1653,3 +1653,93 @@ Lean 4.33.1 accepts the new proofs, including the composition with
 the verified finite prefix and the unbounded greater-twin-prime
 theorem. The audit of 21 public theorems uses only `propext`,
 `Classical.choice`, and `Quot.sound`.
+
+## Cumulative credit intervals and a signed allowance, 2026-11-12 JST
+
+From `dc75d68338b83ada388d0cd79a6c0691d964ec51`,
+`RebalancedCreditIntervals210.lean` uses the coordinate
+`B_i = 2*(C_i^+-C_0)+3*sum_{k≤i} max(0,-u_k)` after event `i`.
+The interval of length `3*P_i` ending there fits between its anchor
+and its own endpoint. Same-key intervals are disjoint, and a request
+covered by its own growth is disjoint from all earlier intervals.
+
+Telescoping on the clamped interval between two hits gives
+`B_j-B_i = sum_{i<k≤j} (2*(e_k-1)+3*max(0,-u_k))`.
+For selected intervening events with `e_k≥339` and
+`3*(gap_k+1)≤e_k-1`, this is at least
+`11*sum(e_k-1)-3036*count`. In particular, one such event with
+`e_k≥595` separates a later request outside long prime phase reuse
+from every interval before that event. This uses the existing cost
+cap 1166 for those requests.
+
+For `i<j`, the pair intersection has width
+`min(3*P_i, max(0,3*P_j-(B_j-B_i)))`. A demand's duplicate width is
+the intersection with the union of all earlier intervals. It is
+bounded by both the sum of the pair widths and the part reaching
+before the latest earlier different key. Let `E` be the sum of
+these upper bounds minus all cumulative credit outside the union.
+Lean gives `3*W ≤ 3*Phi+3*A+2*G+E`, using the actual startup cost
+`A`. An enclosing band can supply a lower bound on unused credit
+through its length.
+
+`rebalanced_crossing_signed_of_credit_allowance210` checks that
+`10*(3*Phi_upper+E)≤9*M` suffices for the signed crossing bound
+at `M≥367232911` under the existing short-prefix and gap hypotheses.
+For example, `E≤0` and `10*Phi_upper≤3*M` imply this allowance.
+For sufficiently large `M`, the existing sublinear first-phase
+result suffices when `80*E≤27*M`. The uniform allowance on actual
+crossing candidates remains open.
+
+Independent trial division checked seven synthetic controls and
+533 and 684 twin-shaped starts in `[7163911,7263911]` and
+`[367232911,367432911]`. At the 69 and 292 demand arrivals, the
+union and enclosing-band adjustments were nonpositive. Counting
+growth through the requests gives 7 and 30 overlapping pairs.
+Including negative costs leaves 6 and 8. All three pairs on the
+`M=69921739` control separate after negative costs are included.
+On the `M=367264309` control at horizon `734547102`, the pair
+cap reduces the duplicate-width upper bound from 1974 to 90.
+There are 43,547 unused units at that prefix, giving `E=-43457`.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedCreditIntervals210 A166944.ResidualRebalancedPairOffsets210
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=diagnostics python3 - <<'PY'
+from itertools import combinations
+from rebalanced_potential_probe import rebalanced_potential
+from travel_credit_prefix import capped_hits
+from travel_mod210_probe import residue_tables
+from travel_residue_probe import increment_at
+from travel_reuse_overlap_probe import replay
+
+table, potential = residue_tables(), rebalanced_potential()
+
+def demand_intervals(M, cutoff):
+    requests, costs = replay(M, table, rebalanced=potential)
+    hits, _ = capped_hits(M)
+    growth_ends, credit_ends, negative = {}, {}, 0
+    for (C, cost), hit in zip(costs, hits, strict=True):
+        growth_ends[C] = 2 * (C + increment_at(hit, C) - 1 - (2*M - 2))
+        negative += max(0, -cost)
+        credit_ends[C] = growth_ends[C] + 3 * negative
+    return [[(ends[w.right] - 3*w.cost, ends[w.right])
+             for w in requests if w.right <= cutoff]
+            for ends in (growth_ends, credit_ends)]
+
+def overlap_width(a, b):
+    return max(0, min(a[1], b[1]) - max(a[0], b[0]))
+
+growth, signed = demand_intervals(69921739, 139856952)
+assert len(growth) == 3
+assert all(overlap_width(a, b) > 0 for a, b in combinations(growth, 2))
+assert all(overlap_width(a, b) == 0 for a, b in combinations(signed, 2))
+_, signed = demand_intervals(367264309, 734547102)
+assert len(signed) == 2
+assert overlap_width(*signed) == 90
+assert signed[-1][1] == 45581
+assert len(set().union(*(range(a, b) for a, b in signed))) == 2034
+print("Cumulative credit witnesses checked")
+PY
+```
+
+Lean 4.33.1 accepts the new proofs. The audit of 24 public theorems
+uses only `propext`, `Classical.choice`, and `Quot.sound`.

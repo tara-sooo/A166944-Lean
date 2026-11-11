@@ -279,10 +279,10 @@ def rebalancedOverlapAdjustment : Int :=
     ((∑ i, trace.rebalancedDemand i % 2 : Nat) : Int) -
     3 * ((trace.rebalancedUnionCredit + trace.rebalancedOutsideCredit : Nat) : Int)
 
-theorem rebalanced_net_cost_le_of_overlap210 :
-    3 * (∑ i, (trace.event i).rebalancedNetCost) ≤
-      (3 * trace.totalCappedFirstPayment + 12163536 + 2 * (D sf - D s) : Nat) +
-        trace.rebalancedOverlapAdjustment := by
+theorem sum_rebalanced_net_cost_parts210 :
+    (∑ i, (trace.event i).rebalancedNetCost) =
+      (trace.totalCappedFirstPayment : Int) + trace.costStartupSum trace.rebalancedCosts +
+        (∑ i, trace.rebalancedDemand i : Nat) - (∑ i, (-trace.rebalancedCosts i).toNat : Nat) := by
   have hsplit : (∑ i, trace.rebalancedCosts i) =
       ((∑ i, (trace.rebalancedCosts i).toNat : Nat) : Int) -
         ((∑ i, (-trace.rebalancedCosts i).toNat : Nat) : Int) := by
@@ -290,11 +290,18 @@ theorem rebalanced_net_cost_le_of_overlap210 :
     exact Finset.sum_congr rfl fun i _ => by omega
   have hpositive := trace.sum_cost_positive trace.rebalancedCosts
   change _ = trace.costStartupSum trace.rebalancedCosts + ∑ i, trace.rebalancedDemand i at hpositive
+  rw [trace.sum_rebalanced_net_cost_split, hsplit, hpositive]
+  omega
+
+theorem rebalanced_net_cost_le_of_overlap210 :
+    3 * (∑ i, (trace.event i).rebalancedNetCost) ≤
+      (3 * trace.totalCappedFirstPayment + 12163536 + 2 * (D sf - D s) : Nat) +
+        trace.rebalancedOverlapAdjustment := by
   have hstartup := trace.rebalanced_startup_cost_le
   have hwidth := trace.rebalanced_demand_width_identity
   have hcredit := trace.rebalanced_union_and_outside_credit_le
   have hunion := trace.card_rebalanced_demand_union_le
-  rw [trace.sum_rebalanced_net_cost_split, hsplit]
+  rw [trace.sum_rebalanced_net_cost_parts210]
   unfold rebalancedOverlapAdjustment
   omega
 

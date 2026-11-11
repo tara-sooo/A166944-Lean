@@ -129,7 +129,7 @@ private theorem rebalanced_demand_linear_cap {i : Fin n} (hi : 0 < trace.costDem
   have hbound := (trace.event i).rebalanced_net_cost_positive_part_le
   omega
 
-private theorem rebalanced_demand_nonlong_bounds {i : Fin n}
+theorem rebalanced_demand_nonlong_bounds {i : Fin n}
     (hi : 0 < trace.costDemand trace.rebalancedCosts i) (short : ¬ trace.ReusedLong i) :
     d (trace.event i).hit ≤ 159 ∧ trace.costDemand trace.rebalancedCosts i ≤ 1166 := by
   let event := trace.event i
