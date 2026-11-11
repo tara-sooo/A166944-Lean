@@ -39,7 +39,7 @@ def capped_hits(record):
     return hits, "event-limit"
 
 
-def prefix_summary(limit, multiplier, growth_charge):
+def prefix_summary(limit, multiplier, growth_charge, residual=False):
     table = residue_tables()
     starts = demands = cutoffs = event_limits = maximum_startup = 0
     for record in range(13, limit + 1, 6):
@@ -50,7 +50,7 @@ def prefix_summary(limit, multiplier, growth_charge):
         cutoffs += stop == "cutoff"
         event_limits += stop == "event-limit"
         _, startup, _, _, paid, failure = funded_summary(
-            record, table, multiplier, growth_charge, hits=hits)
+            record, table, multiplier, growth_charge, hits=hits, residual=residual)
         assert failure is None, (record, failure)
         demands += paid
         maximum_startup = max(maximum_startup, startup)
@@ -62,15 +62,16 @@ def main():
     parser.add_argument("limit", type=int)
     parser.add_argument("--multiplier", type=int, default=0)
     parser.add_argument("--growth-charge", type=int, choices=(2, 4), default=4)
+    parser.add_argument("--residual", action="store_true")
     parser.add_argument("--native", help="Optional path to the native executable to compare")
     args = parser.parse_args()
     assert 13 <= args.limit <= 100_000_000 and 0 <= args.multiplier <= 24
-    result = prefix_summary(args.limit, args.multiplier, args.growth_charge)
+    result = prefix_summary(args.limit, args.multiplier, args.growth_charge, args.residual)
     print("Python trial division (starts, demands, cutoffs, event limits, maximum startup):", result)
     if args.native:
-        output = subprocess.check_output([
-            args.native, str(args.limit), "--funded", str(args.multiplier),
-            "--growth-charge", str(args.growth_charge)], text=True)
+        command = [args.native, str(args.limit), "--funded", str(args.multiplier)]
+        command += ["--residual"] if args.residual else ["--growth-charge", str(args.growth_charge)]
+        output = subprocess.check_output(command, text=True)
         totals = re.search(r"synthetic starts=(\d+) paid demands=(\d+) cutoff stops=(\d+) "
                            r"event-limit stops=(\d+)", output)
         startup = re.search(r"maximum startup=(\d+)", output)

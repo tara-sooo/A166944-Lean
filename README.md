@@ -95,8 +95,14 @@ coefficient eleven. `ChargedPhaseCredits210.lean` proves eventual short
 travel conditional on allocations for these improved costs. The bounded
 search through 100000000 assigns every tested nonstartup request using negative
 balances alone, with no extra first-phase funding; universal allocation
-existence is still open. A tighter residual-travel balance and its local
-budget are also checked for further use.
+existence is still open.
+`ResidualPhaseCredits210.lean` integrates the tighter residual cost into
+the full path and first-crossing budgets. `ResidualStartup210.lean`
+bounds each startup charge by 1478 and the distinct-key total by
+23899260. `ResidualAllocation210.lean` retains unused credit in the net
+budget; `CreditDeficits210.lean` reduces allocation failure to a minimal
+deficient window. Excluding such windows on arbitrary actual prefixes
+and proving a usable uniform net bound remain open.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

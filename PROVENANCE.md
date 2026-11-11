@@ -911,3 +911,91 @@ one-third composite bound pass the axiom audit using only propext,
 Classical.choice and Quot.sound. The existing endpoint-Hall equivalence
 also passes. Attempt retains its prior imports and the canonical
 A166944 theorem remains open.
+
+## Residual path budgets, smaller startup costs and unused credit, 2026-11-11 JST
+
+Codex continued from `de97718`. `ResidualPhaseCredits210.lean`
+integrates the residual step balance into an exact ordered ledger.
+Its first-phase-gap sum is identical to that in the previous ledger,
+and its signed sum is no larger than the four-growth signed sum.
+Lean proves the full path budget, the necessary first-crossing
+condition, and short travel conditional on the finite net inequality
+`24*(F_phase+Q(M))+1315+S_res≤M`, where
+`Q(M)=sqrt(4*(3*M+4))` is the natural square root. This leaves the
+negative signed sum available to cancel first-phase travel.
+
+`ResidualStartup210.lean` proves a sharper event-level startup bound.
+A positive event that is not a reused long-prime phase has increment
+at most169 and positive part at most1478. For a short gap, the bound
+comes from `24*g≤240` and the eleven-growth charge. A first long prime
+has no residual gap. A long composite uses a factor f≥7 with
+g≤2*f and f*f≤e. Positivity forces f≤13 and e≤172; oddness and the
+factor3 first-hit bound exclude e171, leaving e≤169. Its charge is
+also bounded using `24*g≤7*G`.
+
+An admissible startup increment is an odd unsupported value between3
+and169. There are77 such values, kernel-checked on the170-element
+range. The pre-event horizon is even, so its residue modulo210 has105
+possible values, and the hit has two parities. The encoding
+`420*e+4*h+parity` is injective on those inputs, giving16170 admissible
+keys. Positive startup events have keys in this set. Distinct keys and
+the1478 pointwise cap yield the fixed total
+`B_res=16170*1478=23899260`, replacing the old7848037260 bound in the
+new allocation corollaries.
+
+`ResidualAllocation210.lean` defines unused credit U as total supply
+minus total allocation. Source capacities show this subtraction is
+nonnegative. Instead of discarding U, Lean proves
+`S+U≤startupBound+c*F_phase`, and in particular
+`S+U≤B_res+c*F_phase` for the admissible startup keys. Thus the finite
+inequality
+
+`(24+c)*F_phase+B_res+24*Q(M)+1315≤M+U`
+
+suffices for the net crossing budget. The general theorem also accepts
+the exact startup sum in place of B_res. No asymptotic threshold is
+needed for this implication. A uniform bound on the net expression is
+still required to apply it to all actual prefixes.
+
+`CreditDeficits210.lean` proves that failure of weighted interval Hall
+has a deficient window of least timestamp length; every strictly
+smaller contained window has enough capacity. The diagnostic now
+extracts such minimum-length endpoint windows. The remaining
+recurrence-specific task is to exclude their existence on the actual
+capped canonical prefixes. No such exclusion is asserted here.
+
+The native residual mode preserves the earlier default and four-growth
+modes. Through100000000, zero additional funding pays107076 requests
+from440310 synthetic twin-shaped starts, maximum startup20096, with
+two cap/travel cutoff stops and no3000-event stops. Python trial
+division agrees through2000000:14869 starts,927 requests,two cutoff
+stops, maximum startup10740. The interval checker tests all three
+balance modes on seven controls at four funding coefficients and
+retains2187 direct-subset Hall comparisons. The earlier default and
+four-growth prefix totals remain1064 and1049 requests, respectively.
+The synthetic origins are distinct from original-sequence certificates;
+the native run does not inspect events after its two cutoffs.
+
+The optional allocation trace checks the exact identity
+`S+U=startup+c*F_phase` on every paid prefix of these integer replays.
+`travel_residual_net.py` checks cancellation and finite margins using
+both the actual startup sum and B_res. For the replay from45895573,
+the minimum fixed-startup net margin is21418714; from367232911 it is
+341577624. These are integer diagnostics, not new Lean-certified
+record-range extensions. The certified prefix still ends at45895573.
+
+```sh
+lake build A166944.Attempt A166944.TravelTarget A166944.ResidualAllocation210
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 0 --residual
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --residual --native /tmp/travel_credit_search
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_windows.py
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_residual_net.py
+```
+
+Lean4.33.1 accepts the fifteen new public results. Their axiom audit,
+and that of the existing implication to unbounded twin primes, uses
+only propext, Classical.choice and Quot.sound. Attempt's imports and
+the original target remain unchanged. Universal allocation existence,
+the uniform net bound, a usable threshold and the finite-range bridge
+remain open.
