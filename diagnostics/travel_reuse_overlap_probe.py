@@ -5,6 +5,7 @@ from bisect import bisect_right
 from dataclasses import dataclass
 from fractions import Fraction
 from itertools import accumulate
+from math import lcm
 from pathlib import Path
 import re
 
@@ -25,10 +26,12 @@ class Window:
         return self.right - self.left
 
 
-def replay(record, table, *, scaled=False):
+def replay(record, table, *, scaled=False, adjusted=False):
+    scaled = scaled or adjusted
     hits, _ = capped_hits(record)
     index, horizon = record + 2, 2 * record - 2
     previous = {}
+    previous_positive = {}
     windows, costs = [], []
     for hit in hits:
         increment = increment_at(hit, horizon)
@@ -45,10 +48,16 @@ def replay(record, table, *, scaled=False):
             before, after = 8 * before // 9, 8 * after // 9
         if P % increment:
             net = 24 * gap + after - before - 11 * (increment - 1)
+            if adjusted:
+                net -= 24 * first_gap
+                if old is None:
+                    old = previous_positive.get(key)
+                if net > 0:
+                    previous_positive[key] = (horizon, hit)
             if old is not None and net > 0:
                 earlier, earlier_hit = old
                 assert (hit - earlier_hit) % (2 * increment) == 0
-                assert horizon > earlier and (horizon - earlier) % (P * increment) == 0
+                assert horizon > earlier and (horizon - earlier) % lcm(P, 2 * increment) == 0
                 windows.append(Window(earlier, horizon, increment, net))
         elif scaled:
             assert 24 * gap + after - before <= 11 * (increment - 1)
@@ -117,16 +126,21 @@ def contained_window_margins(windows, costs):
             yield growth_margin, growth_margin + 3 * supply, left, right
 
 
-def scaled_overlap_summary(limit, controls, table):
+def scaled_overlap_summary(limit, controls, table, *, adjusted=False):
     twin_starts = {record for record in range(13, limit + 1, 6)
                    if is_prime(record) and is_prime(record - 2)}
     starts = requests = intervals = growth_failures = signed_failures = 0
     least_growth = least_signed = None
     for record in sorted(twin_starts.union(controls)):
         starts += 1
-        windows, costs = replay(record, table, scaled=True)
+        windows, costs = replay(record, table, scaled=True, adjusted=adjusted)
         requests += len(windows)
-        assert all(3 * window.cost <= 2 * window.width for window in windows)
+        if adjusted:
+            for window in windows:
+                if 3 * window.cost > 2 * window.width:
+                    assert (window.increment, window.width) in {(9, 630), (9, 1260), (25, 1050)}
+        else:
+            assert all(3 * window.cost <= 2 * window.width for window in windows)
         for growth, signed, left, right in contained_window_margins(windows, costs):
             intervals += 1
             growth_failures += growth < 0
@@ -135,7 +149,8 @@ def scaled_overlap_summary(limit, controls, table):
             least_growth = candidate if least_growth is None else min(least_growth, candidate)
             candidate = (signed, record, left, right)
             least_signed = candidate if least_signed is None else min(least_signed, candidate)
-    print(f"Scaled potential: {starts=} {requests=} {intervals=} {growth_failures=} {signed_failures=}")
+    label = "Adjusted costs" if adjusted else "Scaled potential"
+    print(f"{label}: {starts=} {requests=} {intervals=} {growth_failures=} {signed_failures=}")
     print(f"Minimum margins (margin, record, left, right): {least_growth=} {least_signed=}")
 
 
@@ -143,14 +158,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("native_output", nargs="?")
     parser.add_argument("--scaled-limit", type=int)
+    parser.add_argument("--adjusted", action="store_true", help="Separate first gaps and include small repeated costs")
     parser.add_argument("--control", type=int, action="append", default=[])
     args = parser.parse_args()
     table = residue_tables()
     if args.scaled_limit is not None:
         if args.native_output is not None:
             parser.error("supply a native output or a scaled search limit")
-        scaled_overlap_summary(args.scaled_limit, args.control, table)
+        scaled_overlap_summary(args.scaled_limit, args.control, table, adjusted=args.adjusted)
         return
+    if args.adjusted:
+        parser.error("--adjusted requires --scaled-limit")
     if args.native_output is None:
         parser.error("supply a native output or a scaled search limit")
     output = Path(args.native_output).read_text()

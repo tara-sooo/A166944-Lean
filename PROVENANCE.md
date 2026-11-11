@@ -1298,3 +1298,77 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --sc
 The original native/Python overlap comparison through 2,000,000 also
 agrees. The Lean 4.33.1 build and audit of 34 declarations pass with
 only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Adjusted costs and first-hit deficit bounds, 2026-11-11 JST
+
+Codex continued from `b91ad42e262113912e5714dd337fce0ed01ba517`.
+`ResidualAdjustedCosts210.lean` splits `W'=24*F+sum(u)` exactly, where
+`F` sums the first long gap of each unsupported prime phase and
+`u=w'-24*f` at the corresponding event. A long reuse uses its latest
+long anchor and the other repeated positive costs use their latest
+positive predecessor of the same key. `ResidualStartupWeights210.lean`
+uses the existing reachable-phase count and travel cap `K(e)` to
+bound each adjusted startup by `max(0,1131+K(e)-11*e)`. A positive
+adjusted cost outside the long reuses requires `e≤159`. The weighted
+finite sum is 4,651,452. Both the original and adjusted sums share the
+phase counting proof.
+
+`ResidualGrowthWindows210.lean` applies the existing interval Hall
+and minimal-deficit results to capacity `2*(b-a)+3*N(a,b)`, where
+`N` counts the negative cost parts at pre-horizons in `(a,b]`. The
+integer sources are `[a,b-1]`, with a negative cost at `H-1`. Positive
+requests attain both endpoints of a minimal deficit and cross every
+interior cut. The deficit at a cut is at most three times the demands
+of requests crossing it, since both proper subwindows pay their own
+requests.
+
+`ResidualSmallReusePairs210.lean` verifies the coarse list of 19
+possible prime pairs and maximum width 6,833. An actual first-hit
+gap above 14 rules out factors 3, 5 and 7 on both sides of the even
+horizon, leaving 15 horizon residues modulo 210. The resulting
+pointwise scaled cost caps for increments 11, 13, 17, 19, 23, 29, 31
+are 1522, 1537, 1722, 1759, 1704, 1809, 1744. The refined list has
+15 pairs, all with maximum prime at most 23 and window width at
+most 5,276. This applies to any deficient growth window with exactly
+two positive requests in the long-prime-only system.
+
+`ResidualSmallAdjusted210.lean` checks the event and horizon residues
+for the four composite increments 9, 25, 45, 63. The resulting cost
+caps are 979, 739, 84, 108. The last two fit in two thirds of their
+same-phase drift. A single adjusted request can be deficient only
+for increment 9 at width 630 or 1260, or increment 25 at width 1050.
+For a minimal single-request deficit these are the actual window
+widths, and the enclosed negative credit in unscaled units is at
+most 558, 138, or 38 respectively.
+
+If every adjusted window fits, then `3*W'≤72*F+13954356+2*G`.
+For `M≥50000000`, the uniform sufficient first-travel inequality
+is `64*(72*F+13957891)≤61*M`; the actual gap also gives a sharper
+per-prefix condition. The existing sublinear first-phase theorem
+gives the first-travel inequality at sufficiently large `M`, with
+an existential threshold. The cofactor bound also proves that a
+single scaled cost is nonpositive when
+`48*(C+1)+1120*e≤11*(e-1)*e`. The adjusted window inequalities on
+actual prefixes and the first-travel inequality between the finite
+bridge and the asymptotic threshold remain open.
+
+The trial-division comparator with the adjusted costs independently
+reproduces the 2,000,000 scan plus eight controls with 14,877 starts,
+956 requests and 1,981 window tests, of which 26 fail with growth
+alone and none with negative credit. Extending the scan to 10,000,000
+plus the same controls gives 58,986 starts, 6,566 requests, 10,719
+window tests, 59 growth-only failures and zero signed failures. The
+least signed margin is 9,321 at synthetic `M=3893863` on
+`[7788016,7788646)`, with increment 9, cost 35 and negative credit
+2,722. The previous native/Python overlap comparator through 2,000,000
+still agrees. The scans are on capped canonical-shaped synthetic starts.
+
+```sh
+lake build A166944.Attempt A166944.ResidualGrowthWindows210 A166944.ResidualSmallAdjusted210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --scaled-limit 10000000 --adjusted \
+  --control 22933441 --control 23613589 --control 23619049 --control 41453053 \
+  --control 45895573 --control 69921739 --control 86278501 --control 89666641
+```
+
+Lean 4.33.1 builds the selected modules. The audit of 40 declarations
+uses only `propext`, `Classical.choice`, and `Quot.sound`.

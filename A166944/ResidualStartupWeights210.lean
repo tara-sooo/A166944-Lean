@@ -1,5 +1,5 @@
 import A166944.ResidualIntervalBudget210
-import A166944.TwinCrossingBudget210
+import A166944.ResidualAdjustedCosts210
 
 /-! # Startup bounds by increment and reachable phase -/
 
@@ -22,45 +22,49 @@ private theorem startup_divisor_none_prime :
       NoProperFactor e.val := by
   decide +kernel
 
-theorem residual_phase_startup_weight210 (event : ResidualPhaseEvent210)
+private theorem startup_gap_le_travel_cap (event : ResidualPhaseEvent210)
     (hnew : ¬ (event.LongPrime ∧ event.phaseKey ∈ event.seen))
-    (hpos : 0 < event.cost) :
-    event.cost.toNat ≤ residualStartupWeight210 (d event.hit) := by
+    (hsize : d event.hit ≤ 169) :
+    24 * (event.hit - event.start) ≤ startupTravelCap210 (d event.hit) + 24 * event.firstGap := by
   let e := d event.hit
   have he : 1 < e := event.step.2.2.2.1
   have hr : 3 ≤ event.hit := by have := event.step.1.1; have := event.step.2.1; omega
   have heodd : e % 2 = 1 := d_mod_two_eq_one_of_three_le hr
+  change e ≤ 169 at hsize
+  change _ ≤ startupTravelCap210 e + _
+  cases hdiv : startupDivisor210 e with
+  | none =>
+    have hp : NoProperFactor e := startup_divisor_none_prime ⟨e, by omega⟩ he heodd hdiv
+    simp only [startupTravelCap210, hdiv, Option.elim_none]
+    by_cases hg : 10 < event.hit - event.start
+    · have hfirst : IsFirstLongPrimePhase residualHorizonPhase210 event.seen event.start event.horizon event.hit :=
+        ⟨hg, hp, fun h => hnew ⟨⟨hg, hp⟩, h⟩⟩
+      simp only [ResidualPhaseEvent210.firstGap, firstLongPrimePhaseGap, if_pos hfirst]
+      omega
+    · omega
+  | some f =>
+    have hf := List.find?_some hdiv
+    have hfd : f < e ∧ f ∣ e := of_decide_eq_true hf
+    have hmem : f ∈ [3, 5, 7, 11, 13] := List.mem_of_find?_eq_some hdiv
+    have hf1 : 1 < f := by simp at hmem; omega
+    have hle := moving_horizon_step_gap_le_twice_increment_factor event.step hf1 hfd.2
+    simp only [startupTravelCap210, hdiv, Option.elim_some]
+    omega
+
+theorem residual_phase_startup_weight210 (event : ResidualPhaseEvent210)
+    (hnew : ¬ (event.LongPrime ∧ event.phaseKey ∈ event.seen))
+    (hpos : 0 < event.cost) :
+    event.cost.toNat ≤ residualStartupWeight210 (d event.hit) := by
   have hbounds := residual_phase_startup_bounds210 (phase := residualHorizonPhase210)
     (seen := event.seen) event.step (fun ⟨hg, hp, hs⟩ => hnew ⟨⟨hg, hp⟩, hs⟩) hpos
-  change e ≤ 169 ∧ event.cost.toNat ≤ 1478 at hbounds
-  have hgap : 24 * (event.hit - event.start - event.firstGap) ≤ startupTravelCap210 e := by
-    cases hdiv : startupDivisor210 e with
-    | none =>
-      have hp : NoProperFactor e := startup_divisor_none_prime ⟨e, by omega⟩ he heodd hdiv
-      simp only [startupTravelCap210, hdiv, Option.elim_none]
-      by_cases hg : 10 < event.hit - event.start
-      · have hfirst : IsFirstLongPrimePhase residualHorizonPhase210 event.seen
-            event.start event.horizon event.hit :=
-          ⟨hg, hp, fun h => hnew ⟨⟨hg, hp⟩, h⟩⟩
-        simp only [ResidualPhaseEvent210.firstGap, firstLongPrimePhaseGap, if_pos hfirst]
-        omega
-      · omega
-    | some f =>
-      have hf := List.find?_some hdiv
-      have hfd : f < e ∧ f ∣ e := of_decide_eq_true hf
-      have hmem : f ∈ [3, 5, 7, 11, 13] := List.mem_of_find?_eq_some hdiv
-      have hf1 : 1 < f := by simp at hmem; omega
-      have hle := moving_horizon_step_gap_le_twice_increment_factor event.step hf1 hfd.2
-      simp only [startupTravelCap210, hdiv, Option.elim_some]
-      omega
+  change d event.hit ≤ 169 ∧ event.cost.toNat ≤ 1478 at hbounds
+  have hgap := startup_gap_le_travel_cap event hnew hbounds.1
   have hstate := event.step.2.2.2.2.2.2.2.2
   have heven := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
   have hV := (supported_excess_and_potential210_bounds event.hit event.nextHorizon heven).2
   have hraw := event.positive_unsupported hpos
   refine Nat.le_min.mpr ⟨hbounds.2, ?_⟩
   simp only [ResidualPhaseEvent210.cost, residualPhaseSeparatorBalance210, if_neg hraw]
-  change 1 < d event.hit at he
-  change 24 * (event.hit - event.start - event.firstGap) ≤ startupTravelCap210 (d event.hit) at hgap
   unfold ResidualPhaseEvent210.firstGap at hgap
   omega
 
@@ -154,57 +158,147 @@ private theorem startup_phase_index_eq {a b : ResidualPhaseEvent210}
   rw [hq, hm, Nat.div_add_mod] at hs
   exact ⟨hs.symm, hp⟩
 
+private def adjustedStartupIncrements210 : Finset Nat :=
+  (Finset.range 160).filter fun e => 1 < e ∧ e % 2 = 1 ∧ ¬ e ∣ 210
+
+def adjustedStartupWeight210 (e : Nat) : Nat := 1131 + startupTravelCap210 e - 11 * e
+
+theorem adjusted_phase_cost_weight210 (event : ResidualPhaseEvent210)
+    (hnew : ¬ (event.LongPrime ∧ event.phaseKey ∈ event.seen))
+    (hpos : 0 < event.adjustedCost) :
+    d event.hit ≤ 159 ∧ event.adjustedCost.toNat ≤ adjustedStartupWeight210 (d event.hit) := by
+  have hu := event.adjusted_cost_positive_unsupported hpos
+  have hcost := event.adjusted_cost_le_of_unsupported hu
+  have he := event.step.2.2.2.1
+  have hr : 3 ≤ event.hit := by have := event.step.1.1; have := event.step.2.1; omega
+  have hodd := d_mod_two_eq_one_of_three_le hr
+  have hsize : d event.hit ≤ 159 := by
+    by_cases hg : 10 < event.hit - event.start
+    · by_cases hp : NoProperFactor (d event.hit)
+      · have hfirst : IsFirstLongPrimePhase residualHorizonPhase210 event.seen event.start event.horizon event.hit :=
+          ⟨hg, hp, fun h => hnew ⟨⟨hg, hp⟩, h⟩⟩
+        simp only [ResidualPhaseEvent210.firstGap, firstLongPrimePhaseGap, if_pos hfirst] at hcost
+        omega
+      · have hseven := moving_horizon_long_composite_seven_growth event.step hg hp
+        have hup := moving_horizon_step_update event.step
+        have h280 : d event.hit ≤ 280 := by omega
+        obtain ⟨f, hf, hd, hsquare⟩ := exists_small_factor_of_composite hp
+        have hf16 : f ≤ 16 := by
+          by_contra h
+          have hf17 : 17 ≤ f := by omega
+          have := Nat.mul_le_mul hf17 hf17
+          omega
+        have hfodd : f % 2 = 1 := by
+          by_contra h
+          have hz : f % 2 = 0 := by omega
+          obtain ⟨k, hk⟩ := hd
+          rw [hk, Nat.mul_mod, hz] at hodd
+          simp at hodd
+        have hf13 : f ≤ 13 := by
+          by_contra h
+          have h15 : f = 15 := by omega
+          have hd3 : 3 ∣ d event.hit := (show 3 ∣ f by rw [h15]; decide).trans hd
+          have hgap := moving_horizon_step_gap_le_twice_increment_factor event.step (by decide : 1 < 3) hd3
+          omega
+        have hgap := moving_horizon_step_gap_le_twice_increment_factor event.step hf hd
+        omega
+    · omega
+  refine ⟨hsize, ?_⟩
+  have hcap := startup_gap_le_travel_cap event hnew (by omega)
+  unfold adjustedStartupWeight210
+  omega
+
+set_option maxRecDepth 16384 in
+theorem adjusted_startup_weight_total210 :
+    (∑ e ∈ adjustedStartupIncrements210, startupPhaseSlots210 e * adjustedStartupWeight210 e) =
+      4651452 := by
+  unfold adjustedStartupIncrements210
+  decide +kernel
+
+set_option maxHeartbeats 800000 in
+private theorem startup_sum_le_of_weights {n : Nat} (events : Fin n → ResidualPhaseEvent210)
+    (selected : Finset (Fin n)) (increments : Finset Nat) (cost : Fin n → Nat) (weight : Nat → Nat)
+    (allowed : ∀ i ∈ selected, d (events i).hit ∈ increments)
+    (distinct : Set.InjOn (fun i => (events i).phaseKey) (selected : Set (Fin n)))
+    (bounded : ∀ i ∈ selected, cost i ≤ weight (d (events i).hit)) :
+    (∑ i ∈ selected, cost i) ≤ ∑ e ∈ increments, startupPhaseSlots210 e * weight e := by
+  classical
+  let codes := increments.sigma (fun e => Finset.range (startupPhaseSlots210 e))
+  let encode (i : Fin n) : Σ _e : Nat, Nat :=
+    ⟨d (events i).hit, startupPhaseIndex210 (events i)⟩
+  have hsubset : selected.image encode ⊆ codes := by
+    intro x hx
+    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hx
+    exact Finset.mem_sigma.mpr ⟨allowed i hi, Finset.mem_range.mpr (startup_phase_index_lt (events i))⟩
+  have hinj : Set.InjOn encode (selected : Set (Fin n)) := by
+    intro i hi j hj h
+    have he := congrArg Sigma.fst h
+    have hidx := congrArg (fun x : Σ _e : Nat, Nat => x.2) h
+    change d (events i).hit = d (events j).hit at he
+    obtain ⟨hC, hp⟩ := startup_phase_index_eq he hidx
+    apply distinct hi hj
+    refine Prod.ext he ?_
+    apply Fin.ext
+    change 2 * ((events i).horizon % 210) + (events i).hit % 2 =
+      2 * ((events j).horizon % 210) + (events j).hit % 2
+    rw [hC, hp]
+  calc
+    (∑ i ∈ selected, cost i) ≤ ∑ i ∈ selected, weight (encode i).1 := Finset.sum_le_sum bounded
+    _ = ∑ x ∈ selected.image encode, weight x.1 :=
+      by rw [Finset.sum_image hinj]
+    _ ≤ ∑ x ∈ codes, weight x.1 := Finset.sum_le_sum_of_subset hsubset
+    _ = ∑ e ∈ increments, startupPhaseSlots210 e * weight e := by
+      unfold codes
+      simp [Finset.sum_sigma, Finset.sum_const, Finset.card_range]
+
 namespace ResidualPhaseTrace210
 
 variable {s sf n first : Nat} {balance : Int}
 variable (trace : ResidualPhaseTrace210 s sf [] n first balance)
 
-set_option maxHeartbeats 800000 in
 theorem refined_startup_cost_le : trace.startupCost ≤ 6181254 := by
-  classical
-  let codes := residualStartupIncrements210.sigma (fun e => Finset.range (startupPhaseSlots210 e))
-  let encode (i : Fin n) : Σ _e : Nat, Nat :=
-    ⟨d (trace.event i).hit, startupPhaseIndex210 (trace.event i)⟩
-  have hsubset : trace.startup.image encode ⊆ codes := by
-    intro x hx
-    obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp hx
+  rw [← residual_startup_weight_total210]
+  apply startup_sum_le_of_weights trace.event trace.startup residualStartupIncrements210
+    (fun i => (trace.event i).cost.toNat) residualStartupWeight210
+  · intro i hi
     have hb := (trace.startup_bounds hi).1
-    have hpos := trace.startup_positive hi
-    have hstep := (trace.event i).step.2.2.2.1
     have hr : 3 ≤ (trace.event i).hit := by
       have := (trace.event i).step.1.1
       have := (trace.event i).step.2.1
       omega
-    have he : d (trace.event i).hit ∈ residualStartupIncrements210 := by
-      unfold residualStartupIncrements210
-      exact Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), hstep,
-        d_mod_two_eq_one_of_three_le hr, (trace.event i).positive_unsupported hpos⟩
-    exact Finset.mem_sigma.mpr ⟨he, Finset.mem_range.mpr (startup_phase_index_lt (trace.event i))⟩
-  have hinj : Set.InjOn encode (trace.startup : Set (Fin n)) := by
-    intro i hi j hj h
-    have he := congrArg Sigma.fst h
-    have hidx := congrArg (fun x : Σ _e : Nat, Nat => x.2) h
-    change d (trace.event i).hit = d (trace.event j).hit at he
-    obtain ⟨hC, hp⟩ := startup_phase_index_eq he hidx
+    unfold residualStartupIncrements210
+    exact Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), (trace.event i).step.2.2.2.1,
+      d_mod_two_eq_one_of_three_le hr, (trace.event i).positive_unsupported (trace.startup_positive hi)⟩
+  · intro i hi j hj h
+    change (trace.event i).phaseKey = (trace.event j).phaseKey at h
     apply trace.startup_unique hi hj
     apply Fin.ext
-    change (420 * d (trace.event i).hit + (2 * ((trace.event i).horizon % 210) + (trace.event i).hit % 2)) %
-        (631 * 420) =
-      (420 * d (trace.event j).hit + (2 * ((trace.event j).horizon % 210) + (trace.event j).hit % 2)) %
-        (631 * 420)
-    rw [he, hC, hp]
-  calc
-    trace.startupCost ≤ ∑ i ∈ trace.startup, residualStartupWeight210 (encode i).1 :=
-      Finset.sum_le_sum fun i hi =>
-        residual_phase_startup_weight210 (trace.event i) (trace.startup_not_reused_long hi)
-          (trace.startup_positive hi)
-    _ = ∑ x ∈ trace.startup.image encode, residualStartupWeight210 x.1 :=
-      by rw [Finset.sum_image hinj]
-    _ ≤ ∑ x ∈ codes, residualStartupWeight210 x.1 := Finset.sum_le_sum_of_subset hsubset
-    _ = 6181254 := by
-      unfold codes
-      rw [Finset.sum_sigma]
-      simpa [Finset.sum_const, Finset.card_range, nsmul_eq_mul] using residual_startup_weight_total210
+    change (420 * (trace.event i).phaseKey.1 + (trace.event i).phaseKey.2.val) % (631 * 420) =
+      (420 * (trace.event j).phaseKey.1 + (trace.event j).phaseKey.2.val) % (631 * 420)
+    rw [h]
+  · intro i hi
+    exact residual_phase_startup_weight210 (trace.event i) (trace.startup_not_reused_long hi)
+      (trace.startup_positive hi)
+
+theorem adjusted_startup_cost_le : trace.adjustedStartupCost ≤ 4651452 := by
+  rw [← adjusted_startup_weight_total210]
+  apply startup_sum_le_of_weights trace.event trace.adjustedStartup adjustedStartupIncrements210
+    (fun i => (trace.event i).adjustedCost.toNat) adjustedStartupWeight210
+  · intro i hi
+    have hpos := trace.adjusted_startup_positive hi
+    have hb := (adjusted_phase_cost_weight210 (trace.event i) (trace.adjusted_startup_not_reused hi) hpos).1
+    have hr : 3 ≤ (trace.event i).hit := by
+      have := (trace.event i).step.1.1
+      have := (trace.event i).step.2.1
+      omega
+    unfold adjustedStartupIncrements210
+    exact Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), (trace.event i).step.2.2.2.1,
+      d_mod_two_eq_one_of_three_le hr, (trace.event i).adjusted_cost_positive_unsupported hpos⟩
+  · intro i hi j hj h
+    exact trace.adjusted_startup_unique hi hj h
+  · intro i hi
+    exact (adjusted_phase_cost_weight210 (trace.event i) (trace.adjusted_startup_not_reused hi)
+      (trace.adjusted_startup_positive hi)).2
 
 end ResidualPhaseTrace210
 

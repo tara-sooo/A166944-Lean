@@ -159,6 +159,19 @@ slack when comparing the remaining signed sum to the first-crossing
 budget. The mixed-key bound and the remaining signed sum on arbitrary
 actual crossing prefixes are open.
 
+`ResidualAdjustedCosts210.lean` separates first travel from the
+scaled signed sum. The new startup bound is 4,651,452, and additional
+repeated positive costs have their own same-key intervals.
+`ResidualGrowthWindows210.lean` applies minimal-deficit reasoning to
+growth plus enclosed negative costs. First-hit residues narrow two
+long-prime requests in a deficient interval to 15 prime pairs and
+width at most 5,276. A single adjusted request in a minimal deficit
+requires increment 9 and width 630 or 1,260, or increment 25 and
+width 1,050. If the adjusted window inequalities hold, the existing
+sublinear first-phase bound pays for the remaining first travel for
+sufficiently large records. The general window inequalities and the
+first-travel bound down to the verified finite range remain open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
