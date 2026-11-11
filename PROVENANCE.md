@@ -1499,3 +1499,21 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --sc
 
 Lean 4.33.1 builds the selected modules. The audit of 34 declarations
 uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Two further certified record replays, 2026-11-12 JST
+
+Starting from `3682029d1e486f0485ed843b79e9edfee71b4aa7`, the first
+replay has 53 nonunit events after `M=91793059`. Its terminal horizon
+is 183616422 and its next record is 183616423 at index 183616425.
+The second replay has five nonunit events. It ends at horizon
+367232910 and reaches record 367232911 at index 367232913.
+`record_index_and_twin_prime_of_le_367232911` proves the position and
+twin-primality statements for every strict record `5 < R ≤ 367232911`.
+`twin_travel_from_367232911` transports the remaining travel hypothesis
+from the last certified record to the existing unrestricted reduction.
+
+The independent recurrence in `diagnostics/generate_record_replays.py`
+through index 367232913 reproduces both terminal horizons and all 58
+nonunit indices. `lake build A166944.VerifiedRecordExtension` and the
+audit of the six added declarations pass on Lean 4.33.1 with only
+`propext`, `Classical.choice`, and `Quot.sound`.

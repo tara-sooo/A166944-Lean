@@ -61,9 +61,13 @@ The replay certificates establish the horizon bound for canonical
 previous records `968 ≤ M < 22933441` and the stronger short-travel
 bound on the interval from `M=22933441` to its next record.
 `VerifiedFiftyMillionBridge.lean` checks the 37-event replay from that
-next record, `45895573`, to `91793059` at index `91793061`. Together
-these certificates reduce the unrestricted targets to short travel
-from canonical greater twin primes `M ≥ 50000000`. `TravelResidues.lean`
+next record, `45895573`, to `91793059` at index `91793061`.
+`VerifiedRecordExtension.lean` checks the next two replays with 53 and
+5 nonunit events. It proves the position and twin-primality statements
+for all strict records `5 < R ≤ 367232911`. The travel bridge
+`twin_travel_from_367232911` reduces the unrestricted targets to short
+travel from canonical greater twin primes `M ≥ 367232911`.
+`TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in
 composite increments by horizon growth and gives a necessary amount of

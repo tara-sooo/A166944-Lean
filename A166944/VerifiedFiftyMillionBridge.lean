@@ -55,10 +55,18 @@ private theorem fiftyPrefix_accepted :
   simp only [recordPrefixCheck, Bool.and_eq_true]
   exact ⟨⟨fiftyReplay_accepted, fiftyReturn_accepted⟩, by decide⟩
 
-theorem records_verified_through_91793061 : RecordsVerifiedThrough 91793061 :=
-  (recordPrefixCheck_sound [(91793058, 9580, fiftyMillionHits)] (by decide : 5 < 45895573)
+private theorem fiftyPrefix_verified :
+    d 91793061 = 91793059 ∧ IsAttainedPreviousMaximum 91793059 91793061 ∧
+      RecordsVerifiedThrough 91793061 :=
+  recordPrefixCheck_sound [(91793058, 9580, fiftyMillionHits)] (by decide : 5 < 45895573)
     verified_record_at_45895573 verified_maximum_at_45895573 records_verified_through_45895575
-    fiftyPrefix_accepted).2.2
+    fiftyPrefix_accepted
+
+theorem verified_maximum_at_91793059 : IsAttainedPreviousMaximum 91793059 91793061 :=
+  fiftyPrefix_verified.2.1
+
+theorem records_verified_through_91793061 : RecordsVerifiedThrough 91793061 :=
+  fiftyPrefix_verified.2.2
 
 theorem record_index_and_factors_of_le_91793059 {R n : Nat}
     (hR : 5 < R) (hbound : R ≤ 91793059) (hn : 2 ≤ n) (hd : d n = R)
