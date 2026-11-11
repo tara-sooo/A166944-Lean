@@ -226,10 +226,11 @@ int next_hit(int index, int horizon, const std::vector<uint16_t>& factor) {
         while (term > 1) {
             int p = factor[term / 2];
             if (!p) p = term;
-            const int residue = odd ? p + 2 : 0;
-            const int period = 2 * p;
-            const int candidate = index + 1 + (residue - (index + 1) % period + period) % period;
-            earliest = std::min(earliest, candidate);
+            const int64_t residue = odd ? int64_t(p) + 2 : 0;
+            const int64_t period = 2LL * p;
+            const int64_t next = int64_t(index) + 1;
+            const int64_t candidate = next + (residue - next % period + period) % period;
+            if (candidate < earliest) earliest = static_cast<int>(candidate);
             do {
                 term /= p;
             } while (term % p == 0);
@@ -238,13 +239,98 @@ int next_hit(int index, int horizon, const std::vector<uint16_t>& factor) {
     return earliest;
 }
 
+struct GrowthPrefix {
+    int record = 0, index = 0, horizon = 0, growth = 0, large_gap_growth = 0, events = 0;
+
+    void print(const char* label) const {
+        if (!record) return;
+        std::cout << label << " M=" << record << " s=" << index << " C=" << horizon
+                  << " G=" << growth << " H=" << large_gap_growth << " events=" << events << '\n';
+    }
+};
+
+int crossing_growth_search(int lower, int limit) {
+    if (lower < 13 || limit < lower || limit > (INT32_MAX - 10) / 3) {
+        std::cerr << "Invalid interval for --crossing-growth\n";
+        return 2;
+    }
+    const auto factor = odd_factors(3 * limit + 10);
+    int64_t starts = 0, prefixes = 0, legal_hits = 0, large_growth = 0, remaining = 0;
+    int64_t quiet_stops = 0, cap_stops = 0, crossing_stops = 0, event_limit_stops = 0;
+    GrowthPrefix peak_growth, peak_large_gap_growth, first_large_growth, first_remaining;
+    for (int record = lower + (7 - lower % 6) % 6; record <= limit; record += 6) {
+        if (factor[record / 2] || factor[(record - 2) / 2]) continue;
+        ++starts;
+        const int start = record + 2, initial_horizon = 2 * record - 2;
+        int index = start, horizon = initial_horizon, large_gap_growth = 0;
+        for (int events = 0; ; ++events) {
+            const int growth = horizon - initial_horizon;
+            const int travel = index - start;
+            const GrowthPrefix prefix{record, index, horizon, growth, large_gap_growth, events};
+            assert(large_gap_growth <= growth);
+            assert(horizon <= 2LL * index && horizon <= 3 * record + 4);
+            assert(2LL * travel <= 5LL * growth + 2);
+            assert(6LL * travel <= 2LL * growth + 13LL * large_gap_growth + 6);
+            ++prefixes;
+            if (!peak_growth.record || 1LL * growth * peak_growth.record > 1LL * peak_growth.growth * record)
+                peak_growth = prefix;
+            if (!peak_large_gap_growth.record ||
+                1LL * large_gap_growth * peak_large_gap_growth.record > 1LL * peak_large_gap_growth.large_gap_growth * record)
+                peak_large_gap_growth = prefix;
+            if (150LL * growth > record) {
+                ++large_growth;
+                if (!first_large_growth.record) first_large_growth = prefix;
+            }
+            if (events == 3000) { ++event_limit_stops; break; }
+            const int hit = next_hit(index, horizon, factor);
+            if (hit > horizon) { ++quiet_stops; break; }
+            const int increment = std::gcd(hit % 2 ? hit - 2 : hit, horizon + (hit % 2 ? 1 : -1));
+            if (increment > record) { ++cap_stops; break; }
+            const int gap = hit - index;
+            const bool candidate = record < 5LL * growth + 2LL * gap + 2 &&
+                record < 13LL * large_gap_growth + 6LL * gap + 16;
+            ++legal_hits;
+            if (candidate) {
+                ++remaining;
+                if (!first_remaining.record) first_remaining = prefix;
+            }
+            if (2LL * (hit - start) > record) {
+                assert(candidate);
+                ++crossing_stops;
+                prefix.print("First travel crossing");
+                std::cout << "next hit=" << hit << " gap=" << gap << " increment=" << increment << '\n';
+                break;
+            }
+            const int increase = increment - 1;
+            if (increase < 3LL * (gap + 1)) {
+                assert((gap <= 10 && increment <= 33) ||
+                    (gap > 10 && !factor[increment / 2] && 1LL * (increment - 4) * increment < 6LL * (horizon + 1)));
+                large_gap_growth += increase;
+            }
+            index = hit;
+            horizon += increase;
+        }
+    }
+    std::cout << "Synthetic starts=" << starts << " prefixes=" << prefixes << " legal next hits=" << legal_hits
+              << " large-growth prefixes=" << large_growth << " growth candidates=" << remaining << '\n'
+              << "Quiet stops=" << quiet_stops << " cap stops=" << cap_stops << " crossing stops=" << crossing_stops
+              << " event-limit stops=" << event_limit_stops << '\n';
+    peak_growth.print("Largest G/M");
+    peak_large_gap_growth.print("Largest H/M");
+    first_large_growth.print("First prefix with 150*G > M");
+    first_remaining.print("First prefix meeting both growth conditions");
+    return 0;
+}
+
 int main(int argc, char** argv) {
+    if (argc == 4 && std::string(argv[1]) == "--crossing-growth")
+        return crossing_growth_search(std::stoi(argv[2]), std::stoi(argv[3]));
     const bool check_half_reserve = argc == 5 && std::string(argv[4]) == "--residual-reserve";
     const bool residual = argc == 5 && (std::string(argv[4]) == "--residual" || check_half_reserve);
     const bool funded = (argc == 4 || argc == 5 || argc == 6) && std::string(argv[2]) == "--funded";
     if ((argc != 2 && !funded) || (argc == 5 && !residual) ||
         (argc == 6 && std::string(argv[4]) != "--growth-charge")) {
-        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER [--growth-charge 2|4 | --residual | --residual-reserve]] | --table\n";
+        std::cerr << "Usage: travel_credit_search LIMIT [--funded MULTIPLIER [--growth-charge 2|4 | --residual | --residual-reserve]] | --table | --crossing-growth LOWER LIMIT\n";
         return 2;
     }
     const int multiplier = funded ? std::stoi(argv[3]) : 0;

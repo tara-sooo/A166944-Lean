@@ -204,9 +204,18 @@ enclosed credit.
 `ResidualFirstPayment210.lean` bounds the full rebalanced net cost by
 `W ≤ 146*G`, where `G` is the actual horizon growth along the prefix.
 For `M ≥ 50000000`, `rebalanced_crossing_budget_of_small_growth210`
-proves the crossing inequality whenever `150*G ≤ M`. With the finite
-travel bridge, the direct crossing route now needs the case
-`M ≥ 367232911` and `150*G > M`.
+proves the crossing inequality whenever `150*G ≤ M`.
+
+`RebalancedCrossingGrowth210.lean` uses a potential of at most two
+modulo six to bound the actual travel `t` by `6*t ≤ 2*G+13*H+6`.
+Here `H` is the growth from events with `e-1 < 3*(gap+1)`.
+A first crossing with gap `g` requires `M < 5*G+2*g+2` and
+`M < 13*H+6*g+16`. The square-root gap bound implies `100*M < 501*G`
+and `M < 14*H`. `RebalancedRemainingCrossingCondition210` asks for
+`W+24*g+11*G+V_start < 12*(M+1)+V_end` on the actual crossings
+meeting these constraints from `M ≥ 367232911`. The existing finite
+travel bridge and the new reduction give `Target` from this bound.
+The signed bound on the remaining crossings is open.
 
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.

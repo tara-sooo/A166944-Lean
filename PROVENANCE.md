@@ -1536,3 +1536,47 @@ lake build A166944.Attempt A166944.ResidualFirstPayment210 A166944.VerifiedRecor
 
 The audit of all nine declarations from the two changes uses only
 `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Growth constraints at the first travel crossing, 2026-11-12 JST
+
+From `c72443c4dbd4319d56c2d0d709a05e24a5a8bb79`, a potential `U`
+takes value two at `(s mod 6, C mod 6) = (2,0), (5,2), (0,4)` and zero
+elsewhere. The parity and divisibility of increments three and five
+give `2*g+U_after ≤ 5*(e-1)+U_before` at every actual first hit. For
+`e ≥ 7` the bound follows from `g ≤ 2*e` and `U ≤ 2`.
+
+Let `H` be the sum of `e-1` at events with `e-1 < 3*(gap+1)`. At all
+other events `6*gap+3*U_after-3*U_before ≤ 2*(e-1)`. The telescoped
+bound `6*t ≤ 2*G+13*H+6` gives the two necessary growth inequalities
+for an actual first crossing. Only gaps at most ten with `e ≤ 33`,
+or longer gaps ending at a prime with `(e-4)*e < 6*(C+1)`, contribute
+to `H`. `growth_at_large_gaps_le_count` also bounds `H` by their count
+times an increment cutoff. The square-root gap bound gives
+`100*M < 501*G` and `M < 14*H`.
+
+The exact signed lower bound at a first crossing retains both endpoint
+potentials and the actual `11*G` charge. Its strict reverse on the
+remaining crossings above the finite prefix implies the full target.
+The reverse inequality remains open.
+
+The bounded native scan over synthetic twin-shaped starts in
+`[367232911,377232911]` checks 33,855 starts, 2,420,497 prefixes and
+2,386,642 legal next hits. Every start stops at a quiet return and no
+prefix has `150*G > M`. The largest `G/M` is `307236/375243109` and
+the largest `H/M` is `184602/375243163`. Independent trial division
+with `travel_residue_probe.py` reproduces both extremal traces and
+the synthetic crossing controls at `M=13` and `M=43`. The existing
+residual-reserve diagnostic through 20,000 gives identical output
+before and after the native change.
+
+```sh
+lake build A166944.Attempt A166944.ResidualFirstPayment210 A166944.VerifiedRecordExtension A166944.ResidualRebalancedPairOffsets210 A166944.RebalancedCrossingGrowth210
+c++ -O2 -Wall -Wextra -Werror -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search --crossing-growth 13 100000
+/tmp/travel_credit_search --crossing-growth 367232911 377232911
+```
+
+Lean 4.33.1 accepts the eight added theorems. The axiom audit reports
+only `propext`, `Classical.choice`, and `Quot.sound`. The composition
+with the existing position, primality and unboundedness theorems is
+also checked.
