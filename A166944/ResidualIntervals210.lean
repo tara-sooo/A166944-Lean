@@ -88,14 +88,17 @@ theorem demand_anchor_lt_key {i : Fin n} (h : 0 < trace.demand i) :
     simp [demand, hs] at h
   exact trace.candidate_lt_and_key (trace.anchor_mem ha)
 
-def reuse (i : Fin n) (h : 0 < trace.demand i) : SamePhaseCreditInterval210 := by
-  have hanchor := trace.demand_anchor_lt_key h
-  let prior := trace.event (trace.anchor i)
-  let current := trace.event i
+def samePhaseInterval {i j : Fin n} (ordered : i < j)
+    (sameKey : (trace.event i).phaseKey = (trace.event j).phaseKey) : SamePhaseCreditInterval210 := by
+  let prior := trace.event i
+  let current := trace.event j
   exact ⟨prior.start, prior.horizon, prior.hit, prior.nextHorizon,
     current.start, current.horizon, current.hit, current.nextHorizon,
-    prior.step, current.step, trace.ordered hanchor.1, congrArg Prod.fst hanchor.2,
-    congrArg Prod.snd hanchor.2⟩
+    prior.step, current.step, trace.ordered ordered, congrArg Prod.fst sameKey,
+    congrArg Prod.snd sameKey⟩
+
+def reuse (i : Fin n) (h : 0 < trace.demand i) : SamePhaseCreditInterval210 :=
+  trace.samePhaseInterval (trace.demand_anchor_lt_key h).1 (trace.demand_anchor_lt_key h).2
 
 private theorem startup_positive {i : Fin n} (hi : i ∈ trace.startup) :
     0 < (trace.event i).cost := (Finset.mem_filter.mp hi).2.1

@@ -120,17 +120,17 @@ private theorem coprime_210_of_no_proper_factor {e : Nat} (he : 1 < e)
   have hg1 : 1 < g := by omega
   exact hprime ⟨g, lt_of_le_of_ne hle hne⟩ hg1 hd
 
-private theorem long_prime_reuse_width (w : SamePhaseCreditInterval210)
+theorem unsupported_prime_reuse_drift (w : SamePhaseCreditInterval210)
     (hprime : NoProperFactor (d w.r)) (hunsupported : ¬ d w.r ∣ 210) :
-    210 * d w.r ≤ w.H - w.C := by
+    210 * d w.r ∣ w.H - w.C ∧ 210 * d w.r ≤ w.H - w.C := by
   have he := w.earlier.2.2.2.1
   have ⟨_, hperiod, hspan, _⟩ := same_phase_credit_interval_constraints210 w
   have hpos := Nat.lcm_pos (by decide : 0 < 210) (by omega : 0 < 2 * d w.r)
   have hed : d w.r ∣ Nat.lcm 210 (2 * d w.r) :=
     (show d w.r ∣ 2 * d w.r from ⟨2, Nat.mul_comm _ _⟩).trans (Nat.dvd_lcm_right _ _)
-  exact Nat.le_of_dvd (by omega)
-    ((coprime_210_of_no_proper_factor he hprime hunsupported).mul_dvd_of_dvd_of_dvd
-      ((Nat.dvd_lcm_left _ _).trans hperiod) (hed.trans hperiod))
+  have hd := (coprime_210_of_no_proper_factor he hprime hunsupported).mul_dvd_of_dvd_of_dvd
+    ((Nat.dvd_lcm_left _ _).trans hperiod) (hed.trans hperiod)
+  exact ⟨hd, Nat.le_of_dvd (by omega) hd⟩
 
 private theorem residual_cost_le_increment (event : ResidualPhaseEvent210) (h : ¬ d event.hit ∣ 210) :
     event.cost ≤ 37 * (d event.hit : Int) + 1326 := by
@@ -190,7 +190,7 @@ private theorem one_middle_event_bounds {j k : Fin n} (positive : 0 < trace.dema
   by_cases hlong : (trace.event j).LongPrime ∧ (trace.event j).phaseKey ∈ (trace.event j).seen
   · have hunsupported := (trace.event j).positive_unsupported hpos
     have hprime := hlong.1.2
-    have hwide := long_prime_reuse_width w (heq.symm ▸ hprime) (heq.symm ▸ hunsupported)
+    have hwide := (unsupported_prime_reuse_drift w (heq.symm ▸ hprime) (heq.symm ▸ hunsupported)).2
     have hlast := residual_cost_le_increment (trace.event j) hunsupported
     have hevent := (trace.event j).step.2.2.2.1
     have hthree : 3 ≤ d (trace.event j).hit := by
@@ -222,12 +222,12 @@ theorem one_middle_event_pays {j k : Fin n} (positive : 0 < trace.demand j)
 /-- In a deficient window spanning at most three events, the two
 endpoints belong to the only positive request in the window. Its
 middle event must be a long prime with an earlier use of its phase. -/
-theorem short_deficit_middle_reused_long {i j : Fin n} (hshort : j.val ≤ i.val + 2)
+theorem short_deficit_middle_and_request {i j : Fin n} (hshort : j.val ≤ i.val + 2)
     (deficit : trace.Deficit (trace.right i) (trace.right j)) :
     ∃ k : Fin n, k.val = i.val + 1 ∧ j.val = k.val + 1 ∧ 463 ≤ d (trace.event k).hit ∧
       d (trace.event i).hit < d (trace.event k).hit ∧
-      (trace.event k).LongPrime ∧
-      (trace.event k).phaseKey ∈ (trace.event k).seen := by
+      (trace.event k).LongPrime ∧ (trace.event k).phaseKey ∈ (trace.event k).seen ∧
+      0 < trace.demand j ∧ trace.anchor j = i ∧ d (trace.event j).hit = d (trace.event i).hit := by
   classical
   let requests := creditWindowRequests210 trace.left trace.right (trace.right i) (trace.right j)
   let sources := creditWindowSources210 trace.time (trace.right i) (trace.right j)
@@ -280,28 +280,36 @@ theorem short_deficit_middle_reused_long {i j : Fin n} (hshort : j.val ≤ i.val
   have hreuse := (trace.reuse j hpos).same_increment
   change d (trace.event (trace.anchor j)).hit = d (trace.event j).hit at hreuse
   rw [hanchor] at hreuse
-  refine ⟨k, rfl, hjk, hsize, hreuse ▸ hinc, ?_⟩
-  by_contra hnew
-  have hpaid := trace.one_middle_event_pays hpos hk hjk hnew
-  omega
+  have hreused : (trace.event k).LongPrime ∧ (trace.event k).phaseKey ∈ (trace.event k).seen := by
+    by_contra hnew
+    have hpaid := trace.one_middle_event_pays hpos hk hjk hnew
+    omega
+  exact ⟨k, rfl, hjk, hsize, hreuse ▸ hinc, hreused.1, hreused.2, hpos, hanchor, hreuse.symm⟩
 
-theorem short_deficit_requires_large_prior_drift {i j : Fin n} (hshort : j.val ≤ i.val + 2)
+theorem short_deficit_middle_reused_long {i j : Fin n} (hshort : j.val ≤ i.val + 2)
     (deficit : trace.Deficit (trace.right i) (trace.right j)) :
-    ∃ k l : Fin n, k < i ∧ l.val = i.val + 1 ∧
-      97230 ≤ (trace.event l).horizon - (trace.event k).horizon := by
-  obtain ⟨l, hl, _, hsize, hinc, hlong, hseen⟩ := trace.short_deficit_middle_reused_long hshort deficit
+    ∃ k : Fin n, k.val = i.val + 1 ∧ j.val = k.val + 1 ∧ 463 ≤ d (trace.event k).hit ∧
+      d (trace.event i).hit < d (trace.event k).hit ∧
+      (trace.event k).LongPrime ∧ (trace.event k).phaseKey ∈ (trace.event k).seen := by
+  obtain ⟨k, hl, hr, hsize, hinc, hlong, hseen, _, _, _⟩ :=
+    trace.short_deficit_middle_and_request hshort deficit
+  exact ⟨k, hl, hr, hsize, hinc, hlong, hseen⟩
+
+theorem short_deficit_prior_prime_drift {i j : Fin n} (hshort : j.val ≤ i.val + 2)
+    (deficit : trace.Deficit (trace.right i) (trace.right j)) :
+    ∃ k l : Fin n, k < i ∧ l.val = i.val + 1 ∧ j.val = l.val + 1 ∧
+      463 ≤ d (trace.event l).hit ∧ d (trace.event j).hit < d (trace.event l).hit ∧
+      210 * d (trace.event l).hit ≤ (trace.event l).horizon - (trace.event k).horizon := by
+  obtain ⟨l, hl, hr, hsize, hinc, hlong, hseen, _, _, hsame⟩ :=
+    trace.short_deficit_middle_and_request hshort deficit
   obtain ⟨k, hkl, _, hkey⟩ := ((trace.seen_iff l _).mp hseen).resolve_left (by simp)
-  let earlier := trace.event k
-  let later := trace.event l
-  let w : SamePhaseCreditInterval210 := ⟨earlier.start, earlier.horizon, earlier.hit, earlier.nextHorizon,
-    later.start, later.horizon, later.hit, later.nextHorizon, earlier.step, later.step,
-    trace.ordered hkl, congrArg Prod.fst hkey.symm, congrArg Prod.snd hkey.symm⟩
+  let w := trace.samePhaseInterval hkl hkey.symm
   have hlarge : 463 ≤ d w.r := w.same_increment.symm ▸ hsize
   have hprime : NoProperFactor (d w.r) := w.same_increment.symm ▸ hlong.2
   have hunsupported : ¬ d w.r ∣ 210 := fun hd => by
     have := Nat.le_of_dvd (by decide : 0 < 210) hd
     omega
-  have hspan := long_prime_reuse_width w hprime hunsupported
+  have hspan := (unsupported_prime_reuse_drift w hprime hunsupported).2
   have hki : k < i := by
     by_contra h
     have heq : k = i := Fin.ext (by omega)
@@ -309,8 +317,14 @@ theorem short_deficit_requires_large_prior_drift {i j : Fin n} (hshort : j.val �
     change d (trace.event l).hit = d (trace.event k).hit at hevent
     rw [heq] at hevent
     omega
-  refine ⟨k, l, hki, hl, ?_⟩
-  change 97230 ≤ w.H - w.C
-  omega
+  rw [w.same_increment] at hspan
+  exact ⟨k, l, hki, hl, hr, hsize, hsame ▸ hinc, hspan⟩
+
+theorem short_deficit_requires_large_prior_drift {i j : Fin n} (hshort : j.val ≤ i.val + 2)
+    (deficit : trace.Deficit (trace.right i) (trace.right j)) :
+    ∃ k l : Fin n, k < i ∧ l.val = i.val + 1 ∧
+      97230 ≤ (trace.event l).horizon - (trace.event k).horizon := by
+  obtain ⟨k, l, hki, hl, _, hsize, _, hspan⟩ := trace.short_deficit_prior_prime_drift hshort deficit
+  exact ⟨k, l, hki, hl, by omega⟩
 
 end A166944Research.ResidualPhaseTrace210

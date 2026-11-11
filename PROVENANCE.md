@@ -1147,3 +1147,86 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --
 
 The Lean 4.33.1 build and audit of 40 declarations pass, using only
 `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Overlapping prime reuse intervals and a two-thirds growth budget, 2026-11-11 JST
+
+Codex continued from `e34d06bc3377df1f88b8b1a0467fa6048414332d`.
+`ResidualNetContributions210.lean` defines each event's net cost as
+its signed residual cost plus 24 times its first-phase gap. The sum
+is exactly `W=24*F_phase+S`. Outside the increments dividing 210, the
+first-phase term cancels, leaving `24*g+ΔV-11*(e-1)`. The positive
+part is at most `37*e+1326`. The strengthened three-event deficit
+witness retains the right request and gives a preceding reuse of its
+middle prime `f≥463` with drift at least `210*f`. Since the right
+increment is smaller than `f`, twice their combined positive net
+cost is at most that drift.
+
+`ResidualReuseOverlap210.lean` uses half-open intervals of horizon
+growth. The union of crossing intervals counts the shared portion
+once. Two reuse costs fit in half their union if the larger
+increment is at least 86. Distinct primes `p,q` with equal drift
+force that drift to be a multiple of `210*p*q`, which pays the two
+costs even at small primes. This also pays more events if their
+increments are bounded by `max(p,q)` and twice their number is at
+most `min(p,q)`. The drifts are equal when the two flank widths
+differ by less than 210, in particular for consecutive matching
+flanks. With two thirds of the growth, an individual prime of at
+least 13 or two primes with maximum at least 41 fit by the pointwise
+cost and reuse-period bounds.
+
+`ResidualGrowthAllocation210.lean` checks the load from all active
+windows at each left endpoint and sums capacities with no duplicate
+growth units. It also sums signed costs over disjoint growth blocks.
+A block `[left,right)` can select any costs with pre-event horizons
+in `(left,right]`, so a negative contribution belongs to at most one
+block. The unselected costs stay in the signed remainder.
+`TwinCrossingBudget210.lean` uses the actual gap `g` and the cap through
+the candidate crossing event. Its open condition asks only for
+`W+24*g+1315 ≤ M` at such crossings and implies the original target
+and unbounded twin primes. The prior signed reserve implies this
+condition. For `G=C-(2*M-2)≤M+6` and `M≥50000000`, the arithmetic
+bound `3*W≤2*G+47652293` suffices using `1536*Q(M)≤M`. Thus the
+two-thirds block bounds can be combined with a bound of 47652293
+on three times the remaining signed sum. These uniform bounds on
+actual prefixes are open.
+
+The bounded native search through 100000000 had 36065 positive
+long-prime reuse windows, 11340 overlapping pairs and 6577 crossings
+from 440310 synthetic canonical-shaped starts. Three overlapping
+pairs have distinct primes and equal widths. Half of the union width
+fails to cover the two positive costs in 83 pairs. The lowest
+margin is -2132 at M69921739, using increments 11 and 13, costs 1276
+and 1260 and union width 2940. Negative net costs inside that interval
+sum to -17940, giving a margin of 33748 when included. The maximum
+uniform load at this start is exactly 34556/15015, with rounded
+scaled load 2301433/1000000. There are 452 overloaded starts and a
+maximum depth of 11.
+
+Merging overlapping windows on each complete capped trace gives
+27846 blocks. Charging every signed event in each block to half its
+growth fails 23780 times. Selecting the positive long-prime reuse
+costs and all negative net costs within each block leaves one
+failure, a single increment 13 at M41453053. Its width is 2730 and
+its positive cost 1380 with no negative net cost inside, giving
+margin -30. That start is below the 50M threshold.
+Rechecking the blocks every time a reuse window arrives gives 38115
+component checks at the two-thirds rate, all nonnegative with
+minimum 1200 at M89666641 and horizon 179336112. The block selection
+stays fixed between these arrivals. For all 12139762 tested prefixes
+from M≥50M, three times the signed remainder is at most 3770442,
+attained at M86278501 and hit 86353653. Trial division independently
+reproduces these reported witnesses on their own traces. The runs
+retain the two cutoff stops and no event-limit stops. These are
+finite tests on synthetic starts.
+
+```sh
+lake build A166944.Attempt A166944.ResidualGrowthAllocation210 A166944.TwinCrossingBudget210 A166944.ResidualIntervalBudget210
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 0 --residual-reserve > /tmp/travel_overlap.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py /tmp/travel_overlap.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_half_reserve_probe.py /tmp/travel_overlap.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --residual --native /tmp/travel_credit_search
+```
+
+Lean 4.33.1 builds the selected modules and the audit of 35
+declarations uses only `propext`, `Classical.choice`, and `Quot.sound`.

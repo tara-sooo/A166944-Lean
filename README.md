@@ -128,6 +128,22 @@ open signed bound `2*(24*F_phase+S) ≤ M+47798520` on those prefixes.
 The previous certificate condition implies this bound. The direct
 signed route applies without a separate allocation hypothesis, and the
 finite bridge below its threshold is proved.
+
+`ResidualNetContributions210.lean` writes `W = 24*F_phase+S` as
+an exact sum over events. The middle and final costs of a three-event
+deficit fit in half of the middle prime's earlier reuse drift.
+`ResidualReuseOverlap210.lean` counts the union of crossing prime
+reuse intervals once. Two equal drifts for distinct primes `p,q` are
+divisible by `210*p*q`, in particular when both crossing flanks
+consist of consecutive corresponding events.
+`ResidualGrowthAllocation210.lean` sums signed costs over disjoint
+growth blocks while keeping unassigned costs in a signed remainder.
+`TwinCrossingBudget210.lean` proves that `3*W ≤ 2*G+47652293`, with
+`G` the horizon growth, rules out the first crossing when checked
+on the applicable prefixes with `M ≥ 50000000`. A sufficient
+construction would bound selected signed reuse costs by two thirds
+of their disjoint block widths and bound the remainder. Both
+general bounds remain open.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

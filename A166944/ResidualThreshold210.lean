@@ -14,7 +14,7 @@ namespace A166944Research
 
 set_option maxRecDepth 4096
 
-private theorem fifty_million_sqrt_budget {M : Nat} (hM : 50000000 ≤ M) :
+theorem fifty_million_sqrt_budget {M : Nat} (hM : 50000000 ≤ M) :
     1536 * Nat.sqrt (4 * (3 * M + 4)) ≤ M := by
   let Q := Nat.sqrt (4 * (3 * M + 4))
   change 1536 * Q ≤ M

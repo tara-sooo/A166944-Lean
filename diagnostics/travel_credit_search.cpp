@@ -15,6 +15,174 @@ struct Event {
     int excess;
     int balance;
     bool reused_long_prime;
+    int net_cost;
+};
+
+struct PrimeReuseWindow {
+    int left;
+    int right;
+    int increment;
+    int cost;
+};
+
+struct ReuseOverlapStats {
+    static constexpr int64_t scale = 1000000;
+    int64_t windows = 0, overlapping_pairs = 0, crossings = 0, distinct_equal_width = 0;
+    int64_t short_pairs = 0, overloaded_starts = 0;
+    int64_t minimum_pair_margin = INT64_MAX, maximum_load = 0;
+    int pair_record = 0, pair_horizon = 0, load_record = 0, load_horizon = 0, maximum_depth = 0;
+    int64_t components = 0, short_signed_components = 0, short_reuse_components = 0;
+    int64_t minimum_signed_component = INT64_MAX, minimum_reuse_component = INT64_MAX;
+    int component_record = 0, component_horizon = 0;
+    int64_t prefix_component_checks = 0, short_two_thirds = 0, minimum_two_thirds = INT64_MAX;
+    int two_thirds_record = 0, two_thirds_horizon = 0, two_thirds_prefix = 0;
+    int64_t remainder_checks = 0, maximum_triple_remainder = 0;
+    int remainder_record = 0, remainder_hit = 0;
+
+    void observe(int record, const std::vector<PrimeReuseWindow>& entries, const std::vector<Event>& history) {
+        windows += entries.size();
+        std::vector<std::pair<int, int64_t>> changes;
+        for (size_t i = 0; i < entries.size(); ++i) {
+            const auto& current = entries[i];
+            const int width = current.right - current.left;
+            const int64_t rate = (2 * scale * current.cost + width - 1) / width;
+            changes.emplace_back(current.left, rate);
+            changes.emplace_back(current.right, -rate);
+            for (size_t j = 0; j < i; ++j) {
+                const auto& earlier = entries[j];
+                if (current.left >= earlier.right) continue;
+                ++overlapping_pairs;
+                crossings += earlier.left < current.left;
+                const int64_t margin = current.right - std::min(earlier.left, current.left) -
+                    2LL * (earlier.cost + current.cost);
+                if (std::max(earlier.increment, current.increment) >= 86) assert(margin >= 0);
+                if (width == earlier.right - earlier.left && current.increment != earlier.increment) {
+                    ++distinct_equal_width;
+                    assert(width % (210LL * earlier.increment * current.increment) == 0);
+                    assert(margin >= 0);
+                }
+                short_pairs += margin < 0;
+                if (margin < minimum_pair_margin) {
+                    minimum_pair_margin = margin;
+                    pair_record = record;
+                    pair_horizon = current.right;
+                }
+            }
+        }
+        // Negative changes sort before positive ones at a shared endpoint.
+        std::sort(changes.begin(), changes.end());
+        int64_t load = 0;
+        int depth = 0;
+        bool overloaded = false;
+        for (const auto& change : changes) {
+            load += change.second;
+            depth += change.second > 0 ? 1 : -1;
+            maximum_depth = std::max(maximum_depth, depth);
+            overloaded |= load > scale;
+            if (load > maximum_load) {
+                maximum_load = load;
+                load_record = record;
+                load_horizon = change.first;
+            }
+        }
+        assert(load == 0 && depth == 0);
+        overloaded_starts += overloaded;
+
+        int64_t net = 0, covered = 0;
+        size_t count = 0;
+        if (record >= 50000000) ++remainder_checks;
+        for (const auto& event : history) {
+            net += event.net_cost;
+            if (count < entries.size() && entries[count].right == event.horizon) {
+                ++count;
+                covered = observe_components(record, entries, history, count);
+            }
+            if (record >= 50000000) {
+                ++remainder_checks;
+                const int64_t remainder = 3 * (net - covered);
+                if (remainder > maximum_triple_remainder) {
+                    maximum_triple_remainder = remainder;
+                    remainder_record = record;
+                    remainder_hit = event.hit;
+                }
+            }
+        }
+        assert(count == entries.size());
+    }
+
+    int64_t observe_components(int record, const std::vector<PrimeReuseWindow>& entries,
+                              const std::vector<Event>& history, size_t count) {
+        std::vector<PrimeReuseWindow> ordered(entries.begin(), entries.begin() + count);
+        std::sort(ordered.begin(), ordered.end(), [](const auto& a, const auto& b) { return a.left < b.left; });
+        int64_t covered = 0;
+        for (size_t i = 0; i < ordered.size();) {
+            const int left = ordered[i].left;
+            int right = ordered[i].right;
+            int64_t charges = ordered[i].cost;
+            for (++i; i < ordered.size() && ordered[i].left < right; ++i) {
+                right = std::max(right, ordered[i].right);
+                charges += ordered[i].cost;
+            }
+            int64_t signed_cost = 0, negative = 0;
+            auto start = std::upper_bound(history.begin(), history.end(), left,
+                [](int horizon, const Event& event) { return horizon < event.horizon; });
+            for (auto it = start; it != history.end() && it->horizon <= right; ++it) {
+                signed_cost += it->net_cost;
+                negative += std::min(it->net_cost, 0);
+            }
+            const int64_t signed_margin = right - left - 2 * signed_cost;
+            const int64_t reuse_margin = right - left - 2 * (charges + negative);
+            covered += charges + negative;
+            const int64_t two_thirds_margin = 2LL * (right - left) - 3 * (charges + negative);
+            ++prefix_component_checks;
+            short_two_thirds += two_thirds_margin < 0;
+            if (two_thirds_margin < minimum_two_thirds) {
+                minimum_two_thirds = two_thirds_margin;
+                two_thirds_record = record;
+                two_thirds_horizon = right;
+                two_thirds_prefix = entries[count - 1].right;
+            }
+            if (count != entries.size()) continue;
+            ++components;
+            short_signed_components += signed_margin < 0;
+            short_reuse_components += reuse_margin < 0;
+            minimum_signed_component = std::min(minimum_signed_component, signed_margin);
+            if (reuse_margin < minimum_reuse_component) {
+                minimum_reuse_component = reuse_margin;
+                component_record = record;
+                component_horizon = right;
+            }
+        }
+        return covered;
+    }
+
+    void print() const {
+        std::cout << "positive prime reuse windows=" << windows << " overlapping pairs=" << overlapping_pairs
+                  << " crossings=" << crossings << " distinct equal widths=" << distinct_equal_width
+                  << " negative pair margins=" << short_pairs << '\n';
+        if (overlapping_pairs) {
+            std::cout << "minimum overlap pair margin=" << minimum_pair_margin << " record=" << pair_record
+                      << " horizon=" << pair_horizon << '\n';
+        }
+        if (windows) {
+            std::cout << "maximum reuse load=" << maximum_load << " scale=" << scale << " record=" << load_record
+                      << " horizon=" << load_horizon << " maximum depth=" << maximum_depth
+                      << " overloaded starts=" << overloaded_starts << '\n';
+            std::cout << "reuse components=" << components << " negative signed margins=" << short_signed_components
+                      << " minimum signed component margin=" << minimum_signed_component
+                      << " negative reuse margins=" << short_reuse_components << '\n';
+            std::cout << "minimum reuse component margin=" << minimum_reuse_component << " record="
+                      << component_record << " horizon=" << component_horizon << '\n';
+            std::cout << "prefix component checks=" << prefix_component_checks
+                      << " negative two-thirds margins=" << short_two_thirds << '\n';
+            std::cout << "minimum two-thirds margin=" << minimum_two_thirds << " record=" << two_thirds_record
+                      << " horizon=" << two_thirds_horizon << " prefix=" << two_thirds_prefix << '\n';
+        }
+        if (remainder_checks) {
+            std::cout << "remainder checks=" << remainder_checks << " maximum triple remainder="
+                      << maximum_triple_remainder << " record=" << remainder_record << " hit=" << remainder_hit << '\n';
+        }
+    }
 };
 
 std::vector<int> residue_potentials() {
@@ -114,6 +282,7 @@ int main(int argc, char** argv) {
     int signed_record = 0, signed_hit = 0;
     int one_middle = 0, reused_middle = 0;
     int minimum_middle_margin = INT32_MAX, middle_record = 0, middle_hit = 0;
+    ReuseOverlapStats reuse_overlap;
     for (int record = 13; record <= limit; record += 6) {
         if (!is_prime(record) || !is_prime(record - 2)) continue;
         ++starts;
@@ -122,6 +291,7 @@ int main(int argc, char** argv) {
         std::unordered_map<int64_t, int> previous_positive;
         std::vector<Event> history;
         std::vector<std::pair<int, int>> credits;
+        std::vector<PrimeReuseWindow> reuse_windows;
         int64_t first = 0, startup = 0, signed_sum = 0;
         int64_t unused_credit = 0;
         auto reserve_ok = [&](int hit) {
@@ -181,6 +351,12 @@ int main(int argc, char** argv) {
             }
             if (210 % increment) {
                 signed_sum += balance;
+                if (check_half_reserve && previous >= 0 && balance > 0) {
+                    const auto& old = history[previous];
+                    assert((hit - old.hit) % (2 * increment) == 0);
+                    assert((horizon - old.horizon) % (210LL * increment) == 0);
+                    reuse_windows.push_back({old.horizon, horizon, increment, balance});
+                }
                 if (balance < 0) {
                     credits.emplace_back(2 * history.size(), -balance);
                     unused_credit -= balance;
@@ -233,11 +409,14 @@ int main(int argc, char** argv) {
             }
             if (!reserve_ok(hit)) return 1;
             if (long_prime) previous_phase[key] = history.size();
-            history.push_back({hit, horizon, increment, excess, balance, previous >= 0});
+            const int first_gap_cost = long_prime && previous < 0 ? 24 * gap : 0;
+            const int net_cost = first_gap_cost + (210 % increment ? balance : 0);
+            history.push_back({hit, horizon, increment, excess, balance, previous >= 0, net_cost});
             index = hit;
             horizon = updated;
         }
         maximum_startup = std::max(maximum_startup, startup);
+        if (check_half_reserve) reuse_overlap.observe(record, reuse_windows, history);
     }
     std::cout << "synthetic starts=" << starts << " paid demands=" << demands
               << " cutoff stops=" << cutoff_stops << " event-limit stops=" << event_limit_stops
@@ -257,5 +436,6 @@ int main(int argc, char** argv) {
             std::cout << "minimum one-middle margin=" << minimum_middle_margin << " record=" << middle_record
                       << " hit=" << middle_hit << '\n';
         }
+        reuse_overlap.print();
     }
 }
