@@ -11,7 +11,7 @@ intervening growth before it can divide another increment.
 
 namespace A166944Research
 
-private theorem exists_small_factor_of_composite {e : Nat} (he : ¬ NoProperFactor e) :
+theorem exists_small_factor_of_composite {e : Nat} (he : ¬ NoProperFactor e) :
     ∃ f : Nat, 1 < f ∧ f ∣ e ∧ f * f ≤ e := by
   by_cases h : ∃ f : Nat, 1 < f ∧ f ∣ e ∧ f * f ≤ e
   · exact h

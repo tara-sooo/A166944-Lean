@@ -38,9 +38,10 @@ class Source:
     first: int
 
 
-def replay_ledger(record, table, growth_charge=2, *, residual=False):
+def replay_ledger(record, table, growth_charge=2, *, residual=False, hits=None):
     assert growth_charge in (2, 4)
-    _, hits, _ = travel_probe(record)
+    if hits is None:
+        _, hits, _ = travel_probe(record)
     index, horizon = record + 2, 2 * record - 2
     last_long, last_positive, startup_keys = {}, {}, set()
     requests, sources = [], []

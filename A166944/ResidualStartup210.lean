@@ -6,16 +6,6 @@ open Finset
 
 namespace A166944Research
 
-private theorem residual_small_factor {e : Nat} (he : ¬ NoProperFactor e) :
-    ∃ f : Nat, 1 < f ∧ f ∣ e ∧ f * f ≤ e := by
-  by_cases h : ∃ f : Nat, 1 < f ∧ f ∣ e ∧ f * f ≤ e
-  · exact h
-  · exfalso
-    apply he (no_proper_factor_of_no_small_factor (root := Nat.sqrt e) ?_ (Nat.lt_succ_sqrt e))
-    intro f hf hdiv
-    have hroot : f.val ≤ Nat.sqrt e := Nat.le_of_lt_succ f.isLt
-    exact h ⟨f.val, hf, hdiv, (Nat.mul_le_mul hroot hroot).trans (Nat.sqrt_le e)⟩
-
 /-- A startup event has no earlier long prime in its phase. This
 includes a first positive short event following an earlier negative one. -/
 theorem residual_phase_startup_bounds210 {slots s C r C' : Nat}
@@ -60,7 +50,7 @@ theorem residual_phase_startup_bounds210 {slots s C r C' : Nat}
       have hfirst : firstLongPrimePhaseGap phase seen s C r = 0 := by
         simp only [firstLongPrimePhaseGap, if_neg hf]
       rw [hfirst, Nat.sub_zero] at hraw
-      obtain ⟨f, hf, hfd, hsq⟩ := residual_small_factor hp
+      obtain ⟨f, hf, hfd, hsq⟩ := exists_small_factor_of_composite hp
       have hg := moving_horizon_step_gap_le_twice_increment_factor hstep hf hfd
       have hfo : f % 2 = 1 := by
         obtain ⟨k, hk⟩ := hfd

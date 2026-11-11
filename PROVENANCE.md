@@ -1073,3 +1073,77 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_relaxed_cycle_probe.py
 Lean 4.33.1 accepts the 23 new public theorems. Their `#print axioms`
 results are contained in `propext`, `Classical.choice`, and `Quot.sound`.
 The original target and the imports of `A166944.Attempt` are unchanged.
+
+## Actual residual intervals and a direct signed reserve, 2026-11-11 JST
+
+Codex continued from `78c87b2a2a60cccf40812836ddcb52b797891f00`.
+`ResidualEventTrace210.lean` extracts a finite ordered array from an
+actual residual ledger. Each row retains its first-hit proof, prior
+long-prime phase keys, first-phase gap and residual cost. The sums
+equal the input ledger's `F_phase` and `S`. Consecutive rows meet at
+the same recurrence state, and earlier rows account for every
+previously seen phase in an initially empty ledger.
+
+`ResidualIntervals210.lean` uses the latest earlier long-prime event
+of the same key for a reused long prime. Other positive requests use
+the latest positive event of the same key. Positive events without an
+anchor are startups. Their codes are distinct and admissible, and
+each costs at most 1478. Sources are the negative parts of the event
+costs. At zero additional funding, hit timestamps implement exactly
+the eligible ordinal range `anchor < source ≤ request`.
+`ResidualIntervalBudget210.lean` constructs an exact Hall allocation
+if the window inequalities hold. It proves `S+U=startupCost` for the
+resulting certificate and recovers the previous reserve certificate
+from the signed inequality with this exact startup cost.
+
+`ResidualDeficitBounds210.lean` instantiates minimal deficient windows
+on these actual rows. The endpoints are actual hits. Across each
+interior cut there is a positive same-phase request with the full
+index and horizon congruences. Such a request requires at least 630
+horizon drift, since a positive multiple of 210 below 630 would force
+its increment to divide 210. It cannot connect consecutive events.
+For a request with just one intermediate event, the middle increment
+is at least 463 and exceeds the request increment. If the middle is
+short, composite or the first long prime of its phase, its negative
+balance pays the entire request. The composite proof reuses the small
+divisor lemma and charges at most four times its growth to travel.
+Hence a deficient window spanning at most three events needs a
+reused long prime in the middle. Its earlier occurrence is strictly
+before the window, with horizon drift at least `210*463 = 97230` to
+the middle. Longer windows and that remaining repeated-prime case
+are open.
+
+`ResidualThreshold210.lean` isolates the crossing overhead inequality
+`2*(23899260+24*Q(M)+1315)≤M` for `M≥50000000`. Thus
+`2*(24*F_phase+S)≤M+47798520` alone suffices for the crossing budget.
+`TwinSignedReserveTarget210.lean` checks its implication from the older
+allocation and half-reserve condition for any fixed funding multiplier,
+and its implication to unrestricted index, the exact `Target`, and
+unbounded greater twin primes. The signed inequality is still open on
+arbitrary actual short capped prefixes from canonical greater twin
+prime records at or above the threshold.
+
+The bounded native search through 100000000 checks 12139762 relevant
+prefixes from synthetic canonical-shaped starts at or above 50000000.
+The minimum stronger signed margin `M-2*(24*F_phase+S)` is 48546931
+at start 50026063 and hit 50079773. Across all 440310 synthetic starts,
+14 requests have one intervening event, and none of those intermediate
+events is a reused long prime. The least one-middle payment margin is
+29862 at start 62782879 and hit 62787155. Trial division reproduces both
+reported witnesses and their margins over the corresponding individual
+traces. The latter request has endpoint increment 13, middle increment
+2719, demand 36 and negative supply 29898. The previous reserve witness,
+2187 direct subset comparisons, and old mode totals through 2000000
+also agree. These are bounded synthetic replay diagnostics.
+
+```sh
+lake build A166944.Attempt A166944.TwinSignedReserveTarget210 A166944.ResidualDeficitBounds210 A166944.ResidualIntervalBudget210
+g++ -O2 -Wall -Wextra -std=c++17 diagnostics/travel_credit_search.cpp -o /tmp/travel_credit_search
+/tmp/travel_credit_search 100000000 --funded 0 --residual-reserve > /tmp/travel_reserve.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_half_reserve_probe.py /tmp/travel_reserve.log
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_windows.py
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_credit_prefix.py 2000000 --residual --native /tmp/travel_credit_search
+```
+
+The Lean 4.33.1 build and audit of 40 declarations pass, using only
+`propext`, `Classical.choice`, and `Quot.sound`.

@@ -26,16 +26,29 @@ private theorem fifty_million_sqrt_budget {M : Nat} (hM : 50000000 ≤ M) :
     _ = 37748736 * M := by omega
     _ ≤ M * M := Nat.mul_le_mul_right _ (by omega)
 
+set_option maxRecDepth 16384 in
+theorem fifty_million_crossing_overhead210 {M : Nat} (hM : 50000000 ≤ M) :
+    2 * (residualPhaseStartupBound210 + 24 * Nat.sqrt (4 * (3 * M + 4)) + 1315) ≤ M := by
+  have hQ := fifty_million_sqrt_budget hM
+  have hstartup : 64 * (residualPhaseStartupBound210 + 1315) ≤ 31 * M := by
+    change 64 * (23899260 + 1315) ≤ 31 * M
+    omega
+  omega
+
 theorem half_reserve_implies_fifty_million_net_budget210 {M first multiplier unused : Nat}
     (hM : 50000000 ≤ M)
     (hreserve : 2 * ((24 + multiplier) * first) ≤ M + 2 * unused) :
     (24 + multiplier) * first + residualPhaseStartupBound210 +
       24 * Nat.sqrt (4 * (3 * M + 4)) + 1315 ≤ M + unused := by
-  have hQ := fifty_million_sqrt_budget hM
-  have hstartup : 64 * (residualPhaseStartupBound210 + 1315) ≤ 31 * M := by
-    change 64 * (23899260 + 1315) ≤ 31 * M
-    omega
-  have hscaled := Nat.mul_le_mul_left 32 hreserve
+  have hgap := fifty_million_crossing_overhead210 hM
+  omega
+
+theorem signed_reserve_implies_fifty_million_net_budget210 {M first : Nat} {balance : Int}
+    (hM : 50000000 ≤ M)
+    (hreserve : 2 * (((24 * first : Nat) : Int) + balance) ≤
+      (M : Int) + 2 * (residualPhaseStartupBound210 : Int)) :
+    ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
+  have hgap := fifty_million_crossing_overhead210 hM
   omega
 
 structure ResidualReserveCertificate210 (M first multiplier : Nat) (balance : Int) where
@@ -57,14 +70,14 @@ theorem residual_net_budget_of_half_reserve210 {M first multiplier : Nat} {balan
     certificate.startup_allowed certificate.startup_cap
     (half_reserve_implies_fifty_million_net_budget210 hM certificate.reserve)
 
-theorem canonical_travel_of_half_reserve_certificates210 {slots M sf Cf q multiplier : Nat}
-    (phase : Nat → Nat → Fin slots) (hM : 50000000 ≤ M) (hcanon : d (M + 2) = M)
+theorem canonical_travel_of_capped_residual_net_budget210 {slots M sf Cf q : Nat}
+    (phase : Nat → Nat → Fin slots) (hcanon : d (M + 2) = M)
     (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf q)
     (hmax : IsAttainedPreviousMaximum M sf)
-    (hcert : ∀ {s C p first : Nat} {balance : Int},
+    (hbudget : ∀ {s C p first : Nat} {balance : Int},
       HasMovingHorizonResidualPhaseBalances210 phase (M + 2) (2 * M - 2) s C [] p first balance →
       2 * (s - (M + 2)) ≤ M → IsAttainedPreviousMaximum M s →
-      Nonempty (ResidualReserveCertificate210 M first multiplier balance)) :
+      ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M) :
     2 * (sf - (M + 2)) ≤ M := by
   by_cases hshort : 2 * (sf - (M + 2)) ≤ M
   · exact hshort
@@ -75,8 +88,21 @@ theorem canonical_travel_of_half_reserve_certificates210 {slots M sf Cf q multip
     have hmax' : IsAttainedPreviousMaximum M s :=
       ⟨fun j hj hjs => hmax.1 j hj (hjs.trans hs_sf),
         ⟨M + 2, Nat.le_add_left 2 M, hstart, hcanon⟩⟩
-    obtain ⟨certificate⟩ := hcert hledger hs hmax'
-    have hbudget := residual_net_budget_of_half_reserve210 hM certificate
+    have hle := hbudget hledger hs hmax'
     omega
+
+theorem canonical_travel_of_half_reserve_certificates210 {slots M sf Cf q multiplier : Nat}
+    (phase : Nat → Nat → Fin slots) (hM : 50000000 ≤ M) (hcanon : d (M + 2) = M)
+    (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf q)
+    (hmax : IsAttainedPreviousMaximum M sf)
+    (hcert : ∀ {s C p first : Nat} {balance : Int},
+      HasMovingHorizonResidualPhaseBalances210 phase (M + 2) (2 * M - 2) s C [] p first balance →
+      2 * (s - (M + 2)) ≤ M → IsAttainedPreviousMaximum M s →
+      Nonempty (ResidualReserveCertificate210 M first multiplier balance)) :
+    2 * (sf - (M + 2)) ≤ M := by
+  apply canonical_travel_of_capped_residual_net_budget210 phase hcanon hpath hmax
+  intro s C p first balance hledger hs hcap
+  obtain ⟨certificate⟩ := hcert hledger hs hcap
+  exact residual_net_budget_of_half_reserve210 hM certificate
 
 end A166944Research

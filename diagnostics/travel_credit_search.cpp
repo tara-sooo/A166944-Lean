@@ -14,6 +14,7 @@ struct Event {
     int increment;
     int excess;
     int balance;
+    bool reused_long_prime;
 };
 
 std::vector<int> residue_potentials() {
@@ -109,6 +110,10 @@ int main(int argc, char** argv) {
     int64_t maximum_startup = 0;
     int64_t reserve_checks = 0, minimum_reserve_margin = INT64_MAX;
     int reserve_record = 0, reserve_hit = 0;
+    int64_t minimum_signed_margin = INT64_MAX;
+    int signed_record = 0, signed_hit = 0;
+    int one_middle = 0, reused_middle = 0;
+    int minimum_middle_margin = INT32_MAX, middle_record = 0, middle_hit = 0;
     for (int record = 13; record <= limit; record += 6) {
         if (!is_prime(record) || !is_prime(record - 2)) continue;
         ++starts;
@@ -127,6 +132,12 @@ int main(int argc, char** argv) {
                 minimum_reserve_margin = margin;
                 reserve_record = record;
                 reserve_hit = hit;
+            }
+            const int64_t signed_margin = record - 2 * (24 * first + signed_sum);
+            if (signed_margin < minimum_signed_margin) {
+                minimum_signed_margin = signed_margin;
+                signed_record = record;
+                signed_hit = hit;
             }
             if (margin < 0) {
                 std::cout << "Half-reserve failure record=" << record << " hit=" << hit
@@ -175,6 +186,19 @@ int main(int argc, char** argv) {
                     unused_credit -= balance;
                 } else if (balance > 0 && anchor >= 0) {
                     ++demands;
+                    if (check_half_reserve && int(history.size()) == anchor + 2) {
+                        const auto& middle = history[anchor + 1];
+                        assert(middle.increment >= 463);
+                        ++one_middle;
+                        reused_middle += middle.reused_long_prime;
+                        const int margin = std::max(0, -middle.balance) - balance;
+                        if (!middle.reused_long_prime) assert(margin >= 0);
+                        if (margin < minimum_middle_margin) {
+                            minimum_middle_margin = margin;
+                            middle_record = record;
+                            middle_hit = hit;
+                        }
+                    }
                     int owed = balance;
                     for (auto& credit : credits) {
                         if (credit.first <= 2 * anchor) continue;
@@ -209,7 +233,7 @@ int main(int argc, char** argv) {
             }
             if (!reserve_ok(hit)) return 1;
             if (long_prime) previous_phase[key] = history.size();
-            history.push_back({hit, horizon, increment, excess, balance});
+            history.push_back({hit, horizon, increment, excess, balance, previous >= 0});
             index = hit;
             horizon = updated;
         }
@@ -224,5 +248,14 @@ int main(int argc, char** argv) {
     if (check_half_reserve && reserve_checks) {
         std::cout << "half-reserve checks=" << reserve_checks << " minimum margin=" << minimum_reserve_margin
                   << " record=" << reserve_record << " hit=" << reserve_hit << '\n';
+        std::cout << "minimum signed margin=" << minimum_signed_margin << " record=" << signed_record
+                  << " hit=" << signed_hit << '\n';
+    }
+    if (check_half_reserve) {
+        std::cout << "one-middle requests=" << one_middle << " reused long-prime middles=" << reused_middle << '\n';
+        if (one_middle) {
+            std::cout << "minimum one-middle margin=" << minimum_middle_margin << " record=" << middle_record
+                      << " hit=" << middle_hit << '\n';
+        }
     }
 }

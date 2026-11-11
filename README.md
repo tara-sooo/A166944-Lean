@@ -105,9 +105,15 @@ bounds each startup charge by 1478 and the distinct-key total by
 net budget. `CreditDeficits210.lean` reduces allocation failure to a minimal
 deficient window. `CreditDeficitStructure210.lean` proves that positive
 requests attain its endpoints and cross every interior cut.
-`RecurrenceDeficit210.lean` attaches same-phase reuse constraints to
-these witnesses when the requests are indexed by actual recurrence
-events. Excluding such windows on arbitrary actual prefixes remains open.
+`ResidualEventTrace210.lean` and `ResidualIntervals210.lean` construct
+the requests, negative sources and startup costs from actual ordered
+events. `ResidualDeficitBounds210.lean` applies the reuse constraints
+to each cut of a minimal deficient window. Each positive request
+requires at least 630 horizon drift. A deficient window spanning
+at most three events requires a repeated long prime in the middle.
+Its earlier occurrence is before the window with at least 97230
+horizon drift to the middle event. The unrestricted window condition
+remains open.
 
 `ResidualThreshold210.lean` proves that an admissible allocation and
 `2*(24+c)*F_phase ≤ M+2*U` suffice for the crossing budget when
@@ -115,8 +121,13 @@ events. Excluding such windows on arbitrary actual prefixes remains open.
 `TwinReserveTarget210.lean` proves the original A166944 target and
 unbounded twin primes **conditional on** `ResidualReserveCondition210 c`,
 which supplies these certificates on every actual short capped prefix
-in that range. The certificate existence and reserve inequality are
-still open. The finite bridge below this threshold is proved.
+in that range. `ResidualIntervalBudget210.lean` proves the exact
+identity `S+U=startupCost` for the constructed zero-funding allocation.
+`TwinSignedReserveTarget210.lean` reduces the same targets to the single
+open signed bound `2*(24*F_phase+S) ≤ M+47798520` on those prefixes.
+The previous certificate condition implies this bound. The direct
+signed route applies without a separate allocation hypothesis, and the
+finite bridge below its threshold is proved.
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 
