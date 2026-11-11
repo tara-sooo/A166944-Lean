@@ -157,11 +157,20 @@ theorem rebalanced_startup_cost_le : trace.costStartupSum trace.rebalancedCosts 
     (fun i h => (trace.event i).rebalanced_cost_positive_unsupported h)
     (fun i h => (trace.event i).rebalanced_cost_le_of_positive h)
 
-/-- Every individual rebalanced request fits in its growth window,
-including the composite increments 9 and 25. -/
-theorem rebalanced_request_fits210 {i : Fin n} (positive : 0 < trace.costDemand trace.rebalancedCosts i) :
-    3 * trace.costDemand trace.rebalancedCosts i ≤
-      2 * ((trace.event i).horizon - (trace.event (trace.costAnchor trace.rebalancedCosts i)).horizon) := by
+theorem rebalanced_request_period210 {i : Fin n} (positive : 0 < trace.costDemand trace.rebalancedCosts i) :
+    Nat.lcm 210 (2 * d (trace.event i).hit) ∣
+      (trace.event i).horizon - (trace.event (trace.costAnchor trace.rebalancedCosts i)).horizon ∧
+    Nat.lcm 210 (2 * d (trace.event i).hit) ≤
+      (trace.event i).horizon - (trace.event (trace.costAnchor trace.rebalancedCosts i)).horizon := by
+  obtain ⟨order, key⟩ := trace.cost_demand_anchor positive
+  let interval := trace.samePhaseInterval order key
+  have h := (same_phase_credit_interval_constraints210 interval).2
+  rw [interval.same_increment] at h
+  exact ⟨h.1, h.2.1⟩
+
+/-- The last full phase period alone can pay each individual request. -/
+theorem rebalanced_request_pays_period210 {i : Fin n} (positive : 0 < trace.costDemand trace.rebalancedCosts i) :
+    3 * trace.costDemand trace.rebalancedCosts i ≤ 2 * Nat.lcm 210 (2 * d (trace.event i).hit) := by
   have hcost := trace.cost_demand_eq_cost positive
   change trace.costDemand trace.rebalancedCosts i = (trace.event i).rebalancedCost.toNat at hcost
   have hpos : 0 < (trace.event i).rebalancedCost := by omega
@@ -170,17 +179,18 @@ theorem rebalanced_request_fits210 {i : Fin n} (positive : 0 < trace.costDemand 
   obtain ⟨horder, hkey⟩ := trace.cost_demand_anchor positive
   by_cases hl : trace.ReusedLong i
   · have reuse : trace.PrimeReuse (trace.costAnchor trace.rebalancedCosts i) i := ⟨horder, hkey, hl.1.2, hu⟩
-    have hwidth := (trace.prime_reuse_drift reuse).2
     have hp := trace.unsupported_prime_ge_eleven reuse
+    have prime := prime_of_no_proper_factor (by omega : 1 < d (trace.event i).hit) hl.1.2
+    have hcop := Nat.Coprime.coprime_dvd_left (by decide : 105 ∣ 210)
+      ((prime.coprime_iff_not_dvd.mpr hu).symm)
+    have hperiod : Nat.lcm 210 (2 * d (trace.event i).hit) = 210 * d (trace.event i).hit := by
+      change Nat.lcm (2 * 105) (2 * d (trace.event i).hit) = _
+      rw [Nat.lcm_mul_left, hcop.lcm_eq_mul, ← Nat.mul_assoc]
     have hbound := (trace.event i).rebalanced_net_cost_positive_part_le
+    rw [hperiod]
     omega
-  let w := trace.samePhaseInterval horder hkey
-  have hwidth := (same_phase_credit_interval_constraints210 w).2.2.1
-  rw [w.same_increment] at hwidth
   let e := d (trace.event i).hit
-  let width := (trace.event i).horizon - (trace.event (trace.costAnchor trace.rebalancedCosts i)).horizon
-  change Nat.lcm 210 (2 * e) ≤ width at hwidth
-  change 3 * _ ≤ 2 * width
+  change 3 * trace.costDemand trace.rebalancedCosts i ≤ 2 * Nat.lcm 210 (2 * e)
   by_cases hex : e ∈ rebalancedExceptions210
   · have hp := (trace.event i).rebalanced_net_cost_exception_le hex
     have hhalf := Nat.div_mul_le_self (Nat.lcm 210 (2 * e)) 2
@@ -198,6 +208,14 @@ theorem rebalanced_request_fits210 {i : Fin n} (positive : 0 < trace.costDemand 
   change 3 * startupWeightAtCap210 1036 e ≤ 2 * Nat.lcm 210 (2 * e) at hperiod
   have hbound : (trace.event i).rebalancedCost.toNat ≤ startupWeightAtCap210 1036 e := hb.2
   omega
+
+/-- Every individual rebalanced request fits in its growth window,
+including the composite increments 9 and 25. -/
+theorem rebalanced_request_fits210 {i : Fin n} (positive : 0 < trace.costDemand trace.rebalancedCosts i) :
+    3 * trace.costDemand trace.rebalancedCosts i ≤
+      2 * ((trace.event i).horizon - (trace.event (trace.costAnchor trace.rebalancedCosts i)).horizon) :=
+  (trace.rebalanced_request_pays_period210 positive).trans
+    (Nat.mul_le_mul_left 2 (trace.rebalanced_request_period210 positive).2)
 
 abbrev RebalancedGrowthWindows : Prop :=
   trace.GrowthWindows (trace.costAnchor trace.rebalancedCosts) (trace.costDemand trace.rebalancedCosts)

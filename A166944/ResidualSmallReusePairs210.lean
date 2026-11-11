@@ -12,7 +12,7 @@ private theorem small_unsupported_prime_cases210 :
     ∀ p : Fin 35, 1 < p.val → NoProperFactor p.val → ¬ p.val ∣ 210 → p.val ∈ smallReusePrimes210 := by
   decide +kernel
 
-private def longGapHorizons210 : List Nat := [0, 12, 18, 30, 42, 60, 72, 102, 108, 138, 150, 168, 180, 192, 198]
+def longGapHorizons210 : List Nat := [0, 12, 18, 30, 42, 60, 72, 102, 108, 138, 150, 168, 180, 192, 198]
 
 private theorem long_gap_horizon_cases210 :
     ∀ c : Fin 210, c.val % 2 = 0 →
@@ -23,7 +23,7 @@ private theorem long_gap_horizon_cases210 :
 
 /-- A factor 3, 5 or 7 of either horizon term would force an earlier
 hit within fourteen steps. The remaining even horizon residues are finite. -/
-private theorem moving_horizon_long_gap_residue210 {s C r C' : Nat}
+theorem moving_horizon_long_gap_residue210 {s C r C' : Nat}
     (step : IsMovingHorizonStep s C r C') (long : 14 < r - s) : C % 210 ∈ longGapHorizons210 := by
   have hC := step.1.2.2
   have heven := step.1.2.1 ▸ D_mod_two_eq_zero_of_two_le step.1.1

@@ -17,12 +17,16 @@ private def rebalancedStepFits210 (s c gap e allowance : Nat) : Bool :=
   Nat.ble (24 * gap + rebalancedPotential210 (s + gap) (c + e - 1))
     (11 * (e - 1) + rebalancedPotential210 s c + allowance)
 
-private def rebalancedExtraFits210 (s c gap : Nat) : Nat → Bool
-  | 3 => rebalancedStepFits210 s c gap 9 315
-  | 5 => rebalancedStepFits210 s c gap 25 525
-  | 15 => rebalancedStepFits210 s c gap 45 315
-  | 21 => rebalancedStepFits210 s c gap 63 315
-  | _ => true
+def rebalancedClippedCostCaps210 : Nat → List (Nat × Nat)
+  | 3 => [(9, 315), (27, 525), (33, 402), (39, 492)]
+  | 5 => [(25, 525), (55, 360), (65, 204)]
+  | 7 => [(49, 402), (77, 264), (91, 0)]
+  | 15 => [(45, 204), (75, 20)]
+  | 21 => [(63, 128)]
+  | _ => []
+
+private def rebalancedExtraFits210 (s c gap clip : Nat) : Bool :=
+  (rebalancedClippedCostCaps210 clip).all fun (e, cap) => rebalancedStepFits210 s c gap e cap
 
 private def checkRebalancedResidue210 (s c : Nat) : Bool :=
   Nat.ble (rebalancedPotential210 s c) 1036 &&
@@ -90,23 +94,39 @@ theorem moving_horizon_rebalanced_supported210 {s C r C' : Nat}
   simp only [checkRebalancedResidue210, hhit, Bool.and_eq_true] at h
   simpa only [Nat.add_zero] using rebalanced_step_bound_of_check210 step h.2.1
 
+theorem moving_horizon_rebalanced_clipped_cost_cap210 {s C r C' cap : Nat}
+    (step : IsMovingHorizonStep s C r C')
+    (hclip : 1 < Nat.gcd (d r) 210)
+    (entry : (d r, cap) ∈ rebalancedClippedCostCaps210 (Nat.gcd (d r) 210)) :
+    24 * (r - s) + rebalancedPotential210 r C' ≤
+      11 * (d r - 1) + rebalancedPotential210 s C + cap := by
+  have hhit := first_clipped_hit210_of_nonunit step hclip
+  have heven := step.1.2.1 ▸ D_mod_two_eq_zero_of_two_le step.1.1
+  have h := rebalanced_state_checked210 s C heven
+  simp only [checkRebalancedResidue210, hhit, Bool.and_eq_true] at h
+  apply rebalanced_step_bound_of_check210 step
+  have hf := h.2.2
+  exact List.all_eq_true.mp hf (d r, cap) entry
+
 /-- The four composite charges fit in half of their shortest phase
 period, using only this local first-hit bound. -/
 theorem moving_horizon_rebalanced_exception210 {s C r C' : Nat}
     (step : IsMovingHorizonStep s C r C') (exception : d r ∈ rebalancedExceptions210) :
     24 * (r - s) + rebalancedPotential210 r C' ≤
       11 * (d r - 1) + rebalancedPotential210 s C + rebalancedAllowance210 (d r) := by
-  have hc : 1 < Nat.gcd (d r) 210 := by
-    have hm := exception
-    simp only [rebalancedExceptions210, List.mem_cons, List.not_mem_nil, or_false] at hm
-    rcases hm with h | h | h | h <;> rw [h] <;> decide
-  have hhit := first_clipped_hit210_of_nonunit step hc
-  have heven := step.1.2.1 ▸ D_mod_two_eq_zero_of_two_le step.1.1
-  have h := rebalanced_state_checked210 s C heven
-  simp only [checkRebalancedResidue210, hhit, Bool.and_eq_true] at h
-  apply rebalanced_step_bound_of_check210 step
-  have hf := h.2.2
+  have hcap {e cap : Nat} (he : d r = e) (hc : 1 < Nat.gcd e 210)
+      (hm : (e, cap) ∈ rebalancedClippedCostCaps210 (Nat.gcd e 210))
+      (hl : cap ≤ rebalancedAllowance210 e) :
+      24 * (r - s) + rebalancedPotential210 r C' ≤
+        11 * (d r - 1) + rebalancedPotential210 s C + rebalancedAllowance210 (d r) := by
+    have h := moving_horizon_rebalanced_clipped_cost_cap210 step (he ▸ hc) (he ▸ hm)
+    rw [← he] at hl
+    omega
   simp only [rebalancedExceptions210, List.mem_cons, List.not_mem_nil, or_false] at exception
-  rcases exception with he | he | he | he <;> rw [he] at hf ⊢ <;> exact hf
+  rcases exception with he | he | he | he
+  · exact hcap (cap := 315) he (by decide) (by decide) (by decide)
+  · exact hcap (cap := 525) he (by decide) (by decide) (by decide)
+  · exact hcap (cap := 204) he (by decide) (by decide) (by decide)
+  · exact hcap (cap := 128) he (by decide) (by decide) (by decide)
 
 end A166944Research

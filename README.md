@@ -185,6 +185,18 @@ the crossing budget. The window inequalities for overlapping
 requests and a first-charge bound down to the verified finite
 range remain open.
 
+`ResidualRebalancedTwoRequests210.lean` pays all requests of
+one phase key by using one disjoint terminal period per request.
+The first-hit cost caps and endpoint offsets in
+`ResidualRebalancedPairOffsets210.lean` restrict a deficit
+with exactly two positive requests to 33 increment pairs on
+distinct keys, width at most 5,093, and enclosed negative credit
+at most 1,363. The offset checks pay the pairs (23,23) and
+(9,63) from growth alone. An enclosed composite increment
+of at least 295 also rules out a two-request deficit. The
+remaining mixed-key cases require further control of the
+enclosed credit.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

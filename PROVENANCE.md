@@ -1440,3 +1440,62 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --sc
 
 Lean 4.33.1 builds the selected modules. The audit of 42 declarations
 uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Two rebalanced requests and endpoint offsets, 2026-11-12 JST
+
+Codex continued from `cd5acc84ace0924aec1a11411106ccc92d02e7e6`.
+Every positive request fits within two thirds of its minimum
+phase period `lcm(210,2*e)`. Right endpoints with one phase key
+are separated by at least that period. Their terminal periods
+are disjoint and lie inside the respective requests, so any
+collection of requests of one key fits its containing window.
+This applies to long, short, and composite requests.
+
+`ResidualRebalancedPairCaps210.lean` restricts a long reuse in
+a two-request deficit to increment at most 31. Other positive
+requests have increment at most 159 and cost at most 1,166.
+These bounds leave 23 increments to test and 72 coarse pairs.
+The extended clipped checker bounds costs for 13 composite
+increments. The post-event potential for each of seven small
+primes is bounded using the 15 horizon residues required by gaps
+above 14. The refined caps give 35 unordered increment pairs,
+width at most 5,093, and negative credit at most 1,363 for any
+two-request deficit. A single enclosed composite increment
+of at least 295 contributes at least 1,364 credit and pays
+the possible shortfall.
+
+For requests in event order with pre-horizons `C<H`, the
+containing width is at least `lcm(210,2*e)+H-C`, where `e`
+is the earlier increment, and `H-C≥e-1`. The increment-23
+checks combine the two horizon-specific caps with the minimum
+offset modulo 210. Two requests at increment 23 always fit
+from growth alone. A positive increment-63 cost requires
+pre-horizon 22 modulo 210. For a potentially deficient pair
+with 9 earlier, the offset must be between 8 and 34, where
+the first-hit table caps the increment-9 cost by 266. If 63
+is earlier, its own growth gives an offset of at least 62.
+Both orders of (9,63) therefore fit. The resulting list has
+33 pairs, including pairs with equal increments and different
+phase keys. The general signed bound on those pairs and on
+overlaps of three or more requests remains open.
+
+The independent Python calculation reproduces the counts and
+caps. On the synthetic start `M=7163911`, the interval
+`[14342410,14343058)` contains two increment-9 requests of
+234 and 231. Its growth-only margin is −99. Enclosed negative
+cost gives margin 7,731. Through 10,000,000 plus the same eight
+controls, all 10,210 synthetic intervals fit with signed
+credit. Five growth-only failures share that pair and those
+endpoints. The sixth is the three-request control at
+`M=69921739`.
+
+```sh
+lake build A166944.Attempt A166944.ResidualFirstPayment210 A166944.ResidualRebalancedPairOffsets210 A166944.ResidualSmallAdjusted210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/rebalanced_pair_probe.py
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --scaled-limit 10000000 --rebalanced \
+  --control 22933441 --control 23613589 --control 23619049 --control 41453053 \
+  --control 45895573 --control 69921739 --control 86278501 --control 89666641
+```
+
+Lean 4.33.1 builds the selected modules. The audit of 34 declarations
+uses only `propext`, `Classical.choice`, and `Quot.sound`.
