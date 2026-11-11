@@ -203,7 +203,7 @@ theorem growth_window_inside_of_request {anchor : Fin n → Fin n} {i : Fin n} {
   have ⟨hx₁, hx₂⟩ := Finset.mem_Ico.mp hx
   exact Finset.mem_Ico.mpr ⟨hl.trans hx₁, by omega⟩
 
-private theorem sum_positive_requests (requests : Finset (Fin n)) (demand : Fin n → Nat) :
+theorem sum_positive_requests (requests : Finset (Fin n)) (demand : Fin n → Nat) :
     (∑ i ∈ requests, demand i) = ∑ i ∈ requests.filter (fun i => 0 < demand i), demand i := by
   rw [Finset.sum_filter]
   apply Finset.sum_congr rfl
@@ -264,7 +264,7 @@ theorem classify_two_long_growth_requests210 {a b : Nat}
     obtain ⟨hm, hb⟩ := trace.first_hit_two_reuse_deficit210 pj pi h (Finset.union_subset hj' hi') hbad
     exact ⟨j, i, hne.symm, hm, hb⟩
 
-private theorem event_horizon_between (i : Fin n) :
+theorem event_horizon_between (i : Fin n) :
     D s ≤ (trace.event i).horizon ∧ (trace.event i).horizon < D sf := by
   have hs := D_le_of_le (trace.start_ge i)
   have hf := D_le_of_le (trace.hit_le i)
@@ -318,50 +318,64 @@ theorem singleton_adjusted_growth_deficit210 {a b : Nat}
   · exact Or.inl ⟨h9, hw, by omega⟩
   · exact Or.inr ⟨h25, hw, by omega⟩
 
-theorem adjusted_demand_le_growth_and_credit (windows : trace.AdjustedGrowthWindows) :
-    3 * (∑ i, trace.adjustedDemand i) ≤ 2 * (D sf - D s) +
-      3 * (∑ i, (-(trace.event i).adjustedCost).toNat) := by
+theorem cost_demand_le_growth_and_credit {cost : Fin n → Int}
+    (windows : trace.GrowthWindows (trace.costAnchor cost) (trace.costDemand cost) cost) :
+    3 * (∑ i, trace.costDemand cost i) ≤ 2 * (D sf - D s) +
+      3 * (∑ i, (-cost i).toNat) := by
   by_cases hlt : D s < D sf
   · have h := Nat.le_of_not_gt (windows (D s) (D sf) hlt)
-    have hsum : (∑ i ∈ trace.growthRequests trace.adjustedAnchor (D s) (D sf), trace.adjustedDemand i) =
-        ∑ i, trace.adjustedDemand i := by
+    have hsum : (∑ i ∈ trace.growthRequests (trace.costAnchor cost) (D s) (D sf), trace.costDemand cost i) =
+        ∑ i, trace.costDemand cost i := by
       apply Finset.sum_subset (Finset.subset_univ _)
       intro i _ hi
       by_contra hn
-      have hp : 0 < trace.adjustedDemand i := Nat.pos_of_ne_zero hn
-      have ⟨horder, _⟩ := trace.adjusted_demand_anchor hp
+      have hp : 0 < trace.costDemand cost i := Nat.pos_of_ne_zero hn
+      have ⟨horder, _⟩ := trace.cost_demand_anchor hp
       apply hi
       apply Finset.mem_filter.mpr
-      have ha := (trace.event_horizon_between (trace.adjustedAnchor i)).1
+      have ha := (trace.event_horizon_between (trace.costAnchor cost i)).1
       have hb := (trace.event_horizon_between i).2
       exact ⟨Finset.mem_univ _, by rwa [trace.growth_request_left_of_order horder],
         by unfold growthRequestRight; omega⟩
-    have hpaid : 3 * (∑ i ∈ trace.growthRequests trace.adjustedAnchor (D s) (D sf), trace.adjustedDemand i) ≤
+    have hpaid : 3 * (∑ i ∈ trace.growthRequests (trace.costAnchor cost) (D s) (D sf), trace.costDemand cost i) ≤
         2 * (D sf - D s) + 3 * (∑ i ∈ trace.eventsInGrowthBlock (D s) (D sf),
-          (-(trace.event i).adjustedCost).toNat) := h
+          (-cost i).toNat) := h
     rw [hsum] at hpaid
-    have hcredit : (∑ i ∈ trace.eventsInGrowthBlock (D s) (D sf), (-(trace.event i).adjustedCost).toNat) ≤
-        ∑ i, (-(trace.event i).adjustedCost).toNat :=
+    have hcredit : (∑ i ∈ trace.eventsInGrowthBlock (D s) (D sf), (-cost i).toNat) ≤
+        ∑ i, (-cost i).toNat :=
       Finset.sum_le_sum_of_subset (Finset.subset_univ _)
     omega
-  · have hz (i : Fin n) : trace.adjustedDemand i = 0 := by
+  · have hz (i : Fin n) : trace.costDemand cost i = 0 := by
       have := trace.event_horizon_between i
       omega
     simp [hz]
+
+theorem adjusted_demand_le_growth_and_credit (windows : trace.AdjustedGrowthWindows) :
+    3 * (∑ i, trace.adjustedDemand i) ≤ 2 * (D sf - D s) +
+      3 * (∑ i, (-(trace.event i).adjustedCost).toNat) :=
+  trace.cost_demand_le_growth_and_credit windows
+
+theorem sum_signed_cost_le_growth_of_windows {cost : Fin n → Int}
+    (windows : trace.GrowthWindows (trace.costAnchor cost) (trace.costDemand cost) cost) :
+    3 * (∑ i, cost i) ≤ ((3 * trace.costStartupSum cost + 2 * (D sf - D s) : Nat) : Int) := by
+  have hpaid := trace.cost_demand_le_growth_and_credit windows
+  have hsum : (∑ i, cost i) = ((∑ i, (cost i).toNat : Nat) : Int) -
+      ((∑ i, (-cost i).toNat : Nat) : Int) := by
+    rw [Nat.cast_sum, Nat.cast_sum, ← Finset.sum_sub_distrib]
+    exact Finset.sum_congr rfl fun i _ => by omega
+  rw [hsum, trace.sum_cost_positive]
+  omega
 
 /-- When all nonstartup requests fit their growth windows, the only
 separate positive allowances are first travel and the finite startup sum. -/
 theorem scaled_net_cost_le_of_adjusted_windows (windows : trace.AdjustedGrowthWindows) :
     3 * (∑ i, (trace.event i).scaledNetCost) ≤
       ((72 * trace.scaledFirstTravel + 13954356 + 2 * (D sf - D s) : Nat) : Int) := by
-  have hpaid := trace.adjusted_demand_le_growth_and_credit windows
+  have hcost := trace.sum_signed_cost_le_growth_of_windows windows
   have hstart := trace.adjusted_startup_cost_le
-  have hsum : (∑ i, (trace.event i).adjustedCost) =
-      ((∑ i, (trace.event i).adjustedCost.toNat : Nat) : Int) -
-        ((∑ i, (-(trace.event i).adjustedCost).toNat : Nat) : Int) := by
-    rw [Nat.cast_sum, Nat.cast_sum, ← Finset.sum_sub_distrib]
-    exact Finset.sum_congr rfl fun i _ => by omega
-  rw [trace.sum_scaled_net_cost_split, hsum, trace.sum_adjusted_positive]
+  change 3 * (∑ i, (trace.event i).adjustedCost) ≤
+    ((3 * trace.adjustedStartupCost + 2 * (D sf - D s) : Nat) : Int) at hcost
+  rw [trace.sum_scaled_net_cost_split]
   omega
 
 end

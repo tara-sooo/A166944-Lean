@@ -84,74 +84,103 @@ theorem sum_scaled_net_cost_split :
 abbrev ReusedLong (i : Fin n) : Prop :=
   (trace.event i).LongPrime ∧ (trace.event i).phaseKey ∈ (trace.event i).seen
 
-private def priorAdjustedPositive (i : Fin n) : Finset (Fin n) :=
-  univ.filter fun j => j < i ∧ 0 < (trace.event j).adjustedCost ∧
+private def priorPositiveWith (cost : Fin n → Int) (i : Fin n) : Finset (Fin n) :=
+  univ.filter fun j => j < i ∧ 0 < cost j ∧
     (trace.event j).phaseKey = (trace.event i).phaseKey
 
 /-- A long prime reuse keeps the latest long anchor. Other repeated
 positive costs use their latest positive predecessor of the same key. -/
-def adjustedAnchor (i : Fin n) : Fin n :=
+def costAnchor (cost : Fin n → Int) (i : Fin n) : Fin n :=
   if trace.ReusedLong i then trace.anchor i
-  else if h : (trace.priorAdjustedPositive i).Nonempty then (trace.priorAdjustedPositive i).max' h else i
+  else if h : (trace.priorPositiveWith cost i).Nonempty then (trace.priorPositiveWith cost i).max' h else i
 
-def adjustedStartup : Finset (Fin n) :=
-  univ.filter fun i => 0 < (trace.event i).adjustedCost ∧ ¬ trace.ReusedLong i ∧
-    ¬ (trace.priorAdjustedPositive i).Nonempty
+def costStartup (cost : Fin n → Int) : Finset (Fin n) :=
+  univ.filter fun i => 0 < cost i ∧ ¬ trace.ReusedLong i ∧
+    ¬ (trace.priorPositiveWith cost i).Nonempty
 
-def adjustedDemand (i : Fin n) : Nat :=
-  if i ∈ trace.adjustedStartup then 0 else (trace.event i).adjustedCost.toNat
+def costDemand (cost : Fin n → Int) (i : Fin n) : Nat :=
+  if i ∈ trace.costStartup cost then 0 else (cost i).toNat
 
-def adjustedStartupCost : Nat := ∑ i ∈ trace.adjustedStartup, (trace.event i).adjustedCost.toNat
+def costStartupSum (cost : Fin n → Int) : Nat := ∑ i ∈ trace.costStartup cost, (cost i).toNat
 
-theorem adjusted_demand_eq_cost {i : Fin n} (hi : 0 < trace.adjustedDemand i) :
-    trace.adjustedDemand i = (trace.event i).adjustedCost.toNat := by
-  by_cases h : i ∈ trace.adjustedStartup
-  · simp [adjustedDemand, h] at hi
-  · simp [adjustedDemand, h]
+theorem cost_demand_eq_cost {cost : Fin n → Int} {i : Fin n} (hi : 0 < trace.costDemand cost i) :
+    trace.costDemand cost i = (cost i).toNat := by
+  by_cases h : i ∈ trace.costStartup cost
+  · simp [costDemand, h] at hi
+  · simp [costDemand, h]
 
-theorem adjusted_startup_positive {i : Fin n} (hi : i ∈ trace.adjustedStartup) :
-    0 < (trace.event i).adjustedCost := (Finset.mem_filter.mp hi).2.1
+theorem cost_startup_positive {cost : Fin n → Int} {i : Fin n} (hi : i ∈ trace.costStartup cost) :
+    0 < cost i := (Finset.mem_filter.mp hi).2.1
 
-theorem adjusted_startup_not_reused {i : Fin n} (hi : i ∈ trace.adjustedStartup) :
+theorem cost_startup_not_reused {cost : Fin n → Int} {i : Fin n} (hi : i ∈ trace.costStartup cost) :
     ¬ trace.ReusedLong i := (Finset.mem_filter.mp hi).2.2.1
 
-theorem adjusted_startup_unique {i j : Fin n} (hi : i ∈ trace.adjustedStartup)
-    (hj : j ∈ trace.adjustedStartup) (hkey : (trace.event i).phaseKey = (trace.event j).phaseKey) : i = j := by
+theorem cost_startup_unique {cost : Fin n → Int} {i j : Fin n} (hi : i ∈ trace.costStartup cost)
+    (hj : j ∈ trace.costStartup cost) (hkey : (trace.event i).phaseKey = (trace.event j).phaseKey) : i = j := by
   rcases lt_trichotomy i j with hij | heq | hji
   · exact ((Finset.mem_filter.mp hj).2.2.2
-      ⟨i, Finset.mem_filter.mpr ⟨mem_univ _, hij, trace.adjusted_startup_positive hi, hkey⟩⟩).elim
+      ⟨i, Finset.mem_filter.mpr ⟨mem_univ _, hij, trace.cost_startup_positive hi, hkey⟩⟩).elim
   · exact heq
   · exact ((Finset.mem_filter.mp hi).2.2.2
-      ⟨j, Finset.mem_filter.mpr ⟨mem_univ _, hji, trace.adjusted_startup_positive hj, hkey.symm⟩⟩).elim
+      ⟨j, Finset.mem_filter.mpr ⟨mem_univ _, hji, trace.cost_startup_positive hj, hkey.symm⟩⟩).elim
 
-theorem adjusted_demand_anchor {i : Fin n} (hi : 0 < trace.adjustedDemand i) :
-    trace.adjustedAnchor i < i ∧
-      (trace.event (trace.adjustedAnchor i)).phaseKey = (trace.event i).phaseKey := by
-  have hs : i ∉ trace.adjustedStartup := by intro h; simp [adjustedDemand, h] at hi
-  have hpos : 0 < (trace.event i).adjustedCost := by
-    simp only [adjustedDemand, if_neg hs] at hi
+theorem cost_demand_anchor {cost : Fin n → Int} {i : Fin n} (hi : 0 < trace.costDemand cost i) :
+    trace.costAnchor cost i < i ∧
+      (trace.event (trace.costAnchor cost i)).phaseKey = (trace.event i).phaseKey := by
+  have hs : i ∉ trace.costStartup cost := by intro h; simp [costDemand, h] at hi
+  have hpos : 0 < cost i := by
+    simp only [costDemand, if_neg hs] at hi
     omega
   by_cases hl : trace.ReusedLong i
-  · simpa only [adjustedAnchor, if_pos hl] using trace.anchor_of_seen_long hl.1 hl.2
-  · have hprior : (trace.priorAdjustedPositive i).Nonempty := by
+  · simpa only [costAnchor, if_pos hl] using trace.anchor_of_seen_long hl.1 hl.2
+  · have hprior : (trace.priorPositiveWith cost i).Nonempty := by
       by_contra h
       exact hs (Finset.mem_filter.mpr ⟨mem_univ _, hpos, hl, h⟩)
-    rw [adjustedAnchor, if_neg hl, dif_pos hprior]
+    rw [costAnchor, if_neg hl, dif_pos hprior]
     have hm := (Finset.mem_filter.mp (Finset.max'_mem _ hprior)).2
     exact ⟨hm.1, hm.2.2⟩
 
-theorem sum_adjusted_positive :
-    (∑ i, (trace.event i).adjustedCost.toNat) = trace.adjustedStartupCost + ∑ i, trace.adjustedDemand i := by
+theorem sum_cost_positive (cost : Fin n → Int) :
+    (∑ i, (cost i).toNat) = trace.costStartupSum cost + ∑ i, trace.costDemand cost i := by
   calc
-    (∑ i, (trace.event i).adjustedCost.toNat) =
-        ∑ i, ((if i ∈ trace.adjustedStartup then (trace.event i).adjustedCost.toNat else 0) +
-          trace.adjustedDemand i) := by
+    (∑ i, (cost i).toNat) =
+        ∑ i, ((if i ∈ trace.costStartup cost then (cost i).toNat else 0) +
+          trace.costDemand cost i) := by
       apply Finset.sum_congr rfl
       intro i _
-      by_cases hi : i ∈ trace.adjustedStartup <;> simp [adjustedDemand, hi]
+      by_cases hi : i ∈ trace.costStartup cost <;> simp [costDemand, hi]
     _ = _ := by
       rw [Finset.sum_add_distrib, ← Finset.sum_filter]
-      simp [adjustedStartupCost]
+      simp [costStartupSum]
+
+abbrev adjustedAnchor : Fin n → Fin n := trace.costAnchor (fun i => (trace.event i).adjustedCost)
+
+abbrev adjustedStartup : Finset (Fin n) := trace.costStartup (fun i => (trace.event i).adjustedCost)
+
+abbrev adjustedDemand : Fin n → Nat := trace.costDemand (fun i => (trace.event i).adjustedCost)
+
+abbrev adjustedStartupCost : Nat := trace.costStartupSum (fun i => (trace.event i).adjustedCost)
+
+theorem adjusted_demand_eq_cost {i : Fin n} (hi : 0 < trace.adjustedDemand i) :
+    trace.adjustedDemand i = (trace.event i).adjustedCost.toNat := trace.cost_demand_eq_cost hi
+
+theorem adjusted_startup_positive {i : Fin n} (hi : i ∈ trace.adjustedStartup) :
+    0 < (trace.event i).adjustedCost := trace.cost_startup_positive hi
+
+theorem adjusted_startup_not_reused {i : Fin n} (hi : i ∈ trace.adjustedStartup) :
+    ¬ trace.ReusedLong i := trace.cost_startup_not_reused hi
+
+theorem adjusted_startup_unique {i j : Fin n} (hi : i ∈ trace.adjustedStartup)
+    (hj : j ∈ trace.adjustedStartup) (hkey : (trace.event i).phaseKey = (trace.event j).phaseKey) : i = j :=
+  trace.cost_startup_unique hi hj hkey
+
+theorem adjusted_demand_anchor {i : Fin n} (hi : 0 < trace.adjustedDemand i) :
+    trace.adjustedAnchor i < i ∧ (trace.event (trace.adjustedAnchor i)).phaseKey = (trace.event i).phaseKey :=
+  trace.cost_demand_anchor hi
+
+theorem sum_adjusted_positive :
+    (∑ i, (trace.event i).adjustedCost.toNat) = trace.adjustedStartupCost + ∑ i, trace.adjustedDemand i :=
+  trace.sum_cost_positive _
 
 end
 

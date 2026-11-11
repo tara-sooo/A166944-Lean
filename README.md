@@ -172,6 +172,19 @@ sublinear first-phase bound pays for the remaining first travel for
 sufficiently large records. The general window inequalities and the
 first-travel bound down to the verified finite range remain open.
 
+`TravelRebalanced210.lean` checks a new potential on all 22,050
+states modulo 210. Its cap is 1,036, and the positive costs at
+increments 9 and 25 are at most 315 and 525. In
+`ResidualRebalancedCosts210.lean` every individual request fits
+within two thirds of its growth window. Any deficient window
+therefore has at least two positive requests. The first charge
+is capped at the event's positive net cost and the startup bound
+is 4,054,512. `ResidualFirstPayment210.lean` gives an explicit
+cutoff bound for the sum of first charges and connects it to
+the crossing budget. The window inequalities for overlapping
+requests and a first-charge bound down to the verified finite
+range remain open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

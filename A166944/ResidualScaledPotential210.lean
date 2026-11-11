@@ -7,6 +7,10 @@ open Finset
 
 namespace A166944Research
 
+def IsTravelPotential210 (potential : Nat → Nat → Nat) : Prop :=
+  ∀ {s C r C' : Nat}, IsMovingHorizonStep s C r C' → d r ∣ 210 →
+    24 * (r - s) + potential r C' ≤ 11 * (d r - 1) + potential s C
+
 def scaledPotential210 (s C : Nat) : Nat := 8 * supportedPotential210 s C / 9
 
 theorem scaled_potential210_le (s C : Nat) (heven : C % 2 = 0) : scaledPotential210 s C ≤ 1120 := by
@@ -26,6 +30,18 @@ theorem moving_horizon_supported210_scaled_potential {s C r C' : Nat}
 
 namespace ResidualPhaseEvent210
 
+def potentialNetCost (event : ResidualPhaseEvent210) (potential : Nat → Nat → Nat) : Int :=
+  if d event.hit ∣ 210 then 0 else
+    (24 * (event.hit - event.start) : Nat) + (potential event.hit event.nextHorizon : Int) -
+      (potential event.start event.horizon : Int) - 11 * ((d event.hit - 1 : Nat) : Int)
+
+theorem potential_net_cost_le_of_unsupported (event : ResidualPhaseEvent210) {potential : Nat → Nat → Nat}
+    {cap : Nat} (hcap : potential event.hit event.nextHorizon ≤ cap) (hu : ¬ d event.hit ∣ 210) :
+    event.potentialNetCost potential ≤ ((24 * (event.hit - event.start) + cap : Nat) : Int) -
+      11 * ((d event.hit - 1 : Nat) : Int) := by
+  rw [potentialNetCost, if_neg hu]
+  omega
+
 /-- Supported events are covered by the scaled potential. For the other
 events, keep the entire signed difference, including any first-use gap. -/
 def scaledNetCost (event : ResidualPhaseEvent210) : Int :=
@@ -39,8 +55,7 @@ theorem scaled_net_cost_le_of_unsupported (event : ResidualPhaseEvent210) (hu : 
   have hstate := event.step.2.2.2.2.2.2.2.2
   have heven := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
   have hV := scaled_potential210_le event.hit event.nextHorizon heven
-  rw [scaledNetCost, if_neg hu]
-  omega
+  exact event.potential_net_cost_le_of_unsupported hV hu
 
 theorem scaled_net_cost_positive_part_le (event : ResidualPhaseEvent210) :
     event.scaledNetCost.toNat ≤ 37 * d event.hit + 1131 := by
@@ -69,20 +84,22 @@ theorem scaled_net_cost_le_neg1536 (event : ResidualPhaseEvent210)
       omega
     · omega
 
-private def scaledPathValue (x : Nat) : Int :=
-  24 * (x : Int) + (scaledPotential210 x (D x) : Int) - 11 * (D x : Int)
+private def potentialPathValue (potential : Nat → Nat → Nat) (x : Nat) : Int :=
+  24 * (x : Int) + (potential x (D x) : Int) - 11 * (D x : Int)
 
-private theorem scaled_path_value_step (event : ResidualPhaseEvent210) :
-    scaledPathValue event.hit - scaledPathValue event.start ≤ event.scaledNetCost := by
+private theorem potential_path_value_step (event : ResidualPhaseEvent210) {potential : Nat → Nat → Nat}
+    (supported : IsTravelPotential210 potential) :
+    potentialPathValue potential event.hit - potentialPathValue potential event.start ≤
+      event.potentialNetCost potential := by
   have hs := event.step.1.2.1
   have hr := event.step.2.2.2.2.2.2.2.2.2.1
   have hsr := event.step.2.1
   have hup := moving_horizon_step_update event.step
-  unfold scaledPathValue scaledNetCost
+  unfold potentialPathValue potentialNetCost
   rw [hs, hr]
   split
   · rename_i hd
-    have h := moving_horizon_supported210_scaled_potential event.step hd
+    have h := supported event.step hd
     omega
   · omega
 
@@ -93,12 +110,13 @@ namespace ResidualPhaseTrace210
 variable {s sf n first : Nat} {balance : Int}
 variable (trace : ResidualPhaseTrace210 s sf [] n first balance)
 
-theorem scaled_travel_budget {C Cf : Nat}
+theorem potential_travel_budget {C Cf : Nat} {potential : Nat → Nat → Nat}
+    (supported : IsTravelPotential210 potential)
     (path : HasMovingHorizonPathTo s C sf Cf n)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f sf - f s) :
-    ((24 * (sf - s) : Nat) : Int) + (scaledPotential210 sf Cf : Int) ≤
-      ((11 * (Cf - C) : Nat) : Int) + (scaledPotential210 s C : Int) +
-        ∑ i, (trace.event i).scaledNetCost := by
+    ((24 * (sf - s) : Nat) : Int) + (potential sf Cf : Int) ≤
+      ((11 * (Cf - C) : Nat) : Int) + (potential s C : Int) +
+        ∑ i, (trace.event i).potentialNetCost potential := by
   have hstart : D s = C := by
     cases n with
     | zero => exact path.2.2.2.1
@@ -106,13 +124,21 @@ theorem scaled_travel_budget {C Cf : Nat}
   have hend := (moving_horizon_path_endpoint path).2.1
   have ⟨hsf, hCf, _⟩ := moving_horizon_path_gap_le_three_growth path
   have hsum := Finset.sum_le_sum (s := Finset.univ)
-    (fun i _ => (trace.event i).scaled_path_value_step)
-  rw [delta ResidualPhaseEvent210.scaledPathValue] at hsum
-  unfold ResidualPhaseEvent210.scaledPathValue at hsum
+    (fun i _ => (trace.event i).potential_path_value_step supported)
+  rw [delta (ResidualPhaseEvent210.potentialPathValue potential)] at hsum
+  unfold ResidualPhaseEvent210.potentialPathValue at hsum
   rw [hstart, hend] at hsum
   omega
 
-private theorem unsupported_prime_ge_eleven {i j : Fin n} (reuse : trace.PrimeReuse i j) :
+theorem scaled_travel_budget {C Cf : Nat}
+    (path : HasMovingHorizonPathTo s C sf Cf n)
+    (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f sf - f s) :
+    ((24 * (sf - s) : Nat) : Int) + (scaledPotential210 sf Cf : Int) ≤
+      ((11 * (Cf - C) : Nat) : Int) + (scaledPotential210 s C : Int) +
+        ∑ i, (trace.event i).scaledNetCost :=
+  trace.potential_travel_budget moving_horizon_supported210_scaled_potential path delta
+
+theorem unsupported_prime_ge_eleven {i j : Fin n} (reuse : trace.PrimeReuse i j) :
     11 ≤ d (trace.event j).hit := by
   let e := d (trace.event j).hit
   have he : 1 < e := (trace.event j).step.2.2.2.1
@@ -243,10 +269,8 @@ theorem two_scaled_costs_of_enclosed_credit {a peak creditEvent : Fin n}
 
 end ResidualPhaseTrace210
 
-/-- A sufficient budget on an actual capped prefix at the first crossing.
-The overhead includes 1120 for the starting potential and 55 for growth
-beyond `M`. The inequality on the signed sum remains to be proved. -/
-def ScaledCrossingBudgetCondition210 : Prop :=
+/-- A sufficient budget on an actual capped prefix at the first crossing. -/
+def PotentialCrossingBudgetCondition210 (netCost : ResidualPhaseEvent210 → Int) (overhead : Nat) : Prop :=
   ∀ {M s C r C' p first : Nat} {balance : Int},
     50000000 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
     HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
@@ -255,9 +279,14 @@ def ScaledCrossingBudgetCondition210 : Prop :=
     r - s ≤ Nat.sqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
     ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance,
       (∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2)) →
-      (∑ i, (trace.event i).scaledNetCost) + (24 * (r - s) + 1175 : Nat) ≤ (M : Int)
+      (∑ i, netCost (trace.event i)) + (24 * (r - s) + overhead : Nat) ≤ (M : Int)
 
-theorem twin_travel_of_scaled_crossing_budget_condition210 (bound : ScaledCrossingBudgetCondition210) :
+/-- The crossing overhead is the starting potential cap plus 55 for
+the maximum extra horizon growth beyond the previous record. -/
+theorem twin_travel_of_potential_crossing_budget_condition210 {potential : Nat → Nat → Nat} {cap : Nat}
+    (potentialBound : ∀ s C, C % 2 = 0 → potential s C ≤ cap)
+    (supported : IsTravelPotential210 potential)
+    (bound : PotentialCrossingBudgetCondition210 (fun event => event.potentialNetCost potential) (cap + 55)) :
     TwinPrimeTravelBoundFrom 50000000 := by
   intro M sf Cf p hM htwin hcanon hpath hmax
   by_contra hnot
@@ -271,13 +300,23 @@ theorem twin_travel_of_scaled_crossing_budget_condition210 (bound : ScaledCrossi
   have hrMax : IsAttainedPreviousMaximum M r :=
     ⟨fun j hj hjr => hmax.1 j hj (hjr.trans hr), ⟨M + 2, by omega, by omega, hcanon⟩⟩
   have hnet := bound hM htwin hcanon hledger hstep hshort hcross hgap hrMax trace hdelta
-  have htravel := trace.scaled_travel_budget hprefix hdelta
-  have hV := scaled_potential210_le (M + 2) (2 * M - 2) (by omega)
+  change (∑ i, (trace.event i).potentialNetCost potential) +
+    ((24 * (r - s) + (cap + 55) : Nat) : Int) ≤ (M : Int) at hnet
+  have htravel := trace.potential_travel_budget supported hprefix hdelta
+  have hV := potentialBound (M + 2) (2 * M - 2) (by omega)
   have hC := canonical_horizon_bound_of_short_travel hprefix hshort
   have hstate := moving_horizon_path_endpoint hprefix
   have hCe := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
   have hModd : M % 2 = 1 := hcanon ▸ d_mod_two_eq_one_of_three_le (by omega)
   omega
+
+abbrev ScaledCrossingBudgetCondition210 : Prop :=
+  PotentialCrossingBudgetCondition210 ResidualPhaseEvent210.scaledNetCost 1175
+
+theorem twin_travel_of_scaled_crossing_budget_condition210 (bound : ScaledCrossingBudgetCondition210) :
+    TwinPrimeTravelBoundFrom 50000000 :=
+  twin_travel_of_potential_crossing_budget_condition210 scaled_potential210_le
+    moving_horizon_supported210_scaled_potential bound
 
 theorem target_of_scaled_crossing_budget_condition210 (bound : ScaledCrossingBudgetCondition210) : Target :=
   target_of_twin_travel_from_fifty_million (twin_travel_of_scaled_crossing_budget_condition210 bound)

@@ -1372,3 +1372,71 @@ PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --sc
 
 Lean 4.33.1 builds the selected modules. The audit of 40 declarations
 uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Rebalanced costs and capped first payments, 2026-11-12 JST
+
+Codex continued from `618462ef55111b485da358f16f939cdf7262c846`.
+`TravelClip210.lean` proves that an actual event with
+`gcd(e,210)>1` gives a first clipped hit at the same gap with
+increment `gcd(e,210)`. `TravelRebalanced210.lean` checks the
+generated potential on all 22,050 residue states with even horizon.
+The cap is 1,036. The supported steps obey the usual inequality
+`24*g + V_after ≤ 11*(e-1) + V_before`. For increments
+9, 25, 45 and 63 the corresponding allowances are 315, 525,
+315 and 315, half of their respective minimum same-phase drifts.
+The original scaled-cost bounds remain available.
+
+`ResidualRebalancedCosts210.lean` splits the signed net cost
+`w` into the first payment `phi=min(24*f,max(0,w))` and the
+remainder `u=w-phi`. Here `f` is the first long gap of the
+unsupported prime phase, or zero at other events. The cap
+preserves negative net costs and limits the separate payment
+to positive net cost. The startup sum for `u` is at most 4,054,512.
+`rebalanced_request_fits210` proves `3*d≤2*width` for every
+positive reuse request, so `rebalanced_deficit_has_multiple_requests210`
+requires at least two requests in any deficit. This covers the
+previous single-request exceptions at increments 9 and 25
+without using enclosed negative cost.
+
+For an event of increment `e` and pre-horizon `C`, put
+`g*=min(2*e, floor(2*(C+1)/e))`. The first payment is at most
+`min(24*g*, max(0,24*g*+1036-11*(e-1)))`. It vanishes when
+`48*(C+1)+1036*e≤11*(e-1)*e`. For a prefix with total horizon
+growth `G` and all pre-horizons at most `U`, a positive cutoff
+`L` gives the following bound on the sum `Phi` of first payments:
+
+```text
+W = L*(L+1)
+Phi ≤ 210*sum_{prime p≤L} min(48*p,37*p+1047)
+      + floor(max(0,48*(U+1)+1036*(L+1)-11*W)*G/W).
+```
+
+`ResidualFirstPayment210.lean` counts low prime payments once per
+reachable phase and bounds the tail after subtracting the event's
+own growth. If every window fits, the signed sum satisfies
+`3*sum(w)≤3*Phi+12163536+2*G`. The uniform sufficient first
+budget is `64*(3*Phi+12166819)≤61*M` for `M≥50000000`.
+There is also an actual-gap version with overhead 1,091 and an
+eventual bound from the existing sublinear first-phase theorem.
+The window inequalities for overlapping requests and an explicit
+first-payment budget down to the finite bridge are open.
+
+On synthetic canonical-shaped starts through 10,000,000 plus eight
+controls, the trial-division scan checks 58,986 starts, 6,357
+requests and 10,210 intervals. Six intervals are deficient with
+growth alone. All 10,210 fit with enclosed negative credit, with
+least signed margin 315 at `M=6874213` on `[13752100,13752730)`.
+The earlier adjusted scan and native/Python comparator through
+2,000,000 also pass.
+
+```sh
+lake build A166944.Attempt A166944.ResidualFirstPayment210 A166944.ResidualSmallAdjusted210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/rebalanced_potential_probe.py --lean-data \
+  | cmp - A166944/TravelRebalanced210Data.lean
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/travel_reuse_overlap_probe.py --scaled-limit 10000000 --rebalanced \
+  --control 22933441 --control 23613589 --control 23619049 --control 41453053 \
+  --control 45895573 --control 69921739 --control 86278501 --control 89666641
+```
+
+Lean 4.33.1 builds the selected modules. The audit of 42 declarations
+uses only `propext`, `Classical.choice`, and `Quot.sound`.

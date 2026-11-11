@@ -161,14 +161,17 @@ private theorem startup_phase_index_eq {a b : ResidualPhaseEvent210}
 private def adjustedStartupIncrements210 : Finset Nat :=
   (Finset.range 160).filter fun e => 1 < e ∧ e % 2 = 1 ∧ ¬ e ∣ 210
 
-def adjustedStartupWeight210 (e : Nat) : Nat := 1131 + startupTravelCap210 e - 11 * e
+def startupWeightAtCap210 (cap e : Nat) : Nat := cap + 11 + startupTravelCap210 e - 11 * e
 
-theorem adjusted_phase_cost_weight210 (event : ResidualPhaseEvent210)
+abbrev adjustedStartupWeight210 : Nat → Nat := startupWeightAtCap210 1120
+
+theorem adjusted_phase_cost_weight_of_bound210 (event : ResidualPhaseEvent210) {cap : Nat} {cost : Int}
+    (hcap : cap ≤ 1120)
     (hnew : ¬ (event.LongPrime ∧ event.phaseKey ∈ event.seen))
-    (hpos : 0 < event.adjustedCost) :
-    d event.hit ≤ 159 ∧ event.adjustedCost.toNat ≤ adjustedStartupWeight210 (d event.hit) := by
-  have hu := event.adjusted_cost_positive_unsupported hpos
-  have hcost := event.adjusted_cost_le_of_unsupported hu
+    (hpos : 0 < cost)
+    (hcost : cost ≤ (24 * (event.hit - event.start) + cap : Nat) -
+      11 * ((d event.hit - 1 : Nat) : Int) - (24 * event.firstGap : Nat)) :
+    d event.hit ≤ 159 ∧ cost.toNat ≤ startupWeightAtCap210 cap (d event.hit) := by
   have he := event.step.2.2.2.1
   have hr : 3 ≤ event.hit := by have := event.step.1.1; have := event.step.2.1; omega
   have hodd := d_mod_two_eq_one_of_three_le hr
@@ -204,9 +207,19 @@ theorem adjusted_phase_cost_weight210 (event : ResidualPhaseEvent210)
         omega
     · omega
   refine ⟨hsize, ?_⟩
-  have hcap := startup_gap_le_travel_cap event hnew (by omega)
-  unfold adjustedStartupWeight210
+  have hgap := startup_gap_le_travel_cap event hnew (by omega)
+  unfold startupWeightAtCap210
   omega
+
+theorem adjusted_phase_cost_weight210 (event : ResidualPhaseEvent210)
+    (hnew : ¬ (event.LongPrime ∧ event.phaseKey ∈ event.seen))
+    (hpos : 0 < event.adjustedCost) :
+    d event.hit ≤ 159 ∧ event.adjustedCost.toNat ≤ adjustedStartupWeight210 (d event.hit) :=
+  adjusted_phase_cost_weight_of_bound210 event le_rfl hnew hpos
+    (event.adjusted_cost_le_of_unsupported (event.adjusted_cost_positive_unsupported hpos))
+
+def startupWeightSumAtCap210 (cap : Nat) : Nat :=
+  ∑ e ∈ adjustedStartupIncrements210, startupPhaseSlots210 e * startupWeightAtCap210 cap e
 
 set_option maxRecDepth 16384 in
 theorem adjusted_startup_weight_total210 :
@@ -251,6 +264,23 @@ private theorem startup_sum_le_of_weights {n : Nat} (events : Fin n → Residual
       unfold codes
       simp [Finset.sum_sigma, Finset.sum_const, Finset.card_range]
 
+/-- For a fixed increment, the actual horizon parity leaves at most
+210 reachable keys. The tighter gcd count is used for startup weights. -/
+theorem phase_sum_le_of_weights210 {n : Nat} (events : Fin n → ResidualPhaseEvent210)
+    (selected : Finset (Fin n)) (increments : Finset Nat) (cost : Fin n → Nat) (weight : Nat → Nat)
+    (allowed : ∀ i ∈ selected, d (events i).hit ∈ increments)
+    (distinct : Set.InjOn (fun i => (events i).phaseKey) (selected : Set (Fin n)))
+    (bounded : ∀ i ∈ selected, cost i ≤ weight (d (events i).hit)) :
+    (∑ i ∈ selected, cost i) ≤ 210 * (∑ e ∈ increments, weight e) := by
+  apply (startup_sum_le_of_weights events selected increments cost weight allowed distinct bounded).trans
+  rw [Finset.mul_sum]
+  apply Finset.sum_le_sum
+  intro e _
+  have hg : 0 < Nat.gcd e 210 := Nat.gcd_pos_of_pos_right _ (by decide)
+  have h₂ := Nat.mul_le_mul_right (210 / (2 * Nat.gcd e 210)) (by omega : 2 ≤ 2 * Nat.gcd e 210)
+  rw [Nat.mul_comm (2 * Nat.gcd e 210)] at h₂
+  exact Nat.mul_le_mul_right _ (h₂.trans (Nat.div_mul_le_self _ _))
+
 namespace ResidualPhaseTrace210
 
 variable {s sf n first : Nat} {balance : Int}
@@ -280,25 +310,36 @@ theorem refined_startup_cost_le : trace.startupCost ≤ 6181254 := by
     exact residual_phase_startup_weight210 (trace.event i) (trace.startup_not_reused_long hi)
       (trace.startup_positive hi)
 
-theorem adjusted_startup_cost_le : trace.adjustedStartupCost ≤ 4651452 := by
-  rw [← adjusted_startup_weight_total210]
-  apply startup_sum_le_of_weights trace.event trace.adjustedStartup adjustedStartupIncrements210
-    (fun i => (trace.event i).adjustedCost.toNat) adjustedStartupWeight210
+theorem cost_startup_sum_le_at_cap (cost : Fin n → Int) {cap : Nat} (hcap : cap ≤ 1120)
+    (unsupported : ∀ i, 0 < cost i → ¬ d (trace.event i).hit ∣ 210)
+    (bound : ∀ i, 0 < cost i → cost i ≤ (24 * ((trace.event i).hit - (trace.event i).start) + cap : Nat) -
+      11 * ((d (trace.event i).hit - 1 : Nat) : Int) - (24 * (trace.event i).firstGap : Nat)) :
+    trace.costStartupSum cost ≤ startupWeightSumAtCap210 cap := by
+  have hweights {i : Fin n} (hi : i ∈ trace.costStartup cost) :=
+    adjusted_phase_cost_weight_of_bound210 (trace.event i) hcap (trace.cost_startup_not_reused hi)
+      (trace.cost_startup_positive hi) (bound i (trace.cost_startup_positive hi))
+  apply startup_sum_le_of_weights trace.event (trace.costStartup cost) adjustedStartupIncrements210
+    (fun i => (cost i).toNat) (startupWeightAtCap210 cap)
   · intro i hi
-    have hpos := trace.adjusted_startup_positive hi
-    have hb := (adjusted_phase_cost_weight210 (trace.event i) (trace.adjusted_startup_not_reused hi) hpos).1
+    have hb := (hweights hi).1
     have hr : 3 ≤ (trace.event i).hit := by
       have := (trace.event i).step.1.1
       have := (trace.event i).step.2.1
       omega
     unfold adjustedStartupIncrements210
     exact Finset.mem_filter.mpr ⟨Finset.mem_range.mpr (by omega), (trace.event i).step.2.2.2.1,
-      d_mod_two_eq_one_of_three_le hr, (trace.event i).adjusted_cost_positive_unsupported hpos⟩
+      d_mod_two_eq_one_of_three_le hr, unsupported i (trace.cost_startup_positive hi)⟩
   · intro i hi j hj h
-    exact trace.adjusted_startup_unique hi hj h
+    exact trace.cost_startup_unique hi hj h
   · intro i hi
-    exact (adjusted_phase_cost_weight210 (trace.event i) (trace.adjusted_startup_not_reused hi)
-      (trace.adjusted_startup_positive hi)).2
+    exact (hweights hi).2
+
+theorem adjusted_startup_cost_le : trace.adjustedStartupCost ≤ 4651452 := by
+  rw [← adjusted_startup_weight_total210]
+  exact trace.cost_startup_sum_le_at_cap (fun i => (trace.event i).adjustedCost) (by decide)
+    (fun i h => (trace.event i).adjusted_cost_positive_unsupported h)
+    (fun i h => (trace.event i).adjusted_cost_le_of_unsupported
+      ((trace.event i).adjusted_cost_positive_unsupported h))
 
 end ResidualPhaseTrace210
 
