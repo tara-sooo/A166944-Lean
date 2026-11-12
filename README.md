@@ -73,6 +73,13 @@ statements for all strict records `5 < R ≤ 1468965061`.
 `target_of_rebalanced_remaining_crossings_from_1468965061` uses these
 certificates to start the remaining signed crossing condition at
 `M ≥ 1468965061`.
+`VerifiedBoundaryRecordExtension.lean` checks three further replays and
+certifies both conclusions through record 11,751,795,061.
+`RebalancedBoundary210.lean` uses the cofactor at an inside hit to exclude
+new records below a boundary in the index and horizon. A capped replay can
+cross that boundary only after growth greater than `M/4` at large relative
+gaps. A signed budget on those crossing prefixes gives both conclusions by
+`record_index_and_twin_prime_of_rebalanced_boundary210`.
 `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in

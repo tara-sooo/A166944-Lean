@@ -2023,3 +2023,66 @@ Lean 4.33.1 checks the new modules and the composition with
 `target_of_rebalanced_remaining_crossings_from_1468965061`.
 The audit of 27 new or revised public theorems uses only
 `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Cofactor bound for the index and horizon, 2026-11-12 JST
+
+From `b7fd35a1af1b4b1832ea0815a6f68ad1271bb6de`, let
+`Y(s,C) = 432*s - 215*C + 18*V(s,C)`, where `V` is the rebalanced
+potential. For a nonunit hit of increment `e`, its cofactor `v` satisfies
+`3 ≤ v`, `|C-e*v| = 1` in the corresponding parity branch, and
+`gap ≤ 2*v`. For `e > 5` the gcd divisibilities also give
+`C+e ≤ 2*r+1` at the hit `r`. Combining these estimates yields
+`219*e - 2809 ≤ Y(s,C)` for `e ≥ 864`. Thus below `219*M - 2400`
+an inside hit cannot exceed an odd record `M ≥ 863`.
+
+The increment of `Y` is bounded by `18*w-17*(e-1)`, where `w` is the
+signed rebalanced event cost. An increasing step has `e ∤ 210`.
+For gaps at most ten it has `e ≤ 107`. For larger gaps the composite
+possibilities are `49, 77, 121`. The finite factor check uses
+`f² ≤ e`, `gap ≤ 2*f`, and excludes factors three and five. The clipped
+cost cap at increment 91 rules out the fourth numerical candidate.
+
+For a prefix let `G` be its horizon growth, `Phi` its capped first
+payments, and `D_credit` its signed rebalanced credit debt. Put
+`B = 180*Phi + 60*D_credit - 50*G`. The change of `10*Y` is at
+most `B + 729812160`, using the existing startup cap. The period
+bound gives `B ≤ 180*Phi + E - 170*U - 180*N`, with period excess
+`E`, unused growth `U`, and negative cost magnitude `N`.
+At the new finite threshold, every boundary crossing needs `M < 4*H`
+in the prefix, where `H` counts growth at large relative gaps. The
+crossing's own increase is at most `325*gap+18863` and its gap obeys
+`3600*gap ≤ M`. The sufficient budget `B ≤ 2169*M` on these actual
+prefixes excludes the crossing. This implies a long quiet interval at
+the capped exit, so the existing factor and return theorems give the
+record index and twin primality. The uniform budget remains open.
+
+The finite certificate extends from 1,468,965,061 through the next
+three actual records, with 4, 52 and 26 nonunit events respectively.
+
+| Previous record | Next record | Horizon growth | Growth at large relative gaps |
+| ---: | ---: | ---: | ---: |
+| 1,468,965,061 | 2,937,930,211 | 90 | 90 |
+| 2,937,930,211 | 5,875,882,249 | 21,828 | 13,298 |
+| 5,875,882,249 | 11,751,795,061 | 30,564 | 30,370 |
+
+The replay diagnostic uses trial factorization to propose first hits
+and checks each proposed gap against the original gcd recurrence.
+In the bounded range `[11751795061,11751995061]` plus four controls,
+483 twin-shaped starts produce 43,908 transitions and all reach
+quiet exits. The maximum observed prefix budget is 954,242,160 at
+`M=11751931201`. Each replay runs to a quiet exit, a new record inside
+the horizon, a boundary crossing, or 3,000 nonunit events.
+
+```sh
+lake build A166944.TravelRebalanced210
+lake build A166944.VerifiedBoundaryRecordExtension
+lake build A166944.RebalancedBoundary210 A166944.Attempt
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/rebalanced_boundary_probe.py --synthetic 11751795061 11751995061
+```
+
+The mod-210 check uses the same seven 15-row kernel certificates in
+separate declarations to reduce the peak memory of its build.
+Lean 4.33.1 builds both new modules and `A166944.Attempt`. The
+`#print axioms` audit of 21 declarations, including the finite result,
+the boundary reduction to `Target`, and the inherited twin-prime
+implication, reports only `propext`, `Classical.choice`, and `Quot.sound`.

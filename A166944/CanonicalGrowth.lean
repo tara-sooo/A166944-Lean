@@ -11,28 +11,34 @@ even common multiple.
 
 namespace A166944Research
 
+theorem moving_horizon_step_exact_cofactor_gap {s C r C' : Nat}
+    (hstep : IsMovingHorizonStep s C r C') :
+    ∃ v : Nat, 3 ≤ v ∧ C ≤ d r * v + 1 ∧ d r * v ≤ C + 1 ∧ r - s ≤ 2 * v := by
+  rcases moving_horizon_step_event_package hstep with ⟨_, hdiv, _, hsize⟩ | ⟨_, hdiv, _, hsize⟩
+  · obtain ⟨v, hv⟩ := hdiv
+    have hv3 : 3 ≤ v := by
+      by_cases h : 3 ≤ v
+      · exact h
+      · have hle := Nat.mul_le_mul_left (d r) (show v ≤ 2 by omega)
+        have := hstep.2.2.2.1
+        omega
+    have hdiv' : v ∣ C - 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
+    exact ⟨v, hv3, by omega, by omega, moving_horizon_gap_le_twice_even_factor hstep (by omega) hdiv'⟩
+  · obtain ⟨v, hv⟩ := hdiv
+    have hv3 : 3 ≤ v := by
+      by_cases h : 3 ≤ v
+      · exact h
+      · have hle := Nat.mul_le_mul_left (d r) (show v ≤ 2 by omega)
+        have := hstep.2.2.2.1
+        omega
+    have hdiv' : v ∣ C + 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
+    exact ⟨v, hv3, by omega, by omega, moving_horizon_gap_le_twice_odd_factor hstep (by omega) hdiv'⟩
+
 theorem moving_horizon_step_cofactor_gap {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') :
     ∃ v : Nat, d r * v ≤ C + 1 ∧ r - s ≤ 2 * v := by
-  rcases moving_horizon_step_event_package hstep with ⟨_, hdiv, hproper, _⟩ | ⟨_, hdiv, hproper, _⟩
-  · obtain ⟨v, hv⟩ := hdiv
-    have hv1 : 1 < v := by
-      by_cases h : 1 < v
-      · exact h
-      · have hle := Nat.mul_le_mul_left (d r) (show v ≤ 1 by omega)
-        simp only [Nat.mul_one] at hle
-        omega
-    have hdiv' : v ∣ C - 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
-    exact ⟨v, by omega, moving_horizon_gap_le_twice_even_factor hstep hv1 hdiv'⟩
-  · obtain ⟨v, hv⟩ := hdiv
-    have hv1 : 1 < v := by
-      by_cases h : 1 < v
-      · exact h
-      · have hle := Nat.mul_le_mul_left (d r) (show v ≤ 1 by omega)
-        simp only [Nat.mul_one] at hle
-        omega
-    have hdiv' : v ∣ C + 1 := ⟨d r, by simpa [Nat.mul_comm] using hv⟩
-    exact ⟨v, by omega, moving_horizon_gap_le_twice_odd_factor hstep hv1 hdiv'⟩
+  obtain ⟨v, _, _, hprod, hgap⟩ := moving_horizon_step_exact_cofactor_gap hstep
+  exact ⟨v, hprod, hgap⟩
 
 theorem moving_horizon_step_gap_mul_increment_le_twice_horizon {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') : (r - s) * d r ≤ 2 * (C + 1) := by

@@ -41,20 +41,32 @@ private def checkRebalancedRow210 (h : Nat) : Bool :=
 private def checkRebalancedBand210 (start : Nat) : Bool :=
   (List.range' start 15).all checkRebalancedRow210
 
-set_option maxRecDepth 65536 in
-set_option maxHeartbeats 0 in
-private theorem rebalanced_bands_checked210 :
-    checkRebalancedBand210 0 = true ∧ checkRebalancedBand210 15 = true ∧
-      checkRebalancedBand210 30 = true ∧ checkRebalancedBand210 45 = true ∧
-      checkRebalancedBand210 60 = true ∧ checkRebalancedBand210 75 = true ∧
-      checkRebalancedBand210 90 = true := by
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> decide +kernel
+section
+
+set_option maxRecDepth 65536
+set_option maxHeartbeats 0
+
+private theorem rebalanced_band0_checked210 : checkRebalancedBand210 0 = true := by decide +kernel
+private theorem rebalanced_band15_checked210 : checkRebalancedBand210 15 = true := by decide +kernel
+private theorem rebalanced_band30_checked210 : checkRebalancedBand210 30 = true := by decide +kernel
+private theorem rebalanced_band45_checked210 : checkRebalancedBand210 45 = true := by decide +kernel
+private theorem rebalanced_band60_checked210 : checkRebalancedBand210 60 = true := by decide +kernel
+private theorem rebalanced_band75_checked210 : checkRebalancedBand210 75 = true := by decide +kernel
+private theorem rebalanced_band90_checked210 : checkRebalancedBand210 90 = true := by decide +kernel
+
+end
 
 private theorem all_rebalanced_residues_checked210 : (List.range 105).all checkRebalancedRow210 = true := by
   have hs : List.range 105 = List.range' 0 15 ++ List.range' 15 15 ++
       List.range' 30 15 ++ List.range' 45 15 ++ List.range' 60 15 ++
       List.range' 75 15 ++ List.range' 90 15 := by decide
-  obtain ⟨h0, h15, h30, h45, h60, h75, h90⟩ := rebalanced_bands_checked210
+  have h0 := rebalanced_band0_checked210
+  have h15 := rebalanced_band15_checked210
+  have h30 := rebalanced_band30_checked210
+  have h45 := rebalanced_band45_checked210
+  have h60 := rebalanced_band60_checked210
+  have h75 := rebalanced_band75_checked210
+  have h90 := rebalanced_band90_checked210
   unfold checkRebalancedBand210 at h0 h15 h30 h45 h60 h75 h90
   rw [hs]
   simp only [List.all_append, h0, h15, h30, h45, h60, h75, h90, Bool.and_self]
