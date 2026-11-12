@@ -2164,3 +2164,53 @@ The replay scan uses SymPy 1.14.0 for factorization and cross-checks
 the selected witnesses and six actual segments by direct gcd iteration.
 Lean 4.33.1 builds both targets. The axiom audit of 13 declarations
 reports only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Joint endpoint bound and departures from small offsets, 2026-11-12 JST
+
+Write `X=2*s-C`, `g=r-s`, `e=d(r)`, and `F=M*X+4*(C+1)`.
+If `e>M` then `M≤X+2*g` from the offset update. As `g>0`
+and `g*e≤2*(C+1)`, this implies `M*M<F`.
+Any divisor `v>1` of either `C-1` or `C+1` gives `g≤2*v`, so
+for odd `M`, `X+4*v≤M` also excludes `e>M`. In particular, an
+inside record with `X+4*B≤M` has no divisors through `B` on
+either side. At a quiet exit, `X≤M`, `M≥43`, and `C≥2*M-2`
+give the square-root gap needed for both factor certificates.
+`canonical_next_record_factors_of_joint_bound_or_small_factor`
+combines these implications. The bound on actual capped endpoints
+is still open.
+
+On an old step, `F` changes by `M*(X'-X)+4*(e-1)` over the
+integers. If `F` increases while `X` falls, the offset falls
+by exactly two and `2*(e-1)>M`. This narrows the possible first
+crossings of `F=M*M` and retains the horizon growth on flat offsets.
+
+If `e≥5` and `X+1<e`, the new offset is `delta` when `C'%4=0`
+and `2*e+delta` otherwise, with `delta=0` at an even hit and `6`
+at an odd hit. For `X≤6` and `e≥9`, a departure above six has
+`e*e≤C+1`. On the even side with `e%4=3` the stronger bound is
+`3*e*e≤C-1`. On the odd side with `e%4=1` it is `3*e*e≤C+1`.
+The complementary divisor of the hit term would otherwise give
+an earlier hit of the same parity. Including `e<9`, the next
+offset is at most `max(28,2*sqrt(C+1)+6)`.
+
+In six actual segments, 9 of 14 hits with `X≤6` and `e≥9`
+return to at most six. The other five satisfy the cofactor bound.
+The bounded synthetic scans from 14,869 and 478 twin-shaped starts
+give 534,222 total steps. They include 65,696 hits with `X≤6`
+and `e≥9`, with 49,252 returns and 16,444 departures. At the
+synthetic start `M=181`, the odd hit at `r=211` has `e=19` and
+`C=360`, attaining `e*e=C+1` and sending `X=6` to `44`.
+Two local seeds for `M=101`, `X=6` illustrate the new conditions.
+At `C=1600`, the joint bound holds while the old quadratic bound
+fails. At `C=10002`, the joint bound fails and the divisor `7`
+of `C+1` suffices. Direct gcd iteration checks both seeds, the six
+actual segments, and the tightest departure in each synthetic scan.
+
+```sh
+lake build A166944.ReplayLaunch A166944.Attempt
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/replay_launch_probe.py --scan
+```
+
+Lean 4.33.1 builds both targets. The audit of all nine new public
+declarations and `record_index_and_twin_prime_of_le_11751795061`
+reports only `propext`, `Classical.choice`, and `Quot.sound`.
