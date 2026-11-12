@@ -247,6 +247,21 @@ minus credit outside the union. On crossing candidates,
 the first-phase estimate leaves an allowance of `27*M/80` for `E`.
 The uniform signed budget remains open.
 
+`RebalancedAnchorWindows210.lean` allows each demand to use any
+credit coordinate between its anchor and its endpoint. The endpoint
+window inequalities are equivalent to a feasible allocation. A
+window with only long prime reuses of increment at least 109 can
+support any number of requests on at most three phase keys.
+For at most four long keys with increments at least 32, a deficit
+requires a reuse with growth exactly `210*e` and negative cost
+below `8*e+4188` between its anchor and endpoint. A deficit with
+at most three requests has credit width at most 45,053 and request
+increments at most 159. The exact repeat credit debt can be used
+in the signed crossing allowance. If first payments are at most
+three tenths of the record, a first crossing must have a deficient
+anchored window with at least two phase keys. The uniform budget
+on actual crossing candidates remains open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

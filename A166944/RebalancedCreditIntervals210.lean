@@ -78,7 +78,7 @@ theorem rebalanced_credit_after_le_total (i : Fin n) :
   unfold rebalancedCreditAfter rebalancedTotalCredit
   omega
 
-private theorem rebalanced_credit_after_monotone : Monotone trace.rebalancedCreditAfter := by
+theorem rebalanced_credit_after_monotone : Monotone trace.rebalancedCreditAfter := by
   intro i j order
   have hC := D_le_of_le (trace.hit_monotone_for_credit order)
   rw [← trace.rebalanced_next_horizon_eq_D i, ← trace.rebalanced_next_horizon_eq_D j] at hC
@@ -87,7 +87,7 @@ private theorem rebalanced_credit_after_monotone : Monotone trace.rebalancedCred
   unfold rebalancedCreditAfter
   omega
 
-private theorem rebalanced_credit_distance {i j : Fin n} (order : i ≤ j) :
+theorem rebalanced_credit_distance {i j : Fin n} (order : i ≤ j) :
     trace.rebalancedCreditAfter j - trace.rebalancedCreditAfter i =
       2 * ((trace.event j).nextHorizon - (trace.event i).nextHorizon) +
         3 * (∑ k ∈ Ioc i j, trace.rebalancedNegativeCost k) := by
@@ -159,9 +159,10 @@ theorem rebalanced_credit_distance_eq_sum210
   rw [trace.rebalanced_credit_distance order, ← trace.rebalanced_sum_growth_between_hits210 delta order,
     Finset.sum_add_distrib, Finset.mul_sum, Finset.mul_sum]
 
-private theorem same_key_rebalanced_credit_period {i j : Fin n}
+theorem same_key_rebalanced_credit_period_with_negative {i j : Fin n}
     (order : i < j) (key : (trace.event i).phaseKey = (trace.event j).phaseKey) :
-    2 * Nat.lcm 210 (2 * d (trace.event j).hit) ≤ trace.rebalancedCreditAfter j - trace.rebalancedCreditAfter i := by
+    2 * Nat.lcm 210 (2 * d (trace.event j).hit) + 3 * (∑ k ∈ Ioc i j, trace.rebalancedNegativeCost k) ≤
+      trace.rebalancedCreditAfter j - trace.rebalancedCreditAfter i := by
   let interval := trace.samePhaseInterval order key
   have hperiod := (same_phase_credit_interval_constraints210 interval).2.2.1
   have hincrement := interval.same_increment
@@ -172,6 +173,11 @@ private theorem same_key_rebalanced_credit_period {i j : Fin n}
   have hj := moving_horizon_step_update (trace.event j).step
   have h := trace.rebalanced_credit_distance order.le
   omega
+
+theorem same_key_rebalanced_credit_period {i j : Fin n}
+    (order : i < j) (key : (trace.event i).phaseKey = (trace.event j).phaseKey) :
+    2 * Nat.lcm 210 (2 * d (trace.event j).hit) ≤ trace.rebalancedCreditAfter j - trace.rebalancedCreditAfter i :=
+  (Nat.le_add_right _ _).trans (trace.same_key_rebalanced_credit_period_with_negative order key)
 
 def rebalancedCreditInterval (i : Fin n) : Finset Nat :=
   Ico (trace.rebalancedCreditAfter i - 3 * trace.rebalancedDemand i) (trace.rebalancedCreditAfter i)
@@ -413,15 +419,30 @@ def rebalancedCreditAdjustment : Int :=
   ((∑ i, trace.rebalancedCreditExcess i : Nat) : Int) -
     (trace.rebalancedTotalCredit - trace.rebalancedCreditUnion.card : Nat)
 
+def rebalancedCreditDebt : Int :=
+  3 * ((∑ i, trace.rebalancedDemand i : Nat) : Int) - trace.rebalancedTotalCredit
+
+theorem rebalanced_credit_debt_le_adjustment : trace.rebalancedCreditDebt ≤ trace.rebalancedCreditAdjustment := by
+  have hdemand := trace.rebalanced_demand_le_credit_union_and_excess
+  have hunion := trace.rebalanced_credit_union_le_total
+  unfold rebalancedCreditDebt rebalancedCreditAdjustment
+  omega
+
+theorem rebalanced_net_cost_eq_credit_debt210 :
+    3 * (∑ i, (trace.event i).rebalancedNetCost) =
+      (3 * trace.totalCappedFirstPayment + 3 * trace.costStartupSum trace.rebalancedCosts +
+        2 * (D sf - D s) : Nat) + trace.rebalancedCreditDebt := by
+  rw [trace.sum_rebalanced_net_cost_parts210]
+  unfold rebalancedCreditDebt rebalancedTotalCredit
+  simp only [rebalancedNegativeCost]
+  omega
+
 theorem rebalanced_net_cost_le_of_credit_intervals210 :
     3 * (∑ i, (trace.event i).rebalancedNetCost) ≤
       (3 * trace.totalCappedFirstPayment + 3 * trace.costStartupSum trace.rebalancedCosts +
         2 * (D sf - D s) : Nat) + trace.rebalancedCreditAdjustment := by
-  have hdemand := trace.rebalanced_demand_le_credit_union_and_excess
-  have hunion := trace.rebalanced_credit_union_le_total
-  rw [trace.sum_rebalanced_net_cost_parts210]
-  unfold rebalancedCreditAdjustment rebalancedTotalCredit at *
-  simp only [rebalancedNegativeCost] at *
+  rw [trace.rebalanced_net_cost_eq_credit_debt210]
+  have h := trace.rebalanced_credit_debt_le_adjustment
   omega
 
 /-- Unused credit outside any band containing the intervals may be
@@ -443,6 +464,29 @@ end
 
 end ResidualPhaseTrace210
 
+private theorem rebalanced_crossing_signed_of_credit_debt_budget210
+    {M s C r p first firstUpper : Nat} {balance : Int}
+    (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
+      (M + 2) (2 * M - 2) s C [] p first balance)
+    (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
+    (firstBound : trace.totalCappedFirstPayment ≤ firstUpper)
+    (budget : (3 * firstUpper + 3 * trace.costStartupSum trace.rebalancedCosts +
+      35 * (C - (2 * M - 2)) + 72 * (r - s) +
+      3 * rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) + trace.rebalancedCreditDebt <
+      ((36 * (M + 1) + 3 * rebalancedPotential210 s C : Nat) : Int)) :
+    (∑ i, (trace.event i).rebalancedNetCost) +
+      (24 * (r - s) + 11 * (C - (2 * M - 2)) + rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) <
+        ((12 * (M + 1) + rebalancedPotential210 s C : Nat) : Int) := by
+  have path := residual_phase_balances210_path ledger
+  have hstart : D (M + 2) = 2 * M - 2 := by
+    cases p with
+    | zero => exact path.2.2.2.1
+    | succ _ => exact path.1.2.1
+  have hend := (moving_horizon_path_endpoint path).2.1
+  have hcost := trace.rebalanced_net_cost_eq_credit_debt210
+  rw [hstart, hend] at hcost
+  omega
+
 /-- The cumulative credit estimate can be combined with an upper
 bound on first payments to contradict the signed crossing lower bound. -/
 theorem rebalanced_crossing_signed_of_credit_budget210
@@ -458,18 +502,35 @@ theorem rebalanced_crossing_signed_of_credit_budget210
     (∑ i, (trace.event i).rebalancedNetCost) +
       (24 * (r - s) + 11 * (C - (2 * M - 2)) + rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) <
         ((12 * (M + 1) + rebalancedPotential210 s C : Nat) : Int) := by
-  have path := residual_phase_balances210_path ledger
-  have hstart : D (M + 2) = 2 * M - 2 := by
-    cases p with
-    | zero => exact path.2.2.2.1
-    | succ _ => exact path.1.2.1
-  have hend := (moving_horizon_path_endpoint path).2.1
-  have hcost := trace.rebalanced_net_cost_le_of_credit_intervals210
-  rw [hstart, hend] at hcost
+  apply rebalanced_crossing_signed_of_credit_debt_budget210 ledger trace firstBound
+  have h := trace.rebalanced_credit_debt_le_adjustment
   omega
 
-/-- At and above the finite certificate threshold, the first
-payments and the signed credit adjustment share one allowance. -/
+/-- The first payments and the exact repeat demand minus available
+credit share one allowance at and above the finite threshold. -/
+theorem rebalanced_crossing_signed_of_credit_debt_allowance210
+    {M s C r p first firstUpper : Nat} {balance : Int}
+    (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
+    (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
+      (M + 2) (2 * M - 2) s C [] p first balance)
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
+    (firstBound : trace.totalCappedFirstPayment ≤ firstUpper)
+    (allowance : 10 * (3 * (firstUpper : Int) + trace.rebalancedCreditDebt) ≤ (9 * M : Nat)) :
+    (∑ i, (trace.event i).rebalancedNetCost) +
+      (24 * (r - s) + 11 * (C - (2 * M - 2)) + rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) <
+        ((12 * (M + 1) + rebalancedPotential210 s C : Nat) : Int) := by
+  apply rebalanced_crossing_signed_of_credit_debt_budget210 ledger trace firstBound
+  have hpath := residual_phase_balances210_path ledger
+  have hC := canonical_horizon_bound_of_short_travel hpath short
+  have hstate := moving_horizon_path_endpoint hpath
+  have hCe := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
+  have hModd := canonical ▸ d_mod_two_eq_one_of_three_le (by omega : 3 ≤ M + 2)
+  have hgap := (Nat.mul_le_mul_left 1536 gap).trans (fifty_million_sqrt_budget (by omega : 50000000 ≤ M))
+  have hV := rebalanced_potential210_le (M + 2) (2 * M - 2) (by omega)
+  have hstartup := trace.rebalanced_startup_cost_le
+  omega
+
 theorem rebalanced_crossing_signed_of_credit_allowance210
     {M s C r p first firstUpper : Nat} {balance : Int}
     (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
@@ -482,15 +543,8 @@ theorem rebalanced_crossing_signed_of_credit_allowance210
     (∑ i, (trace.event i).rebalancedNetCost) +
       (24 * (r - s) + 11 * (C - (2 * M - 2)) + rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) <
         ((12 * (M + 1) + rebalancedPotential210 s C : Nat) : Int) := by
-  apply rebalanced_crossing_signed_of_credit_budget210 ledger trace firstBound
-  have hpath := residual_phase_balances210_path ledger
-  have hC := canonical_horizon_bound_of_short_travel hpath short
-  have hstate := moving_horizon_path_endpoint hpath
-  have hCe := hstate.2.1 ▸ D_mod_two_eq_zero_of_two_le hstate.1
-  have hModd := canonical ▸ d_mod_two_eq_one_of_three_le (by omega : 3 ≤ M + 2)
-  have hgap := (Nat.mul_le_mul_left 1536 gap).trans (fifty_million_sqrt_budget (by omega : 50000000 ≤ M))
-  have hV := rebalanced_potential210_le (M + 2) (2 * M - 2) (by omega)
-  have hstartup := trace.rebalanced_startup_cost_le
+  apply rebalanced_crossing_signed_of_credit_debt_allowance210 hM canonical ledger short gap trace firstBound
+  have h := trace.rebalanced_credit_debt_le_adjustment
   omega
 
 /-- For sufficiently large records the sublinear first-payment

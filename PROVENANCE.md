@@ -1743,3 +1743,82 @@ PY
 
 Lean 4.33.1 accepts the new proofs. The audit of 24 public theorems
 uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Anchored placement and weighted phase periods, 2026-11-12 JST
+
+From `575f73529f4105d1494b5309b4683b5ce0df8d34`,
+`RebalancedAnchorWindows210.lean` lets demand `3*P_i` use any unit
+between the cumulative credit just after its anchor and just after
+its endpoint. The closed-interval Hall theorem gives the exact
+equivalence between the window inequalities and a feasible
+allocation. A deficient window can be shrunk to positive request
+endpoints while preserving every contained positive request.
+
+Full terminal periods are disjoint within each key. For long reuses,
+the full intervals back to their latest long anchors are disjoint
+within that key as well. A rate bound compares the sum of the
+fractions of the containing window needed by the keys with one.
+At most three keys of long prime increments `e≥109` fit for
+arbitrarily many requests, since `3*(111*e+3141)≤420*e`.
+Four long keys fit when each request has negative cost at least
+`8*e+4188` between its own anchor and endpoint. Its full width is
+twice the horizon drift plus three times that negative cost.
+
+A deficit with at most four long keys of increments `e≥32` forces
+one request with width below `12*P_i`. Its horizon drift is a positive
+multiple of `210*e`. Two periods would already pay this width, so
+the drift is exactly `210*e` and the negative cost is below
+`8*e+4188`. In any deficit with at most two requests the long
+increments are at most 31. With at most three requests the long
+increments are at most 107, all request increments are at most 159,
+and the credit width is at most 45,053. Between actual event
+endpoints of such a window, every increment is at most 22,527
+and every gap at most 45,054. An increment at least 339 with a small
+relative gap is at most 4,371 there.
+
+The exact repeat credit debt is `3*sum P_i - B_total`. It is bounded
+above by the previous terminal-interval adjustment, and
+`3*W = 3*Phi+3*A+2*G+debt`. The signed allowance accepts this exact
+debt. A first crossing with `10*Phi≤3*M` has positive debt, hence a
+deficit at positive anchored endpoints containing at least two
+keys. The universal bound on actual crossings remains open.
+
+Trial division on 533 and 684 synthetic starts in
+`[7163911,7263911]` and `[367232911,367432911]` checks 116 and 723
+positive endpoint windows. All pass and an independent placement
+of each request in the earliest available units succeeds. The
+minimum slack in the two ranges is 3,735 and 1,575 credit units.
+On the `M=367264309` control, the terminal intervals overlap by
+90 units. The full intervals `[3779,45521)` and `[9881,45581)`
+admit the disjoint placements `[3779,3869)` and `[9881,11915)`.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedAnchorWindows210 A166944.ResidualRebalancedPairOffsets210
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=diagnostics python3 - <<'PY'
+from rebalanced_potential_probe import rebalanced_potential
+from travel_credit_prefix import capped_hits
+from travel_mod210_probe import residue_tables
+from travel_residue_probe import increment_at
+from travel_reuse_overlap_probe import replay
+
+M, cut = 367264309, 734547102
+requests, costs = replay(M, residue_tables(), rebalanced=rebalanced_potential())
+hits, _ = capped_hits(M)
+credit, negative = {}, 0
+for (C, cost), hit in zip(costs, hits, strict=True):
+    negative += max(0, -cost)
+    credit[C] = 2 * (C + increment_at(hit, C) - 1 - (2*M - 2)) + 3 * negative
+rows = [(credit[w.left], credit[w.right], 3*w.cost)
+        for w in requests if w.right <= cut]
+assert rows == [(3779, 45521, 90), (9881, 45581, 2034)]
+assert min(rows[0][1], rows[1][1]) - max(r-p for _, r, p in rows) == 90
+assert all(left + size <= right for left, right, size in rows)
+assert rows[0][0] + rows[0][2] <= rows[1][0]
+print("Anchored allocation witness checked")
+PY
+```
+
+Lean 4.33.1 checks the new module and its composition with the
+existing first-crossing reduction. The audit of 51 public
+theorems in the two credit modules and the reused demand cap
+uses only `propext`, `Classical.choice`, and `Quot.sound`.

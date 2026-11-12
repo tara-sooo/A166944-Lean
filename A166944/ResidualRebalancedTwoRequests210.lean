@@ -121,7 +121,7 @@ private theorem rebalanced_request_period_le_window {i : Fin n} {a b : Nat}
   simp only [growthWindow, Nat.card_Ico] at hwidth
   exact h.2.trans hwidth
 
-private theorem rebalanced_demand_linear_cap {i : Fin n} (hi : 0 < trace.costDemand trace.rebalancedCosts i) :
+theorem rebalanced_demand_linear_cap {i : Fin n} (hi : 0 < trace.costDemand trace.rebalancedCosts i) :
     trace.costDemand trace.rebalancedCosts i ≤ 37 * d (trace.event i).hit + 1047 := by
   have h := trace.cost_demand_eq_cost hi
   change _ = (trace.event i).rebalancedCost.toNat at h
