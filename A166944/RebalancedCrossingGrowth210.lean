@@ -1,5 +1,5 @@
 import A166944.ResidualFirstPayment210
-import A166944.VerifiedRecordExtension
+import A166944.VerifiedLaterRecordExtension
 
 /-! # Horizon growth and gap constraints at the first travel crossing -/
 
@@ -218,11 +218,11 @@ theorem crossing_growth_ratios_of_gap_bound210 {M G H g : Nat}
   have hgap := (Nat.mul_le_mul_left 1536 gap).trans (fifty_million_sqrt_budget hM)
   exact ⟨by omega, by omega⟩
 
-/-- The signed upper bound on the remaining actual crossings after the
-finite certificates and the two growth constraints are applied. -/
-def RebalancedRemainingCrossingCondition210 : Prop :=
+/-- The signed upper bound on actual crossings from a given record
+threshold, after the two growth constraints are applied. -/
+def RebalancedRemainingCrossingConditionFrom210 (threshold : Nat) : Prop :=
   ∀ {M s C r C' p first : Nat} {balance : Int},
-    367232911 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
+    threshold ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
     HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance →
     IsMovingHorizonStep s C r C' → 2 * (s - (M + 2)) ≤ M → M < 2 * (r - (M + 2)) →
@@ -235,8 +235,12 @@ def RebalancedRemainingCrossingCondition210 : Prop :=
         (24 * (r - s) + 11 * (C - (2 * M - 2)) + rebalancedPotential210 (M + 2) (2 * M - 2) : Nat) <
           ((12 * (M + 1) + rebalancedPotential210 s C : Nat) : Int)
 
-theorem twin_travel_of_rebalanced_remaining_crossings210
-    (bound : RebalancedRemainingCrossingCondition210) : TwinPrimeTravelBoundFrom 367232911 := by
+def RebalancedRemainingCrossingCondition210 : Prop :=
+  RebalancedRemainingCrossingConditionFrom210 367232911
+
+theorem twin_travel_of_rebalanced_remaining_crossings_from210 {threshold : Nat}
+    (hthreshold : 5 < threshold) (bound : RebalancedRemainingCrossingConditionFrom210 threshold) :
+    TwinPrimeTravelBoundFrom threshold := by
   intro M sf Cf p hM htwin hcanon hpath hmax
   by_contra hnot
   obtain ⟨s, C, r, C', q, first, balance, hledger, hstep, hr, _, hshort, hcross, hgap, _⟩ :=
@@ -252,9 +256,18 @@ theorem twin_travel_of_rebalanced_remaining_crossings210
   exact (not_lt_of_ge hlower)
     (bound hM htwin hcanon hledger hstep hshort hcross hgap hrMax trace hdelta hgrowth hlarge)
 
+theorem twin_travel_of_rebalanced_remaining_crossings210
+    (bound : RebalancedRemainingCrossingCondition210) : TwinPrimeTravelBoundFrom 367232911 :=
+  twin_travel_of_rebalanced_remaining_crossings_from210 (by decide) bound
+
 theorem target_of_rebalanced_remaining_crossings210
     (bound : RebalancedRemainingCrossingCondition210) : Target :=
   target_of_twin_travel_from_fifty_million
     (twin_travel_from_367232911 (twin_travel_of_rebalanced_remaining_crossings210 bound))
+
+theorem target_of_rebalanced_remaining_crossings_from_1468965061
+    (bound : RebalancedRemainingCrossingConditionFrom210 1468965061) : Target :=
+  target_of_twin_travel_from_fifty_million (twin_travel_from_367232911
+    (twin_travel_from_1468965061 (twin_travel_of_rebalanced_remaining_crossings_from210 (by decide) bound)))
 
 end A166944Research

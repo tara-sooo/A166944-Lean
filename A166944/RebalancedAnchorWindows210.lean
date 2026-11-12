@@ -252,30 +252,28 @@ theorem rebalanced_long_anchor_widths_fit_on_key210 {a b : Nat}
 def rebalancedAnchorKeys (selected : Finset (Fin n)) : Finset (Nat × Fin 420) :=
   selected.image fun i => (trace.event i).phaseKey
 
-/-- Each key can be charged at a different fraction of the common
-window capacity. The sum of the fractions must be at most one. -/
-theorem rebalanced_anchor_pay_of_key_rates210 {a b scale : Nat}
-    (selected : Finset (Fin n)) (positiveScale : 0 < scale)
+/-- Charge each key at its own rate using the width available to that key. -/
+theorem rebalanced_anchor_demand_scaled_le_of_key_rates210 {capacity scale : Nat}
+    (selected : Finset (Fin n))
     (rate : Nat × Fin 420 → Nat) (width : Fin n → Nat)
     (widthFits : ∀ key ∈ trace.rebalancedAnchorKeys selected,
-      (∑ i ∈ selected with (trace.event i).phaseKey = key, width i) ≤ b - a)
+      (∑ i ∈ selected with (trace.event i).phaseKey = key, width i) ≤ capacity)
     (localPay : ∀ i ∈ selected, scale * (3 * trace.rebalancedDemand i) ≤
-      rate (trace.event i).phaseKey * width i)
-    (rateSum : (∑ key ∈ trace.rebalancedAnchorKeys selected, rate key) ≤ scale) :
-    3 * (∑ i ∈ selected, trace.rebalancedDemand i) ≤ b - a := by
+      rate (trace.event i).phaseKey * width i) :
+    scale * (3 * (∑ i ∈ selected, trace.rebalancedDemand i)) ≤
+      (∑ key ∈ trace.rebalancedAnchorKeys selected, rate key) * capacity := by
   let key (i : Fin n) := (trace.event i).phaseKey
   let keys := trace.rebalancedAnchorKeys selected
-  apply Nat.le_of_mul_le_mul_left _ positiveScale
   calc
     _ = ∑ i ∈ selected, scale * (3 * trace.rebalancedDemand i) := by simp only [Finset.mul_sum]
     _ = ∑ k ∈ keys, ∑ i ∈ selected with key i = k, scale * (3 * trace.rebalancedDemand i) :=
       (Finset.sum_fiberwise_of_maps_to (fun i hi => mem_image_of_mem key hi) _).symm
-    _ ≤ ∑ k ∈ keys, rate k * (b - a) := by
+    _ ≤ ∑ k ∈ keys, rate k * capacity := by
       apply Finset.sum_le_sum
       intro k hk
       let fiber := selected.filter fun i => key i = k
       have hsame (i : Fin n) (hi : i ∈ fiber) : key i = k := (mem_filter.mp hi).2
-      have hfit : (∑ i ∈ fiber, width i) ≤ b - a := widthFits k hk
+      have hfit : (∑ i ∈ fiber, width i) ≤ capacity := widthFits k hk
       calc
         _ ≤ ∑ i ∈ fiber, rate k * width i := by
           apply Finset.sum_le_sum
@@ -285,8 +283,22 @@ theorem rebalanced_anchor_pay_of_key_rates210 {a b scale : Nat}
           rwa [hsame i hi] at h
         _ = rate k * (∑ i ∈ fiber, width i) := (Finset.mul_sum _ _ _).symm
         _ ≤ _ := Nat.mul_le_mul_left _ hfit
-    _ = (∑ k ∈ keys, rate k) * (b - a) := (Finset.sum_mul _ _ _).symm
-    _ ≤ _ := Nat.mul_le_mul_right _ rateSum
+    _ = (∑ k ∈ keys, rate k) * capacity := (Finset.sum_mul _ _ _).symm
+
+/-- A common window pays for all requests if the key rates sum to at
+most one after scaling. -/
+theorem rebalanced_anchor_pay_of_key_rates210 {a b scale : Nat}
+    (selected : Finset (Fin n)) (positiveScale : 0 < scale)
+    (rate : Nat × Fin 420 → Nat) (width : Fin n → Nat)
+    (widthFits : ∀ key ∈ trace.rebalancedAnchorKeys selected,
+      (∑ i ∈ selected with (trace.event i).phaseKey = key, width i) ≤ b - a)
+    (localPay : ∀ i ∈ selected, scale * (3 * trace.rebalancedDemand i) ≤
+      rate (trace.event i).phaseKey * width i)
+    (rateSum : (∑ key ∈ trace.rebalancedAnchorKeys selected, rate key) ≤ scale) :
+    3 * (∑ i ∈ selected, trace.rebalancedDemand i) ≤ b - a :=
+  Nat.le_of_mul_le_mul_left
+    ((trace.rebalanced_anchor_demand_scaled_le_of_key_rates210 selected rate width widthFits localPay).trans
+      (Nat.mul_le_mul_right _ rateSum)) positiveScale
 
 theorem rebalanced_anchor_pay_of_three_large_keys210 {a b : Nat}
     (selected : Finset (Fin n)) (inside : selected ⊆ trace.rebalancedAnchorRequests a b)
@@ -457,8 +469,10 @@ private theorem rebalanced_anchor_demand_ceiling {a b L : Nat}
         omega
     _ = _ := by simp
 
-theorem rebalanced_anchor_deficit_long_bounds_of_few210 {a b : Nat} {i : Fin n}
-    (deficit : trace.RebalancedAnchorDeficit a b) (inside : i ∈ trace.rebalancedAnchorRequests a b)
+theorem rebalanced_anchor_long_bounds_of_width_deficit210 {a b width : Nat} {i : Fin n}
+    (deficit : width < 3 * (∑ i ∈ trace.rebalancedAnchorRequests a b, trace.rebalancedDemand i))
+    (periodFits : ∀ j ∈ trace.rebalancedAnchorRequests a b, trace.rebalancedPhasePeriodWidth j ≤ width)
+    (inside : i ∈ trace.rebalancedAnchorRequests a b)
     (long : trace.ReusedLong i) :
     ((trace.rebalancedAnchorRequests a b).card ≤ 2 → d (trace.event i).hit ≤ 31) ∧
       ((trace.rebalancedAnchorRequests a b).card ≤ 3 → d (trace.event i).hit ≤ 107) := by
@@ -469,16 +483,13 @@ theorem rebalanced_anchor_deficit_long_bounds_of_few210 {a b : Nat} {i : Fin n}
   let L := d (trace.event j).hit
   have hiL : d (trace.event i).hit ≤ L := hmax i (mem_filter.mpr ⟨inside, long⟩)
   have ⟨hjreq, hjlong⟩ := mem_filter.mp hj
-  have ⟨hp, ha, hb⟩ := (mem_filter.mp hjreq).2
-  have hperiod := trace.rebalanced_phase_period_fits_anchor hp
-  rw [trace.rebalanced_phase_period_width_of_long hp hjlong] at hperiod
-  have hspan : 420 * L ≤ b - a := by omega
+  have hspan : 420 * L ≤ width :=
+    trace.rebalanced_phase_period_width_of_long (mem_filter.mp hjreq).2.1 hjlong ▸ periodFits j hjreq
   have hceil (k : Fin n) (hk : k ∈ requests) (hklong : trace.ReusedLong k) :
       d (trace.event k).hit ≤ L := hmax k (mem_filter.mpr ⟨hk, hklong⟩)
   have htest {q : Nat} (hcard : requests.card ≤ q) (hL : 4 ≤ L) : 420 * L < q * (111 * L + 3141) := by
     have hsum := trace.rebalanced_anchor_demand_ceiling hL hceil
     have hbound := Nat.mul_le_mul_right (111 * L + 3141) hcard
-    change b - a < 3 * (∑ i ∈ requests, trace.rebalancedDemand i) at deficit
     exact (hspan.trans_lt deficit).trans_le (hsum.trans hbound)
   constructor
   · intro few
@@ -494,6 +505,16 @@ theorem rebalanced_anchor_deficit_long_bounds_of_few210 {a b : Nat} {i : Fin n}
       omega
     have hodd := d_mod_two_eq_one_of_three_le hr
     omega
+
+theorem rebalanced_anchor_deficit_long_bounds_of_few210 {a b : Nat} {i : Fin n}
+    (deficit : trace.RebalancedAnchorDeficit a b) (inside : i ∈ trace.rebalancedAnchorRequests a b)
+    (long : trace.ReusedLong i) :
+    ((trace.rebalancedAnchorRequests a b).card ≤ 2 → d (trace.event i).hit ≤ 31) ∧
+      ((trace.rebalancedAnchorRequests a b).card ≤ 3 → d (trace.event i).hit ≤ 107) := by
+  apply trace.rebalanced_anchor_long_bounds_of_width_deficit210 deficit ?_ inside long
+  intro j hj
+  obtain ⟨hp, ha, hb⟩ := (mem_filter.mp hj).2
+  exact (trace.rebalanced_phase_period_fits_anchor hp).trans (by omega)
 
 theorem rebalanced_anchor_small_deficit_bounds210 {a b : Nat}
     (deficit : trace.RebalancedAnchorDeficit a b) (few : (trace.rebalancedAnchorRequests a b).card ≤ 3) :

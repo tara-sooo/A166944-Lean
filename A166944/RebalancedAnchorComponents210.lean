@@ -162,9 +162,9 @@ theorem rebalanced_anchor_components_exist210 : Nonempty trace.RebalancedAnchorC
 def RebalancedAnchorComponents.unused (cover : trace.RebalancedAnchorComponents) : Nat :=
   trace.rebalancedTotalCredit - ∑ w ∈ cover.windows, (trace.rebalancedComponentInterval w).card
 
-theorem rebalanced_credit_debt_eq_component_debts210 (cover : trace.RebalancedAnchorComponents) :
-    trace.rebalancedCreditDebt =
-      (∑ w ∈ cover.windows, trace.rebalancedComponentDebt w) - (cover.unused : Int) := by
+theorem sum_rebalanced_component_demands210 (cover : trace.RebalancedAnchorComponents) :
+    (∑ w ∈ cover.windows, ∑ i ∈ trace.rebalancedComponentRequests w, trace.rebalancedDemand i) =
+      ∑ i, trace.rebalancedDemand i := by
   let requests := univ.filter fun i => 0 < trace.rebalancedDemand i
   have hdisjoint : (cover.windows : Set (Fin n × Fin n)).PairwiseDisjoint trace.rebalancedComponentRequests := by
     intro u hu v hv hne
@@ -188,10 +188,12 @@ theorem rebalanced_credit_debt_eq_component_debts210 (cover : trace.RebalancedAn
     · intro hi
       obtain ⟨w, hw, hiw⟩ := cover.covered i (mem_filter.mp hi).2
       exact mem_biUnion.mpr ⟨w, hw, hiw⟩
-  have hsum : (∑ w ∈ cover.windows, ∑ i ∈ trace.rebalancedComponentRequests w, trace.rebalancedDemand i) =
-      ∑ i, trace.rebalancedDemand i := by
-    rw [← Finset.sum_biUnion hdisjoint, hreq]
-    exact (sum_positive_requests _ _).symm
+  rw [← Finset.sum_biUnion hdisjoint, hreq]
+  exact (sum_positive_requests _ _).symm
+
+theorem rebalanced_credit_debt_eq_component_debts210 (cover : trace.RebalancedAnchorComponents) :
+    trace.rebalancedCreditDebt =
+      (∑ w ∈ cover.windows, trace.rebalancedComponentDebt w) - (cover.unused : Int) := by
   have hwidth : (∑ w ∈ cover.windows, (trace.rebalancedComponentInterval w).card) ≤ trace.rebalancedTotalCredit := by
     rw [← Finset.card_biUnion cover.disjoint]
     have hsub : cover.windows.biUnion trace.rebalancedComponentInterval ⊆ Ico 0 trace.rebalancedTotalCredit := by
@@ -201,7 +203,8 @@ theorem rebalanced_credit_debt_eq_component_debts210 (cover : trace.RebalancedAn
         (mem_Ico.mp hw).2.trans_le (trace.rebalanced_credit_after_le_total w.2)⟩
     simpa only [Nat.card_Ico, Nat.sub_zero] using Finset.card_le_card hsub
   unfold rebalancedCreditDebt rebalancedComponentDebt RebalancedAnchorComponents.unused
-  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Nat.cast_sum, ← Nat.cast_sum, hsum]
+  rw [Finset.sum_sub_distrib, ← Finset.mul_sum, ← Nat.cast_sum, ← Nat.cast_sum,
+    trace.sum_rebalanced_component_demands210 cover]
   omega
 
 /-- Use the finite shortfall caps, less the negative costs already

@@ -1869,3 +1869,97 @@ Lean 4.33.1 checks the new modules and the composition of their
 crossing allowance with `target_of_rebalanced_remaining_crossings210`.
 The audit of 12 new public theorems uses only `propext`,
 `Classical.choice`, and `Quot.sound`.
+
+## Growth rates and a joint first-payment budget, 2026-11-12 JST
+
+From `27acad17132541b1ef8117b90dcbda91992d7b84`, disjoint
+anchor components have disjoint event ranges. Their horizon
+growths `G_w` sum to at most prefix growth `G`. With scaled
+repeat demand `Q_w`, define the growth debt as `Q_w-2*G_w`.
+The exact repeat credit debt is the sum of these growth debts
+minus twice the unused growth and three times the prefix's total
+negative cost. The signed identity counts negative costs once.
+
+The finite pair and triple checks also apply to positive growth
+debt before any negative costs are credited. They give the
+respective bounds `min(4052, floor(7*G_w/4))` and
+`min(8368, floor(18*G_w/5))`. Such windows have growth at most
+5,093 and 21,638 respectively. Independent enumeration of the
+same ordered tuples gives maximum demand-to-twice-growth ratios
+of 2178/1165 and 3267/1175.
+
+The terminal phase periods fit in raw horizon growth on each key.
+For at most four long keys, all increments at least 109, the
+growth debt is at most `floor(2*G_w/3)`. For at most five long keys,
+all increments at least 393, it is at most `floor(5*G_w/6)`. Both
+allow arbitrarily many requests. The prefix allowance uses these
+rates and the positive part of the actual growth debt for other
+windows.
+
+The refined first-payment bound uses the smaller of the cofactor
+and linear increment weights above cutoff `L`. The tail counts
+only positive first-payment events with increment greater than
+`L`. Such events cannot lie inside windows with growth below
+`L`, so the growth in those deficient windows can be subtracted
+before evaluating the tail. At `L=338`, the finite low-prime sum
+is 13,887,360 and `Phi ≤ 13887360 + 41*H_first`. Hence
+`10*debt + 1230*H_first + 416620800 ≤ 9*M` suffices to rule out
+the first crossing. At threshold 367,232,911,
+nonpositive debt and `H_first ≤ 2348353` suffice. The joint bound
+on all actual crossing candidates remains open.
+
+Trial division with the existing capped replay and rebalanced
+potential gives one positive growth debt among 44 components at
+the 533 synthetic starts in `[7163911,7263911]`. At `M=7166563`,
+the post-horizon interval `[14342418,14343066)` has two requests
+with scaled total 1,395 and growth debt 99. For the 684 synthetic
+starts in `[367232911,367432911]`, all 147 components have
+nonpositive growth debt, and the maximum `H_first` at cutoff
+338 is 77,474. The minimum slack in the displayed numeric
+budget is 2,797,229,001 at `M=367418929`. The control
+`M=367264309` through horizon 734,547,102 has growth 18,502,
+unused growth 202, negative cost 2,859, repeat debt −43,457,
+and first payment 20,394. These are synthetic prefix checks.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedComponentGrowth210 A166944.ResidualRebalancedPairOffsets210
+```
+
+Lean 4.33.1 checks the new modules and the composition of
+`rebalanced_crossing_signed_of_joint_growth_budget210` with
+`target_of_rebalanced_remaining_crossings_from_1468965061`.
+The audit of 42 new or revised public theorems uses only `propext`,
+`Classical.choice`, and `Quot.sound`.
+
+### Two further actual record transitions
+
+`VerifiedLaterRecordExtension.lean` checks 109 nonunit events
+from record 367,232,911 with total travel 14,181, and a quiet
+return to record 734,482,123 at index 734,482,125. The next replay
+has six events with travel 1,209 and returns to record
+1,468,965,061 at index 1,468,965,063. The prefix certificates
+give the index and twin-primality statements for every strict
+record `5 < R ≤ 1468965061`. They also bound travel on every
+capped prefix in each of these two segments. The remaining
+signed crossing condition now starts at `M ≥ 1468965061`,
+where nonpositive debt and `H_first ≤ 10409808` suffice for
+the numeric cutoff-338 bound.
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=diagnostics python3 - <<'PY'
+from travel_credit_prefix import capped_hits, is_prime
+from travel_residue_probe import increment_at
+
+for M, next_M, count, travel in (
+    (367232911, 734482123, 109, 14181),
+    (734482123, 1468965061, 6, 1209),
+):
+    hits, stop = capped_hits(M)
+    assert (stop, len(hits), hits[-1] - (M + 2)) == ("quiet", count, travel)
+    C = 2*M - 2
+    for hit in hits:
+        C += increment_at(hit, C) - 1
+    assert C + 1 == next_M and is_prime(C - 1) and is_prime(C + 1)
+print("Both later record segments checked")
+PY
+```

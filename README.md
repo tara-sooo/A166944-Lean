@@ -67,6 +67,12 @@ next record, `45895573`, to `91793059` at index `91793061`.
 for all strict records `5 < R ≤ 367232911`. The travel bridge
 `twin_travel_from_367232911` reduces the unrestricted targets to short
 travel from canonical greater twin primes `M ≥ 367232911`.
+`VerifiedLaterRecordExtension.lean` checks two more replays with 109
+and 6 nonunit events. It certifies the position and twin-primality
+statements for all strict records `5 < R ≤ 1468965061`.
+`target_of_rebalanced_remaining_crossings_from_1468965061` uses these
+certificates to start the remaining signed crossing condition at
+`M ≥ 1468965061`.
 `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in
@@ -272,6 +278,23 @@ anchored intervals into disjoint windows. The exact repeat credit
 debt is the sum of their signed debts minus all credit outside the
 union. The small-window bounds and the unused credit enter the
 same allowance for first payments and repeat credit debt.
+
+`RebalancedComponentGrowth210.lean` also bounds the excess over
+twice a window's horizon growth `g`, before applying negative costs.
+The two- and three-request bounds are `min(4052, floor(7*g/4))`
+and `min(8368, floor(18*g/5))`. With only long reuses, at most four
+keys of increments at least 109 give excess at most `floor(2*g/3)`,
+and at most five keys of increments at least 393 give
+`floor(5*g/6)`. The prefix estimate subtracts twice the unused
+growth and three times all negative costs.
+
+The first-payment cutoff now counts growth only at events with a
+positive payment above the cutoff increment. That growth excludes
+the growth already inside deficient windows shorter than the cutoff.
+At cutoff 338 the bound is `Phi ≤ 13887360 + 41*H_first`, with
+`H_first` the growth of those high first-payment events.
+The resulting joint inequality is sufficient to exclude a first
+crossing and remains open on arbitrary actual candidates.
 
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.

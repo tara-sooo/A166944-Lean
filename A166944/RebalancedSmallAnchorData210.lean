@@ -80,12 +80,14 @@ abbrev smallAnchorTripleFloor210 (e f h : Nat) : Nat :=
 private def smallAnchorPairTest210 (e f : Nat × Nat × Nat) : Prop :=
   let cost := 3 * (e.2.1 + f.2.1)
   let width := pairFloor210 e f
-  width < cost → cost ≤ 10188 ∧ cost ≤ width + 4052 ∧ max e.1 f.1 ≤ 77
+  width < cost → cost ≤ 10188 ∧ cost ≤ width + 4052 ∧ max e.1 f.1 ≤ 77 ∧
+    8 * cost ≤ 15 * width
 
 private def smallAnchorTripleTest210 (e f h : Nat × Nat × Nat) : Prop :=
   let cost := 3 * (e.2.1 + f.2.1 + h.2.1)
   let width := tripleFloor210 e f h
-  width < cost → cost ≤ 43278 ∧ cost ≤ width + 8368 ∧ max e.1 (max f.1 h.1) ≤ 119
+  width < cost → cost ≤ 43278 ∧ cost ≤ width + 8368 ∧ max e.1 (max f.1 h.1) ≤ 119 ∧
+    5 * cost ≤ 14 * width
 
 private instance (e f : Nat × Nat × Nat) : Decidable (smallAnchorPairTest210 e f) := by
   unfold smallAnchorPairTest210
@@ -139,15 +141,39 @@ private theorem small_anchor_triple_checks210 :
   simp only [List.all_append, small_anchor_triples_0, small_anchor_triples_8, small_anchor_triples_16,
     small_anchor_triples_24, small_anchor_triples_32, small_anchor_triples_40, Bool.and_self]
 
+theorem small_anchor_pair_width_test210 {e f : Nat}
+    (he : e ∈ smallAnchorIncrements210) (hf : f ∈ smallAnchorIncrements210) :
+    smallAnchorPairFloor210 e f < 3 * (smallAnchorCap210 e + smallAnchorCap210 f) →
+      3 * (smallAnchorCap210 e + smallAnchorCap210 f) ≤ 10188 ∧
+      3 * (smallAnchorCap210 e + smallAnchorCap210 f) ≤ smallAnchorPairFloor210 e f + 4052 ∧
+      max e f ≤ 77 ∧
+      8 * (3 * (smallAnchorCap210 e + smallAnchorCap210 f)) ≤ 15 * smallAnchorPairFloor210 e f :=
+  of_decide_eq_true (List.all_eq_true.mp
+    (List.all_eq_true.mp small_anchor_pair_checks210 _ (small_anchor_row_mem210 he))
+    _ (small_anchor_row_mem210 hf))
+
+theorem small_anchor_triple_width_test210 {e f g : Nat}
+    (he : e ∈ smallAnchorIncrements210) (hf : f ∈ smallAnchorIncrements210)
+    (hg : g ∈ smallAnchorIncrements210) :
+    smallAnchorTripleFloor210 e f g < 3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) →
+      3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) ≤ 43278 ∧
+      3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) ≤ smallAnchorTripleFloor210 e f g + 8368 ∧
+      max e (max f g) ≤ 119 ∧
+      5 * (3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g)) ≤
+        14 * smallAnchorTripleFloor210 e f g :=
+  of_decide_eq_true (List.all_eq_true.mp (List.all_eq_true.mp
+    (List.all_eq_true.mp small_anchor_triple_checks210 _ (small_anchor_row_mem210 he))
+    _ (small_anchor_row_mem210 hf)) _ (small_anchor_row_mem210 hg))
+
 theorem small_anchor_pair_test210 {e f : Nat}
     (he : e ∈ smallAnchorIncrements210) (hf : f ∈ smallAnchorIncrements210) :
     smallAnchorPairFloor210 e f < 3 * (smallAnchorCap210 e + smallAnchorCap210 f) →
       3 * (smallAnchorCap210 e + smallAnchorCap210 f) ≤ 10188 ∧
       3 * (smallAnchorCap210 e + smallAnchorCap210 f) ≤ smallAnchorPairFloor210 e f + 4052 ∧
-      max e f ≤ 77 :=
-  of_decide_eq_true (List.all_eq_true.mp
-    (List.all_eq_true.mp small_anchor_pair_checks210 _ (small_anchor_row_mem210 he))
-    _ (small_anchor_row_mem210 hf))
+      max e f ≤ 77 := by
+  intro deficit
+  obtain ⟨hcost, hshort, hinc, _⟩ := small_anchor_pair_width_test210 he hf deficit
+  exact ⟨hcost, hshort, hinc⟩
 
 theorem small_anchor_triple_test210 {e f g : Nat}
     (he : e ∈ smallAnchorIncrements210) (hf : f ∈ smallAnchorIncrements210)
@@ -155,9 +181,9 @@ theorem small_anchor_triple_test210 {e f g : Nat}
     smallAnchorTripleFloor210 e f g < 3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) →
       3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) ≤ 43278 ∧
       3 * (smallAnchorCap210 e + smallAnchorCap210 f + smallAnchorCap210 g) ≤ smallAnchorTripleFloor210 e f g + 8368 ∧
-      max e (max f g) ≤ 119 :=
-  of_decide_eq_true (List.all_eq_true.mp (List.all_eq_true.mp
-    (List.all_eq_true.mp small_anchor_triple_checks210 _ (small_anchor_row_mem210 he))
-    _ (small_anchor_row_mem210 hf)) _ (small_anchor_row_mem210 hg))
+      max e (max f g) ≤ 119 := by
+  intro deficit
+  obtain ⟨hcost, hshort, hinc, _⟩ := small_anchor_triple_width_test210 he hf hg deficit
+  exact ⟨hcost, hshort, hinc⟩
 
 end A166944Research.RebalancedSmallAnchorData210

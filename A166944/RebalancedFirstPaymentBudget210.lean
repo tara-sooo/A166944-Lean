@@ -114,21 +114,51 @@ private theorem first_payment_phase_mem (event : ResidualPhaseEvent210)
     Nat.mod_mod_of_dvd _ (by decide : 7 ∣ 210), decide_eq_true_eq]
   exact ⟨h2, h3, h5a, h5b, h7⟩
 
+private def firstPaymentLowBound210 (L : Nat) : Nat :=
+  ∑ p ∈ Nat.primesLE L, firstPaymentPhaseSlots210 p * min (48 * p) (37 * p + 1047)
+
+private def firstPaymentCofactorWeight210 (L U : Nat) : Nat :=
+  48 * (U + 1) + 1036 * (L + 1) - 11 * (L * (L + 1))
+
 /-- Positive first payments at low increments use at most 42 phases per
-prime, or 30 from increment 127. Above the cutoff, only growth at large
-relative gaps contributes. -/
+prime, or 30 from increment 127. -/
 def refinedFirstPaymentCutoffBound210 (L U largeGapGrowth : Nat) : Nat :=
-  (∑ p ∈ Nat.primesLE L, firstPaymentPhaseSlots210 p * min (48 * p) (37 * p + 1047)) +
-    ((48 * (U + 1) + 1036 * (L + 1) - 11 * (L * (L + 1))) * largeGapGrowth) / (L * (L + 1))
+  firstPaymentLowBound210 L + firstPaymentCofactorWeight210 L U * largeGapGrowth / (L * (L + 1))
+
+def refinedFirstPaymentGrowthBound210 (L U highGrowth : Nat) : Nat :=
+  firstPaymentLowBound210 L +
+    min (firstPaymentCofactorWeight210 L U) ((37 * L + 1084) * (L + 1)) * highGrowth / (L * (L + 1))
+
+private theorem capped_first_payment_large_linear_weighted (event : ResidualPhaseEvent210) {L : Nat}
+    (large : L < d event.hit) :
+    (L * (L + 1)) * event.cappedFirstPayment ≤ ((37 * L + 1084) * (L + 1)) * (d event.hit - 1) := by
+  let g := d event.hit - 1
+  have hg : L ≤ g := by dsimp [g]; omega
+  have hp := event.capped_first_payment_le_increment.trans (min_le_right _ _)
+  have h : L * event.cappedFirstPayment ≤ (37 * L + 1084) * g := calc
+    _ ≤ L * (37 * g + 1084) := Nat.mul_le_mul_left _ (by dsimp [g]; omega)
+    _ = 37 * L * g + 1084 * L := by rw [Nat.mul_add]; ac_rfl
+    _ ≤ 37 * L * g + 1084 * g := Nat.add_le_add_left (Nat.mul_le_mul_left _ hg) _
+    _ = _ := by rw [Nat.add_mul]
+  calc
+    _ = (L + 1) * (L * event.cappedFirstPayment) := by ac_rfl
+    _ ≤ (L + 1) * ((37 * L + 1084) * g) := Nat.mul_le_mul_left _ h
+    _ = _ := by change _ = ((37 * L + 1084) * (L + 1)) * g; ac_rfl
 
 namespace ResidualPhaseTrace210
 
 variable {s sf n first : Nat} {balance : Int}
 variable (trace : ResidualPhaseTrace210 s sf [] n first balance)
 
-theorem refined_rebalanced_first_payment_bound210 (L U : Nat) (hL : 338 ≤ L)
+def highFirstPaymentEvents (L : Nat) : Finset (Fin n) :=
+  univ.filter fun i => 0 < (trace.event i).cappedFirstPayment ∧ L < d (trace.event i).hit
+
+def growthAtHighFirstPayments (L : Nat) : Nat :=
+  ∑ i ∈ trace.highFirstPaymentEvents L, (d (trace.event i).hit - 1)
+
+theorem refined_rebalanced_first_payment_bound_of_high_growth210 (L U : Nat) (hL : 0 < L)
     (hU : ∀ i, (trace.event i).horizon ≤ U) :
-    trace.totalCappedFirstPayment ≤ refinedFirstPaymentCutoffBound210 L U trace.growthAtLargeGaps := by
+    trace.totalCappedFirstPayment ≤ refinedFirstPaymentGrowthBound210 L U (trace.growthAtHighFirstPayments L) := by
   classical
   let payment (i : Fin n) := (trace.event i).cappedFirstPayment
   let low := univ.filter fun i : Fin n => 0 < payment i ∧ d (trace.event i).hit ≤ L
@@ -158,13 +188,13 @@ theorem refined_rebalanced_first_payment_bound210 (L U : Nat) (hL : 338 ≤ L)
       _ ≤ ∑ x ∈ codes, weight x.1 := Finset.sum_le_sum_of_subset hsubset
       _ = _ := by simp [codes, Finset.sum_sigma, Finset.sum_const, card_first_payment_phases_at]
   let W := L * (L + 1)
-  let A := 48 * (U + 1) + 1036 * (L + 1) - 11 * W
-  have hhigh : (∑ i ∈ high, payment i) ≤ A * trace.growthAtLargeGaps / W := by
+  let A := min (firstPaymentCofactorWeight210 L U) ((37 * L + 1084) * (L + 1))
+  have hhigh : (∑ i ∈ high, payment i) ≤ A * trace.growthAtHighFirstPayments L / W := by
     have hW : 0 < W := Nat.mul_pos (by omega) (by omega)
     apply (Nat.le_div_iff_mul_le hW).mpr
     rw [Nat.mul_comm (∑ i ∈ high, payment i), Finset.mul_sum]
     calc
-      _ ≤ ∑ i ∈ high, A * (trace.event i).growthWithLargeGap := by
+      _ ≤ ∑ i ∈ high, if 0 < payment i then A * (d (trace.event i).hit - 1) else 0 := by
         apply Finset.sum_le_sum
         intro i hi
         by_cases hzero : payment i = 0
@@ -174,17 +204,55 @@ theorem refined_rebalanced_first_payment_bound210 (L U : Nat) (hL : 338 ≤ L)
             by_contra h
             have hle : d (trace.event i).hit ≤ L := by omega
             exact (Finset.mem_sdiff.mp hi).2 (Finset.mem_filter.mpr ⟨mem_univ _, hpos, hle⟩)
-          have hlarge := (trace.event i).positive_first_payment_large_gap (by omega) hpos
-          simpa only [ResidualPhaseEvent210.growthWithLargeGap, if_pos hlarge] using
-            (trace.event i).capped_first_payment_large_weighted he (hU i)
-      _ = A * (∑ i ∈ high, (trace.event i).growthWithLargeGap) := (Finset.mul_sum _ _ _).symm
-      _ ≤ A * trace.growthAtLargeGaps :=
-        Nat.mul_le_mul_left _ (Finset.sum_le_sum_of_subset (Finset.subset_univ _))
+          rw [if_pos hpos]
+          change _ ≤ min (firstPaymentCofactorWeight210 L U) ((37 * L + 1084) * (L + 1)) *
+            (d (trace.event i).hit - 1)
+          rw [min_def]
+          split
+          · exact (trace.event i).capped_first_payment_large_weighted he (hU i)
+          · exact capped_first_payment_large_linear_weighted (trace.event i) he
+      _ = A * trace.growthAtHighFirstPayments L := by
+        rw [← Finset.sum_filter, growthAtHighFirstPayments, Finset.mul_sum]
+        congr 1
+        ext i
+        simp only [high, low, highFirstPaymentEvents, mem_sdiff, mem_filter, mem_univ, true_and, payment]
+        omega
   have hsplit := Finset.sum_sdiff (f := payment) (Finset.subset_univ low)
   change (∑ i ∈ high, payment i) + (∑ i ∈ low, payment i) = trace.totalCappedFirstPayment at hsplit
   change trace.totalCappedFirstPayment ≤ (∑ e ∈ Nat.primesLE L, firstPaymentPhaseSlots210 e * weight e) +
-    A * trace.growthAtLargeGaps / W
+    A * trace.growthAtHighFirstPayments L / W
   omega
+
+theorem growth_at_high_first_payments_le_large_gaps210 {L : Nat} (hL : 338 ≤ L) :
+    trace.growthAtHighFirstPayments L ≤ trace.growthAtLargeGaps := by
+  unfold growthAtHighFirstPayments growthAtLargeGaps ResidualPhaseEvent210.growthWithLargeGap
+  rw [← Finset.sum_filter]
+  apply Finset.sum_le_sum_of_subset
+  intro i hi
+  obtain ⟨hpos, he⟩ := (mem_filter.mp hi).2
+  exact mem_filter.mpr ⟨mem_univ _, (trace.event i).positive_first_payment_large_gap (by omega) hpos⟩
+
+theorem refined_rebalanced_first_payment_bound210 (L U : Nat) (hL : 338 ≤ L)
+    (hU : ∀ i, (trace.event i).horizon ≤ U) :
+    trace.totalCappedFirstPayment ≤ refinedFirstPaymentCutoffBound210 L U trace.growthAtLargeGaps := by
+  apply (trace.refined_rebalanced_first_payment_bound_of_high_growth210 L U (by omega) hU).trans
+  unfold refinedFirstPaymentGrowthBound210 refinedFirstPaymentCutoffBound210
+  exact Nat.add_le_add_left (Nat.div_le_div_right (Nat.mul_le_mul (min_le_left _ _)
+    (trace.growth_at_high_first_payments_le_large_gaps210 hL))) _
+
+set_option maxRecDepth 16384 in
+theorem rebalanced_first_payment_bound_at_338210 (U : Nat) (hU : ∀ i, (trace.event i).horizon ≤ U) :
+    trace.totalCappedFirstPayment ≤ 13887360 + 41 * trace.growthAtHighFirstPayments 338 := by
+  apply (trace.refined_rebalanced_first_payment_bound_of_high_growth210 338 U (by decide) hU).trans
+  have hlow : firstPaymentLowBound210 338 = 13887360 := by decide +kernel
+  unfold refinedFirstPaymentGrowthBound210
+  rw [hlow]
+  apply Nat.add_le_add_left
+  apply Nat.div_le_of_le_mul
+  calc
+    _ ≤ (41 * (338 * (338 + 1))) * trace.growthAtHighFirstPayments 338 :=
+      Nat.mul_le_mul_right _ ((min_le_right _ _).trans (by decide))
+    _ = _ := by ac_rfl
 
 end ResidualPhaseTrace210
 
