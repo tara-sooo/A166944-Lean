@@ -13,9 +13,50 @@ open Classical
 variable {s sf n first : Nat} {balance : Int}
 variable (trace : ResidualPhaseTrace210 s sf [] n first balance)
 
-private def growthPeriod (i : Fin n) : Finset Nat :=
-  let finish := 2 * (trace.event i).nextHorizon
-  Ico (finish - trace.rebalancedPhasePeriodWidth i) finish
+def rebalancedGrowthPeriodStart (i : Fin n) : Nat :=
+  2 * (trace.event i).nextHorizon - trace.rebalancedPhasePeriodWidth i
+
+def rebalancedGrowthPeriod (i : Fin n) : Finset Nat :=
+  Ico (trace.rebalancedGrowthPeriodStart i) (2 * (trace.event i).nextHorizon)
+
+private theorem growth_period_fits_anchor {i : Fin n} (positive : 0 < trace.rebalancedDemand i) :
+    trace.rebalancedPhasePeriodWidth i ≤
+      2 * ((trace.event i).nextHorizon -
+        (trace.event (trace.costAnchor trace.rebalancedCosts i)).nextHorizon) := by
+  obtain ⟨order, phase⟩ := trace.cost_demand_anchor positive
+  have h := trace.same_key_period_le_post_growth210 order phase
+  unfold rebalancedPhasePeriodWidth rebalancedWindowGrowth at *
+  omega
+
+theorem rebalanced_growth_period_card210 {i : Fin n} (positive : 0 < trace.rebalancedDemand i) :
+    (trace.rebalancedGrowthPeriod i).card = trace.rebalancedPhasePeriodWidth i := by
+  have h := trace.growth_period_fits_anchor positive
+  rw [rebalancedGrowthPeriod, rebalancedGrowthPeriodStart, Nat.card_Ico]
+  omega
+
+theorem rebalanced_growth_period_subset210 {l r i : Fin n}
+    (inside : i ∈ trace.rebalancedAnchorRequests
+      (trace.rebalancedCreditAfter l) (trace.rebalancedCreditAfter r)) :
+    trace.rebalancedGrowthPeriod i ⊆ Ico (2 * (trace.event l).nextHorizon) (2 * (trace.event r).nextHorizon) := by
+  have ⟨positive, hleft, hright⟩ := (mem_filter.mp inside).2
+  have ha : (trace.event l).nextHorizon ≤ (trace.event (trace.costAnchor trace.rebalancedCosts i)).nextHorizon :=
+    trace.rebalanced_next_horizon_mono210 (trace.rebalanced_credit_after_strict_mono210.le_iff_le.mp hleft)
+  have hb : (trace.event i).nextHorizon ≤ (trace.event r).nextHorizon :=
+    trace.rebalanced_next_horizon_mono210 (trace.rebalanced_credit_after_strict_mono210.le_iff_le.mp hright)
+  intro x hx
+  simp only [rebalancedGrowthPeriod, rebalancedGrowthPeriodStart, mem_Ico] at hx ⊢
+  have h := trace.growth_period_fits_anchor positive
+  exact ⟨by omega, by omega⟩
+
+theorem rebalanced_growth_periods_disjoint_of_same_key210 {i j : Fin n} (order : i < j)
+    (phase : (trace.event i).phaseKey = (trace.event j).phaseKey) :
+    Disjoint (trace.rebalancedGrowthPeriod i) (trace.rebalancedGrowthPeriod j) := by
+  have hperiod := trace.same_key_period_le_post_growth210 order phase
+  change _ ≤ (trace.event j).nextHorizon - (trace.event i).nextHorizon at hperiod
+  rw [Finset.disjoint_left]
+  intro x hx hy
+  simp only [rebalancedGrowthPeriod, rebalancedGrowthPeriodStart, mem_Ico, rebalancedPhasePeriodWidth] at hx hy
+  omega
 
 /-- The terminal periods of requests on one key fit even when only
 horizon growth is counted as capacity. -/
@@ -25,50 +66,18 @@ theorem rebalanced_anchor_growth_periods_fit_on_key210 {l r : Fin n}
       (trace.rebalancedCreditAfter l) (trace.rebalancedCreditAfter r))
     (key : Nat × Fin 420) (same : ∀ i ∈ selected, (trace.event i).phaseKey = key) :
     (∑ i ∈ selected, trace.rebalancedPhasePeriodWidth i) ≤ 2 * trace.rebalancedWindowGrowth l r := by
-  have hseparate {i j : Fin n} (order : i < j)
-      (phase : (trace.event i).phaseKey = (trace.event j).phaseKey) :
-      Disjoint (trace.growthPeriod i) (trace.growthPeriod j) := by
-    have hperiod := trace.same_key_period_le_post_growth210 order phase
-    change _ ≤ (trace.event j).nextHorizon - (trace.event i).nextHorizon at hperiod
-    rw [Finset.disjoint_left]
-    intro x hx hy
-    simp only [growthPeriod, mem_Ico, rebalancedPhasePeriodWidth] at hx hy
-    omega
-  have hdisjoint : (selected : Set (Fin n)).PairwiseDisjoint trace.growthPeriod := by
+  have hdisjoint : (selected : Set (Fin n)).PairwiseDisjoint trace.rebalancedGrowthPeriod := by
     intro i hi j hj hne
     have hkey := (same i hi).trans (same j hj).symm
     rcases lt_or_gt_of_ne hne with order | order
-    · exact hseparate order hkey
-    · exact (hseparate order hkey.symm).symm
-  have hperiod (i : Fin n) (hi : i ∈ selected) :
-      trace.rebalancedPhasePeriodWidth i ≤
-        2 * ((trace.event i).nextHorizon -
-          (trace.event (trace.costAnchor trace.rebalancedCosts i)).nextHorizon) := by
-    obtain ⟨order, phase⟩ := trace.cost_demand_anchor (mem_filter.mp (inside hi)).2.1
-    have h := trace.same_key_period_le_post_growth210 order phase
-    unfold rebalancedPhasePeriodWidth rebalancedWindowGrowth at *
-    omega
-  have hsubset (i : Fin n) (hi : i ∈ selected) :
-      trace.growthPeriod i ⊆ Ico (2 * (trace.event l).nextHorizon) (2 * (trace.event r).nextHorizon) := by
-    have ⟨_, hleft, hright⟩ := (mem_filter.mp (inside hi)).2
-    have ha : (trace.event l).nextHorizon ≤ (trace.event (trace.costAnchor trace.rebalancedCosts i)).nextHorizon :=
-      trace.rebalanced_next_horizon_mono210 (trace.rebalanced_credit_after_strict_mono210.le_iff_le.mp hleft)
-    have hb : (trace.event i).nextHorizon ≤ (trace.event r).nextHorizon :=
-      trace.rebalanced_next_horizon_mono210 (trace.rebalanced_credit_after_strict_mono210.le_iff_le.mp hright)
-    intro x hx
-    simp only [growthPeriod, mem_Ico] at hx ⊢
-    have h := hperiod i hi
-    exact ⟨by omega, by omega⟩
+    · exact trace.rebalanced_growth_periods_disjoint_of_same_key210 order hkey
+    · exact (trace.rebalanced_growth_periods_disjoint_of_same_key210 order hkey.symm).symm
   calc
-    _ = ∑ i ∈ selected, (trace.growthPeriod i).card := by
-      apply Finset.sum_congr rfl
-      intro i hi
-      rw [growthPeriod, Nat.card_Ico]
-      have h := hperiod i hi
-      omega
-    _ = (selected.biUnion trace.growthPeriod).card := (Finset.card_biUnion hdisjoint).symm
+    _ = ∑ i ∈ selected, (trace.rebalancedGrowthPeriod i).card :=
+      Finset.sum_congr rfl fun i hi => (trace.rebalanced_growth_period_card210 (mem_filter.mp (inside hi)).2.1).symm
+    _ = (selected.biUnion trace.rebalancedGrowthPeriod).card := (Finset.card_biUnion hdisjoint).symm
     _ ≤ (Ico (2 * (trace.event l).nextHorizon) (2 * (trace.event r).nextHorizon)).card :=
-      Finset.card_le_card (Finset.biUnion_subset.mpr hsubset)
+      Finset.card_le_card (Finset.biUnion_subset.mpr (fun _ hi => trace.rebalanced_growth_period_subset210 (inside hi)))
     _ = _ := by rw [Nat.card_Ico, rebalancedWindowGrowth, Nat.mul_sub]
 
 private theorem rebalanced_anchor_growth_bound_of_long_keys {l r : Fin n} {scale rate keys : Nat}

@@ -296,6 +296,18 @@ At cutoff 338 the bound is `Phi ≤ 13887360 + 41*H_first`, with
 The resulting joint inequality is sufficient to exclude a first
 crossing and remains open on arbitrary actual candidates.
 
+`RebalancedPeriodLoad210.lean` distributes each demand over its
+terminal phase period in sixtieths. The load bound can be checked
+at period starts, even in a window with many distinct keys.
+Five simultaneous long periods of increments at least 393, or
+two of increments at least 143 alongside one nonlong period,
+have load at most 85. The bound for the whole prefix uses the
+signed period loads, retaining the surplus in windows with
+unused capacity. The first-payment estimate at cutoff 338 also
+subtracts the actual gap shortfall and charges the potential
+once per consecutive run. The joint bound on actual crossing
+candidates remains open.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

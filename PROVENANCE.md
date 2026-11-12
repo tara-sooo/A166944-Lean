@@ -1963,3 +1963,63 @@ for M, next_M, count, travel in (
 print("Both later record segments checked")
 PY
 ```
+
+## Weighted period overlaps and first-payment runs, 2026-11-12 JST
+
+From `a66ec90cf5450c3e072e3ae1bfbae3751d1e817d`, put each scaled
+request `3*P_i` on its terminal phase period of width `L_i` at
+integer weight `ceil(60*3*P_i/L_i)` per unit. Periods of one key
+are disjoint. Summing the point loads counts each weight times
+its period width. The load at any occupied point is at most the
+load at the latest start of its covering periods.
+
+The weights for long requests of increment at least 109, 143,
+or 393 are at most 20, 19, or 17 respectively. The nonlong
+weight is at most 46 by the checked cost caps for odd increments
+below 160. A window can use any number of keys with no load
+above 85 if at most five large long periods cover each point.
+The mixed criterion permits two long periods of increments at
+least 143 and one nonlong period at each point.
+
+Let `E_w` be the sum of `max(0,load-85)` over the doubled
+horizon range of a window. For the disjoint cover, Lean checks
+`60*debt ≤ 50*G + sum(E_w) - 170*G_unused - 180*N`, where
+`N` is the total negative cost magnitude. The joint allowance
+uses the smaller of the prior growth allowance and the signed
+period load minus capacity in each window. This retains surplus
+in paid windows. For sufficiently large records, the sublinear
+first-payment estimate and `sum(E_w)+300 ≤ 2*M` suffice for the
+signed crossing bound.
+
+Above cutoff 338, let `H` be the growth at positive first
+payments, `k` their count, `b` their number of consecutive runs,
+and `F=sum(2*e-gap)` their gap shortfall. The potential differences
+cancel between consecutive selected events, giving
+`Phi + 24*F ≤ 13887360 + 37*H + 48*k + 1036*b`.
+This estimate and the signed period allowance compose with the
+reduction to `Target` above record 1,468,965,061. The combined
+uniform estimate on actual crossing candidates remains open.
+
+The endpoint sweep in the diagnostic treats adjacent half-open
+windows as separate when they only share a boundary. Trial
+division on 684 twin-shaped synthetic starts in
+`[367232911,367432911]` gives 160 components with maximum
+point load 76. At 579 synthetic starts in
+`[1468965061,1469165061]`, there are 119 components.
+The `M=1468999771` window has 20 requests on 16 keys, maximum
+depth four, and peak load 77. The `M=1469100181` window has
+seven requests on six keys, peak load 100, and excess 13,920.
+The maximum saving in the first-payment upper bound is 5,745,336
+at `M=1469113729`. All new joint-budget comparisons pass in
+both bounded synthetic ranges.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedPeriodLoad210 A166944.ResidualRebalancedPairOffsets210
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/rebalanced_period_load_probe.py 367232911 367432911
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/rebalanced_period_load_probe.py 1468965061 1469165061
+```
+
+Lean 4.33.1 checks the new modules and the composition with
+`target_of_rebalanced_remaining_crossings_from_1468965061`.
+The audit of 27 new or revised public theorems uses only
+`propext`, `Classical.choice`, and `Quot.sound`.
