@@ -19,7 +19,7 @@ def rebalancedBoundaryValue210 (s C : Nat) : Int :=
 
 def rebalancedBoundaryLimit210 (M : Nat) : Int := 219 * (M : Int) - 2400
 
-private theorem horizon_le_twice_index {s C : Nat} (state : IsMovingHorizonState s C) :
+theorem moving_horizon_state_horizon_le_twice_index {s C : Nat} (state : IsMovingHorizonState s C) :
     C ≤ 2 * s := by
   have ha := a_le_three_mul s
   have hD := state.2.1
@@ -28,7 +28,7 @@ private theorem horizon_le_twice_index {s C : Nat} (state : IsMovingHorizonState
 
 theorem horizon_le_rebalanced_boundary_value210 {s C : Nat} (state : IsMovingHorizonState s C) :
     (C : Int) ≤ rebalancedBoundaryValue210 s C := by
-  have := horizon_le_twice_index state
+  have := moving_horizon_state_horizon_le_twice_index state
   unfold rebalancedBoundaryValue210
   omega
 
@@ -36,7 +36,7 @@ theorem horizon_le_rebalanced_boundary_value210 {s C : Nat} (state : IsMovingHor
 up to the parity-dependent constants in the gcd map. -/
 theorem moving_horizon_index_offset_of_large_increment {s C r C' : Nat}
     (step : IsMovingHorizonStep s C r C') (large : 5 < d r) : C + d r ≤ 2 * r + 1 := by
-  have hC := horizon_le_twice_index step.1
+  have hC := moving_horizon_state_horizon_le_twice_index step.1
   have hsr := step.2.1
   have hCe := step.1.2.1 ▸ D_mod_two_eq_zero_of_two_le step.1.1
   rcases Nat.mod_two_eq_zero_or_one r with heven | hodd
@@ -194,7 +194,7 @@ private theorem rebalanced_boundary_sqrt_le210 {M C : Nat}
     _ = 11365920000 * M := by rw [← Nat.mul_assoc]
     _ ≤ M * M := Nat.mul_le_mul_right _ (by omega)
 
-private theorem rebalanced_boundary_crossing_gap210 {M s C r C' : Nat}
+theorem rebalanced_boundary_crossing_gap210 {M s C r C' : Nat}
     (hM : 11751795061 ≤ M) (step : IsMovingHorizonStep s C r C')
     (below : rebalancedBoundaryValue210 s C ≤ rebalancedBoundaryLimit210 M) :
     3600 * (r - s) ≤ M := by

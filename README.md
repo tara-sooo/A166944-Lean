@@ -80,6 +80,9 @@ new records below a boundary in the index and horizon. A capped replay can
 cross that boundary only after growth greater than `M/4` at large relative
 gaps. A signed budget on those crossing prefixes gives both conclusions by
 `record_index_and_twin_prime_of_rebalanced_boundary210`.
+`ReplayOffset210.lean` uses returns to `2*s-C ≤ 6` to bound the offset
+from a shorter suffix. From such a return, increments dividing 210
+allow at most nine nonunit events and offset at most 76.
 `TravelResidues.lean`
 gives a sufficient budget that treats event starts at horizons divisible
 by six separately. `TravelFactors.lean` bounds long gaps ending in

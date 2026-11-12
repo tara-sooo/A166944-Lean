@@ -2086,3 +2086,81 @@ Lean 4.33.1 builds both new modules and `A166944.Attempt`. The
 `#print axioms` audit of 21 declarations, including the finite result,
 the boundary reduction to `Target`, and the inherited twin-prime
 implication, reports only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Index offset returns and continuations, 2026-11-12 JST
+
+Rowland's recurrence returns to `a(n)=3*n` at its nonunit hits. This
+comes from the recurring-structure lemma, whose first-hit distance
+uses the smallest prime factor of a single fixed term.
+[Rowland, arXiv:0710.3217v3, Section 3](https://arxiv.org/pdf/0710.3217v3)
+
+For the A166944 recurrence, Shevelev's observation 6 and Theorem 1
+use a quiet interval of square-root length near a fundamental point
+as a sufficient condition. Proposition 1 records the parity-dependent
+upper bounds on `a(n)/n`. These suggest tracking the offset from
+`3*n` at intermediate events.
+[Shevelev, arXiv:0911.5478v11, Sections 1 and 4](https://arxiv.org/pdf/0911.5478v11)
+
+Write `X=2*s-C`, `g=r-s`, and `e=d(r)`. At any genuine event with
+`e≥5`, the offset after the hit is `2*e*k` at an even hit or
+`2*e*k+6` at an odd hit, with `k≥0`. Using
+`X'+(e-1)=X+2*g` and `g*e≤2*(C+1)` shows that
+`3*e²>e*(X+1)+4*(C+1)` forces `k=0`.
+
+For a suffix starting at `X≤6`, its large-gap growth `H` alone
+bounds the terminal offset by `X≤4*H+8`. The stronger estimate
+retains all the growth `G` as `3*X_end+G≤3*X_start+13*H+6`.
+Just before a crossing of the cofactor boundary, the current
+horizon `C` and final gap `g` therefore satisfy
+`219*M < C+864*H+325*g+41639` with `H` taken on that suffix.
+For `M≥11751795061` and `C≤8*M` this gives `6*M<25*H`.
+The horizon itself still increases across a return.
+
+The exact supported-hit map modulo 210 gives a finite certificate
+from offset at most six. Start at each of the 210 index residues
+and four even offsets. The initial horizon residue follows from
+`C=2*s-X`. A supported path from any such state has at most nine
+events, offset at most 76, and horizon growth at most 32. Lean
+checks the four sets of starting residues and transfers the result
+to genuine recurrence paths via `first_clipped_hit210_of_supported`.
+
+The separate C++ clipped enumeration at modulus 90090 considers
+all 360,360 initial residue/offset pairs for increments at most 15.
+It finds 1,426,261 transitions, at most 30 events per path, offset
+at most 220, and horizon growth at most 170. These larger-table
+values are computational checks. The same enumeration independently
+matches the three mod-210 bounds.
+
+In 14,869 twin-shaped synthetic starts through 2M, the 491,514
+transitions include a run of six successive gaps above ten each
+increasing `X` at `M=733333`. At `M=1461853`, increment 8297
+with gap 179 forces `X` from 7944 to 6. The near-threshold scan
+of 478 starts in `[11751795067,11751995061]` gives 42,708 events.
+Of 27,087,276 total units of large-gap growth, 14,797,746 occur
+on steps ending at `X≤6`. At `M=11751887509`, one stretch has
+473 successive post-event offsets above six. Fourteen consecutive
+events in that replay increase both `s` and `C` by 420, increasing
+`X` by 420 and the boundary value by 91,140 while restoring both
+residues modulo 210. An arbitrary local first-hit state gives a
+single positive step returning to the same residues modulo 30030.
+Both witnesses are checked with the original gcd recurrence.
+
+A second sufficient condition uses `2*X≤M` and `8*(C+1)≤M²`
+at every capped endpoint. An inside increment above `M` would need
+`M≤4*g` and therefore `M²<8*(C+1)`. At a quiet exit, the small
+offset gives enough distance for both horizon terms to be prime.
+`canonical_next_record_factors_of_index_offset_bounds` proves the
+resulting conditional next-record theorem for `M≥33`. The uniform
+endpoint estimates remain open.
+
+```sh
+lake build A166944.ReplayOffset210 A166944.Attempt
+g++ -O3 -std=c++17 -Wall -Wextra -o /tmp/replay_offset_clipped diagnostics/replay_offset_clipped.cpp
+/tmp/replay_offset_clipped
+PYTHONDONTWRITEBYTECODE=1 python3 diagnostics/replay_offset_probe.py --scan
+```
+
+The replay scan uses SymPy 1.14.0 for factorization and cross-checks
+the selected witnesses and six actual segments by direct gcd iteration.
+Lean 4.33.1 builds both targets. The axiom audit of 13 declarations
+reports only `propext`, `Classical.choice`, and `Quot.sound`.
