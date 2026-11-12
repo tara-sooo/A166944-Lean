@@ -262,6 +262,17 @@ three tenths of the record, a first crossing must have a deficient
 anchored window with at least two phase keys. The uniform budget
 on actual crossing candidates remains open.
 
+`RebalancedSmallAnchorDeficits210.lean` includes the horizon growth
+between ordered requests in the window-width lower bound. In a
+deficient window with two requests, the credit width is at most
+10,187 and the deficit plus three times its negative costs is at
+most 4,052. The bounds for three requests are 43,277 and 8,368.
+`RebalancedAnchorComponents210.lean` partitions the union of the
+anchored intervals into disjoint windows. The exact repeat credit
+debt is the sum of their signed debts minus all credit outside the
+union. The small-window bounds and the unused credit enter the
+same allowance for first payments and repeat credit debt.
+
 The ordinary
 `A166944.Attempt` build stays on the recurrence-side imports.
 

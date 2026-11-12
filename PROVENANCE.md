@@ -1822,3 +1822,50 @@ Lean 4.33.1 checks the new module and its composition with the
 existing first-crossing reduction. The audit of 51 public
 theorems in the two credit modules and the reused demand cap
 uses only `propext`, `Classical.choice`, and `Quot.sound`.
+
+## Ordered small deficits and disjoint anchor components, 2026-11-12 JST
+
+From `c6c5e648f9221f4936036530e447fc26b7663ec3`, a deficit with up
+to three requests has at most 47 eligible increments. The
+window contains the full phase period of each request and the
+horizon growth from its endpoint through the last request. Between consecutive
+requests of increments `e,f`, the growth is at least `f-1`,
+and at least `2*f-2` when `e=f` by the factor reuse residues.
+The finite checks in `RebalancedSmallAnchorData210.lean` use
+the maximum over the ordered requests of twice the period and
+the subsequent growth. Independent enumeration leaves 59 pairs
+and 4,400 triples whose summed cost caps can exceed that floor.
+
+For actual event endpoints, the credit width also includes three
+times the sum `N_w` of negative cost magnitudes between them.
+With two requests the width is at most 10,187, `N_w ≤ 1350`,
+the deficit plus `3*N_w` is at most 4,052, and all increments are
+at most 77. The corresponding bounds with three requests are
+43,277, 2,789, 8,368, and 119.
+
+The union of positive anchored intervals is a disjoint union of
+windows with original endpoints. Every request belongs to one
+window. The exact repeat credit debt is the sum of the signed
+window debts minus the unused credit outside the union. The
+component allowance uses `4052-3*N_w` or `8368-3*N_w` on positive
+two- or three-request debts and the positive part of the actual
+debt elsewhere. The signed crossing theorem accepts the sum of
+these allowances minus unused credit in place of the exact debt.
+The uniform bound with first payments on actual first crossings
+remains open.
+
+Trial division at the full capped synthetic prefixes in the two
+preceding scan ranges gives 44 and 147 components with no positive
+debt, from 69 and 292 requests. On the `M=367264309` control through
+horizon `734547102`, the component is `[3779,45581)` and its total
+demand is 2,124. Its debt is −39,678 and there are 3,779 unused
+units, giving exact repeat credit debt −43,457.
+
+```sh
+lake build A166944.Attempt A166944.RebalancedAnchorComponents210 A166944.ResidualRebalancedPairOffsets210
+```
+
+Lean 4.33.1 checks the new modules and the composition of their
+crossing allowance with `target_of_rebalanced_remaining_crossings210`.
+The audit of 12 new public theorems uses only `propext`,
+`Classical.choice`, and `Quot.sound`.
