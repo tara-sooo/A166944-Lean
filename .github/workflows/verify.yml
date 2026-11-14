@@ -69,6 +69,8 @@ jobs:
             A166944.CompositeThird \
             A166944.CompSweep1000 \
             A166944.CompSweepComplete \
+            A166944.CompSweepRecords \
+            A166944.Q2TailKill \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
