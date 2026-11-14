@@ -12,6 +12,9 @@ Focused research tasks will use separately assigned child Issues as they are cre
 
 ## Current structure
 
+- `GATE_MAP.md` — the conditional entry points into `Target` and the edges between them, extracted mechanically.
+- `REACH.md` — the unconditional finite certificates, and the one missing bound.
+- `DECLARATIONS.json` — per-module declaration counts, enforced by CI so that a silent loss of content fails the build.
 - `A166944/ResearchDefs.lean` — ultra-light recurrence and record definitions.
 - `A166944/Lemmas.lean` — reusable Lean-verified lemmas only.
 - `A166944/Attempt.lean` — active lightweight proof-search/checkpoint file.
@@ -48,6 +51,33 @@ The remaining **5E.3 critical obstruction** is to rule out the `q = 3` and
 ancestry**, beyond aggregate scalar identities and local factor conditions.
 Known scalar survivors are diagnostic arithmetic assignments, **not** actual
 A166944 recurrence paths. No quotient family has been universally eliminated.
+
+**What "the obstruction" reduces to, as of this revision.** `GATE_MAP.md`
+records the thirteen conditional entry points into `Target` and the implication
+edges between them; the `Residual*` certificate chain is the only chain, and the
+other entry points are siblings, so "which gate to close" has eight incomparable
+answers rather than one. `REACH.md` records the unconditional side: the finite
+replay certificates reach `RecordsVerifiedThrough 11751795063`, and what stands
+between them and `Target` is one uniform bound. As of this revision that bound
+has been pinned down from five independent directions and they agree:
+
+- `TravelReduction.lean` — travel is *exactly* the index cap `2*sf <= 3*M+4`,
+  and the state bound `Cf <= 2*sf` cannot supply it (`state_bound_alone_is_not_travel`);
+- `CountFromIndex.lean` — `2*p <= B sf + sf - 2 - (2*M - 2)`, so the event count
+  is bounded by the endpoint index and the reservoir;
+- `CountBoundLimits.lean` — the proven count bounds `3q <= E`, `E <= M*q`,
+  `2q <= T` admit *any* `q` and so cannot bound the count;
+- `BIntegrate.lean` — `B sf + (sf - s) = B s + S` with `S = sum (d r - 1)`, so
+  the reservoir at the exit is determined by the accumulated excess;
+- `ExitBand.lean` — the slack bound `Cf - sf <= 2*M - 4` holds at every canonical
+  exit, including the five that are not dangerous, but only on the hypothesis
+  `sf <= 2*M - 4`.
+
+So the missing input is a uniform bound on the terminal index `sf` (equivalently
+on the event count `p`, equivalently a lower bound on `B sf`). `EventCountFails.lean`
+records that the event-count side condition `48*p*p + 1 < M` consumed by
+`canonical_travel_bound_of_event_count` is *not* automatic: it fails at five of
+the fourteen records a sweep to 2.5 million reaches, the largest at `M = 2659`.
 
 The record-index work branch proves that difference records are unbounded.
 `A166944/RecordBarrier.lean` bounds the index of a record above any threshold

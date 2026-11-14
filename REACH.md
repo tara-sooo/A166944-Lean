@@ -107,6 +107,26 @@ directly. Bounding either one from above is equivalent to bounding `p`, so
 phrasing the gap as "`T` has no upper bound" is true but not the useful form: the
 missing input is the count.
 
+## Five independent routes to the same missing bound
+
+Recorded because each was found separately and they agree, which is the strongest
+evidence available that the diagnosis is right and not an artefact of one
+formulation. All five are kernel-checked in the modules named.
+
+| route | module | statement |
+| --- | --- | --- |
+| travel is an index cap | `TravelReduction.lean` | travel `2*(sf-(M+2)) <= M` is *exactly* `2*sf <= 3*M+4`, and `Cf <= 2*sf` cannot supply it (`state_bound_alone_is_not_travel`) |
+| count from the index | `CountFromIndex.lean` | `2*p <= B sf + sf - 2 - (2*M - 2)` |
+| count bounds cannot bound the count | `CountBoundLimits.lean` | `3q <= E`, `E <= M*q`, `2q <= T` admit any `q` |
+| reservoir is pinned | `BIntegrate.lean` | `B sf + (sf - s) = B s + S` with `S = sum (d r - 1)` |
+| exit band | `ExitBand.lean` | `Cf - sf <= 2*M - 4` at every canonical exit, on the hypothesis `sf <= 2*M - 4` |
+
+The second and fourth together eliminate `B sf`, leaving a relation among
+`p`, `sf` and `S`; the third says the proven count bounds cannot close it; the
+fifth says the slack bound needs the same index bound as everything else. Hence:
+**one uniform bound on the terminal index `sf`**, equivalently on the event count
+`p`, equivalently a lower bound on the reservoir `B sf`.
+
 ## What a proof of the missing bound has to look like
 
 It has to bound `p`, the number of nonunit events, by roughly `sqrt(M)/7`, using
