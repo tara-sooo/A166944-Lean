@@ -73,6 +73,9 @@ jobs:
       - name: Build B-coordinate lemmas
         run: lake build A166944.BCoordinates
 
+      - name: Build q=3 branch barriers
+        run: lake build A166944.Q3Barrier
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
