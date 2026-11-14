@@ -185,6 +185,42 @@ jobs:
         run: lake env lean A166944/Baseline.lean
 
       # ------------------------------------------------------------------
+      # Declaration guard.
+      #
+      # A build succeeds whether a module has four theorems or twelve, so CI
+      # cannot see a silent loss of content. This happened once: a deduplication
+      # pass dropped eight declarations from TailReduction while CI stayed green.
+      # `DECLARATIONS.json` is the manifest; a module that loses declarations, or
+      # a new module that is not listed, fails the job.
+      # ------------------------------------------------------------------
+      - name: Check the declaration manifest
+        run: |
+          python3 - <<'EOF'
+          import json, os, re, sys
+          man = json.load(open("DECLARATIONS.json"))
+          now, bad = {}, []
+          for f in sorted(os.listdir("A166944")):
+              if not f.endswith(".lean"):
+                  continue
+              s = open(os.path.join("A166944", f), encoding="utf-8", errors="replace").read()
+              th = len(re.findall(r'^(?:private\s+|protected\s+)?theorem\s', s, re.M))
+              df = len(re.findall(r'^(?:private\s+|protected\s+)?def\s', s, re.M))
+              now[f[:-5]] = th + df
+          for m, n in man["modules"].items():
+              if now.get(m, -1) < n:
+                  bad.append(f"{m}: {n} -> {now.get(m, 'MISSING')}")
+          for m in now:
+              if m not in man["modules"]:
+                  bad.append(f"{m}: new module, not in the manifest")
+          if bad:
+              print("::error::declaration manifest mismatch")
+              for b in bad:
+                  print("   " + b)
+              sys.exit(1)
+          print(f"manifest ok: {len(now)} modules, {sum(now.values())} declarations")
+          EOF
+
+      # ------------------------------------------------------------------
       # Axiom audit for the headline results. `#print axioms` must stay inside
       # the standard three; a `sorryAx` line here fails the job.
       # ------------------------------------------------------------------
