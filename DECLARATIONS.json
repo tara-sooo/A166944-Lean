@@ -25,6 +25,7 @@
   "CreditDeficits210": 2,
   "CreditHall210": 5,
   "CreditWindows210": 12,
+  "CrossingRoute": 1,
   "CycleLimits": 10,
   "DNodes": 6,
   "EventCountFails": 7,
@@ -117,5 +118,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1679
+ "total": 1680
 }
