@@ -67,6 +67,12 @@ jobs:
       - name: Build stopping criterion
         run: lake build A166944.StoppingCriterion
 
+      - name: Build first-hit arithmetic toolkit
+        run: lake build A166944.FirstHitArithmetic
+
+      - name: Build B-coordinate lemmas
+        run: lake build A166944.BCoordinates
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
