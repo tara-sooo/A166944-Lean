@@ -5,11 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - A166944/ResearchDefs.lean
-      - A166944/Lemmas.lean
-      - A166944/TargetDefs.lean
-      - A166944/Bridge.lean
-      - A166944/Baseline.lean
+      - A166944/**
       - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
@@ -61,6 +57,15 @@ jobs:
 
       - name: Build active attempt
         run: lake build A166944.Attempt
+
+      - name: Build record barrier (unbounded difference records)
+        run: lake build A166944.RecordBarrier
+
+      - name: Build canonical record reduction
+        run: lake build A166944.CanonicalRecord
+
+      - name: Build stopping criterion
+        run: lake build A166944.StoppingCriterion
 
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
