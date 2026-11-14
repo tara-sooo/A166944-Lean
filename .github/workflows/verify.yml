@@ -84,6 +84,7 @@ jobs:
             A166944.BIntegrate \
             A166944.ExitBand \
             A166944.EventCountFails \
+            A166944.ExitCoordinates \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
