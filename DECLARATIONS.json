@@ -27,6 +27,7 @@
   "CreditWindows210": 12,
   "CycleLimits": 10,
   "DNodes": 6,
+  "ExitBand": 3,
   "FirstHitArithmetic": 10,
   "FirstHitDivisor": 6,
   "FundedPhaseCredits210": 7,
@@ -112,5 +113,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1659
+ "total": 1662
 }

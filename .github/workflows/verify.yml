@@ -82,6 +82,7 @@ jobs:
             A166944.BLedger \
             A166944.BStepLaw \
             A166944.BIntegrate \
+            A166944.ExitBand \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
