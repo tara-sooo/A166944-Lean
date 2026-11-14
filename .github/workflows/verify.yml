@@ -85,6 +85,9 @@ jobs:
       - name: Build cycle limits
         run: lake build A166944.CycleLimits
 
+      - name: Build composite probe
+        run: lake build A166944.CompositeProbe
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
