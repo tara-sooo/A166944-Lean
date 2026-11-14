@@ -94,6 +94,12 @@ jobs:
       - name: Build composite third case
         run: lake build A166944.CompositeThird
 
+      - name: Build composite sweep to 1000
+        run: lake build A166944.CompSweep1000
+
+      - name: Build complete composite classification
+        run: lake build A166944.CompSweepComplete
+
       - name: Build travel reduction
         run: lake build A166944.TravelReduction
 
