@@ -78,4 +78,20 @@ theorem odd_record_value_le_D_add_one {R r : Nat} (hR : 5 < R) (hr : 2 ≤ r)
   rw [hd] at hdvd
   exact Nat.le_of_dvd (Nat.succ_pos _) hdvd
 
+/-- **Even-branch index bound.**  On the even branch the value divides `r`, so a
+nontrivial increment cannot exceed its own index.  (The odd branch gives the
+sharper `d r + 2 <= r`, since there it divides `r - 2`.) -/
+theorem even_event_value_le_index {r C : Nat} (hr : 2 ≤ r) (heven : r % 2 = 0)
+    (hD : D (r - 1) = C) (hpos : 1 < d r) : d r ≤ r := by
+  obtain ⟨_, hdvd⟩ := even_event_value_dvd hr heven hD
+  exact Nat.le_of_dvd (by omega) hdvd
+
+/-- **The index-free form of the odd bound.**  For an event at an odd index the
+value is bounded by `D` one step earlier plus one, with no reference to the
+running horizon `C`. -/
+theorem odd_event_value_le_D_pred_add_one {r : Nat} (hr : 2 ≤ r) (hodd : r % 2 = 1)
+    (hpos : 1 < d r) : d r ≤ D (r - 1) + 1 := by
+  obtain ⟨hdvd, _⟩ := odd_event_value_dvd (C := D (r - 1)) hr hodd rfl
+  exact Nat.le_of_dvd (by omega) hdvd
+
 end A166944Research
