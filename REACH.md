@@ -64,26 +64,56 @@ prime. These are real theorems about the actual recurrence, not conditionals.
 
 ## What is missing, in one sentence
 
-**A bound on the terminal index `sf` of a canonical capped replay, uniform in `M`.**
+**An upper bound on the number of events `p` in a canonical capped replay.**
 
-The certificates cover a finite interval because each one was *computed*. To get
-`Target` one needs the same conclusion for all `M`, and the only thing standing
-between the finite certificates and that conclusion is a uniform bound on how
-far a capped replay can travel.
+The earlier version of this file said "a bound on the terminal index `sf`",
+and then "no upper bound on `T`". Both were imprecise, and the correction
+matters because it changes what a proof attempt should aim at.
 
-Equivalently, by `TravelReduction.lean`:
+What already exists, from `CanonicalTravel.lean`:
 
-    travel is 2 * (sf - (M + 2)) <= M,
-    which under M + 2 <= sf is exactly the index cap 2 * sf <= 3 * M + 4.
+    moving_horizon_path_travel_bound   (line 38)
+        sf - s <= p * sqrt (4 * (U + 1))      -- for any horizon bound U
 
-And by `BCapDictionary.lean`, the same statement is `2 * Cf <= 3 * M + 2 * B sf`:
-what is needed is a *lower* bound on the reservoir `B sf`, since travel is
-precisely the reservoir being spent. `B` is not monotone (`B 1 = 2 > B 3 = 1`),
-so no upper bound on `B` helps.
+    canonical_travel_bound_of_event_count   (line 170)
+        (hcount : 48 * (p * p) + 1 < M)  ->  2 * (sf - (M + 2)) <= M
 
-`Lemmas.lean:3851` and `:7355` give `3 q <= E`, `E <= M * q` and `2 q <= T` --
-a lower bound on `T` and both bounds on `E`. There is no upper bound on `T`
-anywhere in the tree.
+So the *displacement* `sf - s` is already bounded, in terms of `p`, and the step
+from `hcount` to travel is already proved. Substituting `U = 3M + 4` and
+requiring `2 * (sf - (M + 2)) <= M` gives
+
+    2 * p * sqrt (4 * (3M + 4)) <= M        approximately,
+    i.e.  p <= sqrt(M) / 7                  approximately.
+
+At `M = 45895573` that is `p <= 977`. The `hcount` form `48p^2 + 1 < M` says the
+same thing: `p <= sqrt((M-1)/48)`, which is `977` at that `M`.
+
+Numercially, the verified certificates have
+
+    M = 45895573    p = 37      (26.4x of slack)
+    M = 91793059    p = 53      (26.1x)
+    M = 367232911   p = 109     (25.4x)
+
+so the observed event counts are more than twenty-five times below what is
+needed. That is an empirical margin, **not a proof margin**, and it is the whole
+of the gap.
+
+## Why `T` is not the right object
+
+`moving_horizon_path_count_bounds` (`Lemmas.lean:7355`) states its bounds in terms
+of a `T` defined by the ledger `sf + q = s + T`, so that `T` is the displacement
+*plus* the event count. `moving_horizon_path_travel_bound` bounds the displacement
+directly. Bounding either one from above is equivalent to bounding `p`, so
+phrasing the gap as "`T` has no upper bound" is true but not the useful form: the
+missing input is the count.
+
+## What a proof of the missing bound has to look like
+
+It has to bound `p`, the number of nonunit events, by roughly `sqrt(M)/7`, using
+only `d (M + 2) = M`, the path, and `IsAttainedPreviousMaximum M sf`. The
+available count bounds (`Lemmas.lean:3851`, `:7355`) give `3q <= E`,
+`E <= M * q` and `2q <= T` -- a lower bound on `T` and both bounds on `E`. None
+of them bounds `q`.
 
 ## How to use this file
 
