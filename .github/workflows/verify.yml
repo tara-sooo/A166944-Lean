@@ -82,6 +82,9 @@ jobs:
       - name: Build absolute-index constraints
         run: lake build A166944.AbsoluteIndex
 
+      - name: Build cycle limits
+        run: lake build A166944.CycleLimits
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
