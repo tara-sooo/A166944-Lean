@@ -76,6 +76,9 @@ jobs:
       - name: Build q=3 branch barriers
         run: lake build A166944.Q3Barrier
 
+      - name: Build renormalized growth
+        run: lake build A166944.RenormalizedGrowth
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
