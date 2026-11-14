@@ -34,42 +34,65 @@ them so that "what is left" can be read off instead of asserted.
 
 ## Implication edges between the gates
 
-Only these edges exist in the tree. An arrow means "the source is *sufficient*
-for the target", read directly from a theorem's type.
+Extracted mechanically from the theorem signatures in `A166944/` (38 edges).
+An arrow means "the source is sufficient for the target". Every edge below is a
+theorem that exists; none is inferred.
+
+### Edges into `Target`
 
 ```
-ResidualReserveCondition210
-    ==> ResidualSignedReserveCondition210      TwinSignedReserveTarget210.lean:22
-    ==> TwinPrimeTravelBoundFrom 50000000      TwinReserveTarget210.lean:23
-    ==> Target                                 TwinReserveTarget210.lean:39
-
-ResidualSignedReserveCondition210
-    ==> ResidualCrossingBudgetCondition210     TwinCrossingBudget210.lean:32
-    ==> TwinPrimeTravelBoundFrom 50000000      TwinSignedReserveTarget210.lean:33
-    ==> Target                                 TwinSignedReserveTarget210.lean:49
-
-ResidualCrossingBudgetCondition210
-    ==> TwinPrimeTravelBoundFrom 50000000      TwinCrossingBudget210.lean:58
-    ==> Target                                 TwinCrossingBudget210.lean:72
-
-ResidualSignedReserveCondition210
-    ==> ResidualCrossingBudgetCondition210
+ResidualReserveCondition210          -> Target   target_of_reserve_condition210            TwinReserveTarget210.lean:38
+ResidualSignedReserveCondition210    -> Target   target_of_signed_reserve_condition210     TwinSignedReserveTarget210.lean:49
+ResidualCrossingBudgetCondition210   -> Target   target_of_crossing_budget_condition210    TwinCrossingBudget210.lean:72
+ScaledCrossingBudgetCondition210     -> Target   target_of_scaled_crossing_budget_...210   ResidualScaledPotential210.lean:321
+RebalancedCrossingBudgetCondition210 -> Target   target_of_rebalanced_crossing_budget_...  ResidualRebalancedCosts210.lean:331
+RebalancedBoundaryCondition210       -> Target   target_of_rebalanced_boundary210          RebalancedBoundary210.lean:412
+RebalancedOverlapCrossingCondition210-> Target   target_of_rebalanced_overlap_crossings210 RebalancedOverlapBudget210.lean:402
+RebalancedRemainingCrossingCondition210 -> Target  target_of_rebalanced_remaining_...     RebalancedCrossingGrowth210.lean:264
+CanonicalTravelBoundFrom 22933441    -> Target   target_of_travel_bound_from_22933441      TravelTarget.lean:83
+TwinPrimeTravelBoundFrom 22933441    -> Target   target_of_twin_prime_travel_bound_...     TravelTarget.lean:76
+TwinPrimeTravelBoundFrom 50000000    -> Target   target_of_twin_travel_from_fifty_million  VerifiedFiftyMillionBridge.lean:97
 ```
 
-So the *certificate* chain is a chain, not a fan:
+### Edges into `TwinPrimeTravelBoundFrom`
+
+```
+ResidualReserveCondition210          -> TwinPrimeTravelBoundFrom 50000000   TwinReserveTarget210.lean:23
+ResidualSignedReserveCondition210    -> TwinPrimeTravelBoundFrom 50000000   TwinSignedReserveTarget210.lean:33
+ResidualCrossingBudgetCondition210   -> TwinPrimeTravelBoundFrom 50000000   TwinCrossingBudget210.lean:58
+RebalancedRemainingCrossingConditionFrom210 -> TwinPrimeTravelBoundFrom 367232911  RebalancedCrossingGrowth210.lean:260
+IsTravelPotential210 & PotentialCrossingBudgetCondition210 -> TwinPrimeTravelBoundFrom  ResidualScaledPotential210.lean
+```
+
+### Edges between budget conditions
+
+```
+ResidualReserveCondition210        -> ResidualSignedReserveCondition210    TwinSignedReserveTarget210.lean:22
+ResidualSignedReserveCondition210  -> ResidualCrossingBudgetCondition210   TwinCrossingBudget210.lean:32
+```
+
+### What this shows
+
+The `Residual*` certificate chain is a chain, not a fan:
 
 ```
 ResidualReserveCondition210
   -> ResidualSignedReserveCondition210
   -> ResidualCrossingBudgetCondition210
+  -> TwinPrimeTravelBoundFrom 50000000
   -> Target
 ```
 
-The other ten entry points are **siblings**, not reductions of one another: each
-takes its own budget hypothesis and produces `Target` directly, and no theorem
-in the tree derives one from another. In particular the README's numbering
-(`Residual*` tower, `Rebalanced*` tower, `Scaled*`, `Potential*`) reflects the
-order in which the estimators were written, not a dependency order.
+But the **other eight entry points are siblings**. Each takes its own budget
+hypothesis and produces `Target` directly; no theorem derives one budget
+condition from another except the two `Residual*` edges above. In particular
+nothing connects the `Rebalanced*` tower to the `Residual*` tower, and nothing
+connects `ScaledCrossingBudgetCondition210` to either. The README's ordering
+(`Residual*`, then `Rebalanced*`, then `Scaled*`) reflects the order in which
+the estimators were written, not a dependency order.
+
+So "which gate should we close?" has eight incomparable answers, not one. That
+is the actual state of the reduction.
 
 ## The threshold that matters
 
