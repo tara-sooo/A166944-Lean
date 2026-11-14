@@ -1,1 +1,11 @@
 .lake/
+
+# Local Lean elaboration artifacts from the Mathlib-free verification loop
+# (`p2m-a166-build` writes .olean next to each source). Never commit these.
+*.olean
+*.ilean
+*.olean.hash
+*.ilean.hash
+*.olean.server.hash
+*.olean.private
+*.trace
