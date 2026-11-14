@@ -79,4 +79,21 @@ theorem a_at_exit_le {M sf Cf : Nat}
   have hslack := canonical_exit_slack_le_two_mul_sub_four hM hsf hstate
   omega
 
+/-- **The index is the value minus the horizon.**  `sf = a sf - Cf` at any state,
+directly from `a sf = Cf + sf`. -/
+theorem sf_eq_a_sub_horizon {sf Cf : Nat} (hstate : IsMovingHorizonState sf Cf) :
+    sf = a sf - Cf := by
+  have ha := a_at_state hstate
+  omega
+
+/-- **The index is the reservoir minus two, plus the horizon gap.**  Combining
+`B sf + sf = Cf + 2` with `sf = a sf - Cf` shows the three coordinates carry no
+independent information: any two determine the third. -/
+theorem coordinates_determined {sf Cf : Nat} (hstate : IsMovingHorizonState sf Cf) :
+    a sf = B sf + 2 * sf - 2 := by
+  have ha := a_at_state hstate
+  have hB := moving_horizon_state_B_add_index hstate
+  omega
+
 end A166944Research
+
