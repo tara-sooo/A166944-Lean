@@ -47,17 +47,123 @@ jobs:
         run: lake exe cache get
 
       # ------------------------------------------------------------------
-      # Whole-library build.
+      # Build every module in the library.
       #
-      # Previously this workflow listed a handful of individual modules, so
-      # most of the repository -- including `RecordBarrier` (the unbounded
-      # records theorem), `CanonicalRecord`, `TravelTarget` (which derives
-      # `Target`) and every `Verified*` certificate -- was never built by CI.
-      # `lake build A166944` now covers the entire library in one step, so a
-      # broken module fails the job no matter which file it lives in.
+      # `lake build A166944` (the whole-library target) fails at the job-
+      # computation stage with 'some modules have bad imports', so the
+      # modules are listed explicitly instead. The lightweight research
+      # core comes first so a break in it fails fast; the rest is chunked
+      # to keep individual steps short.
       # ------------------------------------------------------------------
-      - name: Build the whole library
-        run: lake build A166944
+      - name: Build research core
+        run: |
+          lake build A166944.ResearchDefs \
+            A166944.Lemmas \
+            A166944.RecordBarrier \
+            A166944.CanonicalRecord \
+            A166944.RecordIndex \
+            A166944.StoppingCriterion \
+            A166944.FirstHitArithmetic \
+            A166944.BCoordinates \
+            A166944.CompositeProbe \
+            A166944.CompositeThird \
+            A166944.CompSweep1000 \
+            A166944.CompSweepComplete \
+            A166944.Q1Witness \
+            A166944.AbsoluteIndex \
+            A166944.Q3Barrier \
+            A166944.CycleLimits \
+            A166944.RenormalizedGrowth \
+            A166944.CompositeRecord \
+            A166944.RecordIndexBounds \
+            A166944.SelfHit \
+            A166944.TravelReduction
+      - name: Build remaining modules (1/4)
+        run: |
+          lake build A166944.Attempt \
+            A166944.Baseline \
+            A166944.Bridge \
+            A166944.CanonicalGrowth \
+            A166944.CanonicalTravel \
+            A166944.ChargedPhaseCredits210 \
+            A166944.CreditDeficitStructure210 \
+            A166944.CreditDeficits210 \
+            A166944.CreditHall210 \
+            A166944.CreditWindows210 \
+            A166944.FundedPhaseCredits210 \
+            A166944.HorizonCrossing \
+            A166944.QuietReturn \
+            A166944.RebalancedAnchorComponents210 \
+            A166944.RebalancedAnchorWindows210 \
+            A166944.RebalancedBoundary210 \
+            A166944.RebalancedComponentGrowth210 \
+            A166944.RebalancedCreditIntervals210 \
+            A166944.RebalancedCrossingGrowth210 \
+            A166944.RebalancedFirstPaymentBudget210
+      - name: Build remaining modules (2/4)
+        run: |
+          lake build A166944.RebalancedOverlapBudget210 \
+            A166944.RebalancedPeriodLoad210 \
+            A166944.RebalancedSmallAnchorData210 \
+            A166944.RebalancedSmallAnchorDeficits210 \
+            A166944.RecordReplay \
+            A166944.RecurrenceDeficit210 \
+            A166944.ReplayLaunch \
+            A166944.ReplayOffset210 \
+            A166944.ResidualAdjustedCosts210 \
+            A166944.ResidualAllocation210 \
+            A166944.ResidualDeficitBounds210 \
+            A166944.ResidualEventTrace210 \
+            A166944.ResidualFirstPayment210 \
+            A166944.ResidualGrowthAllocation210 \
+            A166944.ResidualGrowthWindows210 \
+            A166944.ResidualIntervalBudget210 \
+            A166944.ResidualIntervals210 \
+            A166944.ResidualNetContributions210 \
+            A166944.ResidualPhaseCredits210 \
+            A166944.ResidualRebalancedCosts210
+      - name: Build remaining modules (3/4)
+        run: |
+          lake build A166944.ResidualRebalancedMixedOffsets210 \
+            A166944.ResidualRebalancedPairCaps210 \
+            A166944.ResidualRebalancedPairOffsets210 \
+            A166944.ResidualRebalancedTwoRequests210 \
+            A166944.ResidualReuseOverlap210 \
+            A166944.ResidualScaledPotential210 \
+            A166944.ResidualSmallAdjusted210 \
+            A166944.ResidualSmallReusePairs210 \
+            A166944.ResidualStartup210 \
+            A166944.ResidualStartupWeights210 \
+            A166944.ResidualThreshold210 \
+            A166944.ReuseCongruences \
+            A166944.SeparatorBlocks210 \
+            A166944.TargetDefs \
+            A166944.TravelCharged210 \
+            A166944.TravelClip210 \
+            A166944.TravelExcess \
+            A166944.TravelFactors \
+            A166944.TravelFirstUse \
+            A166944.TravelMod210
+      - name: Build remaining modules (4/4)
+        run: |
+          lake build A166944.TravelMod210Data \
+            A166944.TravelPhases210 \
+            A166944.TravelRebalanced210 \
+            A166944.TravelRebalanced210Data \
+            A166944.TravelResidues \
+            A166944.TravelSigned210 \
+            A166944.TravelTarget \
+            A166944.TwinCrossingBudget210 \
+            A166944.TwinReserveTarget210 \
+            A166944.TwinSignedReserveTarget210 \
+            A166944.VerifiedBoundaryRecordExtension \
+            A166944.VerifiedFiftyMillionBridge \
+            A166944.VerifiedLaterRecordExtension \
+            A166944.VerifiedRecordExtension \
+            A166944.VerifiedRecordPrefix \
+            A166944.VerifiedTravelExtension \
+            A166944.VerifiedTwinPrimePrefix
+
 
       # ------------------------------------------------------------------
       # Single-file checks that `lake build` does not exercise the same way:
