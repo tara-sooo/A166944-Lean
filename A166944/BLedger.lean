@@ -1,4 +1,4 @@
-import A166944.BCoordinates
+import A166944.BStepLaw
 import A166944.CountFromIndex
 
 /-!
@@ -41,30 +41,30 @@ the reason, rather than carried as a theorem, because the version attempted in
 
 namespace A166944Research
 
-/-! ## The reservoir ledger, as a target
+/-! ## The path ledger, as a target
 
 The identity to prove is
 
     B sf + T + q = B s + E
 
-at a canonical start, i.e. `B sf = (M - 2) + E - T - q`. It holds numerically on
-every record checked (11 of 11, M from 13 to 88801), and the ingredients are both
-in the tree: `moving_horizon_path_ledger` supplies `E` and `T` with
-`Cf + q = C + E` and `sf + q = s + T`, and `excess_succ_add_two`
-(`Lemmas.lean:1241`) is the per-step law `B (k + 1) + 2 = B k + d (k + 1)`.
+with `E`, `T` from `moving_horizon_path_ledger`. The step law it sums is now
+proved (`B_step_law`, in `BStepLaw`), so the remaining work is bookkeeping: the
+induction has to carry the running reservoir alongside `E` and `T`, and `omega`
+does not push through the truncated subtraction in `D_succ_eq_D_add_d_sub_one`
+(`D r = D (r-1) + (d r - 1)`) without an explicit `Nat.add_sub_assoc` rewrite.
 
-It is recorded here as a target rather than as a theorem because the induction did
-not close: summing the step law over a path and matching it against the ledger
-needs the gap sum `r - s` carried alongside `E` and `T`, and the versions I
-attempted left `omega` with a goal it could not solve. Writing the correct
-induction is a self-contained piece of work, and leaving a broken proof or a
-weakened statement would be worse than leaving the target.
+Recorded as a target rather than as a theorem because the version attempted here
+left `omega` with a goal it could not solve, and a broken proof or a weakened
+statement would be worse than an honest target.
 
-Why it matters: if the identity holds then `B sf` is *determined* by `E`, `T`,
-`q` and `M`, so the observed near-equality `B sf ~ M` is a statement about
-`E - T - q` being small rather than about `B` having independent freedom. That
-reframes the missing event-count bound as a bound on `E - T - q`, which is the
-quantity the count bounds in `Lemmas.lean:3851` and `:7355` actually control.
+Why it matters, and what the step law already buys: at a canonical start
+`B (M + 2) = M - 2`, so the ledger would read `B sf = (M - 2) + E - T - q`. That
+*determines* the reservoir -- the observed near-equality `B sf ~ M` is then a
+statement about `E - T - q` being small, not about `B` having independent freedom.
+Since `REACH.md` identifies the missing input as an event count bound and
+`CountFromIndex` gives `2 * q <= B sf + sf - 2 - (2 * M - 2)`, pinning `B sf`
+this way is the step that converts the problem into a bound on `E - T - q` --
+exactly the quantity `Lemmas.lean:3851` and `:7355` constrain.
 
 -/
 
