@@ -73,6 +73,7 @@ jobs:
             A166944.Q2TailKill \
             A166944.DNodes \
             A166944.TwinSweep \
+            A166944.TailReduction \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
