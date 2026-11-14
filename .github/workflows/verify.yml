@@ -86,6 +86,7 @@ jobs:
             A166944.EventCountFails \
             A166944.ExitCoordinates \
             A166944.GapBound \
+            A166944.ExitThreshold \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
