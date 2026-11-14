@@ -97,6 +97,9 @@ jobs:
       - name: Build travel reduction
         run: lake build A166944.TravelReduction
 
+      - name: Build self-hit identity
+        run: lake build A166944.SelfHit
+
       - name: Build record index bounds
         run: lake build A166944.RecordIndexBounds
 
