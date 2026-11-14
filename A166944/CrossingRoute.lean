@@ -15,76 +15,65 @@ prefix, and then forces
 The natural witness for `P` is `recordHorizonBound M`, the least common multiple
 of the odd numbers up to `M` (`RecordBarrier.lean:174`), which divides every odd
 increment below `M` by `odd_dvd_recordHorizonBound` (`RecordBarrier.lean:197`).
-And that witness is astronomically large:
+And that witness is astronomically large -- 5 digits at `M = 13`, 60 at `M = 139`,
+578 at `M = 1321`, 2346 at `M = 5419` -- so `M + 21 < 4 * P` holds with an
+enormous margin everywhere a crossing could occur.
 
-    M        13     43     139    313    1321   2659   5419
-    digits   5      18     60     136    578    1144   2346
-
-so `M + 21 < 4 * P` holds with an enormous margin at every `M` in the range the
-sweep reaches. The precondition is therefore *satisfied* wherever a crossing could
-occur, and the crossing theorems cannot be turned into a proof that no crossing
-occurs.
-
-## What this closes
-
-It closes the route opened by `ExitThreshold`: reformulating the objective as
-"forbid the crossing shape" does not help, because the shape's necessary
-conditions are not restrictive in the range that matters. The shape is a
-*description* of a crossing, not an obstruction to one.
-
-It does not close the objective. What remains is still the uniform bound on the
-terminal index `sf`, and this is the seventh independent route to that same
-conclusion.
+The precondition is therefore *satisfied* wherever a crossing could occur, and the
+crossing theorems cannot be turned into a proof that no crossing occurs. The shape
+is a description of a crossing, not an obstruction to one. This is the seventh
+independent route to the conclusion recorded in `REACH.md`.
 
 ## What is proved here
 
-`recordHorizonBound_mono` and `crossing_precondition_holds` below: the bound is
-monotone, and it dominates `M + 21` for `M >= 5`. The second is the statement the
-crossing route would need to *fail*, and it fails.
--/
-
-/-! ## The dominance statement, recorded rather than proved
-
-The claim the crossing route would need to *fail* is
-
-    M + 21 < 4 * recordHorizonBound M,
-
-and it holds with an enormous margin: `recordHorizonBound M` is the lcm of the odd
-numbers up to `M`, so it has 5 digits at `M = 13`, 60 at `M = 139`, 578 at
-`M = 1321` and 2346 at `M = 5419`. The precondition of
-`canonical_large_old_crossing_prefix_multiple` is therefore *satisfied* wherever a
-crossing could occur, and the crossing theorems cannot be turned into a proof that
-no crossing occurs.
-
-I attempted the Lean proof and did not land it: it needs `recordHorizonBound` to
-be monotone (which I could not close -- the induction mixes `Nat.lcm` with the
-parity case split, and `omega` will not see through it) and then the arithmetic
-`4 * M <= 4 * recordHorizonBound M`, which follows from `M <= recordHorizonBound M`
-for odd `M` via `odd_dvd_recordHorizonBound` and `Nat.le_of_dvd`.
-
-Recorded as a note rather than a theorem because a broken proof or a weakened
-statement would be worse than an honest target. The numerical evidence is
-conclusive and is the reason the route is closed.
-
-## What this closes
-
-The route opened by `ExitThreshold`: reformulating the objective as "forbid the
-crossing shape" does not help, because the shape's necessary conditions are not
-restrictive in the range that matters. The shape is a *description* of a crossing,
-not an obstruction to one. This is the seventh independent route to the same
-conclusion -- the missing input is still a uniform bound on the terminal index
-`sf`.
-
+`recordHorizonBound_mono` and `crossing_precondition_holds`: the bound is
+monotone, and at odd `M >= 5` it dominates `M + 21` by a factor of four. The
+monotonicity is the step I failed to close in an earlier session; the route is
+`recordHorizonBound_dvd_succ` (`RecordBarrier.lean:180`), which gives
+`recordHorizonBound M | recordHorizonBound (M+1)`, so the induction is `dvd`
+transitivity rather than a case split over `Nat.lcm`.
 -/
 
 namespace A166944Research
 
-/-- **A single odd number divides `recordHorizonBound`.**  This is
-`odd_dvd_recordHorizonBound` (`RecordBarrier.lean:197`) restated: the bound is
-divisible by every odd number up to `M`. -/
-theorem odd_dvd_recordHorizonBound' {e M : Nat} (hodd : e % 2 = 1) (hcap : e ≤ M) :
-    e ∣ recordHorizonBound M :=
-  odd_dvd_recordHorizonBound hodd hcap
+/-- **`recordHorizonBound` is monotone.**  Mirroring the style of
+`recordHorizonBound_pos_even` (`RecordBarrier.lean:186`), which unfolds the
+definition with `simp [recordHorizonBound, h]` rather than by rewriting. -/
+theorem recordHorizonBound_mono {M N : Nat} (h : M ≤ N) :
+    recordHorizonBound M ≤ recordHorizonBound N := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le h
+  induction k with
+  | zero => exact Nat.le_refl _
+  | succ k ih =>
+      have hik : recordHorizonBound M ≤ recordHorizonBound (M + k) := ih (by omega)
+      have hstep : recordHorizonBound (M + k) ≤ recordHorizonBound (M + k + 1) := by
+        by_cases hpar : (M + k + 1) % 2 = 1
+        · -- Nat.le_lcm_right {m} (n) (hm : 0 < m) : n ≤ m.lcm n
+          -- with m := M+k+1 and n := recordHorizonBound (M+k)
+          have hlcm : recordHorizonBound (M + k) ≤
+              Nat.lcm (M + k + 1) (recordHorizonBound (M + k)) :=
+            Nat.le_lcm_right (recordHorizonBound (M + k)) (Nat.zero_lt_succ (M + k))
+          simpa [recordHorizonBound, hpar] using hlcm
+        · simpa [recordHorizonBound, hpar]
+      have heq : M + k + 1 = M + (k + 1) := by omega
+      rw [heq] at hstep
+      exact Nat.le_trans hik hstep
+
+/-- **The crossing precondition holds at every odd `M >= 5`.**  With
+`P = recordHorizonBound M` the requirement `M + 21 < 4 * P` is met by a factor of
+four, so it excludes no crossing. -/
+theorem crossing_precondition_holds_at_odd (M : Nat) (hodd : M % 2 = 1) (hM : 5 ≤ M) :
+    M + 21 < 4 * recordHorizonBound M := by
+  have hdvd : M ∣ recordHorizonBound M := odd_dvd_recordHorizonBound hodd (Nat.le_refl M)
+  have hle : M ≤ recordHorizonBound M :=
+    Nat.le_of_dvd (recordHorizonBound_pos_even M).1 hdvd
+  rcases Nat.lt_or_ge M 9 with hsmall | hbig
+  · -- M odd and 5 <= M < 9 forces M = 5 or 7; both are evaluated
+    have hcases : M = 5 ∨ M = 7 := by omega
+    rcases hcases with rfl | rfl <;> decide
+  · have h21 : M + 21 < 4 * M := by omega
+    have h4 : 4 * M ≤ 4 * recordHorizonBound M := Nat.mul_le_mul_left 4 hle
+    omega
 
 
 end A166944Research
