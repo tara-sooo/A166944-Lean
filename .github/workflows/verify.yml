@@ -5,11 +5,7 @@ on:
   push:
     branches: [main]
     paths:
-      - A166944/ResearchDefs.lean
-      - A166944/Lemmas.lean
-      - A166944/TargetDefs.lean
-      - A166944/Bridge.lean
-      - A166944/Baseline.lean
+      - A166944/**
       - lakefile.toml
       - lake-manifest.json
       - lean-toolchain
@@ -61,6 +57,45 @@ jobs:
 
       - name: Build active attempt
         run: lake build A166944.Attempt
+
+      - name: Build record barrier (unbounded difference records)
+        run: lake build A166944.RecordBarrier
+
+      - name: Build canonical record reduction
+        run: lake build A166944.CanonicalRecord
+
+      - name: Build stopping criterion
+        run: lake build A166944.StoppingCriterion
+
+      - name: Build first-hit arithmetic toolkit
+        run: lake build A166944.FirstHitArithmetic
+
+      - name: Build B-coordinate lemmas
+        run: lake build A166944.BCoordinates
+
+      - name: Build q=3 branch barriers
+        run: lake build A166944.Q3Barrier
+
+      - name: Build renormalized growth
+        run: lake build A166944.RenormalizedGrowth
+
+      - name: Build absolute-index constraints
+        run: lake build A166944.AbsoluteIndex
+
+      - name: Build cycle limits
+        run: lake build A166944.CycleLimits
+
+      - name: Build composite probe
+        run: lake build A166944.CompositeProbe
+
+      - name: Build composite record lemmas
+        run: lake build A166944.CompositeRecord
+
+      - name: Build record index bounds
+        run: lake build A166944.RecordIndexBounds
+
+      - name: Build q=1 witness refutation
+        run: lake build A166944.Q1Witness
 
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
