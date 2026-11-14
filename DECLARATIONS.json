@@ -16,6 +16,7 @@
   "CompositeProbe": 6,
   "CompositeRecord": 2,
   "CompositeThird": 4,
+  "CountBoundLimits": 2,
   "CreditDeficitStructure210": 2,
   "CreditDeficits210": 2,
   "CreditHall210": 5,
@@ -107,5 +108,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1649
+ "total": 1651
 }
