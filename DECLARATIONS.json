@@ -33,6 +33,7 @@
   "FirstHitArithmetic": 10,
   "FirstHitDivisor": 6,
   "FundedPhaseCredits210": 7,
+  "GapBound": 2,
   "HorizonCrossing": 25,
   "Lemmas": 295,
   "Q1Witness": 4,
@@ -115,5 +116,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1675
+ "total": 1677
 }
