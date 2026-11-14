@@ -74,4 +74,103 @@ theorem unit_tail_gcd_eq_one_odd {s C r C' j v : Nat}
     (fun h => h.2.2.2 j hsj hjr) (fun h => h.2.2.2 j hsj hjr)
   exact Nat.gcd_eq_one_iff.mp (htail.2 hodd) v hv hdiv
 
+/-- Core reduction: adding a multiple leaves the gcd unchanged. -/
+theorem gcd_add_eq_gcd_self {A X : Nat} : Nat.gcd A (A + X) = Nat.gcd A X := by
+  rw [Nat.add_comm A X]
+  exact Nat.gcd_add_self_right A X
+
+/-- Abstract even-tail reduction. `S` is the canonical state index `delta*c`
+    and `d` is `2*delta`; the second argument is `C - 1`. -/
+theorem gcd_of_split_even {S d k : Nat} (hd : 1 ≤ d) (hk : k ≤ d - 1) :
+    Nat.gcd (S + k) (S + d - 1) = Nat.gcd (S + k) (d - 1 - k) := by
+  have hsum : k + (d - 1 - k) = d - 1 := by omega
+  have h1 : (S + k) + (d - 1 - k) = S + d - 1 := by
+    rw [Nat.add_assoc, hsum, Nat.add_sub_assoc hd S]
+  rw [← h1]
+  exact gcd_add_eq_gcd_self
+
+/-- Abstract odd-tail reduction, in terms of `j - 2`; the second argument
+    is `C + 1` and `d + 3` is `2*delta + 3`. -/
+theorem gcd_of_split_odd {S d k : Nat} (hk2 : 2 ≤ k) (hk : k ≤ d + 3) :
+    Nat.gcd (S + k - 2) (S + d + 1) = Nat.gcd (S + k - 2) (d + 3 - k) := by
+  have hk2' : S + k - 2 = S + (k - 2) := Nat.add_sub_assoc hk2 S
+  have hsum : (k - 2) + (d + 3 - k) = d + 1 := by omega
+  have h1 : (S + k - 2) + (d + 3 - k) = S + d + 1 := by
+    rw [hk2', Nat.add_assoc, hsum]
+    omega
+  rw [← h1]
+  exact gcd_add_eq_gcd_self
+
+/-- Canonical even-tail reduction: at state index `s + k` the horizon term
+    `C - 1` reduces to the `c`-free number `2*delta - 1 - k`. -/
+theorem canonical_even_tail_gcd_reduction {delta c k : Nat} (hd : 1 ≤ delta)
+    (hk : k ≤ 2 * delta - 1) :
+    Nat.gcd (delta * c + k) (delta * (c + 2) - 1) =
+      Nat.gcd (delta * c + k) (2 * delta - 1 - k) := by
+  have hexp : delta * (c + 2) = delta * c + 2 * delta := by
+    rw [Nat.mul_add, Nat.mul_comm delta 2]
+  have hd2 : 1 ≤ 2 * delta := by omega
+  rw [hexp]
+  exact gcd_of_split_even (S := delta * c) (d := 2 * delta) (k := k) hd2 hk
+
+/-- Canonical odd-tail reduction: at state index `s + k` the horizon term
+    `C + 1` reduces to the `c`-free number `2*delta + 3 - k`. -/
+theorem canonical_odd_tail_gcd_reduction {delta c k : Nat} (hk2 : 2 ≤ k)
+    (hk : k ≤ 2 * delta + 3) :
+    Nat.gcd (delta * c + k - 2) (delta * (c + 2) + 1) =
+      Nat.gcd (delta * c + k - 2) (2 * delta + 3 - k) := by
+  have hexp : delta * (c + 2) = delta * c + 2 * delta := by
+    rw [Nat.mul_add, Nat.mul_comm delta 2]
+  rw [hexp]
+  exact gcd_of_split_odd (S := delta * c) (d := 2 * delta) (k := k) hk2 hk
+
+/-- At a canonical state the even-tail event divides the `c`-free number
+    `2*delta - 1 - (r - s)`; in the intermediate band this is the hard bound. -/
+theorem canonical_even_tail_event_dvd_bounded {delta c k e : Nat} (hd : 1 ≤ delta)
+    (hk : k ≤ 2 * delta - 1)
+    (he : e = Nat.gcd (delta * c + k) (delta * (c + 2) - 1)) :
+    e ∣ 2 * delta - 1 - k := by
+  rw [he, canonical_even_tail_gcd_reduction hd hk]
+  exact Nat.gcd_dvd_right _ _
+
+/-- **The canonical addition theorem (even branch).** At the canonical
+critical state, an even-tail unit run of length `k` followed by a *proper*
+event of value `e` satisfies `k + e ≤ 2 * delta - 1`. The run plus its event
+is bounded by twice the previous record, independently of `c`. -/
+theorem canonical_even_tail_additive_bound {delta c k e : Nat} (hd : 1 ≤ delta)
+    (hk : k ≤ 2 * delta - 1)
+    (he : e = Nat.gcd (delta * c + k) (delta * (c + 2) - 1))
+    (hlt : e < delta * (c + 2) - 1) :
+    k + e ≤ 2 * delta - 1 := by
+  have hkne : k ≠ 2 * delta - 1 := by
+    intro hk'
+    have hself : delta * c + k = delta * (c + 2) - 1 := by
+      have hexp : delta * (c + 2) = delta * c + 2 * delta := by
+        rw [Nat.mul_add, Nat.mul_comm delta 2]
+      omega
+    rw [he, hself, Nat.gcd_self] at hlt
+    omega
+  have hDpos : 0 < 2 * delta - 1 - k := by omega
+  have hdiv := canonical_even_tail_event_dvd_bounded (c := c) hd hk he
+  have hle : e ≤ 2 * delta - 1 - k := Nat.le_of_dvd hDpos hdiv
+  have hsum : k + (2 * delta - 1 - k) = 2 * delta - 1 := Nat.add_sub_of_le hk
+  omega
+
+/-- **Slack corollary.** The even unit tail before a canonical proper event
+is at most `2 * delta - 2` long. -/
+theorem canonical_even_tail_run_le {delta c k e : Nat} (hd : 1 ≤ delta)
+    (hk : k ≤ 2 * delta - 1)
+    (he : e = Nat.gcd (delta * c + k) (delta * (c + 2) - 1))
+    (hlt : e < delta * (c + 2) - 1) :
+    k ≤ 2 * delta - 2 := by
+  have h := canonical_even_tail_additive_bound hd hk he hlt
+  have hepos : 0 < e := by
+    rw [he]
+    exact Nat.gcd_pos_of_pos_right _
+      (by have := Nat.mul_pos hd (show 0 < c + 2 by omega); omega)
+  have hone : k + 1 ≤ 2 * delta - 1 :=
+    Nat.le_trans (Nat.add_le_add_left hepos k) h
+  have hcancel : (2 * delta - 1) + 1 = 2 * delta := Nat.sub_add_cancel (by omega)
+  omega
+
 end A166944Research
