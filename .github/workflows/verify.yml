@@ -88,6 +88,12 @@ jobs:
       - name: Build composite probe
         run: lake build A166944.CompositeProbe
 
+      - name: Build composite record lemmas
+        run: lake build A166944.CompositeRecord
+
+      - name: Build record index bounds
+        run: lake build A166944.RecordIndexBounds
+
       - name: Build canonical bridge
         run: lake build A166944/Bridge.lean
 
