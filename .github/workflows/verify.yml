@@ -28,7 +28,7 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
 
@@ -46,77 +46,55 @@ jobs:
       - name: Fetch Mathlib precompiled cache
         run: lake exe cache get
 
-      - name: Build lightweight recurrence definitions
-        run: lake build A166944.ResearchDefs
+      # ------------------------------------------------------------------
+      # Whole-library build.
+      #
+      # Previously this workflow listed a handful of individual modules, so
+      # most of the repository -- including `RecordBarrier` (the unbounded
+      # records theorem), `CanonicalRecord`, `TravelTarget` (which derives
+      # `Target`) and every `Verified*` certificate -- was never built by CI.
+      # `lake build A166944` now covers the entire library in one step, so a
+      # broken module fails the job no matter which file it lives in.
+      # ------------------------------------------------------------------
+      - name: Build the whole library
+        run: lake build A166944
 
-      - name: Build verified lightweight lemmas
-        run: lake build A166944.Lemmas
-
-      - name: Build prime target definitions
-        run: lake build A166944.TargetDefs
-
-      - name: Build active attempt
-        run: lake build A166944.Attempt
-
-      - name: Build record barrier (unbounded difference records)
-        run: lake build A166944.RecordBarrier
-
-      - name: Build canonical record reduction
-        run: lake build A166944.CanonicalRecord
-
-      - name: Build stopping criterion
-        run: lake build A166944.StoppingCriterion
-
-      - name: Build first-hit arithmetic toolkit
-        run: lake build A166944.FirstHitArithmetic
-
-      - name: Build B-coordinate lemmas
-        run: lake build A166944.BCoordinates
-
-      - name: Build q=3 branch barriers
-        run: lake build A166944.Q3Barrier
-
-      - name: Build renormalized growth
-        run: lake build A166944.RenormalizedGrowth
-
-      - name: Build absolute-index constraints
-        run: lake build A166944.AbsoluteIndex
-
-      - name: Build cycle limits
-        run: lake build A166944.CycleLimits
-
-      - name: Build composite probe
-        run: lake build A166944.CompositeProbe
-
-      - name: Build composite record lemmas
-        run: lake build A166944.CompositeRecord
-
-      - name: Build composite third case
-        run: lake build A166944.CompositeThird
-
-      - name: Build composite sweep to 1000
-        run: lake build A166944.CompSweep1000
-
-      - name: Build complete composite classification
-        run: lake build A166944.CompSweepComplete
-
-      - name: Build travel reduction
-        run: lake build A166944.TravelReduction
-
-      - name: Build self-hit identity
-        run: lake build A166944.SelfHit
-
-      - name: Build record index bounds
-        run: lake build A166944.RecordIndexBounds
-
-      - name: Build q=1 witness refutation
-        run: lake build A166944.Q1Witness
-
-      - name: Build canonical bridge
-        run: lake build A166944/Bridge.lean
-
+      # ------------------------------------------------------------------
+      # Single-file checks that `lake build` does not exercise the same way:
+      # these are `#check` / `#print axioms` scripts, and the bridge must agree
+      # with the pinned upstream Formal Conjectures source.
+      # ------------------------------------------------------------------
       - name: Check canonical bridge
         run: lake env lean A166944/Bridge.lean
 
       - name: Check reproducible canonical baseline
         run: lake env lean A166944/Baseline.lean
+
+      # ------------------------------------------------------------------
+      # Axiom audit for the headline results. `#print axioms` must stay inside
+      # the standard three; a `sorryAx` line here fails the job.
+      # ------------------------------------------------------------------
+      - name: Audit axioms of the headline theorems
+        run: |
+          cat > AxiomAudit.lean <<'EOF'
+          import A166944.RecordBarrier
+          import A166944.CanonicalRecord
+          import A166944.TravelTarget
+          import A166944.StoppingCriterion
+          import A166944.FirstHitArithmetic
+          import A166944.AbsoluteIndex
+          import A166944.CompSweepComplete
+          #print axioms A166944Research.difference_records_unbounded
+          #print axioms A166944Research.record_index_iff_no_canonical_escape
+          #print axioms A166944Research.no_event_on_interval_iff
+          #print axioms A166944Research.moving_horizon_event_divisor_gap
+          #print axioms A166944Research.D_ge_sub_two
+          #print axioms A166944Research.composite_differences_below_1000
+          #print axioms A166944Research.no_composite_difference_above_200
+          EOF
+          lake env lean AxiomAudit.lean
+          if lake env lean AxiomAudit.lean 2>&1 | grep -q 'sorryAx'; then
+            echo "::error::a headline theorem depends on sorryAx"
+            exit 1
+          fi
+          rm -f AxiomAudit.lean
