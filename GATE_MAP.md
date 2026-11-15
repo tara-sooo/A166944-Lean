@@ -133,3 +133,41 @@ interchangeable, not stacked.
 Before reporting that the obstruction has been "narrowed", check the claim
 against this table. If it is not one of the thirteen rows above, or not an edge
 printed above, then it is a new statement and it needs its own theorem.
+
+## What the entry points actually assume
+
+An audit of the reference structure turned up a fact this file did not state: **seven
+of the eight `*210` entry points assume the travel bound internally.**
+
+| entry point | assumes `2*(s-(M+2)) ≤ M`? |
+| --- | --- |
+| `ResidualReserveCondition210` (`TwinReserveTarget210`) | yes |
+| `ResidualSignedReserveCondition210` (`TwinSignedReserveTarget210`) | yes |
+| `ResidualCrossingBudgetCondition210` (`TwinCrossingBudget210`) | yes, three times |
+| `RebalancedRemainingCrossingCondition210` (`RebalancedCrossingGrowth210`) | yes |
+| `RebalancedOverlapCrossingCondition210` (`RebalancedOverlapBudget210`) | yes |
+| `ResidualScaledCrossingBudgetCondition210` (`ResidualScaledPotential210`) | yes |
+| `ResidualRebalancedCostCondition210` (`ResidualRebalancedCosts210`) | yes |
+| `RebalancedBoundaryCondition210` (`RebalancedBoundary210`) | **no** |
+
+So the "thirteen conditional entry points" are not thirteen independent ways in. Seven
+of them take the travel bound as a hypothesis and contribute an additional condition on
+top of it; they are strictly stronger assumptions than the bound, not alternatives to
+it. Working through the travel bound, as this development has done, was therefore not
+a choice among equals.
+
+`RebalancedBoundaryCondition210` is the exception and is worth a look for that reason
+alone.
+
+### And they are unreachable in the reference graph
+
+The same audit counted references: of the seventeen `target_of_*` declarations named in
+this file, **five have zero references anywhere** and six more are referenced only
+inside their own module. They are proved, they conclude `Target`, and nothing calls
+them. The whole library has 1478 theorems of which **387 are orphans** in that sense,
+133 of them in the `*210` files.
+
+That is not a soundness problem -- an unreferenced theorem is still a theorem -- but it
+is a reachability problem: the entry points a reader would find here are, for the most
+part, not connected to anything. `Attempt.lean` (1871 lines) is the extreme case and
+has no importer at all.
