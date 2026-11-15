@@ -120,6 +120,7 @@
   "TwinSweep": 9,
   "TwoCapGate": 5,
   "TwoCapTarget": 3,
+  "TwoCapThreshold": 2,
   "VerifiedBoundaryRecordExtension": 7,
   "VerifiedFiftyMillionBridge": 14,
   "VerifiedLaterRecordExtension": 12,
@@ -128,5 +129,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1781
+ "total": 1783
 }
