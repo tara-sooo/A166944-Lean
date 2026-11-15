@@ -27,6 +27,7 @@
   "BandExcursion": 13,
   "BandReentry": 10,
   "Baseline": 0,
+  "BindingCoordinate": 50,
   "Bridge": 4,
   "CanonicalGrowth": 18,
   "CanonicalRecord": 16,
@@ -172,5 +173,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2454
+ "total": 2504
 }
