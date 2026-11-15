@@ -2,6 +2,10 @@
  "modules": {
   "AbsoluteIndex": 11,
   "AbsorptionCriterion": 5,
+  "AngleC_Composite": 19,
+  "AngleC_Path13": 36,
+  "AngleC_Relaxed": 9,
+  "AngleC_Route": 6,
   "AttainmentIsFree": 18,
   "Attempt": 2,
   "AuditAttainmentLower": 8,
@@ -159,5 +163,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2219
+ "total": 2289
 }

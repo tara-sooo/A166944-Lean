@@ -129,6 +129,10 @@ jobs:
             A166944.RoomCount \
             A166944.PinnedCharacterization \
             A166944.SqrtFreeTransport \
+            A166944.AngleC_Composite \
+            A166944.AngleC_Path13 \
+            A166944.AngleC_Route \
+            A166944.AngleC_Relaxed \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
