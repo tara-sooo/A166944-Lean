@@ -100,6 +100,7 @@ jobs:
             A166944.TwoCapTarget \
             A166944.TwoCapThreshold \
             A166944.RelaxedCap \
+            A166944.TravelExcessSum \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

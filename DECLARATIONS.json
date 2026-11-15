@@ -104,6 +104,7 @@
   "TravelCharged210": 14,
   "TravelClip210": 12,
   "TravelExcess": 16,
+  "TravelExcessSum": 3,
   "TravelFactors": 15,
   "TravelFirstUse": 13,
   "TravelMod210": 25,
@@ -130,5 +131,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1787
+ "total": 1790
 }
