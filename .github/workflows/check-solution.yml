@@ -79,7 +79,6 @@ jobs:
 
           def d (n : Nat) : Nat := a n - a (n - 1)
           def D (n : Nat) : Nat := a n - n
-          def B (n : Nat) : Nat := a n - (2 * n - 2)
 
           def IsDifferenceRecord (R : Nat) : Prop :=
             ∃ n : Nat, 2 ≤ n ∧ d n = R ∧ ∀ k : Nat, 2 ≤ k → k < n → d k < R
@@ -127,12 +126,18 @@ jobs:
           # holding the first stub's .olean has to be on the search path. Adding
           # it to LEAN_PATH rather than relying on -R keeps both stubs in the
           # same namespace resolution the platform uses.
-          export LEAN_PATH="$PWD/Definitions:${LEAN_PATH:-}"
-          lake env lean -o Definitions/Def_a166944_record_core.olean \
-            Definitions/Def_a166944_record_core.lean
+          # `lake env` sets LEAN_PATH itself, so it has to be extended after
+          # entering the environment, and the search path holds the *parent* of
+          # the `Definitions` directory -- Lean resolves `Definitions.X` by
+          # looking for `Definitions/X.olean` under each entry.
+          build() {
+            lake env bash -c "LEAN_PATH=\"$PWD:\$LEAN_PATH\" lean -o '$1' '$2'"
+          }
+          build Definitions/Def_a166944_record_core.olean \
+                Definitions/Def_a166944_record_core.lean
           test -f Definitions/Def_a166944_record_core.olean
-          lake env lean -o Definitions/Def_a166944_moving_horizon.olean \
-            Definitions/Def_a166944_moving_horizon.lean
+          build Definitions/Def_a166944_moving_horizon.olean \
+                Definitions/Def_a166944_moving_horizon.lean
           test -f Definitions/Def_a166944_moving_horizon.olean
           echo "stub oleans:"
           ls -la Definitions/*.olean
