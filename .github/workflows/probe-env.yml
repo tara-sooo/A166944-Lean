@@ -166,10 +166,7 @@ jobs:
             echo "  no"
           fi
           echo "--- probe: can we import it? ---"
-          cat > /tmp/SqrtProbe.lean <<'EOF'
-import Mathlib.Data.Nat.Sqrt
-#check Nat.sqrt
-EOF
+          printf 'import Mathlib.Data.Nat.Sqrt\n#check Nat.sqrt\n' > /tmp/SqrtProbe.lean
           lake env lean /tmp/SqrtProbe.lean && echo "  import Mathlib.Data.Nat.Sqrt works" || echo "  import failed"
 
       - name: Build the recurrence-side modules
