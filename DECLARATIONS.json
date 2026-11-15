@@ -87,6 +87,7 @@
   "ResidualStartupWeights210": 26,
   "ResidualThreshold210": 7,
   "ReuseCongruences": 6,
+  "RoomLedger": 32,
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
   "StoppingCriterion": 4,
@@ -118,5 +119,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1681
+ "total": 1713
 }
