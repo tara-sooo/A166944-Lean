@@ -23,9 +23,13 @@ there, and the Prove2Me paper cited at the end of it.
 | verification | Lean, Lean's three standard axioms, plus the **comparator** confirming the statement matches Mathlib's own |
 | cost of failure | the initial, abandoned attempts contributed **about 7%** of the non-boilerplate lines |
 
-The claim circulating as "1,000 agents in 30 hours" does not appear on the
-Anthropic page. That page says 11 days and "dozens" of agents. Treat the page as
-authoritative and the other figure as unverified.
+**Correction, and an earlier error of mine.** I first recorded here that the
+"1,000 agents in 30 hours" figure "does not appear on the Anthropic page", on the
+strength of the September page alone. That was wrong: it is a **second, separate
+result**, published on 2026-11-09 with Fable 5.2 / Mythos 5.2. Both figures are
+Anthropic's. See the next section. The lesson is the one this project keeps
+relearning, applied to sources rather than to arithmetic: a search that stops at
+the first confirming hit is not a check.
 
 ## The part that matters for us
 
@@ -64,6 +68,99 @@ research cluster.
 
 That is closer to this project's situation than FLT is, and it cuts against the
 intuition that scale is what is missing here.
+
+
+## The second run: 1,000 agents, 28.7 hours, and no platform
+
+Source: <https://claude.dev/blog/safely-scaling-multi-agent-teams-with-fable-5-2/>
+(Barry Zhang, Tianyi Peng, Elle Najt, Keller Scholl, Lance Martin; 2026-11-09), with
+the release announcement at <https://www.anthropic.com/claude-fable-and-mythos-5-2>.
+
+This is a **reproduction**, not a fresh proof: the agents were handed a list of 60
+statements, a one-sentence sketch of the classical route, the definitions those
+statements use, and 47 proved lemmas from the September run. They were told to write
+Lean proofs, build and check them, and submit to a shared main branch where a grader
+checked them.
+
+| | September (Prove2Me) | November (SQL) |
+| --- | --- | --- |
+| elapsed | 11 days | **28.7 hours** |
+| agents | dozens | **1,000** (1 lead + 999 helpers) |
+| output tokens | ~6 billion | **one third as many** |
+| proof length | 13 million lines | **one seventh** |
+| scaffolding | Prove2Me's DAG + a researcher steering | 60 statements, 47 lemmas, one-sentence sketch |
+| coordination | provided by the platform | **the agents built it themselves** |
+| human steering | occasional instructions | none during the run |
+
+### What replaced Prove2Me
+
+A **shared Postgres database**, chosen because "its transactions handle concurrent
+writes from 1,000 agents, and Claude is already familiar with it". The lead created
+five tables **in the first ten minutes**:
+
+| table | purpose |
+| --- | --- |
+| `Announce` | the lead's orders to everyone |
+| `Assign` | who owns which statement |
+| `Notes` | an open board for claiming work and reporting progress |
+| `Subtasks` | a to-do list; anyone may add, first claimer owns |
+| `Landed` | a log of finished work |
+
+Then it assigned each statement to a crew of 16–17 helpers (999 rows), made one
+helper per crew a **captain** responsible for posting a plan and splitting work, and
+told every helper to begin by **judging its statement's difficulty**.
+
+### The lead's actual job, which is the transferable part
+
+It was not proving anything. It was three things:
+
+1. **Triage by difficulty.** About 27 minutes in, with three statements proved, the
+   lead read the posted verdicts and set aside the 47 that most helpers judged
+   infeasible in budget, reassigning nearly everyone to the remaining 10. All ten
+   were proved within about 70 minutes, and the lead's own comment is the point:
+   *"the team's throughput is far higher than the early 'infeasible-in-budget'
+   verdicts assumed"*.
+2. **Reassignment.** *"there is no reason to idle"* -- helpers were moved to harder
+   statements as the easy ones landed. By hour 3 the lead told free helpers *"do not
+   wait for me"*, so they could pick up work without waiting for an assignment.
+3. **Splitting the one hard statement as a tree.** With only Langlands–Tunnell left,
+   whose own captain had estimated 0.7–1 million lines and *under a 1% chance* of
+   finishing, the lead moved ~750 helpers onto it with the words *"Honest odds are
+   low."* The work became a **tree of 2,418 tasks, up to 10 levels deep**, growing
+   whenever a piece was too big for one helper.
+
+The structural trick in that tree is stated plainly and is the single most useful
+sentence in the post for this project:
+
+> Each piece could assume the pieces beneath it, so hundreds of helpers could work
+> in parallel before those pieces were proved.
+
+### Anthropic's own conclusions, which bear directly on how this project is run
+
+> Agents tend to give up on hard problems and misjudge their difficulty. Early on,
+> helpers judged 47 of the 60 statements infeasible within the run's budget, yet the
+> team went on to prove most of them. Human encouragement at such moments can keep
+> agents from stopping too early.
+
+and
+
+> This result doesn't obviate the need for domain-specific harnesses or platforms.
+> Prove2Me, for example, may still improve efficiency by helping agents compile Lean
+> code faster and letting them search for and reuse human results.
+
+So the two runs are complements, not a replacement: the platform gives reuse and
+compilation speed, and a lead that triages and reassigns gives throughput.
+
+### Also worth copying
+
+- **A shared machine caps out around 100 agents.** "more than half of our 100-agent
+  runs had to be stopped or restarted because memory, disk, or CPU ran out." The
+  1,000-agent run used one sandbox per agent. This project runs on one phone, so the
+  cap here is far lower and the lesson is about *sequencing*, not parallelism.
+- **A grader on `main`.** Nothing counted as proved until Lean's checker accepted
+  it, and pushing to main went through a separate merge job.
+- **A restart.** Activity stopped near hour 18 and the run was restarted from a save
+  with 12 more hours. Long runs are expected to break and resume.
 
 ## What does not transfer
 
