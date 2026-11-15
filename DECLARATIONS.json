@@ -113,6 +113,7 @@
   "ResidualThreshold210": 7,
   "ReuseCongruences": 6,
   "RoomLedger": 32,
+  "RoomQuantum": 8,
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
   "Sharp48": 17,
@@ -150,5 +151,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2060
+ "total": 2068
 }
