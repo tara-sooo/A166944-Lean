@@ -153,5 +153,8 @@ jobs:
           echo "checking $f"
           test -f "$f" || { echo "::error::no such solution file: $f"; exit 1; }
           cp "$f" Check.lean
-          lake env lean Check.lean
+          # Same search path as the stub builds: the solution imports
+          # `Definitions.Def_...`, which resolves to `Definitions/Def_....olean`
+          # relative to an entry on LEAN_PATH, and $PWD is that entry.
+          lake env bash -c "LEAN_PATH=\"$PWD:\$LEAN_PATH\" lean Check.lean"
           echo "compiled cleanly: $f"
