@@ -109,7 +109,12 @@ the intermediate value is arithmetically unreachable because `q + 1` is even. -/
 quantum more. -/
 theorem moving_horizon_room_quantum_even {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hr : r % 2 = 0) :
-    C' - r = 2 * d r ∨ 2 * d r + 2 ≤ C' - r := by
+    C' - r = 2 * d r ∨ 4 * d r ≤ C' - r := by
+  -- The quotient normal form gives `C' - r = d r * (q + 1)` with `q` odd, so
+  -- `q + 1` is even and the room is an even multiple of `d r`. An earlier version
+  -- of this statement used `2 * d r + 2 <= C' - r`, which is true but weak: the
+  -- values between `2e` and `4e` are unreachable, and the sharper form is what the
+  -- summation needs.
   obtain ⟨q, _, hqmod, hq1, hlast⟩ :=
     moving_horizon_even_quotient_normal_form hstep hr
   have hdr1 : 1 ≤ d r := by
@@ -120,6 +125,7 @@ theorem moving_horizon_room_quantum_even {s C r C' : Nat}
     rw [hlast, ← hq]
     omega
   · right
+    -- `q >= 3` and odd, so `q + 1 >= 4`.
     have hq3 : 3 ≤ q := by omega
     have hmul : d r * 4 ≤ d r * (q + 1) := Nat.mul_le_mul_left _ (by omega)
     rw [hlast]
@@ -145,7 +151,7 @@ theorem moving_horizon_room_quantum_odd {s C r C' : Nat}
 /-- **The room quantum dichotomy, bundled.** -/
 theorem moving_horizon_room_quantum {s C r C' : Nat}
     (hstep : IsMovingHorizonStep s C r C') :
-    (r % 2 = 0 → C' - r = 2 * d r ∨ 2 * d r + 2 ≤ C' - r) ∧
+    (r % 2 = 0 → C' - r = 2 * d r ∨ 4 * d r ≤ C' - r) ∧
       (r % 2 = 1 → C' - r + 4 = 3 * d r ∨ 5 * d r ≤ C' - r + 4) :=
   ⟨fun hr => moving_horizon_room_quantum_even hstep hr,
    fun hr => moving_horizon_room_quantum_odd hstep hr⟩
