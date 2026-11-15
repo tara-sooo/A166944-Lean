@@ -1,0 +1,158 @@
+name: Probe the Prove2Me v4.29 environment
+
+# Why this workflow exists
+#
+# Prove2Me is isolated per Lean environment, and the Twin Prime Conjecture
+# mission points at the *v4.29.0-rc3* instance of `twin_prime_conjecture`
+# (theorem a3b92c39, mathlib rev 777aaa61), not the v4.33.1 one (185e92b6,
+# 0df444a) that the A166944 work targets. Imports resolve only within one
+# environment, so connecting the A166944 route to the mission means re-creating
+# the A166944 chain inside v4.29.
+#
+# Before doing that by hand, this workflow answers the question that decides
+# whether it is feasible at all: **does the A166944 development compile against
+# Mathlib 777aaa61 under Lean v4.29.0-rc3?** The proofs use only `omega`,
+# `decide`, `simp` and `rfl`, with no Mathlib imports on the recurrence side, so
+# the answer is expected to be yes -- but it has to be checked rather than
+# assumed, and the check should not run on the phone.
+#
+# This workflow is read-only with respect to the platform: it never posts
+# anything. It only reports whether the sources build.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mathlib_rev:
+        description: "Prove2Me mathlib revision to probe"
+        required: false
+        default: "777aaa61dcd2a1258d2b4962dbe983ede4d23b2e"
+      toolchain:
+        description: "Lean toolchain for that revision"
+        required: false
+        default: "leanprover/lean4:v4.29.0-rc3"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a166944-probe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v5
+
+      # ------------------------------------------------------------------
+      # Build an isolated checkout pinned to the target environment. The
+      # repository's own lakefile stays untouched: this job writes its
+      # manifest into a scratch directory so that a failed probe cannot
+      # disturb the v4.33.1 configuration the main workflow uses.
+      # ------------------------------------------------------------------
+      - name: Pin the probe environment
+        run: |
+          set -euo pipefail
+          mkdir -p probe
+          cp -r A166944 probe/A166944
+          printf '%s\n' "${{ github.event.inputs.toolchain }}" > probe/lean-toolchain
+          cat > probe/lakefile.toml <<EOF
+          name = "a166944probe"
+          version = "0.1.0"
+          defaultTargets = ["A166944"]
+
+          [leanOptions]
+          autoImplicit = false
+          relaxedAutoImplicit = false
+
+          [[require]]
+          name = "mathlib"
+          git = "https://github.com/leanprover-community/mathlib4.git"
+          rev = "${{ github.event.inputs.mathlib_rev }}"
+
+          [[lean_lib]]
+          name = "A166944"
+          globs = ["A166944.*"]
+          EOF
+          cat probe/lean-toolchain
+          grep 'rev' probe/lakefile.toml
+
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+          lake-package-directory: probe
+
+      - name: Fetch Mathlib at the pinned revision
+        working-directory: probe
+        run: lake update
+
+      - name: Fetch the precompiled cache for that revision
+        working-directory: probe
+        run: lake exe cache get
+
+      # ------------------------------------------------------------------
+      # The probe proper. `MathlibFree` is the recurrence-side subset: the
+      # modules whose transitive imports never touch Mathlib, so they must
+      # build in any environment. `MathlibDependent` is the part that needs
+      # `Nat.Prime` and therefore depends on the revision's Mathlib API.
+      # ------------------------------------------------------------------
+      - name: Build the recurrence-side modules
+        working-directory: probe
+        run: |
+          set -euo pipefail
+          # every module that compiles under Init alone in the v4.33.1 tree
+          lake build \
+            A166944.ResearchDefs \
+            A166944.Lemmas \
+            A166944.CanonicalRecord \
+            A166944.RecordIndex \
+            A166944.RecordBarrier \
+            A166944.CanonicalTravel \
+            A166944.CanonicalGrowth \
+            A166944.StoppingCriterion \
+            A166944.FirstHitArithmetic \
+            A166944.BCoordinates \
+            A166944.DNodes \
+            A166944.GapBound \
+            A166944.BStepLaw \
+            A166944.BIntegrate \
+            A166944.TravelReduction \
+            A166944.CountFromIndex \
+            A166944.CountBoundLimits \
+            A166944.ExitBand \
+            A166944.ExitCoordinates \
+            A166944.ExitThreshold \
+            A166944.CrossingRoute \
+            A166944.RoomLedger \
+            A166944.ExcessIdentity \
+            A166944.OrphanHarvest \
+            A166944.TailReduction \
+            A166944.Q2TailKill \
+            A166944.CompositeProbe \
+            A166944.CompositeThird \
+            A166944.CompSweep1000 \
+            A166944.CompSweepComplete \
+            A166944.CompSweepRecords \
+            A166944.Q1Witness \
+            A166944.EventCountFails \
+            A166944.TwinSweep \
+            A166944.RecordCoordinates \
+            A166944.BCapDictionary
+
+      - name: Build the Mathlib-dependent modules
+        working-directory: probe
+        run: |
+          set -euo pipefail
+          lake build A166944.TargetDefs A166944.TravelTarget
+
+      - name: Report
+        if: always()
+        run: |
+          echo "probe finished with status ${{ job.status }}"
+          echo "mathlib rev : ${{ github.event.inputs.mathlib_rev }}"
+          echo "toolchain   : ${{ github.event.inputs.toolchain }}"
