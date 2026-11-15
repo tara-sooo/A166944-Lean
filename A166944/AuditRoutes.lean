@@ -13,8 +13,9 @@ namespace A166944Research
 
 /-- Route 1 (`TravelReduction`): the index cap and the travel bound are *the same
 inequality* by arithmetic -- not an obstruction. -/
-theorem R6_route1 : 2 * (sf - (M + 2)) ≤ M ↔ 2 * sf ≤ 3 * M + 4 := by
-  constructor <;> intro h <;> omega
+theorem R6_route1 {M sf : Nat} (h : M + 2 ≤ sf) :
+    2 * (sf - (M + 2)) ≤ M ↔ 2 * sf ≤ 3 * M + 4 := by
+  constructor <;> intro hc <;> omega
 
 /-- Route 9 (`ExcessIdentity`): bounding `S` alone is equivalent to the travel
 bound, i.e. the route is *circular*, not independent. -/
