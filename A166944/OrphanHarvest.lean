@@ -77,8 +77,7 @@ theorem count_index_route_is_vacuous (M sf : Nat) (hfeas : M ≤ sf + 1) :
         sf - (M + 2) ≤ p * isqrt (4 * (3 * M + 4 + 1)) := by
   refine ⟨2 * sf, sf + 1 - M, ?_, ?_⟩
   · show sf + 1 - M + M ≤ sf + 1
-    rw [Nat.sub_add_cancel hfeas]
-    exact Nat.le_refl _
+    omega
   have hroot : 1 ≤ isqrt (4 * (3 * M + 4 + 1)) := by
     rcases Nat.eq_zero_or_pos (isqrt (4 * (3 * M + 4 + 1))) with h0 | hpos
     · exfalso

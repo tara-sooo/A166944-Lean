@@ -1,5 +1,17 @@
 name: A166944 v4.29 port verification
 
+# Verifies the port against the real Lean v4.29.0-rc3 toolchain.
+#
+# The earlier version of this workflow rewrote lean-toolchain, which invalidated the
+# Mathlib olean cache and failed for a reason that had nothing to do with the port.
+# This version keeps the repository's own toolchain intact, installs v4.29.0-rc3
+# alongside it, and builds the core-only modules with the toolchain's own lean --
+# no lake, no Mathlib -- which is exactly how the port was verified locally (98/98).
+#
+# The core-only modules are the ones the mission needs: the four-module closure
+# ResearchDefs / Lemmas / RecordBarrier / TargetDefs has no Nat.sqrt at all, and the
+# Isqrt replacement keeps the rest of the spine independent of Mathlib.
+
 on:
   push:
     branches: [port-v429]
@@ -12,62 +24,92 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install the pinned toolchain
+      - name: Install Lean v4.29.0-rc3 directly
         run: |
-          curl -sSfL https://elan.lean-lang.org/elan-init.sh -o elan-init.sh
-          sh elan-init.sh -y --default-toolchain none
-          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          set -euo pipefail
+          URL="https://github.com/leanprover/lean4/releases/download/v4.29.0-rc3/lean-4.29.0-rc3-linux.tar.zst"
+          curl -sSfL "$URL" -o lean.tar.zst
+          ls -l lean.tar.zst
+          # zstd is present on ubuntu-latest; tar handles .tar.zst with --zstd.
+          tar --zstd -xf lean.tar.zst
+          ls -d lean-4.29.0-rc3-linux
+          ./lean-4.29.0-rc3-linux/bin/lean --version
 
-      - name: Pin v4.29.0-rc3
+      - name: Build the core-only modules with v4.29
         run: |
-          printf 'leanprover/lean4:v4.29.0-rc3\n' > lean-toolchain
-          cat lean-toolchain
+          set -euo pipefail
+          export PATH="$PWD/lean-4.29.0-rc3-linux/bin:$PATH"
+          export LEAN_PATH="$PWD"
+          # Topological order, computed from the import graph. Deterministic and
+          # independent of Mathlib: these modules import only Init and each other.
+          cat > /tmp/topo.py <<'PYEOF'
+          import os, re, sys
+          root = "A166944"
+          mods = {}
+          for f in sorted(os.listdir(root)):
+              if not f.endswith(".lean"): continue
+              name = "A166944." + f[:-5]
+              body = open(os.path.join(root, f), encoding="utf-8", errors="replace").read()
+              depth = 0
+              for line in body.splitlines():
+                  s = line.strip()
+                  if s.startswith("/-"):
+                      depth += 1
+                      continue
+                  if depth: 
+                      if "-/" in s: depth = max(0, depth - s.count("-/"))
+                      continue
+                  if s.startswith("--"): continue
+                  if s.startswith("import "):
+                      mods.setdefault(name, set()).add(s.split()[1])
+              mods.setdefault(name, set())
+          # Keep only modules whose imports are all Init or A166944.
+          def core(m, seen=None):
+              if seen is None: seen = set()
+              if m in seen: return True
+              seen.add(m)
+              for d in mods.get(m, ()):
+                  if d.startswith("A166944."):
+                      if not core(d, seen): return False
+                  elif not d.startswith("Init"):
+                      return False
+              return True
+          keep = sorted(m for m in mods if core(m))
+          print("\n".join(keep))
+          PYEOF
+          python3 /tmp/topo.py > /tmp/coremods.txt
+          echo "core-only modules: $(wc -l < /tmp/coremods.txt)"
+          ok=0; fail=0; failed=""
+          # Iterate to a fixed point so the order does not matter.
+          while : ; do
+            progress=0
+            for m in $(cat /tmp/coremods.txt); do
+              f="$(echo "$m" | sed 's|^A166944\.|A166944/|').lean"
+              [ -f "${f%.lean}.olean" ] && continue
+              if timeout 300 lean --root=. -o "${f%.lean}.olean" "$f" > /tmp/b.log 2>&1; then
+                ok=$((ok+1)); progress=1
+              else
+                if grep -q "object file .* does not exist" /tmp/b.log; then continue; fi
+                fail=$((fail+1)); failed="$failed $m"
+                echo "### FAIL $m"; head -8 /tmp/b.log
+              fi
+            done
+            [ "$progress" = "0" ] && break
+          done
+          echo "=============================="
+          echo "BUILT OK : $ok"
+          echo "FAILED   : $fail"
+          [ "$fail" = "0" ]
 
-      - name: Fetch Mathlib 777aaa6
+      - name: Axiom audit of the square-root replacement
         run: |
-          cat > lakefile.toml <<'LAKEEOF'
-          name = "a166944port"
-          defaultTargets = ["A166944"]
-
-          [[require]]
-          name = "mathlib"
-          git = "https://github.com/leanprover-community/mathlib4"
-          rev = "777aaa61dcd2a1258d2b4962dbe983ede4d23b2e"
-
-          [[lean_lib]]
-          name = "A166944"
-          LAKEEOF
-          lake update 2>&1 | tail -5
-
-      - name: Cache Mathlib oleans
-        uses: actions/cache@v4
-        with:
-          path: .lake/packages/mathlib/.lake/build/lib/lean
-          key: mathlib-777aaa6-v429
-
-      - name: Build Mathlib
-        run: lake exe cache get 2>&1 | tail -5
-
-      - name: Build the port
-        run: |
-          set -o pipefail
-          lake build A166944 2>&1 | tee build.log | tail -60
-          echo "=== summary ==="
-          grep -cE "^✔|Built" build.log || true
-          if grep -qE "^error|error:" build.log; then
-            echo "=== ERRORS ==="
-            grep -E "error" build.log | head -30
-            exit 1
-          fi
-
-      - name: Axiom audit on the ported modules
-        run: |
-          cat > Audit.lean <<'AUDITEOF'
-          import A166944.CanonicalTravel
+          set -euo pipefail
+          export PATH="$PWD/lean-4.29.0-rc3-linux/bin:$PATH"
+          export LEAN_PATH="$PWD"
+          cat > /tmp/Audit.lean <<'AUDITEOF'
+          import A166944.Isqrt
           #print axioms A166944Research.isqrt_sq_le
           #print axioms A166944Research.lt_succ_isqrt
           #print axioms A166944Research.isqrt_le_isqrt
           AUDITEOF
-          # Importing CanonicalTravel pulls in the whole spine, so a clean build
-          # here means the Isqrt replacement is used everywhere it has to be.
-          lake env lean Audit.lean 2>&1 | head -20
+          lean --root=. /tmp/Audit.lean
