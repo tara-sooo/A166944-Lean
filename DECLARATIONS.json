@@ -99,6 +99,7 @@
   "RoomLedger": 32,
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
+  "Sharp48": 17,
   "StoppingCriterion": 4,
   "TailReduction": 12,
   "TargetDefs": 3,
@@ -132,5 +133,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1808
+ "total": 1825
 }
