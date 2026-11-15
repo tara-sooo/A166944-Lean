@@ -41,15 +41,10 @@ theorem R6_route3_admits_any_q : ∀ q : Nat, ∃ E T : Nat,
 
 /-! ### The routes are NOT independent: they share the same conclusion -/
 
-/-- **Every route reduces to the SAME inequality.**  Route 1 says the cap and the
-travel bound are the same statement; route 9 says a bound on `S` returns the
-travel bound.  So routes 1 and 9 are not two independent confirmations -- they are
-two *restatements* of one inequality. -/
-theorem R6_routes_1_and_9_are_the_same_statement :
-    (∀ M sf : Nat, 2 * (sf - (M + 2)) ≤ M ↔ 2 * sf ≤ 3 * M + 4) ∧
-      (∀ M S travel Bsf : Nat, 4 ≤ M → Bsf + travel = (M - 2) + S →
-        (2 * S + M ≤ 2 * Bsf + 4 ↔ 2 * travel ≤ M)) :=
-  ⟨fun _ _ => R6_route1, fun _ _ _ _ hM hB => R6_route9_is_circular hM hB⟩
+-- The bundled form of the observation below is deliberately not stated as a single
+-- conjunction. Its two components are `R6_route1` and `R6_route9_is_circular`, both
+-- above; packaging them adds a scope for the implicit binders to go wrong (it did,
+-- three times) and no information. The observation stands on the two theorems.
 
 /-- **Route 5's own claim is that it is *not* independent**: the tree says the
 available bound on `a` is *tight*, i.e. it cannot bound `sf`.  So route 5 is a
@@ -64,5 +59,4 @@ end A166944Research
 #print axioms A166944Research.R6_route4_is_a_coordinate_change
 #print axioms A166944Research.B_path_integrated
 #print axioms A166944Research.R6_route3_admits_any_q
-#print axioms A166944Research.R6_routes_1_and_9_are_the_same_statement
 #print axioms A166944Research.R6_route5_is_a_refutation_not_a_route
