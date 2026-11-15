@@ -109,6 +109,8 @@ jobs:
             A166944.ExcessCriterion \
             A166944.QuietWindowBound \
             A166944.ExcessLower \
+            A166944.ExcessGap \
+            A166944.TerminalRigidity \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

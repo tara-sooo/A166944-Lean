@@ -35,6 +35,7 @@
   "DNodes": 6,
   "EventCountFails": 7,
   "ExcessCriterion": 8,
+  "ExcessGap": 70,
   "ExcessIdentity": 1,
   "ExcessLower": 2,
   "ExcessSumInterval": 18,
@@ -109,6 +110,7 @@
   "StoppingCriterion": 4,
   "TailReduction": 12,
   "TargetDefs": 3,
+  "TerminalRigidity": 22,
   "TravelCharged210": 14,
   "TravelClip210": 12,
   "TravelExcess": 16,
@@ -139,5 +141,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1874
+ "total": 1966
 }

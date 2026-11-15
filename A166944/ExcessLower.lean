@@ -22,10 +22,17 @@ approach the obstruction, and it is recorded with that stated rather than implie
 
 It is useful for one thing: `TravelExcessSum` bounds the travel by `2 * (S + p)`, and
 with `2p <= S` that becomes `travel <= 3 * S`, eliminating `p`. The relaxed cap is
-equivalent to `4 * travel <= 3 * M - 9`, so `4 * S <= M - 3` would suffice. Whether
-that holds is not proved here; the measurements say it holds at every record from
-`M = 313` upward and fails at `M = 43` and `M = 139`, both far below the threshold.
-That is an observation.
+equivalent to `4 * travel <= 3 * M - 9`, so `4 * S <= M - 3` would suffice.
+
+**A correction.** An earlier version of this paragraph said `4 * S <= M - 3` fails
+only at `M = 43` and `M = 139`, "both far below the threshold" and therefore
+harmless. The first half is right and the inference is wrong: `139` is the *optimal
+threshold of the excess route itself*, not an incidental small case.
+`ExcessCriterion.quarter_bound_fails_while_excess_holds_at_139` exhibits the
+separation there, and the canonical starts below `139` are exactly `7`, `13`, `43`
+(`ExcessGap.canonical_start_solutions_below_139`). So the quarter bound fails at the
+one point where the excess criterion is most useful, and the two are not
+interchangeable.
 -/
 
 namespace A166944Research
