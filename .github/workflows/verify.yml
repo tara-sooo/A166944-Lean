@@ -104,6 +104,10 @@ jobs:
             A166944.CapBCandidates \
             A166944.Sharp48 \
             A166944.HorizonLedger \
+            A166944.AttainmentIsFree \
+            A166944.AbsorptionCriterion \
+            A166944.ExcessCriterion \
+            A166944.QuietWindowBound \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

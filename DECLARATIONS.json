@@ -1,6 +1,8 @@
 {
  "modules": {
   "AbsoluteIndex": 11,
+  "AbsorptionCriterion": 5,
+  "AttainmentIsFree": 18,
   "Attempt": 2,
   "BCapDictionary": 11,
   "BCoordinates": 24,
@@ -32,6 +34,7 @@
   "CycleLimits": 10,
   "DNodes": 6,
   "EventCountFails": 7,
+  "ExcessCriterion": 8,
   "ExcessIdentity": 1,
   "ExcessSumInterval": 18,
   "ExitBand": 3,
@@ -50,6 +53,7 @@
   "Q2TailKill": 9,
   "Q3Barrier": 6,
   "QuietReturn": 4,
+  "QuietWindowBound": 9,
   "RebalancedAnchorComponents210": 12,
   "RebalancedAnchorWindows210": 47,
   "RebalancedBoundary210": 23,
@@ -134,5 +138,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1832
+ "total": 1872
 }
