@@ -1,0 +1,137 @@
+# Why the A166944 barrier has not moved, and what would move it
+
+Written down because the analysis itself has been the missing artifact. Sixteen rounds
+of work have closed sixteen routes, corrected four of the author's errors, and made
+`REACH.md` and `GATE_MAP.md` accurate -- and moved the barrier not at all. This file
+records why, in enough detail to be actionable.
+
+## The barrier's exact shape
+
+The target is equivalent to
+
+$$\sum_i e_i \;\le\; \frac{3M-9}{8},$$
+
+the sum of the **event values** along a canonical replay, where an event is a step at
+which the first difference exceeds 1. The equivalence goes through
+`sf = (M+2) + travel`, `travel <= 2(S+p)` and `S + p = sum e_i`.
+
+Every property of a single event value is already proved:
+
+| property | where |
+| --- | --- |
+| `e_i ∣ C_i - 1` and `e_i ∣ r_i` (even hit) | `Lemmas.moving_horizon_event_divisibility_even` |
+| `e_i ∣ C_i + 1` and `e_i ∣ r_i - 2` (odd hit) | `Lemmas.moving_horizon_event_divisibility_odd` |
+| `3 * e_i <= C_i ± 1` | `Lemmas.moving_horizon_step_event_package` |
+| `e_i <= M` | `IsAttainedPreviousMaximum`, first conjunct |
+| `e_i >= 3` | `Lemmas.moving_horizon_step_event_ge_three` |
+| `e_i > 1`, `C_{i+1} = C_i + e_i - 1` | `moving_horizon_step_event_package`, `moving_horizon_step_update` |
+
+So the local structure is fully known. What is missing is a way to sum it.
+
+## Four reasons the present toolkit cannot get there
+
+### 1. There are upper bounds and no usable lower bounds
+
+The hypotheses give `e <= M` (an upper bound), `e >= 3` (far too weak), and
+`C' = C + e - 1` (monotone increase). But `e ∣ C ± 1` says only that `e` **is a
+divisor** of `C ± 1`; it does not say `e` is small. `e = C - 1` is consistent with every
+one of the six properties above.
+
+What the sum needs is a statement that the **quotient** `(C ± 1)/e` is large, and
+nothing in the library bounds that quotient from below.
+
+### 2. A bound on `S` alone is not enough, and this is proved
+
+`CapBCandidates.excess_bound_alone_does_not_give_cap`, for all `M >= 16` and all
+admissible `S`, exhibits `sf, Cf, Bsf` with the ledger `Bsf + sf = Cf + 2` intact,
+`Bsf >= 4`, `8S <= 3M`, and `4 sf > 7M - 1`. The witness takes the reservoir as small as
+the ledger permits.
+
+`TerminalRigidity.terminal_cap_iff_reservoir_excess` states the normal form:
+
+$$4\,sf \le 7M-1 \quad\Longleftrightarrow\quad M + 1 + 4S \;\le\; 4\,B_{sf}.$$
+
+The cap bounds `S` **relative to** `B sf`. Any route that assumes an upper bound on `S`
+is assuming something stronger than the target, which is why such routes keep closing
+without helping.
+
+### 3. Every coordinate change is circular
+
+`S`, `travel`, `B`, `room` and `slack` are linked by the ledger and cannot be moved
+independently. `ExcessIdentity` proved the substitution returns the statement;
+`TerminalRigidity` proved the same for the terminal coordinates; `AuditRoutes` proved
+routes 1 and 9 are the same inequality restated. Thirteen of the sixteen closed routes
+are this phenomenon.
+
+### 4. Induction on the record sequence cannot work, and this is proved
+
+`RecordInductionFails.cap_does_not_transfer_along_records`: the cap holds at `M = 7`
+(the replay is empty, `sf = 9`, `Cf = 12`) and fails at the next record `M = 13`
+(`sf = 24`, `Cf = 42`, `4*24 = 96 > 90`). So the induction hypothesis must hold below
+the threshold too, which is where it fails.
+
+And carrying the threshold gains nothing: `RecordTransferFixpoint.next_criterion_substituted`
+shows the hypothesis the step needs, after substituting `Cf = (2M-2) + S`, contains no
+cap on `M`, no terminal index and no event count of `M`. The step asks for what it is
+meant to establish, in different letters.
+
+This is also why the FLT analogy does not transfer. Infinite descent needs a quantity
+that strictly decreases; `R' = 2R - 1 + S` increases and the threshold moves up.
+
+## The four angles not yet tried
+
+Each is stated as a lemma that could be attacked on its own.
+
+### A. The factor structure of `e_i`
+
+`e_i` divides both `C_i ± 1` and `r_i` (or `r_i - 2`), so `e_i` divides
+`gcd(C_i ± 1, r_i)`. Bounding that gcd from above bounds `e_i`. Nothing in the library
+evaluates this gcd. **Target lemma:** a bound on `gcd (C ± 1) r` in terms of `M`.
+
+### B. Monotonicity of the quotient
+
+If the quotients `(C_i ± 1)/e_i` increase along a replay, then the event values must
+grow more slowly than the horizon. Measured, `e_i / M` is at most `0.18` and falls as
+`M` grows. **Target lemma:** the quotient at step `i+1` is at least the quotient at
+step `i`, or bounded below by a function of `i`.
+
+### C. Factorisation of `C_i ± 1`
+
+`C_i ± 1` is the horizon at an event; `e_i` is a divisor of it. If `C_i ± 1` has a
+large prime factor then `e_i` cannot be that large unless it takes the whole factor.
+Measured, `C_f - 1` and `C_f + 1` are both prime at every record examined, which makes
+the quotient as large as possible at the exit -- but that is an observation, and the
+mechanism needs to hold at every step, not only the last. **Target lemma:** a lower
+bound on the largest prime factor of `C_i ± 1`, or on its smallest divisor above 1.
+
+### D. Simultaneous induction on `p` and `sum e_i`
+
+`p` alone is not boundable (`OrphanHarvest.count_index_route_is_vacuous` proved `p`
+and `sf` are only constrainable jointly). But `p` and `sum e_i` together might be,
+since `C + 2p <= C_f` and `C_f = (2M-2) + sum(e_i - 1)` relate them. **Target lemma:**
+a joint bound showing `sum e_i` grows slower than `M` while `p` grows slower than
+`sum e_i`.
+
+## What the measurements say, as observations
+
+`sum e_i` divided by the allowance `(3M-9)/8`:
+
+| M | p | sum e_i | allowance | ratio |
+| --- | --- | --- | --- | --- |
+| 139 | 2 | 38 | 51 | 0.745 |
+| 313 | 6 | 42 | 116 | 0.362 |
+| 2659 | 11 | 113 | 996 | 0.114 |
+| 10891 | 11 | 269 | 4083 | 0.066 |
+| 355723 | 57 | 2445 | 133395 | 0.018 |
+
+The worst case is `M = 139`, and the margin improves with `M`. That is a margin, not a
+proof margin, and this development has already recorded what happens when the two are
+confused.
+
+## The honest conclusion
+
+Not "this cannot be done". The barrier has a known shape, the local structure is fully
+proved, and four specific angles remain untried -- each of which reduces to a lemma
+about divisibility that the library does not contain. What has not happened yet is the
+production of new number-theoretic content about `gcd(C ± 1, r)`, as opposed to further
+rearrangements of what is already there.
