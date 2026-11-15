@@ -9,6 +9,19 @@ replays, 869 steps): the room `C - s` stays within a *tiny relative* neighbourho
 of `M` at every state, `room / M in [0.99999, 1.1223]`, and the terminal room obeys
 `M - 43 <= Cf - sf <= M + 14349` on the complete replays.
 
+**Correction, and it matters.** The interval above is an artefact of the record set,
+not a law. The table it came from begins around `M = 44383`, so the small records that
+violate the interval were never in it. Checked over all 23 non-empty canonical replays
+up to `1e8`, 17 violate the interval: at `M = 13` the ratio ranges from `9/13` to
+`20/13`, at `M = 43` from `39/43` to `66/43`. Only `M in {713833, 1427749, 45895573,
+91793059}` stays inside on its own. And the stated upper end `1.1223` is below
+`156/139 = 1.1223021...`, the value that produced it, so the interval does not contain
+its own endpoint.
+
+So `room / M -> 1` is an **asymptotic observation above the threshold** and no argument
+may use it below. The degenerate branch occurs precisely at `M = 13` and `M = 43`, the
+two records where the cap fails.
+
 This file pins down exactly what that means.
 
 ## 1. The path-level exact ledger (new, and it is the whole story)

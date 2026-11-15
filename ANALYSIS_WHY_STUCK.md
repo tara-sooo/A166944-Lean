@@ -37,8 +37,15 @@ The hypotheses give `e <= M` (an upper bound), `e >= 3` (far too weak), and
 divisor** of `C ± 1`; it does not say `e` is small. `e = C - 1` is consistent with every
 one of the six properties above.
 
-What the sum needs is a statement that the **quotient** `(C ± 1)/e` is large, and
-nothing in the library bounds that quotient from below.
+**Correction.** This paragraph originally said "nothing in the library bounds that
+quotient from below". That is false, and it was false when written:
+`Lemmas.moving_horizon_step_event_package` (commit `6415319`, 2026-09-08) already
+carries `3 * d r <= C - 1` on the even branch and `3 * d r <= C + 1` on the odd, which
+is exactly a lower bound of 3 on the quotient. What is missing is not a bound on the
+quotient but a bound on the **number of steps** and on the **sum**; the quotient is
+free to be anything from 3 upward (measured: median 54750, maximum 953589).
+
+So the honest statement of the gap is narrower than the one this file opened with.
 
 ### 2. A bound on `S` alone is not enough, and this is proved
 
