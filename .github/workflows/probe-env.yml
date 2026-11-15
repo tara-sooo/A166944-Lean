@@ -100,15 +100,18 @@ jobs:
           elan toolchain install "$TC"
           elan default "$TC"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-          # Locate the toolchain directory and insist on the prelude.
-          TCDIR="$(elan toolchain list | tr -d ' ' | grep -F "$TC" | head -1)"
-          echo "toolchain: $TCDIR"
-          LEANDIR="$HOME/.elan/toolchains/$(echo "$TCDIR" | tr '/' '-' | sed 's/^leanprover-//')"
+          # Ask elan where the toolchain actually is rather than reconstructing the
+          # directory name: the naming rule differs between toolchain sources
+          # (`lean4:v4.29.0-rc3` here, not `leanprover-lean4-v4.29.0-rc3`), and a
+          # wrong guess makes the prelude check fail on a toolchain that is fine.
+          LEANBIN="$(elan which lean)"
+          echo "lean binary: $LEANBIN"
+          LEANDIR="$(dirname "$(dirname "$LEANBIN")")"
           echo "lean dir: $LEANDIR"
           for f in Init/Prelude.olean Init/Data/Nat/Sqrt.olean; do
             if [ ! -f "$LEANDIR/lib/lean/$f" ]; then
               echo "::error::toolchain is missing $f -- the prelude did not install"
-              ls "$LEANDIR/lib/lean/Init" | head -20 || true
+              ls "$LEANDIR/lib/lean/Init" 2>/dev/null | head -20 || true
               exit 1
             fi
           done
