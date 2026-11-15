@@ -108,7 +108,12 @@ jobs:
           echo "lean binary: $LEANBIN"
           LEANDIR="$(dirname "$(dirname "$LEANBIN")")"
           echo "lean dir: $LEANDIR"
-          for f in Init/Prelude.olean Init/Data/Nat/Sqrt.olean; do
+          # Only the prelude is required of the toolchain. `Nat.sqrt` lives in
+          # `Init/Data/Nat/Sqrt` under v4.33.1 but not under v4.29.0-rc3, where
+          # Mathlib supplies it -- so checking for it here would fail on a
+          # perfectly good toolchain. What the check is for is distinguishing an
+          # incomplete toolchain (the original failure) from a project problem.
+          for f in Init/Prelude.olean; do
             if [ ! -f "$LEANDIR/lib/lean/$f" ]; then
               echo "::error::toolchain is missing $f -- the prelude did not install"
               ls "$LEANDIR/lib/lean/Init" 2>/dev/null | head -20 || true
@@ -116,6 +121,12 @@ jobs:
             fi
           done
           echo "prelude present"
+          # Where sqrt lives, for the record, without failing on it.
+          if [ -f "$LEANDIR/lib/lean/Init/Data/Nat/Sqrt.olean" ]; then
+            echo "sqrt in toolchain: yes"
+          else
+            echo "sqrt in toolchain: no -- expected under v4.29, supplied by Mathlib"
+          fi
 
       - name: Fetch Mathlib at the pinned revision
         working-directory: probe
