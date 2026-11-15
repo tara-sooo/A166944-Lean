@@ -112,3 +112,67 @@ is the one the platform was built for.
 Concretely: `open-leaves` on the twin prime route currently returns the relaxed
 index cap and the horizon cap. Work should be handed out as "close leaf X", with
 the platform's own statement as the specification, rather than as "try angle Y".
+
+## The verification chain, in detail
+
+From the Lean4 Academy write-up of the same release
+(<https://academy.lean4.dev/proofs/fermats-last-theorem>) and the proof
+repository, the released artifact carries four separate checks, and they are worth
+copying one by one because each catches a different class of error:
+
+1. **A clean build.** The repository reports the project builds from scratch.
+2. **An axiom audit.** `FinalCheck.lean` prints the axioms the final declaration
+   depends on and they are Lean's three standard ones. This is the check that would
+   catch a `sorry` or an `axiom` smuggled in anywhere in the dependency tree.
+3. **A statement comparison.** A [comparator](https://github.com/leanprover/comparator)
+   confirms the proved statement is *the same statement* as Mathlib's, rather than a
+   weakening of it that happens to typecheck. For an upstream-pinned goal this is
+   nearly free; it is also the check that stops the most damaging failure mode,
+   which is proving something adjacent.
+4. **A second kernel.** A patched version of [nanoda](https://github.com/ammkrn/nanoda_lib),
+   a Rust implementation of the Lean kernel, re-checked the declarations
+   independently of Lean's own kernel.
+
+That fourth check is the one this project does not do and could not do cheaply on a
+phone. Its value is that it does not trust the elaborator: if the proof term is
+wrong in a way Lean's kernel would accept because of a bug, a second kernel
+disagrees.
+
+The Academy page also states the framing plainly, which is the same point
+`REACH.md` makes about certificates:
+
+> A formalization of a known theorem. It does not replace Wiles's discovery or erase
+> the community work on which it builds.
+
+and, about the campaign itself, that it is "an automation milestone built on human
+proofs, Mathlib, and earlier formalization projects". The page is explicit that it
+did not rebuild the artifact.
+
+## Buzzard's response, and the distinction he draws
+
+Buzzard's own write-up is at
+<https://xenaproject.wordpress.com/2026/09/04/flt-anthropic-has-beaten-me-to-it/>.
+The Academy page summarises it: he
+
+> welcomed the achievement while explaining why useful, maintainable mathematical
+> libraries remain a separate goal.
+
+That distinction matters here. A proof that a checker accepts is not the same
+artifact as a library a human can use, and this project has been producing the
+first kind while sometimes reporting it as the second.
+
+## The three reasons listed on the platform's own page, as a design brief
+
+Prove2Me is described on the Anthropic page as helping in exactly three ways, and
+each one implies something about how to use it:
+
+| the platform provides | which means the workflow should be |
+| --- | --- |
+| a DAG of statements agents read to choose their next target | pick leaves from the frontier; do not assign angles |
+| statements and proofs in separate files with independent links | work one `Thm_`/`Sol_` pair at a time; the small unit is the point |
+| a natural-language description per statement, for search and reuse | search by meaning before reproving; reuse is the intended path |
+
+The third is the one this project has used least. Every consumer theorem is a
+description that another agent can find, and re-deriving a lemma that is already on
+the platform is pure waste — which is exactly the failure this development has
+recorded repeatedly under the heading "rediscovery".
