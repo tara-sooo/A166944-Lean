@@ -6,8 +6,8 @@ repository and the live APIs; nothing is projected.
 ## Repository
 
 ```
-branch   main, clean, HEAD ff6428d
-size     171 modules, 2454 declarations
+branch   main, clean, HEAD 626e9a1
+size     172 modules, 2504 declarations
 CI       A166944 canonical verification: success on 2de8437
 guard    DECLARATIONS.json + the explicit module list in verify.yml, both 170
 ```
@@ -23,9 +23,20 @@ cap (B)   4 * sf <= 7 * M - 1
   <=>     Cf + p <= (19M - 25) / 8            ExcessGap.excess_criterion_iff_horizon_form
 ```
 
-Measured, the inequality has enormous slack: `travel / M` runs from 0.00007 to 0.108
-against an allowance of 0.75, a margin of 7x to 10000x. The difficulty is not the
-inequality. It is that the one input every route needs -- an upper bound on the event
+**The slack is not where I said it was, and this is corrected.** I reported a margin of
+7x to 10000x from `travel / M` running 0.00007 to 0.108 against an allowance of 0.75. That
+is the wrong coordinate. The cap's own normal form is `Cf + p <= (19M-25)/8`, and there
+the ratio converges to about 0.8421 from above -- worst case `M = 139` at 0.9602, a margin
+of **3.98 percent**. The travel coordinate looks roomy only because `Cf ~ 2sf ~ 2M`
+dominates and travel is lower order.
+
+`BindingCoordinate.lean` records this, along with why the obvious toolkit closes:
+`cap <-> 16 travel + 8p + 57 <= 3M + 8 r2` where `r2 = 2sf - Cf`, so the cap needs the
+state slack to pay twice the travel, and a state bound supplies only `r2 >= 0`. The
+deficit `19M - 25 - 8(3M+4) = 5M + 57` grows linearly for every `M`, so
+(state bound) x (index cap) cannot reach the joint form at all.
+
+The difficulty is still not the inequality's size. It is that the one input every route needs -- an upper bound on the event
 count `p`, independent of `sf` -- cannot be supplied, and
 `OrphanHarvest.count_index_route_is_vacuous` proves that the obvious combination
 (`travel <= p * sqrt(C)` plus `p + M <= sf + 1`) holds for **every** `sf`, hence bounds
