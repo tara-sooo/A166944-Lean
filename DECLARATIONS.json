@@ -68,6 +68,7 @@
   "ReplayLaunch": 10,
   "ReplayOffset210": 20,
   "ResearchDefs": 22,
+  "ReservoirLower": 2,
   "ResidualAdjustedCosts210": 27,
   "ResidualAllocation210": 4,
   "ResidualDeficitBounds210": 21,
@@ -124,5 +125,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1760
+ "total": 1762
 }
