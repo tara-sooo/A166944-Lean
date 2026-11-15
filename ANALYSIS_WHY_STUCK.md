@@ -189,3 +189,37 @@ found the file unreferenced: 1871 lines whose one theorem is circular.
 So the room coordinate has a lower-bound theory (`RoomInvariant`) and no usable upper
 bound. The upper bound is the missing input, and it is missing for a reason.
 
+## The twin-prime-centre observation was an artefact
+
+I recorded that `S = Cf - (2M-2)` equals the distance from `2M-2` to the first
+twin-prime centre in 7 of 13 records, and treated that as structural. It is not, and
+there is no 13-record window in which it is 7: over the seventeen replayable records
+below three million it is **7 of 17**, and no natural window gives 13.
+
+The mechanism is that `Cf` is *itself* a twin-prime centre -- `Cf - 1` and `Cf + 1` are
+both prime at all seventeen records -- so `twinD <= S` holds automatically, and the two
+agree exactly when there is no twin-prime centre strictly inside `(2M-2, Cf)`. That is a
+question about twin-prime density, not about the recurrence.
+
+Tested against the right null model, the empirical twin-centre gap distribution
+(20931 centres below three million, median gap 102):
+
+| window | n | expected matches | observed |
+| --- | --- | --- | --- |
+| M in [139, 713833] | 13 | 7.50 | 6 |
+| M in [313, 713833] | 12 | 6.67 | 6 |
+| M >= 139 | 15 | 7.50 | 6 |
+| M >= 7 | 18 | 10.17 | 7 |
+
+Observed is at or below expected in every window. The matches carry no signal.
+
+Two further corrections from the same review. `Cf + 1` is the next record value
+(16 consecutive pairs), but that is `AttainmentIsFree.terminal_exit_reset`, proved on
+15 November -- not a new observation. And my "every record satisfies
+`sum e / (3M/8) <= 0.731`" fails at `M = 13` (ratio 4.51) and `M = 43` (3.72); above the
+threshold the binding record is `M = 139` at 0.7290, with 0.002 of margin.
+
+What remains true is the reduction itself: `8(S+p) <= 3M-9` is equivalent to
+`8Cf + 8p <= 19M - 25`, already in `ExcessGap.excess_criterion_iff_horizon_form`. And
+`p` remains the only input no route supplies.
+
