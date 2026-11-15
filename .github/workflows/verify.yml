@@ -117,6 +117,9 @@ jobs:
             A166944.AuditSharp48Domain \
             A166944.AuditCountFailures \
             A166944.AuditAttainmentLower \
+            A166944.RecordInductionFails \
+            A166944.RecordTransferFixpoint \
+            A166944.RecordBridge \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

@@ -74,10 +74,13 @@
   "RebalancedSmallAnchorData210": 28,
   "RebalancedSmallAnchorDeficits210": 15,
   "RecordBarrier": 19,
+  "RecordBridge": 6,
   "RecordCoordinates": 4,
   "RecordIndex": 24,
   "RecordIndexBounds": 2,
+  "RecordInductionFails": 23,
   "RecordReplay": 27,
+  "RecordTransferFixpoint": 8,
   "RecurrenceDeficit210": 7,
   "RelaxedCap": 4,
   "RenormalizedGrowth": 7,
@@ -147,5 +150,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2023
+ "total": 2060
 }
