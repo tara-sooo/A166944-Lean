@@ -92,6 +92,7 @@ jobs:
             A166944.ExcessIdentity \
             A166944.OrphanHarvest \
             A166944.ExcessSumInterval \
+            A166944.BandReentry \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

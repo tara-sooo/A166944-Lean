@@ -7,6 +7,7 @@
   "BIntegrate": 1,
   "BLedger": 2,
   "BStepLaw": 1,
+  "BandReentry": 10,
   "Baseline": 0,
   "Bridge": 4,
   "CanonicalGrowth": 18,
@@ -122,5 +123,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1737
+ "total": 1747
 }
