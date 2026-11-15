@@ -36,6 +36,7 @@
   "EventCountFails": 7,
   "ExcessCriterion": 8,
   "ExcessIdentity": 1,
+  "ExcessLower": 2,
   "ExcessSumInterval": 18,
   "ExitBand": 3,
   "ExitCoordinates": 6,
@@ -138,5 +139,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1872
+ "total": 1874
 }
