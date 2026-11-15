@@ -57,9 +57,11 @@
   "HorizonLedger": 7,
   "Lemmas": 295,
   "OrphanHarvest": 5,
+  "PinnedExclusion": 15,
   "Q1Witness": 4,
   "Q2TailKill": 9,
   "Q3Barrier": 6,
+  "QuantumExclusive": 20,
   "QuietReturn": 4,
   "QuietWindowBound": 9,
   "RebalancedAnchorComponents210": 12,
@@ -112,6 +114,7 @@
   "ResidualStartupWeights210": 26,
   "ResidualThreshold210": 7,
   "ReuseCongruences": 6,
+  "RoomInvariant": 31,
   "RoomLedger": 32,
   "RoomQuantum": 8,
   "SelfHit": 1,
@@ -151,5 +154,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2068
+ "total": 2134
 }

@@ -121,6 +121,9 @@ jobs:
             A166944.RecordTransferFixpoint \
             A166944.RecordBridge \
             A166944.RoomQuantum \
+            A166944.RoomInvariant \
+            A166944.PinnedExclusion \
+            A166944.QuantumExclusive \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
