@@ -1,0 +1,130 @@
+name: Build and check the Prove2Me solution files
+
+# Why this workflow exists
+#
+# The solutions we upload to Prove2Me have to be self-contained: the platform
+# compiles them against its own Mathlib with only the published Definition
+# bundles available, so every helper lemma the proof uses has to be inlined. The
+# generator that does the inlining works from a declaration graph, and the graph
+# has gaps -- when a helper is missed, the only symptom is a compile error on the
+# platform, which costs a submission to discover.
+#
+# This workflow moves that discovery here. It takes the generated solution, stubs
+# the platform's Definition bundles locally, and compiles. Failures are reported
+# in full, so the generator can be fixed without spending a submission and
+# without building anything on the phone.
+#
+# It is also the natural home for the eventual generated files, which is why the
+# solutions live under prove2me/solutions/ in the repository rather than in
+# scratch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      solution:
+        description: "Path to the solution file to check"
+        required: false
+        default: "prove2me/solutions/Sol_target_of_travel.lean"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: a166944-solutions-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+
+      - name: Fetch pinned dependencies
+        run: lake update
+
+      - name: Fetch Mathlib precompiled cache
+        run: lake exe cache get
+
+      # ------------------------------------------------------------------
+      # Stub the platform's Definition bundles. These are exactly the two
+      # bundles our submissions declare as their preamble, so the stubs must
+      # match them declaration for declaration.
+      # ------------------------------------------------------------------
+      - name: Write the Definition stubs
+        run: |
+          set -euo pipefail
+          mkdir -p Definitions
+          cat > Definitions/Def_a166944_record_core.lean <<'EOF'
+          import Mathlib.Data.Nat.Prime.Defs
+
+          namespace A166944Research
+
+          def a : Nat → Nat
+            | 0 => 0
+            | 1 => 2
+            | n + 2 =>
+              let prev := a (n + 1)
+              let idx := n + 2
+              if idx % 2 = 0 then prev + Nat.gcd idx prev
+              else prev + Nat.gcd (idx - 2) prev
+
+          def d (n : Nat) : Nat := a n - a (n - 1)
+          def D (n : Nat) : Nat := a n - n
+          def B (n : Nat) : Nat := a n - (2 * n - 2)
+
+          def IsDifferenceRecord (R : Nat) : Prop :=
+            ∃ n : Nat, 2 ≤ n ∧ d n = R ∧ ∀ k : Nat, 2 ≤ k → k < n → d k < R
+
+          def IsGreaterTwinPrime (p : Nat) : Prop := p.Prime ∧ (p - 2).Prime
+          def Target : Prop := ∀ R : Nat, 5 < R → IsDifferenceRecord R → IsGreaterTwinPrime R
+
+          end A166944Research
+          EOF
+          cat > Definitions/Def_a166944_moving_horizon.lean <<'EOF'
+          import Definitions.Def_a166944_record_core
+
+          namespace A166944Research
+
+          def IsMovingHorizonState (s C : Nat) : Prop := 2 ≤ s ∧ D s = C ∧ s < C
+
+          def IsMovingHorizonStep (s C r C' : Nat) : Prop :=
+            IsMovingHorizonState s C ∧ s < r ∧ r ≤ C ∧ 1 < d r ∧
+              (∀ j : Nat, s < j → j < r → d j = 1) ∧
+              D (r - 1) = C ∧ C' = D r ∧ C + 2 ≤ C' ∧ IsMovingHorizonState r C'
+
+          def HasMovingHorizonPathTo (s C sf Cf : Nat) : Nat → Prop
+            | 0 => s = sf ∧ C = Cf ∧ IsMovingHorizonState s C
+            | Nat.succ q =>
+                IsMovingHorizonState s C ∧
+                  ∃ r C', IsMovingHorizonStep s C r C' ∧
+                    HasMovingHorizonPathTo r C' sf Cf q
+
+          def IsAttainedPreviousMaximum (P k : Nat) : Prop :=
+            (∀ j : Nat, 2 ≤ j → j ≤ k → d j ≤ P) ∧
+              ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P
+
+          end A166944Research
+          EOF
+
+      # ------------------------------------------------------------------
+      # The check. The solution imports the bundles by their platform names,
+      # which the stubs above now provide.
+      # ------------------------------------------------------------------
+      - name: Compile the solution
+        run: |
+          set -euo pipefail
+          f="${{ github.event.inputs.solution }}"
+          echo "checking $f"
+          test -f "$f" || { echo "::error::no such solution file: $f"; exit 1; }
+          cp "$f" Check.lean
+          lake env lean Check.lean
+          echo "compiled cleanly: $f"

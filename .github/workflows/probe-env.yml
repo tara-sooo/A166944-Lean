@@ -78,14 +78,15 @@ jobs:
           cat probe/lean-toolchain
           grep 'rev' probe/lakefile.toml
 
-      - uses: leanprover/lean-action@v1
-        with:
-          auto-config: false
-          build: false
-          test: false
-          lint: false
-          use-mathlib-cache: false
-          lake-package-directory: probe
+      # `lean-action` refuses to run without a manifest, so the manifest is
+      # generated first with the toolchain the environment declares.
+      - name: Install the pinned toolchain
+        working-directory: probe
+        run: |
+          set -euo pipefail
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain "$(cat lean-toolchain)"
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
       - name: Fetch Mathlib at the pinned revision
         working-directory: probe
