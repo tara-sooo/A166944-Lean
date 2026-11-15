@@ -142,3 +142,50 @@ proved, and four specific angles remain untried -- each of which reduces to a le
 about divisibility that the library does not contain. What has not happened yet is the
 production of new number-theoretic content about `gcd(C ± 1, r)`, as opposed to further
 rearrangements of what is already there.
+## A correction: the square-root route was already taken, and already closed
+
+I proposed a three-step route as if it were new: bound the gap by `sqrt(C)`, sum it to
+`travel <= p sqrt(C)`, then show the sum fits the budget.
+
+All of it was in the tree. `CanonicalTravel.moving_horizon_step_gap_le_sqrt` is
+`r - s <= isqrt (4 * (U + 1))` and `moving_horizon_path_travel_bound` is
+`sf - s <= p * isqrt (4 * (U + 1))`. That is steps one and two, verbatim.
+
+And step three cannot work, which is also already proved:
+`OrphanHarvest.count_index_route_is_vacuous` exhibits, for **every** `sf`, a horizon
+`Cf` and a count `p` with `p + M <= sf + 1` and `sf - (M+2) <= p * isqrt (4 * (3M+5))`.
+The two bounds hold simultaneously for arbitrary `sf`, so no combination of them bounds
+`sf`, whatever the constant inside the root.
+
+The file already listed this under the fourth reason it cannot get there. Proposing it
+again was the same failure as the duplicate-theorem episodes, one level up: a
+rediscovered strategy rather than a rediscovered lemma.
+## Two more corrections, both from the same afternoon
+
+**`room_f` is not approximately `M` in the sense the phrase suggests.** Measured over
+all thirteen records below three million, `Cf - sf <= M` fails in **eight** of them:
+
+| M | sf | Cf | room | room <= M |
+| --- | --- | --- | --- | --- |
+| 139 | 156 | 312 | 156 | no |
+| 2659 | 2712 | 5418 | 2706 | no |
+| 10891 | 11041 | 22038 | 10997 | no |
+| 355723 | 357042 | 713832 | 356790 | no |
+| 1427749 | 1431006 | 2860770 | 1429764 | no |
+
+The ratio is close to 1 and the relative excess is small (at most 0.15 percent here),
+but the absolute excess reaches 2015. Since the ledger is exact --
+`room_f = (M-4) + S - travel` -- that is `S - travel = 2019` at that record, and
+`S - travel` changes sign across the set (from -39 to +2019). So `S` and `travel` are
+unordered, and no argument may treat them as interchangeable.
+
+**And `Attempt.lean` is not a source of the room bound.** It contains
+`moving_horizon_capped_old_path_endpoint : Cf - sf <= M`, which looks like exactly the
+missing input -- but its hypothesis `HasMovingHorizonCappedOldPath` has `C - s <= M` and
+`C' - r <= M` among its conjuncts (`ResearchDefs.lean:92`), so the conclusion is one of
+the hypotheses at every step. It is a tautology, which is consistent with the audit that
+found the file unreferenced: 1871 lines whose one theorem is circular.
+
+So the room coordinate has a lower-bound theory (`RoomInvariant`) and no usable upper
+bound. The upper bound is the missing input, and it is missing for a reason.
+
