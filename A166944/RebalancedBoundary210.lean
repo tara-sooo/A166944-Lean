@@ -183,10 +183,10 @@ end ResidualPhaseEvent210
 
 private theorem rebalanced_boundary_sqrt_le210 {M C : Nat}
     (hM : 11751795061 ≤ M) (hC : C ≤ 219 * M) :
-    3600 * Nat.sqrt (4 * (C + 1)) ≤ M := by
-  let q := Nat.sqrt (4 * (C + 1))
+    3600 * isqrt (4 * (C + 1)) ≤ M := by
+  let q := isqrt (4 * (C + 1))
   change 3600 * q ≤ M
-  have hq : q * q ≤ 877 * M := Nat.le_trans (Nat.sqrt_le (4 * (C + 1))) (by omega)
+  have hq : q * q ≤ 877 * M := Nat.le_trans (isqrt_sq_le (4 * (C + 1))) (by omega)
   apply Nat.mul_self_le_mul_self_iff.mp
   calc
     (3600 * q) * (3600 * q) = (3600 * 3600) * (q * q) := by ac_rfl
@@ -359,8 +359,8 @@ theorem canonical_next_record_factors_of_rebalanced_boundary210 (bound : Rebalan
     unfold rebalancedBoundaryLimit210 at hbound
     have hC : C ≤ 219 * M := by omega
     have hsqrt := rebalanced_boundary_sqrt_le210 hM hC
-    have hsmall := Nat.sqrt_le_sqrt (by omega : C + 1 ≤ 4 * (C + 1))
-    have hlong : 2 * Nat.sqrt (C + 1) < C - s := by
+    have hsmall := isqrt_le_isqrt (by omega : C + 1 ≤ 4 * (C + 1))
+    have hlong : 2 * isqrt (C + 1) < C - s := by
       unfold rebalancedBoundaryValue210 at hbound
       omega
     obtain ⟨hnew, hpre, hd, _⟩ := canonical_quiet_return_next_record (by omega) hClo hstate hcap quiet

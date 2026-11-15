@@ -13,11 +13,11 @@ open Finset
 namespace A166944Research
 
 private theorem charged_crossing_gap_bound {M : Nat} (hM : 147456 ≤ M) :
-    96 * Nat.sqrt (4 * (3 * M + 4)) ≤ M := by
-  let Q := Nat.sqrt (4 * (3 * M + 4))
+    96 * isqrt (4 * (3 * M + 4)) ≤ M := by
+  let Q := isqrt (4 * (3 * M + 4))
   change 96 * Q ≤ M
   apply Nat.mul_self_le_mul_self_iff.mp
-  have hQ : Q * Q ≤ 4 * (3 * M + 4) := Nat.sqrt_le _
+  have hQ : Q * Q ≤ 4 * (3 * M + 4) := isqrt_sq_le _
   calc
     (96 * Q) * (96 * Q) = (96 * 96) * (Q * Q) := by ac_rfl
     _ ≤ (96 * 96) * (16 * M) := Nat.mul_le_mul_left _ (by omega)

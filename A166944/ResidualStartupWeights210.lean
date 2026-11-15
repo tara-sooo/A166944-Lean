@@ -350,7 +350,7 @@ theorem crossing_budget_of_refined_startup210 {M s C r p first : Nat} {balance :
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
     (short : 2 * (s - (M + 2)) ≤ M)
-    (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (rest : 3 * (((24 * first : Nat) : Int) + ∑ i ∈ Finset.univ \ trace.startup, (trace.event i).cost) ≤
       2 * ((C - (2 * M - 2) : Nat) : Int) + 29108531) :

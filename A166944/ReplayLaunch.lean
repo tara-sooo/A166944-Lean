@@ -77,9 +77,9 @@ theorem moving_horizon_new_record_excludes_small_factors {M s C r C' B : Nat}
 
 private theorem long_quiet_gap_of_index_offset_le_record {M s C : Nat}
     (hM : 43 ≤ M) (hC : 2 * M - 2 ≤ C) (state : IsMovingHorizonState s C)
-    (offset : replayIndexOffset s C ≤ M) : 2 * Nat.sqrt (C + 1) < C - s := by
-  let q := Nat.sqrt (C + 1)
-  have hq : q * q ≤ C + 1 := Nat.sqrt_le _
+    (offset : replayIndexOffset s C ≤ M) : 2 * isqrt (C + 1) < C - s := by
+  let q := isqrt (C + 1)
+  have hq : q * q ≤ C + 1 := isqrt_sq_le _
   have hsmall : 9 * q ≤ C := by
     apply Nat.mul_self_le_mul_self_iff.mp
     calc
@@ -290,7 +290,7 @@ theorem moving_horizon_step_low_offset_departure_cofactor {s C r C' : Nat}
 /-- A step out of the small-offset region starts at square-root scale. -/
 theorem moving_horizon_step_low_offset_departure_bound {s C r C' : Nat}
     (step : IsMovingHorizonStep s C r C') (offset : replayIndexOffset s C ≤ 6) :
-    replayIndexOffset r C' ≤ max 28 (2 * Nat.sqrt (C + 1) + 6) := by
+    replayIndexOffset r C' ≤ max 28 (2 * isqrt (C + 1) + 6) := by
   by_cases large : 9 ≤ d r
   · have hpost := moving_horizon_step_index_offset_mod_four step (by omega) (by omega)
     by_cases depart : 6 < replayIndexOffset r C'
@@ -298,16 +298,16 @@ theorem moving_horizon_step_low_offset_departure_bound {s C r C' : Nat}
         rcases moving_horizon_step_low_offset_departure_cofactor step large offset depart with ⟨_, h⟩ | ⟨_, h⟩
         all_goals split at h <;> omega
       have hroot := Nat.le_of_lt_succ
-        (Nat.mul_self_lt_mul_self_iff.mp (Nat.lt_of_le_of_lt hsquare (Nat.lt_succ_sqrt _)))
-      have hmax := Nat.le_max_right 28 (2 * Nat.sqrt (C + 1) + 6)
+        (Nat.mul_self_lt_mul_self_iff.mp (Nat.lt_of_le_of_lt hsquare (lt_succ_isqrt _)))
+      have hmax := Nat.le_max_right 28 (2 * isqrt (C + 1) + 6)
       split at hpost <;> split at hpost <;> omega
-    · have hmax := Nat.le_max_left 28 (2 * Nat.sqrt (C + 1) + 6)
+    · have hmax := Nat.le_max_left 28 (2 * isqrt (C + 1) + 6)
       omega
   · have hupdate := moving_horizon_step_index_offset_update step
     have hgap := moving_horizon_step_gap_le_twice_increment step
     have hr : 3 ≤ r := by have := step.1.1; have := step.2.1; omega
     have he := d_mod_two_eq_one_of_three_le hr
-    have hmax := Nat.le_max_left 28 (2 * Nat.sqrt (C + 1) + 6)
+    have hmax := Nat.le_max_left 28 (2 * isqrt (C + 1) + 6)
     omega
 
 end A166944Research

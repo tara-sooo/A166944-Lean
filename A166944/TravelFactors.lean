@@ -16,10 +16,10 @@ theorem exists_small_factor_of_composite {e : Nat} (he : ¬ NoProperFactor e) :
   by_cases h : ∃ f : Nat, 1 < f ∧ f ∣ e ∧ f * f ≤ e
   · exact h
   · exfalso
-    apply he (no_proper_factor_of_no_small_factor (root := Nat.sqrt e) ?_ (Nat.lt_succ_sqrt e))
+    apply he (no_proper_factor_of_no_small_factor (root := isqrt e) ?_ (lt_succ_isqrt e))
     intro f hf hdiv
-    have hroot : f.val ≤ Nat.sqrt e := Nat.le_of_lt_succ f.isLt
-    exact h ⟨f.val, hf, hdiv, Nat.le_trans (Nat.mul_le_mul hroot hroot) (Nat.sqrt_le e)⟩
+    have hroot : f.val ≤ isqrt e := Nat.le_of_lt_succ f.isLt
+    exact h ⟨f.val, hf, hdiv, Nat.le_trans (Nat.mul_le_mul hroot hroot) (isqrt_sq_le e)⟩
 
 /-- A long composite gap has a factor at least seven. Its square pays
 for all 24 units of travel at a cost of only seven units of growth. -/
@@ -212,7 +212,7 @@ theorem canonical_first_travel_crossing_residual {M sf Cf q : Nat}
       IsMovingHorizonStep s C r C' ∧ r ≤ sf ∧ p + 1 ≤ q ∧
       2 * (s - (M + 2)) ≤ M ∧ M < 2 * (r - (M + 2)) ∧
       3 * M < 6 * (total + (r - s)) + 2 * (C - (2 * M - 2)) ∧
-      M < 6 * (total + Nat.sqrt (4 * (3 * M + 4))) + 10 := by
+      M < 6 * (total + isqrt (4 * (3 * M + 4))) + 10 := by
   let cutoff := M + 2 + M / 2
   obtain ⟨s, C, r, C', p, hpre, hstep, hs, hr, hp, hrf⟩ :=
     moving_horizon_path_first_index_crossing hpath (by omega : M + 2 ≤ cutoff) (by omega)

@@ -71,8 +71,8 @@ theorem residual_net_budget_of_allocation210 {n m first multiplier M : Nat} {bal
     (allowedStartup : ∀ i ∈ certificate.startup, (key i).val ∈ residualStartupCodes210)
     (cap : ∀ i ∈ certificate.startup, (cost i).toNat ≤ 1478)
     (hnet : (24 + multiplier) * first + residualPhaseStartupBound210 +
-      24 * Nat.sqrt (4 * (3 * M + 4)) + 1315 ≤ M + phaseCreditUnused210 certificate) :
-    ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
+      24 * isqrt (4 * (3 * M + 4)) + 1315 ≤ M + phaseCreditUnused210 certificate) :
+    ((24 * (first + isqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
   have hbound := residual_allocation_with_reserve_bound210 certificate allowedStartup cap
   rw [hsum] at hbound
   rw [Nat.add_mul] at hnet

@@ -329,7 +329,7 @@ theorem rebalanced_crossing_signed_of_component_growth_allowance210
     (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
     (firstBound : trace.totalCappedFirstPayment ≤ firstUpper)
@@ -346,7 +346,7 @@ theorem rebalanced_crossing_signed_of_joint_growth_budget210
     (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
     (cutoff : 338 ≤ L) (cover : trace.RebalancedAnchorComponents)
@@ -372,7 +372,7 @@ theorem rebalanced_crossing_signed_of_first_high_growth_at_338210
     (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (budget : 10 * trace.rebalancedCreditDebt + 1230 * (trace.growthAtHighFirstPayments 338 : Int) +
       416620800 ≤ (9 * M : Nat)) :

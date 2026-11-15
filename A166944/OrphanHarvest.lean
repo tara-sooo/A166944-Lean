@@ -74,22 +74,22 @@ jointly satisfiable for *every* travel distance -- the route has no content unti
 theorem count_index_route_is_vacuous (M sf : Nat) (hfeas : M ≤ sf + 1) :
     ∃ _Cf p : Nat,
       p + M ≤ sf + 1 ∧
-        sf - (M + 2) ≤ p * Nat.sqrt (4 * (3 * M + 4 + 1)) := by
+        sf - (M + 2) ≤ p * isqrt (4 * (3 * M + 4 + 1)) := by
   refine ⟨2 * sf, sf + 1 - M, ?_, ?_⟩
   · show sf + 1 - M + M ≤ sf + 1
     rw [Nat.sub_add_cancel hfeas]
     exact Nat.le_refl _
-  have hroot : 1 ≤ Nat.sqrt (4 * (3 * M + 4 + 1)) := by
-    rcases Nat.eq_zero_or_pos (Nat.sqrt (4 * (3 * M + 4 + 1))) with h0 | hpos
+  have hroot : 1 ≤ isqrt (4 * (3 * M + 4 + 1)) := by
+    rcases Nat.eq_zero_or_pos (isqrt (4 * (3 * M + 4 + 1))) with h0 | hpos
     · exfalso
-      have hlt := Nat.lt_succ_sqrt (4 * (3 * M + 4 + 1))
+      have hlt := lt_succ_isqrt (4 * (3 * M + 4 + 1))
       rw [h0] at hlt
       omega
     · exact hpos
   have hq : sf - (M + 2) ≤ sf + 1 - M := by omega
   calc sf - (M + 2) ≤ sf + 1 - M := hq
     _ = (sf + 1 - M) * 1 := (Nat.mul_one _).symm
-    _ ≤ (sf + 1 - M) * Nat.sqrt (4 * (3 * M + 4 + 1)) :=
+    _ ≤ (sf + 1 - M) * isqrt (4 * (3 * M + 4 + 1)) :=
         Nat.mul_le_mul_left _ hroot
 
 /-- The companion: the `B sf` form of the count bound is also unconditional. -/

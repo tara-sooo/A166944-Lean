@@ -87,7 +87,7 @@ theorem canonical_first_crossing_requires_signed_separators210 {M sf Cf q : Nat}
       HasMovingHorizonSignedBalances210 (M + 2) (2 * M - 2) s C [] p supported separators ∧
       IsMovingHorizonStep s C r C' ∧ r ≤ sf ∧ p + 1 ≤ q ∧
       2 * (s - (M + 2)) ≤ M ∧ M < 2 * (r - (M + 2)) ∧
-      r - s ≤ Nat.sqrt (4 * (3 * M + 4)) ∧
+      r - s ≤ isqrt (4 * (3 * M + 4)) ∧
       ((12 * M + supportedPotential210 s C : Nat) : Int) <
         ((24 * (first + (r - s)) + 11 * (C - (2 * M - 2)) +
           supportedPotential210 (M + 2) (2 * M - 2) : Nat) : Int) + separators ∧

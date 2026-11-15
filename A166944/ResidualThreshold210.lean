@@ -15,11 +15,11 @@ namespace A166944Research
 set_option maxRecDepth 4096
 
 theorem fifty_million_sqrt_budget {M : Nat} (hM : 50000000 ≤ M) :
-    1536 * Nat.sqrt (4 * (3 * M + 4)) ≤ M := by
-  let Q := Nat.sqrt (4 * (3 * M + 4))
+    1536 * isqrt (4 * (3 * M + 4)) ≤ M := by
+  let Q := isqrt (4 * (3 * M + 4))
   change 1536 * Q ≤ M
   apply Nat.mul_self_le_mul_self_iff.mp
-  have hQ : Q * Q ≤ 4 * (3 * M + 4) := Nat.sqrt_le _
+  have hQ : Q * Q ≤ 4 * (3 * M + 4) := isqrt_sq_le _
   calc
     (1536 * Q) * (1536 * Q) = (1536 * 1536) * (Q * Q) := by ac_rfl
     _ ≤ (1536 * 1536) * (16 * M) := Nat.mul_le_mul_left _ (by omega)
@@ -28,7 +28,7 @@ theorem fifty_million_sqrt_budget {M : Nat} (hM : 50000000 ≤ M) :
 
 set_option maxRecDepth 16384 in
 theorem fifty_million_crossing_overhead210 {M : Nat} (hM : 50000000 ≤ M) :
-    2 * (residualPhaseStartupBound210 + 24 * Nat.sqrt (4 * (3 * M + 4)) + 1315) ≤ M := by
+    2 * (residualPhaseStartupBound210 + 24 * isqrt (4 * (3 * M + 4)) + 1315) ≤ M := by
   have hQ := fifty_million_sqrt_budget hM
   have hstartup : 64 * (residualPhaseStartupBound210 + 1315) ≤ 31 * M := by
     change 64 * (23899260 + 1315) ≤ 31 * M
@@ -39,7 +39,7 @@ theorem half_reserve_implies_fifty_million_net_budget210 {M first multiplier unu
     (hM : 50000000 ≤ M)
     (hreserve : 2 * ((24 + multiplier) * first) ≤ M + 2 * unused) :
     (24 + multiplier) * first + residualPhaseStartupBound210 +
-      24 * Nat.sqrt (4 * (3 * M + 4)) + 1315 ≤ M + unused := by
+      24 * isqrt (4 * (3 * M + 4)) + 1315 ≤ M + unused := by
   have hgap := fifty_million_crossing_overhead210 hM
   omega
 
@@ -47,7 +47,7 @@ theorem signed_reserve_implies_fifty_million_net_budget210 {M first : Nat} {bala
     (hM : 50000000 ≤ M)
     (hreserve : 2 * (((24 * first : Nat) : Int) + balance) ≤
       (M : Int) + 2 * (residualPhaseStartupBound210 : Int)) :
-    ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
+    ((24 * (first + isqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
   have hgap := fifty_million_crossing_overhead210 hM
   omega
 
@@ -65,7 +65,7 @@ structure ResidualReserveCertificate210 (M first multiplier : Nat) (balance : In
 
 theorem residual_net_budget_of_half_reserve210 {M first multiplier : Nat} {balance : Int}
     (hM : 50000000 ≤ M) (certificate : ResidualReserveCertificate210 M first multiplier balance) :
-    ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
+    ((24 * (first + isqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M := by
   exact residual_net_budget_of_allocation210 certificate.allocation certificate.sum_exact
     certificate.startup_allowed certificate.startup_cap
     (half_reserve_implies_fifty_million_net_budget210 hM certificate.reserve)
@@ -77,7 +77,7 @@ theorem canonical_travel_of_capped_residual_net_budget210 {slots M sf Cf q : Nat
     (hbudget : ∀ {s C p first : Nat} {balance : Int},
       HasMovingHorizonResidualPhaseBalances210 phase (M + 2) (2 * M - 2) s C [] p first balance →
       2 * (s - (M + 2)) ≤ M → IsAttainedPreviousMaximum M s →
-      ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M) :
+      ((24 * (first + isqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M) :
     2 * (sf - (M + 2)) ≤ M := by
   by_cases hshort : 2 * (sf - (M + 2)) ≤ M
   · exact hshort

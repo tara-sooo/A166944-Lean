@@ -362,7 +362,7 @@ theorem rebalanced_crossing_signed_of_overlap_budget210
     (hM : 50000000 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (firstBound : trace.totalCappedFirstPayment ≤ firstUpper)
     (budget : 64 * ((3 * firstUpper + 12166819 : Nat) + trace.rebalancedOverlapAdjustment) ≤ (61 * M : Nat)) :
@@ -392,7 +392,7 @@ def RebalancedOverlapCrossingCondition210 : Prop :=
     HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance →
     IsMovingHorizonStep s C r C' → 2 * (s - (M + 2)) ≤ M → M < 2 * (r - (M + 2)) →
-    r - s ≤ Nat.sqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
+    r - s ≤ isqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
     ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance,
       (∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2)) →
       M < 5 * (C - (2 * M - 2)) + 2 * (r - s) + 2 →

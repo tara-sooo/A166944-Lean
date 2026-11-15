@@ -15,7 +15,7 @@ namespace A166944Research
 
 /-! ### A. The witness `k=2, M=191` is arithmetically correct -/
 
-theorem R2_witness_191_hypothesis : (191 : Nat) < 2 * (2 * Nat.sqrt (4 * (3 * 191 + 4))) :=
+theorem R2_witness_191_hypothesis : (191 : Nat) < 2 * (2 * isqrt (4 * (3 * 191 + 4))) :=
   witness_191_satisfies_long_travel
 
 theorem R2_witness_191_rejects_47 : ¬ (191 ≤ 47 * (2 * 2) + 1) := by decide
@@ -44,12 +44,12 @@ theorem R2_family_members_are_not_canonical :
 satisfies `M % 6 = 1`.  `191 % 6 = 5`, so `191` cannot be such an `M`. -/
 theorem R2_witness_191_cannot_be_a_canonical_start : ¬ (191 % 6 = 1) := by decide
 
-/-- `Nat.sqrt` cannot be evaluated by `decide` (its own module says so); the
+/-- `isqrt` cannot be evaluated by `decide` (its own module says so); the
 value is pinned by the tree's `sqrt_ge_of_sq_le` instead. -/
-theorem R2_sqrt_757 : 95 ≤ Nat.sqrt (4 * (3 * 757 + 4)) :=
+theorem R2_sqrt_757 : 95 ≤ isqrt (4 * (3 * 757 + 4)) :=
   sqrt_ge_of_sq_le (by decide : 95 * 95 ≤ 4 * (3 * 757 + 4))
 
-theorem R2_sqrt_43 : 23 ≤ Nat.sqrt (4 * (3 * 43 + 4)) :=
+theorem R2_sqrt_43 : 23 ≤ isqrt (4 * (3 * 43 + 4)) :=
   sqrt_ge_of_sq_le (by decide : 23 * 23 ≤ 4 * (3 * 43 + 4))
 
 /-- **The sharp constant is still 48 ON THE CANONICAL DOMAIN**, witnessed at
@@ -58,14 +58,14 @@ hypothesis holds, and coefficient 47 fails while 48 succeeds.  So the lead's
 *conclusion* survives the domain restriction -- only its chosen witness `191` is
 off-domain.  The smallest canonical-domain witness is `M = 757, k = 4`. -/
 theorem R2_canonical_witness_757 :
-    (757 % 6 = 1) ∧ (757 : Nat) < 2 * (4 * Nat.sqrt (4 * (3 * 757 + 4))) ∧
+    (757 % 6 = 1) ∧ (757 : Nat) < 2 * (4 * isqrt (4 * (3 * 757 + 4))) ∧
       ¬ (757 ≤ 47 * (4 * 4) + 1) ∧ 757 ≤ 48 * (4 * 4) + 1 := by
   have hsqrt := R2_sqrt_757
-  have hgoal : (757 : Nat) < 2 * (4 * Nat.sqrt (4 * (3 * 757 + 4))) := by
-    have h1 : 8 * 95 ≤ 8 * Nat.sqrt (4 * (3 * 757 + 4)) :=
+  have hgoal : (757 : Nat) < 2 * (4 * isqrt (4 * (3 * 757 + 4))) := by
+    have h1 : 8 * 95 ≤ 8 * isqrt (4 * (3 * 757 + 4)) :=
       Nat.mul_le_mul_left 8 hsqrt
-    have h2 : 2 * (4 * Nat.sqrt (4 * (3 * 757 + 4))) =
-        8 * Nat.sqrt (4 * (3 * 757 + 4)) := by rw [← Nat.mul_assoc]
+    have h2 : 2 * (4 * isqrt (4 * (3 * 757 + 4))) =
+        8 * isqrt (4 * (3 * 757 + 4)) := by rw [← Nat.mul_assoc]
     rw [h2]; omega
   exact ⟨by decide, hgoal, by decide, by decide⟩
 
@@ -77,12 +77,12 @@ theorem R2_191_is_not_attainable : 191 % 6 = 5 ∧ 757 % 6 = 1 := by decide
 /-- **`M = 43` is on the canonical domain and does NOT bind.**  It satisfies the
 hypothesis at `k = 1` but also satisfies the coefficient-47 conclusion. -/
 theorem R2_43_is_canonical_but_not_binding :
-    (43 % 6 = 1) ∧ (43 : Nat) < 2 * (1 * Nat.sqrt (4 * (3 * 43 + 4))) ∧
+    (43 % 6 = 1) ∧ (43 : Nat) < 2 * (1 * isqrt (4 * (3 * 43 + 4))) ∧
       (43 ≤ 47 * (1 * 1) + 1) := by
   have hsqrt := R2_sqrt_43
-  have hgoal : (43 : Nat) < 2 * (1 * Nat.sqrt (4 * (3 * 43 + 4))) := by
-    have h1 : 2 * 23 ≤ 2 * Nat.sqrt (4 * (3 * 43 + 4)) := Nat.mul_le_mul_left 2 hsqrt
-    have h2 : 2 * (1 * Nat.sqrt (4 * (3 * 43 + 4))) = 2 * Nat.sqrt (4 * (3 * 43 + 4)) := by
+  have hgoal : (43 : Nat) < 2 * (1 * isqrt (4 * (3 * 43 + 4))) := by
+    have h1 : 2 * 23 ≤ 2 * isqrt (4 * (3 * 43 + 4)) := Nat.mul_le_mul_left 2 hsqrt
+    have h2 : 2 * (1 * isqrt (4 * (3 * 43 + 4))) = 2 * isqrt (4 * (3 * 43 + 4)) := by
       rw [Nat.one_mul]
     rw [h2]; omega
   exact ⟨by decide, hgoal, by decide⟩

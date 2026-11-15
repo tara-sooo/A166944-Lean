@@ -32,7 +32,7 @@ theorem moving_horizon_path_travel_by_six_cover {s C sf Cf p U : Nat}
     (hU : ∀ j : Nat, IsReplayEventStart s sf j → D j ≤ U)
     (cover : List Nat)
     (hcover : ∀ j : Nat, IsReplayEventStart s sf j → 6 ∣ D j → j ∈ cover) :
-    sf - s ≤ 6 * p + cover.length * (Nat.sqrt (4 * (U + 1)) - 6) := by
+    sf - s ≤ 6 * p + cover.length * (isqrt (4 * (U + 1)) - 6) := by
   induction p generalizing s C cover with
   | zero =>
       obtain ⟨rfl, _, _⟩ := hpath
@@ -95,7 +95,7 @@ theorem canonical_travel_bound_of_six_cover {M sf Cf p : Nat}
     (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
     (cover : List Nat)
     (hcover : ∀ j : Nat, IsReplayEventStart (M + 2) sf j → 6 ∣ D j → j ∈ cover)
-    (hbudget : 2 * (6 * p + cover.length * (Nat.sqrt (4 * (3 * M + 4)) - 6)) ≤ M) :
+    (hbudget : 2 * (6 * p + cover.length * (isqrt (4 * (3 * M + 4)) - 6)) ≤ M) :
     2 * (sf - (M + 2)) ≤ M := by
   by_cases h : 2 * (sf - (M + 2)) ≤ M
   · exact h
@@ -119,7 +119,7 @@ theorem canonical_travel_bound_of_six_cover {M sf Cf p : Nat}
     have hcover' (j : Nat) (hj : IsReplayEventStart (M + 2) r j) (hdiv : 6 ∣ D j) :
         j ∈ cover := hcover j ⟨hj.1, by have := hj.2.1; omega, hj.2.2⟩ hdiv
     have ht := moving_horizon_path_travel_by_six_cover hto hU cover hcover'
-    change r - (M + 2) ≤ 6 * (q + 1) + cover.length * (Nat.sqrt (4 * (3 * M + 4)) - 6) at ht
+    change r - (M + 2) ≤ 6 * (q + 1) + cover.length * (isqrt (4 * (3 * M + 4)) - 6) at ht
     omega
 
 end A166944Research

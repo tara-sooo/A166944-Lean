@@ -276,7 +276,7 @@ def PotentialCrossingBudgetCondition210 (netCost : ResidualPhaseEvent210 → Int
     HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance →
     IsMovingHorizonStep s C r C' → 2 * (s - (M + 2)) ≤ M → M < 2 * (r - (M + 2)) →
-    r - s ≤ Nat.sqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
+    r - s ≤ isqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
     ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance,
       (∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2)) →
       (∑ i, netCost (trace.event i)) + (24 * (r - s) + overhead : Nat) ≤ (M : Int)
