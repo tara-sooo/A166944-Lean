@@ -107,7 +107,7 @@ directly. Bounding either one from above is equivalent to bounding `p`, so
 phrasing the gap as "`T` has no upper bound" is true but not the useful form: the
 missing input is the count.
 
-## Eleven independent routes to the same missing bound
+## Twelve independent routes to the same missing bound
 
 Recorded because each was found separately and they agree, which is the strongest
 evidence available that the diagnosis is right and not an artefact of one
@@ -126,6 +126,7 @@ formulation. All five are kernel-checked in the modules named.
 | the excess sum is not independent | `ExcessIdentity.lean` | substituting `B sf = (M-2) + S - travel` into the scaled form returns `2*travel <= M`; a bound on `S` alone cannot suffice |
 | the divisor structure is slack | `ExcessSumInterval.lean` | the event value divides the horizon and the index, but is three to four orders of magnitude smaller than the index, so the constraint leaves the quotient free |
 | excursions | `BandReentry.lean`, `BandExcursion.lean` | a replay leaves the capped band and re-enters it, so a tail cannot be packaged as one in-band suffix; the exit shape is `2*(r-s)+1 <= M`, which is vacuous in `M` |
+| minimum form and quiet windows | `HalfWindow.lean` | the gap obeys `r - s <= 2 * min (d r) v` and a quiet window yields `C - s - 1 <= f`; but the cofactor binds in only 16 of 1050 steps, so the sum collapses to route 4, and the window statements already hold at `M = 13` |
 
 The first five together eliminate `B sf`, leaving a relation among `p`, `sf` and
 `S`; the third says the proven count bounds cannot close it; the fifth says the
