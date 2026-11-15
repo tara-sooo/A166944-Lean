@@ -25,6 +25,36 @@ Focused research tasks will use separately assigned child Issues as they are cre
 - `RESEARCH_PROTOCOL.md` — external-status, novelty, semantic-fidelity, and correction checks.
 - `PROVENANCE.md` — AI/tool provenance and audit ledger.
 
+## Where this is connected
+
+The reduction to the Twin Prime Conjecture is published on
+[Prove2Me](https://prove2.me), in the environment the platform currently defaults
+to (Mathlib `0df444a`, Lean v4.33.1). The mission points at a different, isolated
+environment, so the route appears under the v4.33.1 instance of
+`twin_prime_conjecture` rather than on the mission page; a v4.29 re-publication is
+planned but not done.
+
+What is there, all machine-checked and accepted:
+
+| kind | name |
+| --- | --- |
+| Definition | `a166944_record_core`, `a166944_moving_horizon`, `a166944_canonical`, `a166944_composite_test` |
+| Proved | `difference_records_unbounded`, `record_index_iff_canonical_returns`, `unbounded_greater_twin_primes_of_target`, `composite_differences_below_1000`, `a166944_target_of_travel`, `band_exit_gap_le_half_record_v2` |
+| Open | `a166944_record_is_greater_twin_prime`, `twin_prime_conjecture_of_target`, **`a166944_travel_bound_from_45895573`** |
+
+`GET /api/v1/theorems/<twin_prime_conjecture id>/open-leaves` returns exactly two
+entries: `prime_k_tuple_conjecture` (the pre-existing analytic route) and
+`a166944_travel_bound_from_45895573`. So the whole A166944 route is, as far as the
+platform is concerned, one inequality.
+
+`prove2me/` holds the generator that inlines helpers into a self-contained
+solution, the solutions themselves, and the workflow that compiles them against
+stubbed Definition bundles before a submission is spent. Two things learned the
+hard way are recorded there: Lean treats `{M s C r C'}` and `{s C r C' M}` as
+different types, so a formal statement must be generated from the declaration
+rather than retyped; and a theorem name cannot be reused once published, so a
+corrected statement needs a new name.
+
 ## Current research position
 
 The current attack studies the recurrence through
@@ -59,7 +89,8 @@ other entry points are siblings, so "which gate to close" has eight incomparable
 answers rather than one. `REACH.md` records the unconditional side: the finite
 replay certificates reach `RecordsVerifiedThrough 11751795063`, and what stands
 between them and `Target` is one uniform bound. As of this revision that bound
-has been pinned down from five independent directions and they agree:
+has been pinned down from twelve independent directions and they agree. `REACH.md`
+carries the full table with statements; in outline:
 
 - `TravelReduction.lean` — travel is *exactly* the index cap `2*sf <= 3*M+4`,
   and the state bound `Cf <= 2*sf` cannot supply it (`state_bound_alone_is_not_travel`);
@@ -71,7 +102,25 @@ has been pinned down from five independent directions and they agree:
   the reservoir at the exit is determined by the accumulated excess;
 - `ExitBand.lean` — the slack bound `Cf - sf <= 2*M - 4` holds at every canonical
   exit, including the five that are not dangerous, but only on the hypothesis
-  `sf <= 2*M - 4`.
+  `sf <= 2*M - 4`;
+- `ExitCoordinates.lean` — the value coordinate cannot bound `sf` from above:
+  `a sf / sf` tends to `3`, so the available bound is tight;
+- `ExitThreshold.lean`, `CrossingRoute.lean` — a crossing is equivalent to a
+  horizon cap, and the crossing precondition holds with enormous margin, so no
+  crossing theorem forbids one;
+- `RoomLedger.lean` — `Cf - sf = B sf - 2` exactly, so the room coordinate carries
+  the same information as the reservoir;
+- `ExcessIdentity.lean` — substituting the reservoir ledger into the scaled form
+  returns the travel bound, so a bound on `S` alone cannot suffice;
+- `ExcessSumInterval.lean` — the event value divides the horizon and the index,
+  but is three to four orders of magnitude smaller than the index, so the
+  constraint leaves the quotient free;
+- `BandReentry.lean`, `BandExcursion.lean` — a replay leaves the capped band and
+  re-enters it, so a tail cannot be packaged as one in-band suffix; the exit shape
+  `2*(r-s)+1 <= M` is vacuous in `M`;
+- `HalfWindow.lean` — the minimum form `r - s <= 2 * min (d r) v` and the quiet
+  window statements; the cofactor binds in only 16 of 1050 measured steps, so the
+  sum collapses to the `GapBound` route.
 
 So the missing input is a uniform bound on the terminal index `sf` (equivalently
 on the event count `p`, equivalently a lower bound on `B sf`). `EventCountFails.lean`
