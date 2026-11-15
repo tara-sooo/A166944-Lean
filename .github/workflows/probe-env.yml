@@ -169,6 +169,92 @@ jobs:
           printf 'import Mathlib.Data.Nat.Sqrt\n#check Nat.sqrt\n' > /tmp/SqrtProbe.lean
           lake env lean /tmp/SqrtProbe.lean && echo "  import Mathlib.Data.Nat.Sqrt works" || echo "  import failed"
 
+      # ------------------------------------------------------------------
+      # Can the 118 KB single-file solution build in THIS environment?
+      #
+      # `Sol_target_of_travel.lean` imports only the two platform Definition
+      # bundles -- no library at all beyond them -- and uses `omega`, `simp`
+      # and `decide` (276 / 139 / 31 occurrences). The bundles are stubbed
+      # here exactly as `check-solution.yml` stubs them, because the platform
+      # hands a submission no library other than those two modules.
+      #
+      # This is the question that decides whether the A166944 route can be
+      # resubmitted to the Twin Prime Conjecture mission at all: that mission
+      # is pinned to v4.29.0-rc3, so a solution that only compiles under
+      # v4.33.1 cannot reach it. Runs before the recurrence-side build
+      # because it needs nothing from it -- only the Mathlib cache above.
+      # ------------------------------------------------------------------
+      - name: Check the single-file solution in this environment
+        working-directory: probe
+        run: |
+          set -euo pipefail
+          mkdir -p Definitions
+          cat > Definitions/Def_a166944_record_core.lean <<'STUBEOF'
+          import Mathlib.Data.Nat.Prime.Defs
+
+          namespace A166944Research
+
+          def a : Nat → Nat
+            | 0 => 0
+            | 1 => 2
+            | n + 2 =>
+              let prev := a (n + 1)
+              let idx := n + 2
+              if idx % 2 = 0 then prev + Nat.gcd idx prev
+              else prev + Nat.gcd (idx - 2) prev
+
+          def d (n : Nat) : Nat := a n - a (n - 1)
+          def D (n : Nat) : Nat := a n - n
+
+          def IsDifferenceRecord (R : Nat) : Prop :=
+            ∃ n : Nat, 2 ≤ n ∧ d n = R ∧ ∀ k : Nat, 2 ≤ k → k < n → d k < R
+
+          def IsGreaterTwinPrime (p : Nat) : Prop := p.Prime ∧ (p - 2).Prime
+          def Target : Prop := ∀ R : Nat, 5 < R → IsDifferenceRecord R → IsGreaterTwinPrime R
+
+          end A166944Research
+          STUBEOF
+          cat > Definitions/Def_a166944_moving_horizon.lean <<'STUBEOF'
+          import Definitions.Def_a166944_record_core
+
+          namespace A166944Research
+
+          def IsMovingHorizonState (s C : Nat) : Prop := 2 ≤ s ∧ D s = C ∧ s < C
+
+          def IsMovingHorizonStep (s C r C' : Nat) : Prop :=
+            IsMovingHorizonState s C ∧ s < r ∧ r ≤ C ∧ 1 < d r ∧
+              (∀ j : Nat, s < j → j < r → d j = 1) ∧
+              D (r - 1) = C ∧ C' = D r ∧ C + 2 ≤ C' ∧ IsMovingHorizonState r C'
+
+          def HasMovingHorizonPathTo (s C sf Cf : Nat) : Nat → Prop
+            | 0 => s = sf ∧ C = Cf ∧ IsMovingHorizonState s C
+            | Nat.succ q =>
+                IsMovingHorizonState s C ∧
+                  ∃ r C', IsMovingHorizonStep s C r C' ∧
+                    HasMovingHorizonPathTo r C' sf Cf q
+
+          def IsAttainedPreviousMaximum (P k : Nat) : Prop :=
+            (∀ j : Nat, 2 ≤ j → j ≤ k → d j ≤ P) ∧
+              ∃ r : Nat, 2 ≤ r ∧ r ≤ k ∧ d r = P
+
+          end A166944Research
+          STUBEOF
+
+          # Same LEAN_PATH trick as check-solution.yml: `Definitions.X`
+          # resolves to `Definitions/X.olean` under a LEAN_PATH entry, and the
+          # second stub imports the first by module name.
+          build() { lake env bash -c "LEAN_PATH=\"$PWD:\$LEAN_PATH\" lean -o '$1' '$2'"; }
+          build Definitions/Def_a166944_record_core.olean Definitions/Def_a166944_record_core.lean
+          test -f Definitions/Def_a166944_record_core.olean
+          build Definitions/Def_a166944_moving_horizon.olean Definitions/Def_a166944_moving_horizon.lean
+          test -f Definitions/Def_a166944_moving_horizon.olean
+          echo "stub oleans built"
+
+          cp ../prove2me/solutions/Sol_target_of_travel.lean Check.lean
+          echo "=== compiling Sol_target_of_travel.lean under ${{ github.event.inputs.toolchain }} ==="
+          lake env bash -c "LEAN_PATH=\"$PWD:\$LEAN_PATH\" lean Check.lean"
+          echo "SOL RESULT: compiled cleanly in this environment"
+
       - name: Build the recurrence-side modules
         working-directory: probe
         run: |
@@ -211,6 +297,56 @@ jobs:
             A166944.TwinSweep \
             A166944.RecordCoordinates \
             A166944.BCapDictionary
+
+      # ------------------------------------------------------------------
+      # How much of any failure is `Nat.sqrt` alone?
+      #
+      # `CanonicalTravel.lean` is the single file in the tree that imports
+      # `Init.Data.Nat.Sqrt`. Under v4.33.1 the toolchain carries that module;
+      # under v4.29.0-rc3 it does not, and Mathlib owns it instead. Step
+      # "Locate Nat.sqrt in this environment" reports where it lives; this
+      # step measures the consequence.
+      #
+      # This is a measurement, not a repository change: the pristine pinned
+      # copy is restored first, then patched in the scratch tree only. The
+      # rewrite points the import at `Mathlib.Data.Nat.Sqrt` (confirmed to
+      # exist at the pinned revision) and leaves every proof term alone --
+      # `Nat.sqrt`, `Nat.sqrt_le`, `Nat.lt_succ_sqrt` and `Nat.sqrt_le_sqrt`
+      # are the same names on both sides of the move.
+      # ------------------------------------------------------------------
+      - name: Measure how much of any failure is Nat.sqrt alone
+        if: always()
+        working-directory: probe
+        run: |
+          set -uo pipefail
+          if [ ! -f lake-manifest.json ]; then
+            echo "no manifest -- environment never came up, skipping the sqrt measurement"
+            exit 0
+          fi
+          rm -rf A166944
+          cp -r ../A166944 A166944
+          echo "--- files importing the missing root (pristine) ---"
+          grep -rln 'import Init.Data.Nat.Sqrt' A166944/ || echo "  none"
+          # Repoint the root at Mathlib, in the scratch copy only.
+          find A166944 -name '*.lean' -exec grep -l 'Init\.Data\.Nat\.Sqrt' {} + \
+            | while read -r f; do
+                sed -i 's#import Init\.Data\.Nat\.Sqrt#import Mathlib.Data.Nat.Sqrt#' "$f"
+                echo "  repointed: $f"
+              done
+          echo "--- files still importing the missing root ---"
+          grep -rln 'Init.Data.Nat.Sqrt' A166944/ || echo "  none"
+          echo "--- rebuilding the modules that depend on CanonicalTravel ---"
+          ok=0; bad=0; badlist=""
+          for m in CanonicalTravel CountBoundLimits RoomLedger ExcessIdentity \
+                   OrphanHarvest TravelTarget; do
+            if lake build "A166944.$m" >"/tmp/sq_$m.log" 2>&1; then
+              echo "SQRTFREE OK   : A166944.$m"; ok=$((ok+1))
+            else
+              echo "SQRTFREE FAIL : A166944.$m"; bad=$((bad+1)); badlist="$badlist $m"
+              grep -E 'error' "/tmp/sq_$m.log" | head -8 || true
+            fi
+          done
+          echo "SQRTFREE SUMMARY: ok=$ok fail=$bad${badlist:+ failed:$badlist}"
 
       - name: Build the Mathlib-dependent modules
         working-directory: probe
