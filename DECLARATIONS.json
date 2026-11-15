@@ -39,6 +39,7 @@
   "GapBound": 2,
   "HorizonCrossing": 25,
   "Lemmas": 295,
+  "OrphanHarvest": 5,
   "Q1Witness": 4,
   "Q2TailKill": 9,
   "Q3Barrier": 6,
@@ -120,5 +121,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1714
+ "total": 1719
 }
