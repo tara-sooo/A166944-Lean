@@ -65,6 +65,7 @@
   "RecordIndexBounds": 2,
   "RecordReplay": 27,
   "RecurrenceDeficit210": 7,
+  "RelaxedCap": 4,
   "RenormalizedGrowth": 7,
   "ReplayLaunch": 10,
   "ReplayOffset210": 20,
@@ -129,5 +130,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1783
+ "total": 1787
 }
