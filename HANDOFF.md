@@ -6,8 +6,8 @@ repository and the live APIs; nothing is projected.
 ## Repository
 
 ```
-branch   main, clean, HEAD 5c98ce6
-size     170 modules, 2378 declarations
+branch   main, clean, HEAD ff6428d
+size     171 modules, 2454 declarations
 CI       A166944 canonical verification: success on 2de8437
 guard    DECLARATIONS.json + the explicit module list in verify.yml, both 170
 ```
@@ -40,6 +40,36 @@ Sixteen routes have been closed. The useful record of why is `ANALYSIS_WHY_STUCK
 4. the twin-prime-centre coincidence is an artefact (observed <= expected under the
    correct null model);
 5. `sum e / (3M/8) <= 0.731` fails at `M = 13` and `M = 43`.
+
+## The barrier, in its smallest form (new, and verified independently)
+
+`S` is not determined by twin primes. It is determined by the Rowland excess at the
+doubling index. Over all fourteen replayable records below 3.2 million,
+
+```
+Cf = D (2M - 2)        and        S = E (2M - 2)
+```
+
+where `D n = a n - n` and `E n = a n - 2n`. `DoublingReadoff.lean` carries this.
+
+The reading index `2M - 2` is **larger** than the replay's own final index (at `M = 139`,
+276 against 156), so `S` is not a function of where the replay stopped. That is why the
+twin-prime-centre reading was wrong for a structural reason, not just by counterexample.
+
+The cap `S <= (M+4)/2` becomes `2 * E (2M-2) <= M + 4`, which follows from
+`4 * E n <= n` at `n = 2M - 2`. The repository's global result `a n <= 3n` gives only
+`E n <= n`. **The gap is a factor of four and it is attained** -- `E 18 = 18` and
+`E 156 = 156` -- so no global growth bound can be improved to close it.
+
+So the barrier is now a single statement about one window:
+
+```
+D increases by at most C/2 + O(1) across the doubling window [C, 2C]
+equivalently, the mean of d over (C, 2C] is at least 3/2
+```
+
+Measured, that mean is 2.00006 to 2.11538. But `E 18 = 18` shows `d` can spike locally,
+which is why every global estimate falls short by exactly this factor.
 
 ## The three most recent findings
 
