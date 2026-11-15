@@ -107,11 +107,11 @@ directly. Bounding either one from above is equivalent to bounding `p`, so
 phrasing the gap as "`T` has no upper bound" is true but not the useful form: the
 missing input is the count.
 
-## Twelve independent routes to the same missing bound
+## 12 formulations of the same missing bound
 
 Recorded because each was found separately and they agree, which is the strongest
 evidence available that the diagnosis is right and not an artefact of one
-formulation. All five are kernel-checked in the modules named.
+formulation. All 12 are kernel-checked in the modules named.
 
 | route | module | statement |
 | --- | --- | --- |
@@ -130,7 +130,7 @@ formulation. All five are kernel-checked in the modules named.
 
 The first five together eliminate `B sf`, leaving a relation among `p`, `sf` and
 `S`; the third says the proven count bounds cannot close it; the fifth says the
-slack bound needs the same index bound as everything else. The last six close the
+slack bound needs the same index bound as everything else. The remaining 7 close the
 remaining coordinates one at a time: every one of them is exact, or vacuous, or
 reduces to the statement being proved. Hence:
 **one uniform bound on the terminal index `sf`**, equivalently on the event count

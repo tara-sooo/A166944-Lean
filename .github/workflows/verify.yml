@@ -111,6 +111,12 @@ jobs:
             A166944.ExcessLower \
             A166944.ExcessGap \
             A166944.TerminalRigidity \
+            A166944.AuditCapBRadius \
+            A166944.AuditExcessExistential \
+            A166944.AuditRoutes \
+            A166944.AuditSharp48Domain \
+            A166944.AuditCountFailures \
+            A166944.AuditAttainmentLower \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

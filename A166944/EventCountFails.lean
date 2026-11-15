@@ -9,11 +9,13 @@ import A166944.BStepLaw
     hcount : 48 * (p * p) + 1 < M.
 
 This file records that `hcount` is **not** a general truth about canonical exits:
-it fails at five of the fourteen records a sweep to 2.5 million reaches, the
-largest being `M = 2659`. So it is a genuine side condition, not a restatement of
-something already known, and any route that needs it has to establish it.
+it fails at `M = 13`, `M = 43`, `M = 139`, `M = 313` and `M = 2659` among the records
+a sweep to 2.5 million reaches. The smallest failure is `M = 13`, not `M = 139` --
+an earlier version of this file said otherwise, and `CapBCandidates.capB_fails_at_13`
+proves the `M = 13` failure directly. So `hcount` is a genuine side condition, not a
+restatement of something already known.
 
-The smallest failure is `M = 139`, whose canonical replay is two steps long:
+The `M = 139` failure is worth writing out because its replay is short:
 
     (141, 276) --[gap 9, value 25]--> (150, 300) --[gap 6, value 13]--> (156, 312)
 

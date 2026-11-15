@@ -4,6 +4,12 @@
   "AbsorptionCriterion": 5,
   "AttainmentIsFree": 18,
   "Attempt": 2,
+  "AuditAttainmentLower": 8,
+  "AuditCapBRadius": 7,
+  "AuditCountFailures": 7,
+  "AuditExcessExistential": 18,
+  "AuditRoutes": 6,
+  "AuditSharp48Domain": 11,
   "BCapDictionary": 11,
   "BCoordinates": 24,
   "BIntegrate": 1,
@@ -141,5 +147,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1966
+ "total": 2023
 }

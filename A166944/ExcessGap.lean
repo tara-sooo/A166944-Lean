@@ -13,6 +13,20 @@ with `S` the accumulated excess and `p` the step count of a canonical replay. It
 worth knowing that this is **not** a new route to the relaxed index cap, and this
 module records why, together with a refutation of its threshold-free form.
 
+## A limitation of the separation claim
+
+The module's `excess_criterion_is_strictly_sharper` states
+
+    exists M S p, 8*(S+p) <= 3*M - 9 and not (48*p*p + 1 < M)
+
+and an earlier version of this header read that as proving the two criteria have
+different strength. It does not: `S` and `p` are free existential variables, so the
+statement only says such a triple exists. `ExcessGap`'s companion in the audit
+records the sharper form of the objection -- the same shape holds with `S = 0`, a
+value no canonical replay takes, so the two criteria are not being compared on one
+replay. A real separation needs `(S, p)` proved to be the actual values of a
+canonical start, and that proof is not here.
+
 ## The refutation
 
 Without the threshold the criterion is false, and not because of a bad choice of `S`:
