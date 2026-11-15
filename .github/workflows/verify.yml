@@ -128,6 +128,7 @@ jobs:
             A166944.ConsecutiveEventGcd \
             A166944.RoomCount \
             A166944.PinnedCharacterization \
+            A166944.SqrtFreeTransport \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

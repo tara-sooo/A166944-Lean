@@ -8,7 +8,7 @@
   "AuditCapBRadius": 7,
   "AuditCountFailures": 7,
   "AuditExcessExistential": 18,
-  "AuditRoutes": 6,
+  "AuditRoutes": 5,
   "AuditSharp48Domain": 11,
   "BCapDictionary": 11,
   "BCoordinates": 24,
@@ -124,6 +124,7 @@
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
   "Sharp48": 17,
+  "SqrtFreeTransport": 3,
   "StoppingCriterion": 4,
   "TailReduction": 12,
   "TargetDefs": 3,
@@ -158,5 +159,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2217
+ "total": 2219
 }
