@@ -133,6 +133,11 @@ jobs:
             A166944.AngleC_Path13 \
             A166944.AngleC_Route \
             A166944.AngleC_Relaxed \
+            A166944.AngleF_Counting \
+            A166944.AngleC_Refute_F \
+            A166944.AngleC_Refute_F2 \
+            A166944.AngleC_Refute_F4 \
+            A166944.AngleC_Refute_F5 \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \

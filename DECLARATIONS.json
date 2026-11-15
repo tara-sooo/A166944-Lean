@@ -4,8 +4,13 @@
   "AbsorptionCriterion": 5,
   "AngleC_Composite": 19,
   "AngleC_Path13": 36,
+  "AngleC_Refute_F": 33,
+  "AngleC_Refute_F2": 12,
+  "AngleC_Refute_F4": 14,
+  "AngleC_Refute_F5": 5,
   "AngleC_Relaxed": 9,
   "AngleC_Route": 6,
+  "AngleF_Counting": 12,
   "AttainmentIsFree": 18,
   "Attempt": 2,
   "AuditAttainmentLower": 8,
@@ -163,5 +168,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2289
+ "total": 2365
 }
