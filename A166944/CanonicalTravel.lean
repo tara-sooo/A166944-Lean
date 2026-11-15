@@ -1,4 +1,4 @@
-import Init.Data.Nat.Sqrt
+import A166944.Isqrt
 import A166944.CanonicalGrowth
 
 /-!
@@ -26,18 +26,18 @@ theorem moving_horizon_step_gap_square {s C r C' : Nat}
 
 theorem moving_horizon_step_gap_le_sqrt {s C r C' U : Nat}
     (hstep : IsMovingHorizonStep s C r C') (hCU : C ≤ U) :
-    r - s ≤ Nat.sqrt (4 * (U + 1)) := by
+    r - s ≤ isqrt (4 * (U + 1)) := by
   have hsq := moving_horizon_step_gap_square hstep
-  have hup := Nat.lt_succ_sqrt (4 * (U + 1))
-  by_cases h : r - s ≤ Nat.sqrt (4 * (U + 1))
+  have hup := lt_succ_isqrt (4 * (U + 1))
+  by_cases h : r - s ≤ isqrt (4 * (U + 1))
   · exact h
-  · have hle : (Nat.sqrt (4 * (U + 1))).succ ≤ r - s := by omega
+  · have hle : (isqrt (4 * (U + 1))).succ ≤ r - s := by omega
     have hmul := Nat.mul_le_mul hle hle
     omega
 
 theorem moving_horizon_path_travel_bound {s C sf Cf p U : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) (hU : Cf ≤ U) :
-    sf - s ≤ p * Nat.sqrt (4 * (U + 1)) := by
+    sf - s ≤ p * isqrt (4 * (U + 1)) := by
   induction p generalizing s C with
   | zero =>
       obtain ⟨rfl, _, _⟩ := hpath
@@ -60,13 +60,13 @@ theorem canonical_old_crossing_travel {M s C p r C' : Nat}
     (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) s C p)
     (hstep : IsMovingHorizonStep s C r C') (hcap : d r ≤ M)
     (hbelow : C ≤ 3 * M + 4) (hcross : 3 * M + 4 < C') :
-    M < 2 * ((p + 1) * Nat.sqrt (4 * (3 * M + 4))) := by
+    M < 2 * ((p + 1) * isqrt (4 * (3 * M + 4))) := by
   have hModd : M % 2 = 1 := hcanon ▸ d_mod_two_eq_one_of_three_le (by omega)
   have hCU := (moving_horizon_old_crossing_band hModd hstep hcap hbelow hcross).2
   have hprefix := moving_horizon_path_travel_bound hpath hCU
   have hlast := moving_horizon_step_gap_le_sqrt hstep hCU
-  change s - (M + 2) ≤ p * Nat.sqrt (4 * (3 * M + 4)) at hprefix
-  change r - s ≤ Nat.sqrt (4 * (3 * M + 4)) at hlast
+  change s - (M + 2) ≤ p * isqrt (4 * (3 * M + 4)) at hprefix
+  change r - s ≤ isqrt (4 * (3 * M + 4)) at hlast
   have hbase := moving_horizon_path_index_le hpath
   have hsr := hstep.2.1
   have hC' : C' = D r := hstep.2.2.2.2.2.2.1
@@ -76,13 +76,13 @@ theorem canonical_old_crossing_travel {M s C p r C' : Nat}
   omega
 
 private theorem previous_record_le_of_long_travel {M k : Nat} (hM : 0 < M)
-    (htravel : M < 2 * (k * Nat.sqrt (4 * (3 * M + 4)))) : M ≤ 48 * (k * k) + 1 := by
-  let Q := Nat.sqrt (4 * (3 * M + 4))
+    (htravel : M < 2 * (k * isqrt (4 * (3 * M + 4)))) : M ≤ 48 * (k * k) + 1 := by
+  let Q := isqrt (4 * (3 * M + 4))
   change M < 2 * (k * Q) at htravel
   have hsquare : M * M < (2 * (k * Q)) * (2 * (k * Q)) := by
     have hlt := Nat.mul_lt_mul_of_pos_right htravel hM
     exact Nat.lt_of_lt_of_le hlt (Nat.mul_le_mul_left _ (Nat.le_of_lt htravel))
-  have hQ : Q * Q ≤ 4 * (3 * M + 4) := Nat.sqrt_le _
+  have hQ : Q * Q ≤ 4 * (3 * M + 4) := isqrt_sq_le _
   have hup : M * M < 48 * (k * k) * M + 64 * (k * k) := by
     calc
       M * M < (2 * (k * Q)) * (2 * (k * Q)) := hsquare
@@ -178,10 +178,10 @@ theorem canonical_travel_bound_of_event_count {M sf Cf p : Nat}
   have hModd : M % 2 = 1 := hcanon ▸ d_mod_two_eq_one_of_three_le (by omega)
   have hCU : Cf ≤ 3 * M + 3 := by omega
   have hgap := moving_horizon_path_travel_bound hpath hCU
-  change sf - (M + 2) ≤ p * Nat.sqrt (4 * (3 * M + 4)) at hgap
+  change sf - (M + 2) ≤ p * isqrt (4 * (3 * M + 4)) at hgap
   by_cases h : 2 * (sf - (M + 2)) ≤ M
   · exact h
-  · have hlong : M < 2 * (p * Nat.sqrt (4 * (3 * M + 4))) := by omega
+  · have hlong : M < 2 * (p * isqrt (4 * (3 * M + 4))) := by omega
     have hb := previous_record_le_of_long_travel (by omega) hlong
     omega
 
@@ -211,11 +211,11 @@ theorem moving_horizon_path_travel_of_common_multiple {s C sf Cf p P : Nat}
 /-- One run per gap between exceptional increments, with a first-hit
 gap bound for each exception. -/
 def divisorTravelBudget (P U k : Nat) : Nat :=
-  (3 * (P - 1)) * (k + 1) + k * Nat.sqrt (4 * (U + 1))
+  (3 * (P - 1)) * (k + 1) + k * isqrt (4 * (U + 1))
 
 private theorem divisorTravelBudget_succ (P U k : Nat) :
     divisorTravelBudget P U (k + 1) =
-      divisorTravelBudget P U k + 3 * (P - 1) + Nat.sqrt (4 * (U + 1)) := by
+      divisorTravelBudget P U k + 3 * (P - 1) + isqrt (4 * (U + 1)) := by
   unfold divisorTravelBudget
   simp only [Nat.mul_add, Nat.add_mul, Nat.mul_one, Nat.one_mul]
   omega

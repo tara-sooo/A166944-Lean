@@ -212,7 +212,7 @@ theorem rebalanced_first_crossing_growth_constraints210 {M s C r C' p first : Na
   exact ⟨by omega, by omega, by omega⟩
 
 theorem crossing_growth_ratios_of_gap_bound210 {M G H g : Nat}
-    (hM : 50000000 ≤ M) (gap : g ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (hM : 50000000 ≤ M) (gap : g ≤ isqrt (4 * (3 * M + 4)))
     (growth : M < 5 * G + 2 * g + 2) (largeGapGrowth : M < 13 * H + 6 * g + 16) :
     100 * M < 501 * G ∧ M < 14 * H := by
   have hgap := (Nat.mul_le_mul_left 1536 gap).trans (fifty_million_sqrt_budget hM)
@@ -226,7 +226,7 @@ def RebalancedRemainingCrossingConditionFrom210 (threshold : Nat) : Prop :=
     HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance →
     IsMovingHorizonStep s C r C' → 2 * (s - (M + 2)) ≤ M → M < 2 * (r - (M + 2)) →
-    r - s ≤ Nat.sqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
+    r - s ≤ isqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
     ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance,
       (∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2)) →
       M < 5 * (C - (2 * M - 2)) + 2 * (r - s) + 2 →

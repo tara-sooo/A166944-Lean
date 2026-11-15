@@ -5,7 +5,7 @@ import A166944.CanonicalTravel
 
 `CanonicalTravel.previous_record_le_of_long_travel` proves
 
-    M < 2 * (k * Nat.sqrt (4 * (3 * M + 4)))  ->  M <= 48 * (k * k) + 1,
+    M < 2 * (k * isqrt (4 * (3 * M + 4)))  ->  M <= 48 * (k * k) + 1,
 
 and 48 is the only place that constant enters the development: everything
 downstream -- `canonical_old_crossing_event_count`,
@@ -38,9 +38,9 @@ the obstacle.
 
 ## A missing sqrt direction
 
-`sqrt_ge_of_sq_le` -- `m * m <= n` implies `m <= Nat.sqrt n` -- was not in the
-tree. The converse direction `Nat.sqrt_le` was, and `decide` cannot evaluate
-`Nat.sqrt`, so the lower estimate needed this lemma.
+`sqrt_ge_of_sq_le` -- `m * m <= n` implies `m <= isqrt n` -- was not in the
+tree. The converse direction `isqrt_sq_le` was, and `decide` cannot evaluate
+`isqrt`, so the lower estimate needed this lemma.
 
 ## A caution recorded from the attempt
 
@@ -56,16 +56,16 @@ namespace A166944Research
 
 /-! ## 1. The square-root direction the tree was missing -/
 
-/-- **Lower square-root bound.**  A square below `n` bounds `Nat.sqrt n` from
-*below*.  This is what makes a concrete `Nat.sqrt` value usable without `decide`. -/
-theorem sqrt_ge_of_sq_le {n m : Nat} (h : m * m ≤ n) : m ≤ Nat.sqrt n := by
-  by_cases hle : m ≤ Nat.sqrt n
+/-- **Lower square-root bound.**  A square below `n` bounds `isqrt n` from
+*below*.  This is what makes a concrete `isqrt` value usable without `decide`. -/
+theorem sqrt_ge_of_sq_le {n m : Nat} (h : m * m ≤ n) : m ≤ isqrt n := by
+  by_cases hle : m ≤ isqrt n
   · exact hle
   · exfalso
-    have h1 : Nat.sqrt n + 1 ≤ m := by omega
-    have h2 : (Nat.sqrt n + 1) * (Nat.sqrt n + 1) ≤ m * m :=
+    have h1 : isqrt n + 1 ≤ m := by omega
+    have h2 : (isqrt n + 1) * (isqrt n + 1) ≤ m * m :=
       Nat.mul_self_le_mul_self h1
-    have h3 : n < (Nat.sqrt n + 1) * (Nat.sqrt n + 1) := Nat.lt_succ_sqrt n
+    have h3 : n < (isqrt n + 1) * (isqrt n + 1) := lt_succ_isqrt n
     omega
 
 /-! ## 2. Two general helpers, kept free of `omega`-over-products -/
@@ -117,24 +117,24 @@ theorem radicand_at_witness : 4 * (3 * 191 + 4) = 2308 := by decide
 /-- `48^2 <= 2308`. -/
 theorem sq_le_radicand_at_witness : 48 * 48 ≤ 2308 := by decide
 
-/-- `48 <= Nat.sqrt 2308`. -/
-theorem sqrt_radicand_at_witness : 48 ≤ Nat.sqrt 2308 :=
+/-- `48 <= isqrt 2308`. -/
+theorem sqrt_radicand_at_witness : 48 ≤ isqrt 2308 :=
   sqrt_ge_of_sq_le sq_le_radicand_at_witness
 
 /-- **The witness satisfies the hypothesis** of the long-travel bound:
-`191 < 2 * (2 * Nat.sqrt (4 * (3 * 191 + 4)))`. -/
+`191 < 2 * (2 * isqrt (4 * (3 * 191 + 4)))`. -/
 theorem witness_191_satisfies_long_travel :
-    (191 : Nat) < 2 * (2 * Nat.sqrt (4 * (3 * 191 + 4))) := by
+    (191 : Nat) < 2 * (2 * isqrt (4 * (3 * 191 + 4))) := by
   rw [radicand_at_witness]
-  have hmul : 4 * 48 ≤ 4 * Nat.sqrt 2308 := Nat.mul_le_mul_left 4 sqrt_radicand_at_witness
-  have hform : 2 * (2 * Nat.sqrt 2308) = 4 * Nat.sqrt 2308 := by omega
+  have hmul : 4 * 48 ≤ 4 * isqrt 2308 := Nat.mul_le_mul_left 4 sqrt_radicand_at_witness
+  have hform : 2 * (2 * isqrt 2308) = 4 * isqrt 2308 := by omega
   rw [hform]
   omega
 
 /-- **The coefficient 48 is optimal.**  Any `c` for which the long-travel bound
 holds at every `(M, k)` satisfies `48 ≤ c`. -/
 theorem coefficient_forty_eight_is_optimal (c : Nat)
-    (h : ∀ M k : Nat, M < 2 * (k * Nat.sqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :
+    (h : ∀ M k : Nat, M < 2 * (k * isqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :
     48 ≤ c := by
   have hc := h 191 2 witness_191_satisfies_long_travel
   have h4 : (2 : Nat) * 2 = 4 := by decide
@@ -145,7 +145,7 @@ theorem coefficient_forty_eight_is_optimal (c : Nat)
 optimality cannot be misread as a failure of one estimate. -/
 theorem no_smaller_coefficient_works :
     ¬ (∃ c : Nat, c < 48 ∧ ∀ M k : Nat,
-        M < 2 * (k * Nat.sqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) := by
+        M < 2 * (k * isqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) := by
   rintro ⟨c, _, h⟩
   have := coefficient_forty_eight_is_optimal c h
   omega
@@ -162,18 +162,18 @@ private theorem family_radicand {k : Nat} (hk : 1 ≤ k) :
   omega
 
 /-- **Every member of the family satisfies the hypothesis.**  The key step is
-`24 * k <= Nat.sqrt (576 * k * k + 4)`, from `sqrt_ge_of_sq_le` at the square
+`24 * k <= isqrt (576 * k * k + 4)`, from `sqrt_ge_of_sq_le` at the square
 `(24 * k)^2 = 576 * (k * k)`. -/
 theorem family_satisfies_long_travel (k : Nat) (hk : 1 ≤ k) :
-    48 * (k * k) - 1 < 2 * (k * Nat.sqrt (4 * (3 * (48 * (k * k) - 1) + 4))) := by
+    48 * (k * k) - 1 < 2 * (k * isqrt (4 * (3 * (48 * (k * k) - 1) + 4))) := by
   rw [family_radicand hk]
   have h24 : (24 * k) * (24 * k) = 576 * (k * k) := by
     rw [show (24 * k) * (24 * k) = (24 * 24) * (k * k) by ac_rfl]
   have hsq : (24 * k) * (24 * k) ≤ 576 * (k * k) + 4 := by omega
-  have hge : 24 * k ≤ Nat.sqrt (576 * (k * k) + 4) := sqrt_ge_of_sq_le hsq
-  have hstep : k * (24 * k) ≤ k * Nat.sqrt (576 * (k * k) + 4) :=
+  have hge : 24 * k ≤ isqrt (576 * (k * k) + 4) := sqrt_ge_of_sq_le hsq
+  have hstep : k * (24 * k) ≤ k * isqrt (576 * (k * k) + 4) :=
     Nat.mul_le_mul_left k hge
-  have hstep2 : 2 * (k * (24 * k)) ≤ 2 * (k * Nat.sqrt (576 * (k * k) + 4)) :=
+  have hstep2 : 2 * (k * (24 * k)) ≤ 2 * (k * isqrt (576 * (k * k) + 4)) :=
     Nat.mul_le_mul_left 2 hstep
   have hid : 2 * (k * (24 * k)) = 48 * (k * k) := by
     rw [show k * (24 * k) = 24 * (k * k) by ac_rfl]
@@ -183,7 +183,7 @@ theorem family_satisfies_long_travel (k : Nat) (hk : 1 ≤ k) :
 
 /-- **The family refutes every smaller coefficient, uniformly in `k`.** -/
 theorem smaller_coefficient_fails_on_family (c k : Nat) (hc : c < 48) (hk : 2 ≤ k) :
-    (48 * (k * k) - 1 < 2 * (k * Nat.sqrt (4 * (3 * (48 * (k * k) - 1) + 4)))) ∧
+    (48 * (k * k) - 1 < 2 * (k * isqrt (4 * (3 * (48 * (k * k) - 1) + 4)))) ∧
       ¬ (48 * (k * k) - 1 ≤ c * (k * k) + 1) :=
   ⟨family_satisfies_long_travel k (by omega),
     fun hcon => family_contradiction hc hk hcon⟩
@@ -191,7 +191,7 @@ theorem smaller_coefficient_fails_on_family (c k : Nat) (hc : c < 48) (hk : 2 �
 /-- **Packaged form.**  For every `c < 48` there is a witness pair `(M, k)`
 satisfying the hypothesis and failing the coefficient-`c` conclusion. -/
 theorem every_smaller_coefficient_has_witness (c : Nat) (hc : c < 48) :
-    ∃ M k : Nat, M < 2 * (k * Nat.sqrt (4 * (3 * M + 4))) ∧
+    ∃ M k : Nat, M < 2 * (k * isqrt (4 * (3 * M + 4))) ∧
       ¬ (M ≤ c * (k * k) + 1) := by
   refine ⟨48 * (2 * 2) - 1, 2, ?_, ?_⟩
   · have hfam := family_satisfies_long_travel 2 (by decide)
@@ -213,9 +213,9 @@ non-existence of a uniform coefficient below 48.  With
 `previous_record_le_of_long_travel` this pins the constant at exactly 48. -/
 theorem forty_eight_sharp :
     (∀ k : Nat, 1 ≤ k → 48 * (k * k) - 1 <
-        2 * (k * Nat.sqrt (4 * (3 * (48 * (k * k) - 1) + 4)))) ∧
+        2 * (k * isqrt (4 * (3 * (48 * (k * k) - 1) + 4)))) ∧
       ¬ (∃ c : Nat, c < 48 ∧ ∀ M k : Nat,
-        M < 2 * (k * Nat.sqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :=
+        M < 2 * (k * isqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :=
   ⟨family_satisfies_long_travel, no_smaller_coefficient_works⟩
 
 /-- **The frontier hypothesis has no slack in its coefficient.**  The statement
@@ -223,7 +223,7 @@ consumed by `canonical_travel_bound_of_event_count` is the coefficient-48 form, 
 by the theorems above the coefficient cannot be reduced while keeping the same proof
 shape.  So `48 * p * p + 1 < M` is the exact strength of this route. -/
 theorem frontier_coefficient_is_sharp (c : Nat)
-    (h : ∀ M k : Nat, M < 2 * (k * Nat.sqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :
+    (h : ∀ M k : Nat, M < 2 * (k * isqrt (4 * (3 * M + 4))) → M ≤ c * (k * k) + 1) :
     48 ≤ c :=
   coefficient_forty_eight_is_optimal c h
 

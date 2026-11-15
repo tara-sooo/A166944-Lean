@@ -26,7 +26,7 @@ def ResidualCrossingBudgetCondition210 : Prop :=
     HasMovingHorizonResidualPhaseBalances210 (primeHorizonPhase 210 (by decide))
       (M + 2) (2 * M - 2) s C [] p first balance →
     IsMovingHorizonStep s C r C' → 2 * (s - (M + 2)) ≤ M → M < 2 * (r - (M + 2)) →
-    r - s ≤ Nat.sqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
+    r - s ≤ isqrt (4 * (3 * M + 4)) → IsAttainedPreviousMaximum M r →
     ((24 * (first + (r - s)) + 1315 : Nat) : Int) + balance ≤ M
 
 theorem crossing_budget_of_signed_reserve_condition210 (bound : ResidualSignedReserveCondition210) :
@@ -47,7 +47,7 @@ theorem crossing_budget_of_two_thirds_growth210 {M s C r p first : Nat} {balance
     (ledger : HasMovingHorizonResidualPhaseBalances210 (primeHorizonPhase 210 (by decide))
       (M + 2) (2 * M - 2) s C [] p first balance)
     (short : 2 * (s - (M + 2)) ≤ M)
-    (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (growthBound : 3 * (((24 * first : Nat) : Int) + balance) ≤
       2 * ((C - (2 * M - 2) : Nat) : Int) + 47652293) :
     ((24 * (first + (r - s)) + 1315 : Nat) : Int) + balance ≤ M := by

@@ -166,7 +166,7 @@ theorem rebalanced_crossing_budget_of_small_growth210 {M s C r p first : Nat} {b
     (hM : 50000000 ≤ M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
     (growth : 150 * (C - (2 * M - 2)) ≤ M) :
@@ -188,7 +188,7 @@ theorem rebalanced_crossing_budget_of_cutoff210 {M s C r p first L : Nat} {balan
     (hM : 50000000 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
     (windows : trace.RebalancedGrowthWindows) (hL : 0 < L)
@@ -213,7 +213,7 @@ theorem rebalanced_crossing_budget_of_windows_eventually210 :
       threshold ≤ M → d (M + 2) = M →
       HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
         (M + 2) (2 * M - 2) s C [] p first balance →
-      2 * (s - (M + 2)) ≤ M → r - s ≤ Nat.sqrt (4 * (3 * M + 4)) →
+      2 * (s - (M + 2)) ≤ M → r - s ≤ isqrt (4 * (3 * M + 4)) →
       ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance, trace.RebalancedGrowthWindows →
         (∑ i, (trace.event i).rebalancedNetCost) + (24 * (r - s) + 1091 : Nat) ≤ (M : Int) := by
   obtain ⟨B, hB⟩ := canonical_first_prime_phase_travel_sublinear 420 128 (by decide)

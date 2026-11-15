@@ -410,7 +410,7 @@ theorem scaled_crossing_budget_of_adjusted_first_bound210 {M s C r p first : Nat
     (hM : 50000000 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (windows : trace.AdjustedGrowthWindows)
     (firstBudget : 64 * (72 * trace.scaledFirstTravel + 13957891) ≤ 61 * M) :
@@ -431,7 +431,7 @@ theorem scaled_crossing_budget_of_adjusted_windows_eventually210 :
       threshold ≤ M → d (M + 2) = M →
       HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
         (M + 2) (2 * M - 2) s C [] p first balance →
-      2 * (s - (M + 2)) ≤ M → r - s ≤ Nat.sqrt (4 * (3 * M + 4)) →
+      2 * (s - (M + 2)) ≤ M → r - s ≤ isqrt (4 * (3 * M + 4)) →
       ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance, trace.AdjustedGrowthWindows →
         (∑ i, (trace.event i).scaledNetCost) + (24 * (r - s) + 1175 : Nat) ≤ (M : Int) := by
   obtain ⟨B, hB⟩ := canonical_first_prime_phase_travel_sublinear 420 128 (by decide)

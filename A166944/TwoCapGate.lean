@@ -65,11 +65,11 @@ namespace A166944Research
 
 /-- E13a: the exact threshold, `4*s ≤ 7*M - 1`.  **COMPILES.** -/
 private theorem b_tight {M s C : Nat} (hM : 968 ≤ M) (h : 4 * s ≤ 7 * M - 1)
-    (hlo : 2 * M - 2 ≤ C) (hhi : C ≤ 3 * M + 4) : 2 * Nat.sqrt (C + 1) < C - s := by
-  let q := Nat.sqrt (C + 1); let b := M / 8
+    (hlo : 2 * M - 2 ≤ C) (hhi : C ≤ 3 * M + 4) : 2 * isqrt (C + 1) < C - s := by
+  let q := isqrt (C + 1); let b := M / 8
   have hb : 121 ≤ b := by omega
   have hb2 := Nat.mul_le_mul_right b hb
-  have hq2 : q * q ≤ C + 1 := Nat.sqrt_le _
+  have hq2 : q * q ≤ C + 1 := isqrt_sq_le _
   have hqb : q < b := by
     by_cases hq : q < b
     · exact hq
@@ -112,7 +112,7 @@ theorem travel_implies_capB_at_threshold {sf : Nat} (h : 45895573 + 2 ≤ sf)
 private theorem quiet_gap_tight {M s C : Nat}
     (hM : 968 ≤ M) (h4 : 4 * s ≤ 7 * M - 1)
     (hlo : 2 * M - 2 ≤ C) (hhi : C ≤ 3 * M + 4) :
-    2 * Nat.sqrt (C + 1) < C - s :=
+    2 * isqrt (C + 1) < C - s :=
   b_tight hM h4 hlo hhi
 
 /-- **THE DECOMPOSED GATE.**  `canonical_next_record_factors_of_short_travel`

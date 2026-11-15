@@ -122,7 +122,7 @@ theorem record_index_and_twin_prime_of_six_cover_from_45895573
       IsAttainedPreviousMaximum M sf →
       ∃ cover : List Nat,
         (∀ j : Nat, IsReplayEventStart (M + 2) sf j → 6 ∣ D j → j ∈ cover) ∧
-        2 * (6 * p + cover.length * (Nat.sqrt (4 * (3 * M + 4)) - 6)) ≤ M) :
+        2 * (6 * p + cover.length * (isqrt (4 * (3 * M + 4)) - 6)) ≤ M) :
     ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
       (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
   apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573
@@ -136,7 +136,7 @@ theorem record_index_and_twin_prime_of_residual_travel_from_45895573
     (hbudget : ∀ {M s C p total : Nat}, 45895573 ≤ M → IsGreaterTwinPrime M → d (M + 2) = M →
       HasMovingHorizonResidualTravel (M + 2) (2 * M - 2) s C p total →
       IsAttainedPreviousMaximum M s → 2 * (s - (M + 2)) ≤ M →
-      6 * (total + Nat.sqrt (4 * (3 * M + 4))) + 10 ≤ M) :
+      6 * (total + isqrt (4 * (3 * M + 4))) + 10 ≤ M) :
     ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
       (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
   apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573
@@ -160,7 +160,7 @@ theorem record_index_and_twin_prime_of_excess_budget_from_45895573
       HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) s C [] p first →
       HasMovingHorizonTravelExcess (M + 2) (2 * M - 2) s C [] p remaining excess →
       IsAttainedPreviousMaximum M s → 2 * (s - (M + 2)) ≤ M →
-      24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 9 * (C - (2 * M - 2)) + excess ≤ 12 * M) :
+      24 * (first + isqrt (4 * (3 * M + 4))) + 9 * (C - (2 * M - 2)) + excess ≤ 12 * M) :
     ∀ {R n : Nat}, 5 < R → 2 ≤ n → d n = R →
       (∀ j : Nat, 2 ≤ j → j < n → d j < R) → n = R + 2 ∧ IsGreaterTwinPrime R := by
   apply record_index_and_twin_prime_of_twin_travel_bound_from_45895573

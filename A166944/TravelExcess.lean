@@ -201,7 +201,7 @@ theorem canonical_first_travel_crossing_excess {M sf Cf q : Nat}
       HasMovingHorizonFirstUseTravel (M + 2) (2 * M - 2) s C [] p first ∧
       IsMovingHorizonStep s C r C' ∧ r ≤ sf ∧ p + 1 ≤ q ∧
       2 * (s - (M + 2)) ≤ M ∧ M < 2 * (r - (M + 2)) ∧
-      C - (2 * M - 2) ≤ M + 5 ∧ r - s ≤ Nat.sqrt (4 * (3 * M + 4)) ∧
+      C - (2 * M - 2) ≤ M + 5 ∧ r - s ≤ isqrt (4 * (3 * M + 4)) ∧
       12 * M < 24 * (first + (r - s)) + 9 * (C - (2 * M - 2)) + excess := by
   obtain ⟨s, C, r, C', p, total, hres, hstep, hr, hp, hshort, hcross, hdist, _⟩ :=
     canonical_first_travel_crossing_residual hcanon hpath hlong

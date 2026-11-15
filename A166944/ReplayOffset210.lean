@@ -105,15 +105,15 @@ private theorem quiet_return_no_proper_factors_of_low_index_offset {s C : Nat}
     (state : IsMovingHorizonState s C) (hC : 64 ≤ C)
     (offset : 4 * replayIndexOffset s C ≤ C + 2)
     (quiet : ∀ j : Nat, s < j → j ≤ C → d j = 1) : NoProperFactor (C - 1) ∧ NoProperFactor (C + 1) := by
-  let q := Nat.sqrt (C + 1)
-  have hq : q * q ≤ C + 1 := Nat.sqrt_le _
+  let q := isqrt (C + 1)
+  have hq : q * q ≤ C + 1 := isqrt_sq_le _
   have hsmall : 6 * q ≤ C := by
     apply Nat.mul_self_le_mul_self_iff.mp
     calc
       (6 * q) * (6 * q) = 36 * (q * q) := by ac_rfl
       _ ≤ 37 * C := by omega
       _ ≤ C * C := Nat.mul_le_mul_right _ (by omega)
-  have hlong : 2 * Nat.sqrt (C + 1) < C - s := by
+  have hlong : 2 * isqrt (C + 1) < C - s := by
     have htwice := moving_horizon_state_horizon_le_twice_index state
     have hsc := state.2.2
     change 2 * q < C - s

@@ -67,23 +67,23 @@ private theorem quiet_return_no_small_factors {s C root : Nat}
 theorem quiet_return_no_proper_factors {s C : Nat}
     (hstate : IsMovingHorizonState s C)
     (hquiet : ∀ j : Nat, s < j → j ≤ C → d j = 1)
-    (hlong : 2 * Nat.sqrt (C + 1) < C - s) :
+    (hlong : 2 * isqrt (C + 1) < C - s) :
     NoProperFactor (C - 1) ∧ NoProperFactor (C + 1) := by
   obtain ⟨hlo, hhi⟩ := quiet_return_no_small_factors hstate hquiet hlong
-  have hroot : C + 1 < (Nat.sqrt (C + 1) + 1) * (Nat.sqrt (C + 1) + 1) :=
-    Nat.lt_succ_sqrt (C + 1)
+  have hroot : C + 1 < (isqrt (C + 1) + 1) * (isqrt (C + 1) + 1) :=
+    lt_succ_isqrt (C + 1)
   exact ⟨no_proper_factor_of_no_small_factor hlo (by omega),
     no_proper_factor_of_no_small_factor hhi hroot⟩
 
 private theorem long_quiet_gap_of_short_travel {M s C : Nat}
     (hM : 968 ≤ M) (hs : M + 2 ≤ s) (htravel : 2 * (s - (M + 2)) ≤ M)
     (hlo : 2 * M - 2 ≤ C) (hhi : C ≤ 3 * M + 4) :
-    2 * Nat.sqrt (C + 1) < C - s := by
-  let q := Nat.sqrt (C + 1)
+    2 * isqrt (C + 1) < C - s := by
+  let q := isqrt (C + 1)
   let b := M / 8
   have hb : 121 ≤ b := by omega
   have hb2 := Nat.mul_le_mul_right b hb
-  have hq2 : q * q ≤ C + 1 := Nat.sqrt_le _
+  have hq2 : q * q ≤ C + 1 := isqrt_sq_le _
   have hqb : q < b := by
     by_cases h : q < b
     · exact h

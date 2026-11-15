@@ -174,13 +174,13 @@ theorem canonical_prime_gap_budget_sublinear (k : Nat) (hk : 0 < k) :
   intro M Cf hM hCf
   have hM6 : 6 ≤ M := le_trans (le_max_left _ _) hM
   have hA : 0 < A := by omega
-  let root := Nat.sqrt M
+  let root := isqrt M
   let L := A * (root + 1)
   let W := L * (L + 1)
   let G := 2 * (3 * M + 4) * (Cf - (2 * M - 2))
   have hL : 0 < L := Nat.mul_pos hA (by omega)
-  have hroot : root * root ≤ M := Nat.sqrt_le M
-  have hroot' : M < (root + 1) * (root + 1) := Nat.lt_succ_sqrt M
+  have hroot : root * root ≤ M := isqrt_sq_le M
+  have hroot' : M < (root + 1) * (root + 1) := lt_succ_isqrt M
   have hB : B ≤ root + 1 := by
     by_cases h : B ≤ root + 1
     · exact h
@@ -278,11 +278,11 @@ theorem canonical_first_use_travel_sublinear (k : Nat) (hk : 0 < k) :
   exact (Nat.mul_le_mul_left k (canonical_first_use_travel_bound hcanon hcost hshort hL)).trans hbound
 
 private theorem forty_eight_mul_crossing_gap_bound {M : Nat} (hM : 36864 ≤ M) :
-    48 * Nat.sqrt (4 * (3 * M + 4)) ≤ M := by
-  let Q := Nat.sqrt (4 * (3 * M + 4))
+    48 * isqrt (4 * (3 * M + 4)) ≤ M := by
+  let Q := isqrt (4 * (3 * M + 4))
   change 48 * Q ≤ M
   apply Nat.mul_self_le_mul_self_iff.mp
-  have hQ : Q * Q ≤ 4 * (3 * M + 4) := Nat.sqrt_le _
+  have hQ : Q * Q ≤ 4 * (3 * M + 4) := isqrt_sq_le _
   calc
     (48 * Q) * (48 * Q) = (48 * 48) * (Q * Q) := by ac_rfl
     _ ≤ (48 * 48) * (16 * M) := Nat.mul_le_mul_left _ (by omega)

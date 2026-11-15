@@ -1,0 +1,73 @@
+name: A166944 v4.29 port verification
+
+on:
+  push:
+    branches: [port-v429]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the pinned toolchain
+        run: |
+          curl -sSfL https://elan.lean-lang.org/elan-init.sh -o elan-init.sh
+          sh elan-init.sh -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Pin v4.29.0-rc3
+        run: |
+          printf 'leanprover/lean4:v4.29.0-rc3\n' > lean-toolchain
+          cat lean-toolchain
+
+      - name: Fetch Mathlib 777aaa6
+        run: |
+          cat > lakefile.toml <<'LAKEEOF'
+          name = "a166944port"
+          defaultTargets = ["A166944"]
+
+          [[require]]
+          name = "mathlib"
+          git = "https://github.com/leanprover-community/mathlib4"
+          rev = "777aaa61dcd2a1258d2b4962dbe983ede4d23b2e"
+
+          [[lean_lib]]
+          name = "A166944"
+          LAKEEOF
+          lake update 2>&1 | tail -5
+
+      - name: Cache Mathlib oleans
+        uses: actions/cache@v4
+        with:
+          path: .lake/packages/mathlib/.lake/build/lib/lean
+          key: mathlib-777aaa6-v429
+
+      - name: Build Mathlib
+        run: lake exe cache get 2>&1 | tail -5
+
+      - name: Build the port
+        run: |
+          set -o pipefail
+          lake build A166944 2>&1 | tee build.log | tail -60
+          echo "=== summary ==="
+          grep -cE "^✔|Built" build.log || true
+          if grep -qE "^error|error:" build.log; then
+            echo "=== ERRORS ==="
+            grep -E "error" build.log | head -30
+            exit 1
+          fi
+
+      - name: Axiom audit on the ported modules
+        run: |
+          cat > Audit.lean <<'AUDITEOF'
+          import A166944.CanonicalTravel
+          #print axioms A166944Research.isqrt_sq_le
+          #print axioms A166944Research.lt_succ_isqrt
+          #print axioms A166944Research.isqrt_le_isqrt
+          AUDITEOF
+          # Importing CanonicalTravel pulls in the whole spine, so a clean build
+          # here means the Isqrt replacement is used everywhere it has to be.
+          lake env lean Audit.lean 2>&1 | head -20

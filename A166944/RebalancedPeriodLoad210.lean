@@ -304,7 +304,7 @@ theorem rebalanced_crossing_signed_of_period_and_first_gap_budget210
     (hM : 367232911 ≤ M) (canonical : d (M + 2) = M)
     (ledger : HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
       (M + 2) (2 * M - 2) s C [] p first balance)
-    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ Nat.sqrt (4 * (3 * M + 4)))
+    (short : 2 * (s - (M + 2)) ≤ M) (gap : r - s ≤ isqrt (4 * (3 * M + 4)))
     (trace : ResidualPhaseTrace210 (M + 2) s [] p first balance)
     (delta : ∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2))
     (cover : trace.RebalancedAnchorComponents)
@@ -326,7 +326,7 @@ theorem rebalanced_crossing_signed_of_period_excess_eventually210 :
       threshold ≤ M → d (M + 2) = M →
       HasMovingHorizonResidualPhaseBalances210 residualHorizonPhase210
         (M + 2) (2 * M - 2) s C [] p first balance →
-      2 * (s - (M + 2)) ≤ M → r - s ≤ Nat.sqrt (4 * (3 * M + 4)) →
+      2 * (s - (M + 2)) ≤ M → r - s ≤ isqrt (4 * (3 * M + 4)) →
       ∀ trace : ResidualPhaseTrace210 (M + 2) s [] p first balance,
         (∀ f : Nat → Int, (∑ i, (f (trace.event i).hit - f (trace.event i).start)) = f s - f (M + 2)) →
         ∀ cover : trace.RebalancedAnchorComponents,

@@ -206,7 +206,7 @@ theorem canonical_first_crossing_requires_charged_phase_balances210 {slots M sf 
       HasMovingHorizonChargedPhaseBalances210 phase (M + 2) (2 * M - 2) s C [] p first balance ∧
       IsMovingHorizonStep s C r C' ∧ r ≤ sf ∧ p + 1 ≤ q ∧
       2 * (s - (M + 2)) ≤ M ∧ M < 2 * (r - (M + 2)) ∧
-      r - s ≤ Nat.sqrt (4 * (3 * M + 4)) ∧
+      r - s ≤ isqrt (4 * (3 * M + 4)) ∧
       (M : Int) < ((24 * (first + (r - s)) + 1315 : Nat) : Int) + balance := by
   obtain ⟨s, C, r, C', p, _, _, _, hledger, _, hfirst, hstep, hr, hp, hshort, hcross, hG, hg, _⟩ :=
     canonical_first_travel_crossing_excess hcanon hpath hlong
@@ -223,7 +223,7 @@ theorem canonical_travel_bound_of_charged_phase_budget210 {slots M sf Cf q : Nat
     (hbudget : ∀ {s C p first : Nat} {balance : Int},
       HasMovingHorizonChargedPhaseBalances210 phase (M + 2) (2 * M - 2) s C [] p first balance →
       2 * (s - (M + 2)) ≤ M →
-      ((24 * (first + Nat.sqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M) :
+      ((24 * (first + isqrt (4 * (3 * M + 4))) + 1315 : Nat) : Int) + balance ≤ M) :
     2 * (sf - (M + 2)) ≤ M := by
   by_cases hshort : 2 * (sf - (M + 2)) ≤ M
   · exact hshort
