@@ -118,6 +118,8 @@
   "TwinReserveTarget210": 5,
   "TwinSignedReserveTarget210": 6,
   "TwinSweep": 9,
+  "TwoCapGate": 5,
+  "TwoCapTarget": 3,
   "VerifiedBoundaryRecordExtension": 7,
   "VerifiedFiftyMillionBridge": 14,
   "VerifiedLaterRecordExtension": 12,
@@ -126,5 +128,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1773
+ "total": 1781
 }

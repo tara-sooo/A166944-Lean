@@ -96,6 +96,8 @@ jobs:
             A166944.BandExcursion \
             A166944.ReservoirLower \
             A166944.HalfWindow \
+            A166944.TwoCapGate \
+            A166944.TwoCapTarget \
             A166944.Q1Witness \
             A166944.AbsoluteIndex \
             A166944.Q3Barrier \
