@@ -80,13 +80,39 @@ jobs:
 
       # `lean-action` refuses to run without a manifest, so the manifest is
       # generated first with the toolchain the environment declares.
+      #
+      # A previous run failed with
+      #   object file '.../v4.29.0-rc3/lib/lean/Init/Data/Nat/Sqrt.olean'
+      #   of module Init.Data.Nat.Sqrt does not exist
+      # which is the toolchain being incomplete rather than the project being
+      # wrong: elan's init path had left the toolchain directory without the
+      # prelude. Installing explicitly and then *checking* for the prelude
+      # turns that into an early, legible failure instead of one at the first
+      # project module.
       - name: Install the pinned toolchain
         working-directory: probe
         run: |
           set -euo pipefail
+          TC="$(cat lean-toolchain)"
           curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
-            | sh -s -- -y --default-toolchain "$(cat lean-toolchain)"
+            | sh -s -- -y --default-toolchain none
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install "$TC"
+          elan default "$TC"
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+          # Locate the toolchain directory and insist on the prelude.
+          TCDIR="$(elan toolchain list | tr -d ' ' | grep -F "$TC" | head -1)"
+          echo "toolchain: $TCDIR"
+          LEANDIR="$HOME/.elan/toolchains/$(echo "$TCDIR" | tr '/' '-' | sed 's/^leanprover-//')"
+          echo "lean dir: $LEANDIR"
+          for f in Init/Prelude.olean Init/Data/Nat/Sqrt.olean; do
+            if [ ! -f "$LEANDIR/lib/lean/$f" ]; then
+              echo "::error::toolchain is missing $f -- the prelude did not install"
+              ls "$LEANDIR/lib/lean/Init" | head -20 || true
+              exit 1
+            fi
+          done
+          echo "prelude present"
 
       - name: Fetch Mathlib at the pinned revision
         working-directory: probe
