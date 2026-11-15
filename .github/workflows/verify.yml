@@ -57,7 +57,8 @@ jobs:
       # ------------------------------------------------------------------
       - name: Build research core
         run: |
-          lake build A166944.ResearchDefs \
+          lake build A166944.Isqrt \
+            A166944.ResearchDefs \
             A166944.Lemmas \
             A166944.RecordBarrier \
             A166944.CanonicalRecord \

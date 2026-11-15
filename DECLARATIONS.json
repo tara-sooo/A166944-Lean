@@ -65,6 +65,7 @@
   "HalfWindow": 11,
   "HorizonCrossing": 25,
   "HorizonLedger": 7,
+  "Isqrt": 7,
   "Lemmas": 295,
   "OrphanHarvest": 5,
   "PinnedCharacterization": 33,
@@ -168,5 +169,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2365
+ "total": 2372
 }
