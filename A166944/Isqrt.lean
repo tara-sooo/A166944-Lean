@@ -3,15 +3,15 @@ A square root that exists in every environment.
 
 Lean v4.29.0-rc3 -- the environment of the Twin Prime Conjecture mission on
 Prove2Me -- has no `Init.Data.Nat.Sqrt`: the module is absent from the toolchain,
-`isqrt` is absent from `Init`, and `#check @isqrt` fails. Under v4.33.1 the
+`Nat.sqrt` is absent from `Init`, and `#check @Nat.sqrt` fails. Under v4.33.1 the
 kernel grew both, and this development imported them, which is why the
 recurrence side stopped building when it was transplanted.
 
 The root is only ever used through three facts:
 
-* `isqrt_sq_le  n : sqrt n * sqrt n <= n`
-* `lt_succ_isqrt n : n < (sqrt n + 1) * (sqrt n + 1)`
-* `isqrt_le_isqrt : m <= n -> sqrt m <= sqrt n`
+* `Nat.sqrt_le  n : sqrt n * sqrt n <= n`
+* `Nat.lt_succ_sqrt n : n < (sqrt n + 1) * (sqrt n + 1)`
+* `Nat.sqrt_le_sqrt : m <= n -> sqrt m <= sqrt n`
 
 so a replacement only has to supply those. The one below is an upward scan:
 start at `0` and advance while the next square still fits. It needs `n + 1` steps
@@ -44,7 +44,7 @@ The `f = 0` branch is vacuous: `n + 1 <= lo` together with `lo <= lo * lo <= n`
 is a contradiction, discharged without touching the product nonlinearly. -/
 theorem isqrtGo_spec {n f lo : Nat} (hlo : lo * lo ≤ n) (hfuel : n + 1 ≤ lo + f) :
     (isqrtGo n f lo) * (isqrtGo n f lo) ≤ n ∧
-      n < (isqrtGo n f lo + 1) * (isqrtGo n f lo + 1) := by
+      n < (isqrtGo n f lo).succ * (isqrtGo n f lo).succ := by
   induction f generalizing lo with
   | zero =>
       exfalso
@@ -65,8 +65,10 @@ theorem isqrtGo_spec {n f lo : Nat} (hlo : lo * lo ≤ n) (hfuel : n + 1 ≤ lo 
 theorem isqrt_sq_le (n : Nat) : isqrt n * isqrt n ≤ n :=
   (isqrtGo_spec (n := n) (f := n + 1) (lo := 0) (Nat.zero_le n) (by omega)).1
 
-/-- **Upper bound.** The radicand is below the next square. -/
-theorem lt_succ_isqrt (n : Nat) : n < (isqrt n + 1) * (isqrt n + 1) :=
+/-- **Upper bound.** The radicand is below the next square.  Statement shape
+mirrors `Nat.lt_succ_sqrt` exactly (`succ`, not `+ 1`) so that proofs which let
+`omega` unify the product atoms keep working. -/
+theorem lt_succ_isqrt (n : Nat) : n < (isqrt n).succ * (isqrt n).succ :=
   (isqrtGo_spec (n := n) (f := n + 1) (lo := 0) (Nat.zero_le n) (by omega)).2
 
 /-- **Monotonicity.** The root is monotone in the radicand. -/
