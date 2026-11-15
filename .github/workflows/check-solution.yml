@@ -123,13 +123,19 @@ jobs:
       - name: Build the Definition stubs
         run: |
           set -euo pipefail
+          # The second stub imports the first by module name, so the directory
+          # holding the first stub's .olean has to be on the search path. Adding
+          # it to LEAN_PATH rather than relying on -R keeps both stubs in the
+          # same namespace resolution the platform uses.
+          export LEAN_PATH="$PWD/Definitions:${LEAN_PATH:-}"
           lake env lean -o Definitions/Def_a166944_record_core.olean \
             Definitions/Def_a166944_record_core.lean
-          lake env lean -o Definitions/Def_a166944_moving_horizon.olean \
-            -R Definitions Definitions.Def_a166944_moving_horizon \
-            Definitions/Def_a166944_moving_horizon.lean || \
+          test -f Definitions/Def_a166944_record_core.olean
           lake env lean -o Definitions/Def_a166944_moving_horizon.olean \
             Definitions/Def_a166944_moving_horizon.lean
+          test -f Definitions/Def_a166944_moving_horizon.olean
+          echo "stub oleans:"
+          ls -la Definitions/*.olean
 
       # ------------------------------------------------------------------
       # The check. The solution imports the bundles by their platform names,
