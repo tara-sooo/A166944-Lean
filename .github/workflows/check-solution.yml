@@ -116,6 +116,22 @@ jobs:
           EOF
 
       # ------------------------------------------------------------------
+      # Build the stubs first. Writing the .lean files is not enough: the
+      # solution imports them by module name, which needs their .olean, and
+      # `lake env lean` alone does not produce one.
+      # ------------------------------------------------------------------
+      - name: Build the Definition stubs
+        run: |
+          set -euo pipefail
+          lake env lean -o Definitions/Def_a166944_record_core.olean \
+            Definitions/Def_a166944_record_core.lean
+          lake env lean -o Definitions/Def_a166944_moving_horizon.olean \
+            -R Definitions Definitions.Def_a166944_moving_horizon \
+            Definitions/Def_a166944_moving_horizon.lean || \
+          lake env lean -o Definitions/Def_a166944_moving_horizon.olean \
+            Definitions/Def_a166944_moving_horizon.lean
+
+      # ------------------------------------------------------------------
       # The check. The solution imports the bundles by their platform names,
       # which the stubs above now provide.
       # ------------------------------------------------------------------
