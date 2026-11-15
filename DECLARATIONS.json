@@ -114,6 +114,7 @@
   "ResidualStartupWeights210": 26,
   "ResidualThreshold210": 7,
   "ReuseCongruences": 6,
+  "RoomEventJoint": 19,
   "RoomInvariant": 31,
   "RoomLedger": 32,
   "RoomQuantum": 8,
@@ -154,5 +155,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2134
+ "total": 2153
 }
