@@ -107,7 +107,7 @@ directly. Bounding either one from above is equivalent to bounding `p`, so
 phrasing the gap as "`T` has no upper bound" is true but not the useful form: the
 missing input is the count.
 
-## Five independent routes to the same missing bound
+## Eleven independent routes to the same missing bound
 
 Recorded because each was found separately and they agree, which is the strongest
 evidence available that the diagnosis is right and not an artefact of one
@@ -120,12 +120,32 @@ formulation. All five are kernel-checked in the modules named.
 | count bounds cannot bound the count | `CountBoundLimits.lean` | `3q <= E`, `E <= M*q`, `2q <= T` admit any `q` |
 | reservoir is pinned | `BIntegrate.lean` | `B sf + (sf - s) = B s + S` with `S = sum (d r - 1)` |
 | exit band | `ExitBand.lean` | `Cf - sf <= 2*M - 4` at every canonical exit, on the hypothesis `sf <= 2*M - 4` |
+| exit coordinates | `ExitCoordinates.lean` | `a` cannot bound `sf` from above: `a sf / sf` tends to `3`, so the available bound is tight |
+| crossing | `ExitThreshold.lean`, `CrossingRoute.lean` | crossing is equivalent to a horizon cap, and the crossing precondition holds with enormous margin, so no crossing theorem forbids it |
+| room ledger | `RoomLedger.lean` | `Cf - sf = B sf - 2` exactly, so the room coordinate carries the same information as the reservoir |
+| the excess sum is not independent | `ExcessIdentity.lean` | substituting `B sf = (M-2) + S - travel` into the scaled form returns `2*travel <= M`; a bound on `S` alone cannot suffice |
+| the divisor structure is slack | `ExcessSumInterval.lean` | the event value divides the horizon and the index, but is three to four orders of magnitude smaller than the index, so the constraint leaves the quotient free |
+| excursions | `BandReentry.lean`, `BandExcursion.lean` | a replay leaves the capped band and re-enters it, so a tail cannot be packaged as one in-band suffix; the exit shape is `2*(r-s)+1 <= M`, which is vacuous in `M` |
 
-The second and fourth together eliminate `B sf`, leaving a relation among
-`p`, `sf` and `S`; the third says the proven count bounds cannot close it; the
-fifth says the slack bound needs the same index bound as everything else. Hence:
+The first five together eliminate `B sf`, leaving a relation among `p`, `sf` and
+`S`; the third says the proven count bounds cannot close it; the fifth says the
+slack bound needs the same index bound as everything else. The last six close the
+remaining coordinates one at a time: every one of them is exact, or vacuous, or
+reduces to the statement being proved. Hence:
 **one uniform bound on the terminal index `sf`**, equivalently on the event count
 `p`, equivalently a lower bound on the reservoir `B sf`.
+
+Two of these are refutations rather than obstructions, and are recorded as such
+because each is the first thing a new attack tries:
+
+* the threshold `45895573` cannot be dropped -- the proposition without the lower
+  bound is false, with a witnessed canonical replay at `M = 13`
+  (`RoomLedger.travel_bound_without_threshold_is_false`);
+* a replay does not stay out of the band once it leaves
+  (`BandReentry.replay_reenters_capped_band`).
+
+Neither is a reason the problem is hard; both are reasons a particular argument
+does not work. Recording them saves the next attempt from re-deriving them.
 
 ## What a proof of the missing bound has to look like
 
@@ -134,6 +154,41 @@ only `d (M + 2) = M`, the path, and `IsAttainedPreviousMaximum M sf`. The
 available count bounds (`Lemmas.lean:3851`, `:7355`) give `3q <= E`,
 `E <= M * q` and `2q <= T` -- a lower bound on `T` and both bounds on `E`. None
 of them bounds `q`.
+
+## What is measured, what is proved, what is refuted
+
+Kept separate because conflating them is the most common failure in this
+development, including several times in the work that produced this file.
+
+**Proved, unconditional.** The certificates in the table above; the eleven route
+statements; the two refutations. Each is kernel-checked in the named module, with
+`#print axioms` reporting at most `propext` and `Quot.sound`.
+
+**Measured, not proved.** Every quantitative margin in this file:
+
+| quantity | observation | where |
+| --- | --- | --- |
+| `2*travel <= M` | holds for every record from `M = 139` to `M = 1427749`; fails only at `M = 13` and `M = 43` | canonical replay sweep, `n <= 3*10^6` |
+| `S / M` | at most `0.115` for `M >= 313`, `0.0067` at `M = 355723` | same sweep |
+| excursion length | 54 steps at `M = 355723`, 70 at `M = 1427749`; grows far slower than `M` | same sweep |
+| `2*(r-s)+3 <= M` at exits | 9642 exits, no violation | `BandExcursion` sweep |
+| the divisor ratio `e / r` | max `0.5`, typical `10^-4` | `n <= 3*10^7` |
+
+These are margins, not proof margins. The distinction matters because the margins
+are large -- a factor of about 26 at the fifty-million certificate -- and a large
+margin is exactly what makes an empirical approach feel close when it is not.
+
+**Refuted.** Statements that are false, each with a witness rather than an
+argument: the threshold-free travel bound (`M = 13`); `no-reentry`
+(`M = 43`); `room` drops by at most one per step (a drop of 468 at
+`s = 2861166`); `travel <= M` is equivalent to `S <= B sf + 2` (`M = 13`);
+and a candidate divisor law that held in 84.5 percent of cases and turned out to
+be coincidence among small divisors.
+
+**One caution about measurement.** A sweep that stops before `C_0 = 2*M - 2`
+truncates the replay and reports a shorter excursion than the real one, silently.
+Every table above was recomputed after that error was found in an earlier one.
+Check that the sweep horizon exceeds `2*M - 2` for the largest `M` in the table.
 
 ## How to use this file
 
