@@ -30,6 +30,7 @@
   "DNodes": 6,
   "EventCountFails": 7,
   "ExcessIdentity": 1,
+  "ExcessSumInterval": 18,
   "ExitBand": 3,
   "ExitCoordinates": 6,
   "ExitThreshold": 2,
@@ -121,5 +122,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1719
+ "total": 1737
 }
