@@ -43,7 +43,7 @@
   "GapBound": 2,
   "HalfWindow": 11,
   "HorizonCrossing": 25,
-  "HorizonLedger": 3,
+  "HorizonLedger": 7,
   "Lemmas": 295,
   "OrphanHarvest": 5,
   "Q1Witness": 4,
@@ -134,5 +134,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1828
+ "total": 1832
 }

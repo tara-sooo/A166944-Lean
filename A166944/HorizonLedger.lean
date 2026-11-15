@@ -64,4 +64,51 @@ theorem excess_gt_of_horizon_gt {M sf Cf p S c : Nat}
     (hS : Cf = (2 * M - 2) + S) (hbig : 2 * M - 2 + c < Cf) :
     c < S := by omega
 
+/-! ## What a bound on the excess would give
+
+The statements below are conditional on a bound for `S`. They are recorded in that
+form because no bound on `S` is proved yet: the measurements show `S <= M/2` at
+every record examined, but an observation is not a theorem, and stating the
+consequence conditionally is what makes the observation usable the moment a proof
+arrives.
+
+The chain worth knowing: `S <= M/2` gives `Cf <= (5*M)/2 - 2`, which is strictly
+sharper than the horizon cap `Cf <= 3*M + 4` that the development currently carries.
+Feeding that into the count/reservoir inequality gives `p <= M/4 + 1`.
+
+That last one is honest about its own limits. The event-count criterion the frontier
+consolidates on is `48 * p * p + 1 < M`, which needs `p` to be about `sqrt(M)/7`
+-- at `M = 45895573` that is below 980, while `M/4 + 1` allows 11 million. So a bound
+on `S` of the measured strength constrains the horizon usefully and the count
+uselessly. Both facts are recorded, because the second is as informative as the
+first: it says the excess is not where the count bound will come from.
+-/
+
+/-- **A bound on the excess bounds the horizon.**  With `Cf = 2*M - 2 + S`, any
+bound on `S` transfers to `Cf` immediately. -/
+theorem horizon_le_of_excess_le {M Cf S c : Nat} (hS : Cf = (2 * M - 2) + S)
+    (hbound : S ≤ c) :
+    Cf ≤ 2 * M - 2 + c := by omega
+
+/-- **The measured strength of the excess bound would improve the horizon cap.**
+`S <= M/2` gives `Cf <= (5*M)/2 - 2`, against the `Cf <= 3*M + 4` in the tree. -/
+theorem horizon_le_of_excess_le_half {M Cf S : Nat} (hM : 4 ≤ M)
+    (hS : Cf = (2 * M - 2) + S) (hbound : 2 * S ≤ M) :
+    2 * Cf ≤ 5 * M - 4 := by omega
+
+/-- **And it bounds the event count -- weakly.**  Combining with the count/reservoir
+inequality `2*p <= Cf - 2*M + 4` gives `p <= M/4 + 1`, which is far above the
+`sqrt(M)/7` that the event-count criterion needs. Recorded so that the excess route
+and the count route are not confused for one another. -/
+theorem count_le_of_excess_le_half {M Cf p S : Nat} (hM : 4 ≤ M)
+    (hS : Cf = (2 * M - 2) + S) (hbound : 2 * S ≤ M)
+    (hcount : 2 * p ≤ Cf - 2 * M + 4) :
+    4 * p ≤ M + 4 := by omega
+
+/-- **The count bound this gives is not the one the frontier needs.**  At the
+threshold, `M/4 + 1` exceeds `sqrt(M)/7` by four orders of magnitude. Stated as a
+number so the gap is not mistaken for a small one. -/
+theorem excess_route_count_bound_is_far_too_weak :
+    48 * (45895573 / 4 + 1) * (45895573 / 4 + 1) + 1 > 45895573 := by decide
+
 end A166944Research
