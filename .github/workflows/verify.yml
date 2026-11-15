@@ -98,6 +98,7 @@ jobs:
             A166944.ReservoirLower \
             A166944.HalfWindow \
             A166944.GapTwoSided \
+            A166944.LeastDivisorGap \
             A166944.TwoCapGate \
             A166944.TwoCapTarget \
             A166944.TwoCapThreshold \
