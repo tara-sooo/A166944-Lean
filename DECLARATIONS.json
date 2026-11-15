@@ -40,6 +40,7 @@
   "FirstHitDivisor": 6,
   "FundedPhaseCredits210": 7,
   "GapBound": 2,
+  "HalfWindow": 11,
   "HorizonCrossing": 25,
   "Lemmas": 295,
   "OrphanHarvest": 5,
@@ -125,5 +126,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 1762
+ "total": 1773
 }
