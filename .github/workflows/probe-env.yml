@@ -142,6 +142,36 @@ jobs:
       # build in any environment. `MathlibDependent` is the part that needs
       # `Nat.Prime` and therefore depends on the revision's Mathlib API.
       # ------------------------------------------------------------------
+      # ------------------------------------------------------------------
+      # Diagnose where `Nat.sqrt` lives in this environment. Under v4.33.1 it
+      # is in the toolchain (`Init/Data/Nat/Sqrt`), which is why the project
+      # imports it from there to stay Mathlib-free; under v4.29.0-rc3 the
+      # toolchain does not carry it, so the import path has to differ. Ask the
+      # environment rather than assuming which side owns it.
+      # ------------------------------------------------------------------
+      - name: Locate Nat.sqrt in this environment
+        working-directory: probe
+        run: |
+          set -euo pipefail
+          LEANBIN="$(elan which lean)"
+          LEANDIR="$(dirname "$(dirname "$LEANBIN")")"
+          echo "--- toolchain lib/lean/Init/Data/Nat ---"
+          ls "$LEANDIR/lib/lean/Init/Data/Nat" 2>/dev/null | grep -i sqrt || echo "  (no sqrt in toolchain)"
+          echo "--- Mathlib ---"
+          find .lake/packages/mathlib/Mathlib -maxdepth 4 -name 'Sqrt*' 2>/dev/null | head -5 || true
+          echo "--- does Mathlib.Data.Nat.Sqrt exist as a module? ---"
+          if [ -f .lake/packages/mathlib/Mathlib/Data/Nat/Sqrt.olean ]; then
+            echo "  yes"
+          else
+            echo "  no"
+          fi
+          echo "--- probe: can we import it? ---"
+          cat > /tmp/SqrtProbe.lean <<'EOF'
+import Mathlib.Data.Nat.Sqrt
+#check Nat.sqrt
+EOF
+          lake env lean /tmp/SqrtProbe.lean && echo "  import Mathlib.Data.Nat.Sqrt works" || echo "  import failed"
+
       - name: Build the recurrence-side modules
         working-directory: probe
         run: |
