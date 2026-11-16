@@ -54,6 +54,7 @@
   "CycleLimits": 10,
   "DNodes": 6,
   "DoublingReadoff": 25,
+  "EventCountCounterexample": 5,
   "EventCountFails": 7,
   "ExcessCriterion": 8,
   "ExcessGap": 70,
@@ -183,5 +184,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2602
+ "total": 2607
 }
