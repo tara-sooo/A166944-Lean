@@ -116,6 +116,7 @@ jobs:
             A166944.CapBCandidates \
             A166944.Sharp48 \
             A166944.SBoundLemma \
+            A166944.CapBThreshold \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
             A166944.AbsorptionCriterion \
