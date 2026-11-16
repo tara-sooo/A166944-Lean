@@ -68,7 +68,7 @@
   "FirstHitArithmetic": 10,
   "FirstHitDivisor": 6,
   "FirstHitForm": 4,
-  "FrontierGivesWindow": 2,
+  "FrontierGivesWindow": 4,
   "FundedPhaseCredits210": 7,
   "GapBound": 2,
   "GapTwoSided": 3,
@@ -187,5 +187,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2618
+ "total": 2620
 }
