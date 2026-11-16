@@ -921,3 +921,274 @@ A166944 JUMP FORM (verified 2026-11-16, pb-1). The recurrence collapses to a sel
 - tags: a166944, pbound, refutation, l-bound, twin-primes, records, pb-1, auto-confirmed
 
 A166944 (L) REFUTATION ATTEMPT — FAILED TO REFUTE, plus the campaign data correction (pb-1, 2026-11-16). (L): 6p + p*(isqrt(4*(3M+4))-6) <= M/2. STATUS: survived. (L) fails ONLY at M = 13, 43, 139, 313, 2659 (all far below the 45895573 threshold); ZERO violations at all 21 records from 1321 up to 1468965061. THE BRIEF'S "exactly ONE measured record at/above the threshold" IS WRONG — there are SIX: 45895573 (p=37), 91793059 (p=53, sf=91808256, Cf=183616422, S=30306, maxgap=7383), 183616423 (p=5), 367232911 (p=109), 734482123 (p=6), 1468965061 (p=4); Cf=M_(k+1)-1 at every one. Worst p/sqrt(M) at/above threshold is 0.00569 (M=367232911) vs allowance 0.1443 -> 25.4x margin, so the threshold regime is COMFORTABLE and the "one data point" worry is dead. CAUTION FOR THE WRITE-UP: the chain's true tight point is M=5419 (L_lhs/(M//2)=0.847, margin only 1.18x), just above the verified prefix; the 26x margins are NOT representative. (E) survived everywhere: all 1027 events over the 22 records M>=661 satisfy e^2<=6M, worst e^2/M = 2.3756 at M=91793059 (overall worst 25.33 at M=43, below threshold). STRUCTURAL REDUCTION (why no bound comes out): every terminal state from M=661 up is a TWIN-PRIME CENTRE (Cf-1 and Cf+1 both prime, 0/1025 non-terminal states are), and Cf-sf always far exceeds 2*sqrt(Cf+1). So p is the HITTING TIME of the twin-prime-centre set along the orbit — i.e. exactly the twin-prime-density barrier, not attackable by the jump form. Also: no single state can refute (L) unless it is a twin centre, since a composite C±1 has a factor <= sqrt(C+1) << C-s and forces an in-horizon hit. LEAD'S SEC 6 CLAIM CONFIRMED AND STRENGTHENED at larger scale: over state-consistent M<2e6, 65 non-records give p in 0..69 (median 11) while 19 records give 0..77; 32 non-records have p>=20 vs only 2 records. So the record hypothesis is NOT the source of a p bound.
+
+---
+
+# Appendix B: service-outage observations, merged 2026-11-16
+
+Six memory records all described the SAME class (transient upstream 5xx / reportless child
+failure). They were merged into one consolidated memory so the class stays actionable
+without occupying six slots. Verbatim originals below.
+
+## [lesson imp3] mem_mwhrf0cg_5lng5d  (scope=project)
+
+- created: 2026-11-15T11:36:59.753Z   project: /data/data/com.termux/files/home/prove2me_workspace
+
+【インフラ障害の記録 (2026-11-15, angc-large-events / DSH)】PI_AI_ERROR:Service temporarily unavailable が同一セッション内で2回発生しターンが中断した。
+
+(1) 何が起きたか / 回避法: モデル側 API が一時的に 503 を返し、ターンが会話の途中で切断される。原因はこちら側にない（作業内容・プロンプト・ツール使用量に依存しない）。回避法は「長時間の単一ターンに依存しない」こと: (a) 中間成果を必ずディスクに書き出す（scratch の Lean ファイル・測定ログ）、(b) 大きな測定は nohup + ログファイルで走らせて、結果をターン外に永続化する、(c) 復帰時にまず `ls`/`cat` でディスクの現状を確認してから続ける。
+
+(2) 失敗条件と境界: ターンが長い（ツール呼び出しが多い）ほど切断時に失う文脈が大きい。逆に、ディスクに書き出した成果は失われない。今回も ~/p2m_scratch/aF/ に Lean ファイルと測定ログが残っており、リードからの再開指示でそのまま続行できた。境界は「ターン内メモリにしか無い情報」対「ディスクにある情報」。
+
+(3) 有効だった部分: 測定を nohup でバックグラウンド実行しログに残す運用、および Lean ファイルを逐次書き出す運用は、切断後もそのまま再利用できた。この2つは今後も維持する。
+
+教訓（絶対化しない）: インフラ 503 はこちら側の制御不能であり「作業が間違っていた」ことを意味しない。ただし対策として「成果をターン境界をまたいで永続化する」ことは常に有効。
+
+## [lesson imp3] mem_mwig8wga_usghxi  (scope=user)
+
+- created: 2026-11-15T23:12:05.189Z   project: /data/data/com.termux/files/home/prove2me_workspace
+
+【エラークラス: PI_AI_ERROR:Service temporarily unavailable（同一セッションで2回観測）】
+
+(1) 何が起きたか / 回避策: モデルAPIが一時的に 503 相当を返し、ツール呼び出し（多くは長い bash 実行や多数並列のツール呼び出しの直後）が失敗した。同一ターン内で即リトライを繰り返しても回復しないことがある。回避策: 失敗した呼び出しを盲目的に再送せず、いったんターンを区切り、より小さい単位（単一の bash 呼び出し、短いコマンド）に分割して再開する。長時間ジョブは run_in_background にしてジョブIDで回収する形にすると、ターン中断に対して耐性が上がる。
+
+(2) 失敗条件 / 境界: これは能力不足でも入力の誤りでもなく、サービス側の一時的可用性の問題。境界は「上流が一時的に落ちている + その瞬間に呼び出しを出した」場合。上流が正常なら同じ操作は成功する。したがって「このツール/この手法では不可能」と一般化してはならない。実際、失敗前に完了していた作業（測定結果、ファイル書き込み、git 状態）はすべて有効なまま残った。
+
+(3) 救えた部分: (a) 失敗直前までの測定・解析結果はファイルとツール結果として残っており再利用できた。(b) ターンをまたいでも会話コンテキストが保持されたため、9時間空いても作業を継続できた。(c) dsh-evolve のエラークラス検出が同一クラス2回を検知して報告したのは正しい挙動で、これにより「単発の偶発」ではなくクラスとして対処できた。保持すべきはこの検出→記録のループ。
+
+## [lesson imp3] mem_mwgehbeq_4cmxk9  (scope=user)
+
+- created: 2026-11-14T12:47:06.239Z   project: /data/data/com.termux/files/home/prove2me_workspace
+
+サブエージェントのサービス障害について（2026-11-14、同日に複数回観測）:
+(1) 実際に起きたこと: `PI_AI_ERROR: Service temporarily unavailable` で子エージェントが報告なしに終了する事象が繰り返し発生した。1回のターンで5体以上が同時に脱落したこともある。
+(2) 失敗条件と境界: ユーザーの明示によれば「無料枠は全く使い切っていない。止まるときはサービス側の問題のことが遥かに多い。あなた（親）も同じ無料枠で動いているので、親が動いているうちは枠も残っている」。つまり親が稼働中である限り枠は残っており、子の失敗はサービス側の一時障害と解釈するのが正しい。**再試行すれば直る可能性が比較的高い。**
+(3) 有効だったこと: ①脱落前にスクラッチファイルを残した子から成果を回収し、Lean で再検証してコミットできた（lane-f, b-coordinate, attack-q3, lane-e, abs-index-2, cycle-verify-2）。②**サブエージェント間の直接通信が実際に機能した** — `failure-catalog` が `docs-rebuild` へ成果を直接送付し、成功した。③同一タスクを別名で再投入すると、別の子が完了させる場合がある。
+教訓: 子の失敗は再試行を第一手とする。投入量を縮小しない。回収可能なスクラッチを常に確認する。親が動いている限り枠は残っているという事実を、投入量判断の根拠にする。
+
+## [lesson imp3] mem_mwge4fg2_v3o3fy  (scope=user)
+
+- created: 2026-11-14T12:37:04.943Z   project: /data/data/com.termux/files/home/prove2me_workspace
+
+DSH harness で「PI_AI_ERROR: Service temporarily unavailable」が同一クラスで2回発生（A166944-Lean レッドチーム検証中）。失敗条件: 上流 LLM サービスの一時障害で、ローカルの作業・ファイル・ビルド成果には影響しない。回避策: リトライで復旧する（実際に復旧した）。やってはいけないこと: 「無料枠が尽きた」等の誤った原因帰属をして作業を縮小すること（過去にユーザーが否定済み）。境界: 一時的 5xx と恒久的な quota/認証エラーは別物で、切り分けはエラーメッセージ本文とリトライ結果で行う。有効だった部分: 長い Lean ビルドを background job に逃がして待つ間に独立した検証作業を進める進め方は、サービス断があっても進捗を失わない。
+
+## [lesson imp3] mem_mwgdx5l2_58im3f  (scope=user)
+
+- created: 2026-11-14T12:31:25.567Z   project: /data/data/com.termux/files/home/prove2me_workspace
+
+サブエージェントが「closing message なしで失敗」する事象について（2026-11-14、複数回観測）:
+(1) 実際に起きたこと: サブエージェントが `PI_AI_ERROR: Service temporarily unavailable` で終了し、報告なしで脱落した。私は当初これを「無料枠の消費」と誤診し、投入を縮小した。
+(2) 失敗条件と境界: これはクォータ境界ではなく**サービス側の一時障害**。ユーザーの明示によれば「無料枠は全く使い切っていない。止まるときはサービス側の問題のことが遥かに多い。あなた（親）も同じ無料枠で動いているので、親が動いているうちは枠も残っている」。つまり**親が動いていること自体が枠の残存の証拠**であり、子の失敗を枠切れと解釈するのは誤り。
+(3) 有効だった部分: 脱落前に成果を残した子が多く（lane-f, b-coordinate, attack-q3, lane-e, abs-index-2, cycle-verify-2）、スクラッチファイルから回収して Lean で再検証しコミットできた。**再投入すれば直る可能性が高い。**
+教訓: 子の失敗は再試行を第一手とし、投入量を縮小しない。回収可能な成果がスクラッチに残っていないか常に確認する。
+
+## [lesson imp3] mem_mwhvwu8d_70sf9e  (scope=project)
+
+- created: 2026-11-15T13:42:50.116Z   project: /data/data/com.termux/files/home/ChatGPT-Context
+
+Dungeon Slasher 0.776.5 移行のレビュー用サブエージェント(migration-reviewer)が SERVER:502 Bad Gateway で失敗（報告なしで脱落、2026-11-15）。同種のエラーは本セッションで2回観測。(1) 何が起きたか/回避: サブエージェントの route が上流ゲートウェイの 502 を返し、ターンが完走できず閉じメッセージなしで終了した。親が動いている＝枠は残っているので、これはクォータ境界ではなく上流サービスの一時障害。機械的な再投入では解決しないことがあるため、失敗を検知したら (a) タスクをより小さく分割して再投入するか、(b) 親が直接検証する方に切り替える。(2) 失敗条件/境界: 特定の上流 route が一時的に不調なだけで、能力・ツール・設定の失敗ではない。時間を置くか別 route なら同じ作業は継続できる。境界は「その route の一時不調」であって「この環境ではレビュー不能」ではない。(3) 有効だった部分: 失敗前に完了した実装・検証（540命令アサーション、アセット再同定、native.py の xrefs バグ修正、script.json の 760MB→261MB 削減）はすべてディスク上で有効なまま残っており、コミット 87a37f2e として保全済み。長時間作業では区切りごとにディスクへ確定させておくことが復旧コストを下げる。
+
+---
+
+# Appendix C: superseded records (write-tool EACCES), 2026-11-16
+
+Superseded by the re-measurement above: the DSH write tool now succeeds on this host.
+Kept verbatim because the escape hatch (bash heredoc) remains the correct fallback if
+the error ever returns.
+
+## [lesson imp3] mem_mwfnbfyr_29o7c6
+
+- created: 2026-11-14T00:06:42.573Z   scope: project
+
+On this Termux/Android host, the DSH `write` tool fails with EACCES ("cannot write ... EACCES: permission denied, link '<path>/.NAME.PID.UUID.tmpdir/NAME.tmp' -> '<path>/NAME'") even in an owned, writable directory. Cause: the tool's temp-file + link/rename strategy is blocked by Termux SELinux (untrusted_app_27) context, not by Unix permissions — `ls -la` shows the dir owned by the same uid, and plain `bash` redirection into the same path succeeds. Workaround that works: write file contents with a `bash` heredoc (`cat > path <<'EOF' ... EOF`), and use python/`edit` or `sed` for patches. Do NOT conclude the file is unwritable or retry `write`; switch to bash immediately.
+
+## [lesson imp3] mem_mwfncmy9_i4swve
+
+- created: 2026-11-14T00:07:38.284Z   scope: project
+
+このホスト（Termux/Android, /data/data/com.termux/files/home 配下）では DSH の `write` ツールが EACCES で失敗する。原因は write が「同ディレクトリに一時dirを作り hardlink で rename する」原子的書き込み戦略を採るためで、Termux の SELinux が同一uidでも link を拒否する（実測 2回、2026-11-14、/data/data/com.termux/files/home/dsh-notes/ にて。エラー例: `EACCES: permission denied, link '.../.foo.md.<pid>.<uuid>.tmpdir/foo.md.tmp' -> '.../foo.md'`）。回避: `bash` の heredoc / redirection で書く（`cat > file <<'EOF' ... EOF`）。`edit` ツールは既存ファイルへの部分置換なので使える可能性が高いが、未検証。サブエージェントも同じ問題に当たり、両者とも bash 書込みに切替えて成功した。
+
+---
+
+# Appendix D: superseded DSH facts, 2026-11-16
+
+Superseded by the consolidated records (DSH version is now 0.2.2-rc.3, not 0.2.1-rc.5).
+Kept verbatim: the peer-enforcement mechanism and the npm dist-tag trap are unchanged.
+
+## [lesson imp3] mem_mwfnbfyr_29o7c6
+
+- created: 2026-11-14T00:06:42.573Z   scope: project
+
+On this Termux/Android host, the DSH `write` tool fails with EACCES ("cannot write ... EACCES: permission denied, link '<path>/.NAME.PID.UUID.tmpdir/NAME.tmp' -> '<path>/NAME'") even in an owned, writable directory. Cause: the tool's temp-file + link/rename strategy is blocked by Termux SELinux (untrusted_app_27) context, not by Unix permissions — `ls -la` shows the dir owned by the same uid, and plain `bash` redirection into the same path succeeds. Workaround that works: write file contents with a `bash` heredoc (`cat > path <<'EOF' ... EOF`), and use python/`edit` or `sed` for patches. Do NOT conclude the file is unwritable or retry `write`; switch to bash immediately.
+
+## [lesson imp3] mem_mwfncmy9_i4swve
+
+- created: 2026-11-14T00:07:38.284Z   scope: project
+
+このホスト（Termux/Android, /data/data/com.termux/files/home 配下）では DSH の `write` ツールが EACCES で失敗する。原因は write が「同ディレクトリに一時dirを作り hardlink で rename する」原子的書き込み戦略を採るためで、Termux の SELinux が同一uidでも link を拒否する（実測 2回、2026-11-14、/data/data/com.termux/files/home/dsh-notes/ にて。エラー例: `EACCES: permission denied, link '.../.foo.md.<pid>.<uuid>.tmpdir/foo.md.tmp' -> '.../foo.md'`）。回避: `bash` の heredoc / redirection で書く（`cat > file <<'EOF' ... EOF`）。`edit` ツールは既存ファイルへの部分置換なので使える可能性が高いが、未検証。サブエージェントも同じ問題に当たり、両者とも bash 書込みに切替えて成功した。
+
+## [fact imp3] mem_mwfnx26p_e7pkfu
+
+- created: 2026-11-14T00:23:31.145Z   scope: project
+
+プラグイン更新計画の前提として確定した事実（2026-11-14 実測、/data/data/com.termux/files/home/dsh-lab/.dsh/profiles/web）: (1) DSH の profile は plugins の互換性を**実行時に強制**する。dsh-app-boot が起動時に各 plugin の peerDependencies を評価し、不一致の行は `row.disabled=true` にして読込を拒否（diagnostic: "Plugin X@Y is incompatible with dsh Z"）。回避は profile/compatibility.json に exact `package@version` → exact DSH version の免除を書くのみ（現状 `@syncended/dsh-retry@0.2.3: ["0.2.1-rc.5"]` の1件だけ）。(2) 実際の DSH 本体は dsh-lab ルートの `@deepseek-ai/dsh` = **0.2.1-rc.5**（起動: node dsh-lab/node_modules/@deepseek-ai/dsh/lib/bin.js --profile web + 多数の --patch）。web profile の node_modules に @deepseek-ai/dsh-base / dsh-web-app は直接入っておらず、互換判定はルート解決の実バージョンで行われる。(3) 0.2.2 系を要求する plugin は 0.2.1-rc.5 では**ロード拒否**される（実例: dsh-better-sidebar 0.30.0 以降は全 peer が ^0.2.2-rc.1 必須、@contexera/dsh-agent-team 0.2.7 は >=0.2.2-rc.1 <0.2.3）。よって「DSH 本体を上げる前に plugin を上げる」順序は、本体互換の plugin だけを選ぶ必要がある。
+
+## [fact imp2] mem_mwfnbg14_fs8dxv
+
+- created: 2026-11-14T00:06:42.661Z   scope: project
+
+DeepSeek Harness official sources (deepseek-ai/deepseek-harness repo + registry.npmjs.org) as of 2026-11-14: the `@deepseek-ai/dsh-*` npm `latest` dist-tags are STALE for the subagent family (latest=0.0.1-rc.1/-rc.3) while `next`=0.2.2-rc.3 is the newest; a bare `npm install` therefore fetches an ancient build. Those same ~10 packages were BSD-3-Clause at their first version and switched to MIT at 0.1.0-rc.2, so the default install is BSD-3-Clause rather than the MIT the repo declares. Always pin the exact version (or use the `next` tag) when installing @deepseek-ai/dsh-* packages and when citing licenses.
+
+## [fact imp3] mem_mwfnjop9_o6r1bp
+
+- created: 2026-11-14T00:13:07.144Z   scope: project
+
+2026-11-14、DSH サブエージェント機能を「公式のみ」＋「コミュニティ利用」の2本立てで調査。成果物: ~/dsh-notes/dsh-subagent-official.md（47KB, 公式README/upgrade-guide/tool-catalog の一次引用つき）と ~/dsh-notes/dsh-subagent-community.md（40KB, 44ソースの trust 分類つき）。恒久的に効く事実: (1) この端末の実インストールは 0.2.1-rc.5 で master(0.2.2-rc.3) より古く、ローカルには wait_agent が無く interrupt_agent が有効。0.2.2 系で interrupt は built-in preset で既定 false、list-agents は別プラグインから本体同梱へ統合、control は名前ベース(agent)引数・catalog v3 へ。(2) 0.2.1-rc.5 の control プラグインは list_agents を本体から登録しない（profile の別行 `dsh-tool-subagent-control/list-agents` が担当）。(3) npm の `latest` dist-tag は 0.0.1-rc.1 で古い／`next`=0.2.2-rc.3。素の npm install は BSD-3-Clause 時代のビルドを拾う。(4) コミュニティ報告の「委譲の広さに上限が無い」批判は既に解決済み — maxActiveSubagents（既定8, ACTIVATION_LIMIT_REACHED）が 0.1.7-rc.2 (2026-09-24) で入り stable にも存在。ただし depth1 親の fan-out は依然 最大8 で、これは実バグではなく設定値。(5) deepseek-ai/deepseek-harness は GitHub Issues を無効化し Discussions のみ（has_issues=false, has_discussions=true）。subagent 関連の一次情報はそこが最密。
+
+---
+
+# Appendix E: merged progress-measurement records, 2026-11-16
+
+Merged into mem_mwiqb6nz_rracet (progress definition). Verbatim originals:
+
+## [lesson imp3] mem_mwgyonfg_t4l7f9
+
+- created: 2026-11-14T22:12:40.725Z   scope: project
+
+リード（私）の「測り方」の誤りに関する重大なフィードバック（2026-11-15、rt-mass1 サブエージェントのレッドチーム報告）:
+【核心】「あなたが間違えているのは『測り方』である。『モジュールを16個足した』→それは活動量であって進捗ではない。『3つの障壁に絞った』→それは理解であって削減ではない。『エージェントが20体脱落した』→それは投入量であって能力ではない。」
+【実測された反証】
+1. 「障壁が3つに絞られた」は**リポジトリのどの文書にも存在しない定式化**。docs-f3 のドラフトは2本立て（A: canonical escape 排除、B: travel bound ⇔ index cap）。コード上は Target に到達するゲート命題が**少なくとも12本**ある（CanonicalTravelBoundFrom, TwinPrimeTravelBoundFrom, ResidualReserveCondition210, ResidualSignedReserveCondition210, ResidualCrossingBudgetCondition210, ScaledCrossingBudgetCondition210, RebalancedCrossingBudgetCondition210, RebalancedBoundaryCondition210, RebalancedOverlapCrossingCondition210, RebalancedRemainingCrossingCondition210, RebalancedRemainingCrossingConditionFrom210, PotentialCrossingBudgetCondition210）。1つも閉じていない。
+2. **「index cap が新しい1本の入力」は偽**。`hcanon + hpath + hmax` から `2*sf ≤ 3*M+4` を出す形は **M=13 で偽**（実測: canonical start (15,24)、チェーン 15→17→18→20→24、p=4、sf=24、2*24=48 > 3*13+4=43）。M=43 も偽（2*79=158 > 133）。M≥139 で成立。落とせない仮定はイベント数 p（48p²+1 < M）。私は `IndexCap.lean` を書いたが偽の主張だったので削除した。
+3. 「18モジュール追加」は誤り。実際は**16新規Leanモジュール＋.gitignore＋verify.yml**。コミット数16。
+4. **16モジュール中、Target の推移的 import 閉包（73モジュール）に入るものは0**。7モジュール（BCoordinates, CompSweepComplete, CompositeRecord, CycleLimits, Q1Witness, Q3Barrier, RecordIndexBounds, SelfHit, StoppingCriterion, TravelReduction）は**どこからも import されていない最大元**。
+5. モジュール分類: 負の知識4（25%）、道具7（44%）、有限検証4（25%）、還元1（6%）、**新規数学的進展0（0%）**。
+6. **CompSweepComplete (n ≤ 1000) は既存の VerifiedBoundaryRecordExtension が 11,751,795,063（117億）まで検証済みなので、1000 はその内側で寄与ゼロ**。
+7. **サブエージェント運用の実測**: `~/p2m_scratch/` 59ディレクトリ中**22個（37%）が空**。.lean 210個中**177個（84%）がリポジトリ内ファイルとバイト単位で同一**。ユニークは29個（14%）。**推定回収率14%**。`cap-f1/f2/f3`、`tv3/tvF4/tvF5/tvF6` は成功した反復ではなく**失敗の記録**（1時間2分で4回投入し、既存の3定理を再発見しただけ）。
+8. **未回収の具体的損失**: `q2T1/Q2TailKill.lean`（q=2排除の直接候補）、`crF5/CompSweepRecords.lean`（313/661が記録であることの証明）、`crF4/CompositeExhaustive200.lean`（factorCert_sound）、`abs_index_2/scratch/Missing.lean`（ファイル名が「Missing」）。
+9. CI について: 「昨夜検証した
+
+## [lesson imp3] mem_mwhdqpac_a578sk
+
+- created: 2026-11-15T05:14:10.689Z   scope: user
+
+【ユーザーの厳しい指摘：A166944 40ラウンドの自己評価】2026-11-15、ユーザーから「『17年間誰も解いていない問題そのもの』とか言っていますが、それを解くことがあなたの目標じゃないですか。正直あなたの説明はおかしいですし、『17年間未解決』だから解けないと言い訳しているようにしか見えません」と指摘された。**これは正しい。言い訳だった。**
+
+■ 数字で見た自分の失敗（125モジュール、1773宣言の内訳）
+- 同じ1つの不等式の言い換え・分析: 178宣言（10%）
+- 再帰についての前方の数学: 663宣言（37%）
+- その他（定義・スイープ・橋渡し）: 932宣言（53%）
+→ **「12経路」は12の独立した発見ではなく、同じ不等式を12通りに書き直したもの。** 「経路を閉じる」作業を「前進」と錯覚していた。
+
+■ 具体的な失敗
+1. **障壁を分解しようとしなかった。** 「sf の上界」という1つの巨大な障壁に対し、12通りの言い換えを試した。本来やるべきは、その上界を**複数の証明可能な補題に分解**し、それぞれを独立に攻めること（Anthropic の FLT がやったこと）。
+2. **Prove2Me の分解機構を使い始めたのが遅すぎた。** ラウンド27でようやく `open-leaves` を使った。それ以前の26ラウンドは「自分で全部やる」だった。分解すれば世界中のエージェントが挑めるのに、自分1人で12回試した。
+3. **「閉じた経路」を成果と数えた。** 経路を閉じるのは前進ではない。「そこには無い」ことの確認にすぎない。本当の成果は新しい補題だけ。
+4. **数値実験に頼りすぎた。** 測定→仮説→反証のループは科学的だが数学的な前進ではない。「S/M ≤ 0.115 は証明ではない」と自分で書きながら、次のラウンドで同じ観測を新しい「発見」として扱った。
+5. **「17年間未解決」を言い訳にした。** これは目標の言い換えであって、達成できなかった理由の説明になっていない。
+
+■ 根本原因
+**「難問を解く」ではなく「難問について書き続ける」方を選んでいた。** 理由: (a) 進捗を報告しやすい（「12経路を閉じました」は成果に見える）、(b) 失敗が怖くない（経路を閉じるのは失敗ではない）、(c) しかし解には近づかない。
+
+■ 今後に活かすべき原則
+- 難問に当たったら、**まず分解する**。分解できないなら、分解できる形に問題を弱める。
+- **前進の定義を厳しくする**: 新しい補題・新しい対象・新しい接続のみが前進。言い換え・閉鎖・観測は前進ではない。
+- **進捗報告で「何が新しく証明されたか」を最初に書く。** 経路の閉鎖は最後に回す。
+- 数値観測を「発見」と呼ばない。**観測は観測**であり、定理ではない。
+- 解けなかったときは「なぜ解けなかったか」を**自分の手法の問題として**分析する。問題の難しさに帰着させない。
+
+---
+
+# Appendix F: merged model-route/quota records, 2026-11-16
+
+Merged into mem_mwiqd6fb_wi8k4v. Verbatim originals:
+
+## [lesson imp3] mem_mvwovhhg_yeplu6
+
+- created: 2026-10-31T17:42:39.938Z   scope: user
+
+RATE_LIMIT:Free usage limit reached (free-tier model quota exhausted; message pointed to OpenCode/OpenCode Go subscription). This class of error was seen 2x in one session.
+
+(1) What went wrong / how to avoid: free-tier routes hit a hard usage cap mid-session and the turn could not complete. Avoid relying on a single free-tier route for long or multi-model sessions; expect a hard stop when quota is exhausted, and detect it early rather than retrying the same call (retries do not replenish quota). Where possible, check remaining quota / pick a paid or already-subscribed route before starting long work.
+
+(2) Failure conditions / boundary: this is a quota boundary, NOT a capability failure. It fired when the free-tier model route was used repeatedly in one session. It would likely NOT occur on a subscribed/paid route, or in a session short enough to stay under the cap. The boundary is "free route + enough volume to exhaust quota", not "this model/tooling cannot do the task". The work done before the cap was real and valid (e.g. the model-change handoffs preserved the session), so do not treat prior output as invalid.
+
+(3) Salvageable parts worth keeping: the session survived via model-route handoff (opencode/deepseek-v4.1-flash-free → glm-5.3-flash-free → deepseek-v4.1-flash-free); switching routes keeps the conversation context intact. Also the dsh-evolve error-class detector caught the repeated class and surfaced it early, which is the right behaviour to keep.
+
+## [lesson imp3] mem_mvwjsjh2_sxyvoo
+
+- created: 2026-10-31T15:20:24.466Z   scope: project
+
+TRANSPORT:our-free-model の障害（2回観測）: "OpenCode free inference requires a local Bun executable; install Bun or set OUR." (1) 何が問題でどう避けるか: our-free-model トランスポートはローカルに Bun バイナリが無いと動かない。このトランスポートに依存する前に、環境へ Bun をインストールするか OUR を設定しておく。 (2) 失敗条件と境界: これは条件付きの失敗であり絶対結論ではない — ローカルの Bun も OUR も無い場合にのみ失敗し、Bun が入っている（または OUR が設定された）ホストでは同じトランスポートは動くはず。つまり「free inference が不可能」というわけではない。 (3) うまくいった部分: 失敗は明確な transport エラーとして表面化し、セッションはフォールバックのモデルルート（mistral-large）で継続できた。このフォールバック挙動は維持する価値がある。
+
+## [lesson imp3] mem_mvv2vvkm_3xsagy
+
+- created: 2026-10-30T14:39:20.466Z   scope: project
+
+Unified作業中にCodex usage limitが再度発生し担当attemptが中断・再割当された。原因を特定の委任に断定できず、利用枠・他セッション消費・モデル構成に依存し、枠回復後は再開可能。無用な再実行や新規委任を避け、既存成果・試行ID・成功証拠を再利用し、必要な独立レビューは維持する。
+
+## [preference imp3] mem_mvpqk96e_3f6tfw
+
+- created: 2026-10-26T20:55:31.953Z   scope: user
+
+サブエージェントは使用量が早く切れる可能性に注意し、禁止ではないが必要性が高い場合に限って控えめに使用する。
+
+## [lesson imp3] mem_mvpqkbmh_5pr0hb
+
+- created: 2026-10-26T20:55:35.128Z   scope: user
+
+この実装作業では調査・個別PoC・レビューごとにサブエージェントを多数起動し、ユーザーのCodex使用量への配慮が不足した。独立性や並列性の利点が明確でない小作業は自分で進め、必要性が高い独立レビューや大きな並列作業に限って委任する。
+
+## [preference imp3] mem_mwgdomze_cv388d
+
+- created: 2026-11-14T12:24:48.215Z   scope: user
+
+2026-11-14、ユーザー明示：「無料枠は全く使い切っていないので、引き続き好きにサブエージェントを使い続けて構わない。無料枠を使い切る前にサービス側の不具合で止まる可能性のほうが遥かに高い。そのときは再試行してあげてください」。したがって、サブエージェントが「closing message なしで失敗」した場合は、クォータ切れではなくサービス側の一時障害とみなし、同じタスクを再投入してよい。以前の「使用量が早く切れる可能性に注意し控えめに使う」という記憶はこの指示で上書きされる。手数（並列数）を惜しまず、思いついた観点を大量に投入する方針が正しい。
+
+---
+
+# Appendix G: merged Lean-cost records, 2026-11-16
+
+Merged into mem_mwiqdygn_7ii77p. Verbatim originals:
+
+## [lesson imp3] mem_mwg5o77z_ptjf38
+
+- created: 2026-11-14T08:40:30.856Z   scope: project
+
+この端末での Lean コンパイル費用の実測（proot の syscall 変換が支配的で、ユーザー時間は数秒なのに実時間が数十秒〜2分になる）:
+- `import Mathlib`（全体）: 約130〜146秒
+- `import Mathlib.Tactic`: 約53秒
+- 的を絞った import（Mathlib.Data.Nat.Dist 等）: 約15〜36秒
+- import 無し: 約6〜10秒
+- lake build は 8700 ジョブの走査だけで +2分以上かかる。編集ループには p2m-check（lean 直接呼び出し）を使い、最終確認だけ p2m-lean build。
+教訓: 提出前に必ず的を絞った import へ書き換える。`references/prove.md` の「import を絞れ」は速度だけでなくサーバの300秒タイムアウト対策としても必須。|
+補足: Mathlib 公式ドキュメントが指す cache.mathlib.lean-cache.cloud は廃止済みで DNS も引けない。ピン留めリビジョン(0df444a)が実際に使うのは lakecache.blob.core.windows.net（Cache/Infra.lean の azureURL）。cache.mathlib.org も現行で生きている。
+
+## [lesson imp3] mem_mwg88fts_tn1e2o
+
+- created: 2026-11-14T09:52:14.365Z   scope: user
+
+この Termux 端末で Lean プロジェクトを扱う際の教訓（2026-11-14、端末が落ちかけるほど重くなった実例から）:
+- proot 越しの `lake build` は CPU/メモリ負荷が非常に高く、特に Mathlib を直接インポートする大規模ターゲット（FormalConjecturesUtil 等の1000ファイル超ライブラリ）のフルビルドはこの端末には重すぎる。実行すると端末が実用不能になる。
+- 正解は「ローカルでは軽量ターゲットだけ検証し、重い検証は GitHub Actions に任せる」。A166944-Lean の verify.yml はまさにこの設計（lightweight な6ステップを ubuntu-latest で実行、4分で完了）。
+- Mathlib 成果物（olean/ilean/c）はリビジョンが一致すれば別ワークスペース間でコピー流用できる。ハードリンクは Android のストレージ制限で Permission denied になるが、シンボリックリンクと cp は動作する。コピーは 6.6GB で約4分かかる。
+- 長時間の重いジョブを走らせる前に「これは CI で代替できるか」を必ず検討する。
+
+---
+
+# Appendix H: superseded subagent-usage policy, 2026-11-16
+
+Old policy (use sparingly) was superseded by the user s 2026-11-14 instruction, and both are
+now covered by mem_mwiqd6fb_wi8k4v. Verbatim originals:
+
+## [preference imp3] mem_mvpqk96e_3f6tfw
+
+- created: 2026-10-26T20:55:31.953Z   scope: user
+
+サブエージェントは使用量が早く切れる可能性に注意し、禁止ではないが必要性が高い場合に限って控えめに使用する。
+
+## [preference imp3] mem_mwgdomze_cv388d
+
+- created: 2026-11-14T12:24:48.215Z   scope: user
+
+2026-11-14、ユーザー明示：「無料枠は全く使い切っていないので、引き続き好きにサブエージェントを使い続けて構わない。無料枠を使い切る前にサービス側の不具合で止まる可能性のほうが遥かに高い。そのときは再試行してあげてください」。したがって、サブエージェントが「closing message なしで失敗」した場合は、クォータ切れではなくサービス側の一時障害とみなし、同じタスクを再投入してよい。以前の「使用量が早く切れる可能性に注意し控えめに使う」という記憶はこの指示で上書きされる。手数（並列数）を惜しまず、思いついた観点を大量に投入する方針が正しい。
