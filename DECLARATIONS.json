@@ -33,6 +33,7 @@
   "CanonicalRecord": 16,
   "CanonicalTravel": 18,
   "CapBCandidates": 18,
+  "CapBStrength": 20,
   "CarryFactor": 5,
   "ChargedPhaseCredits210": 2,
   "CompSweep1000": 20,
@@ -139,6 +140,7 @@
   "RoomInvariant": 31,
   "RoomLedger": 32,
   "RoomQuantum": 8,
+  "SBoundLemma": 20,
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
   "Sharp48": 17,
@@ -179,5 +181,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2555
+ "total": 2595
 }
