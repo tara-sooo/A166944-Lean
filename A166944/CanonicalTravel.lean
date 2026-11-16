@@ -44,14 +44,29 @@ theorem moving_horizon_path_travel_bound {s C sf Cf p U : Nat}
       simp
   | succ p ih =>
       obtain ⟨_, r, C', hstep, htail⟩ := hpath
-      have hC' := (moving_horizon_path_gap_le_three_growth htail).2.1
-      have hsr := hstep.2.1
+      have hC' : C' ≤ Cf := (moving_horizon_path_gap_le_three_growth htail).2.1
+      have hsr : s < r := hstep.2.1
       have hrf := moving_horizon_path_index_le htail
-      have hgrowth := hstep.2.2.2.2.2.2.2.1
-      have hgap := moving_horizon_step_gap_le_sqrt hstep (by omega : C ≤ U)
+      have hup : C' = C + (d r - 1) := moving_horizon_step_update hstep
+      have hCC' : C ≤ C' := by omega
+      have hCU : C ≤ U := Nat.le_trans hCC' (Nat.le_trans hC' hU)
+      have hgap := moving_horizon_step_gap_le_sqrt hstep hCU
       have hrest := ih htail
+      -- Explicit arithmetic: the terminal `omega` on this goal shape pulls in
+      -- `Classical.choice` (see CLASSICAL_CHOICE_AUDIT.md).
+      have hsrle : s ≤ r := Nat.le_of_lt hsr
+      have hstep_le : sf - s ≤ (r - s) + (sf - r) := by omega
+      have hsum : (r - s) + (sf - r) ≤ isqrt (4 * (U + 1)) + p * isqrt (4 * (U + 1)) :=
+        Nat.add_le_add hgap hrest
+      have hlt : sf - s ≤ isqrt (4 * (U + 1)) + p * isqrt (4 * (U + 1)) :=
+        Nat.le_trans hstep_le hsum
+      have hcomm : isqrt (4 * (U + 1)) + p * isqrt (4 * (U + 1))
+          = p * isqrt (4 * (U + 1)) + isqrt (4 * (U + 1)) :=
+        Nat.add_comm _ _
+      rw [hcomm] at hlt
+      show sf - s ≤ Nat.succ p * isqrt (4 * (U + 1))
       rw [Nat.succ_mul]
-      omega
+      exact hlt
 
 /-- Every first old crossing must have enough events to travel from the
 canonical origin to an index where the upper bound can be exceeded. -/
@@ -145,15 +160,18 @@ theorem canonical_horizon_bound_of_event_count {M sf Cf p : Nat}
     (hpath : HasMovingHorizonPathTo (M + 2) (2 * M - 2) sf Cf p)
     (hmax : IsAttainedPreviousMaximum M sf) (hcount : 48 * (p * p) + 1 < M) :
     Cf ≤ 3 * M + 4 := by
-  by_cases h : Cf ≤ 3 * M + 4
-  · exact h
-  · obtain ⟨sp, Cp, r, Cr, q, hpre, hstep, hbelow, hcross, hq, hr⟩ :=
-      moving_horizon_path_first_crossing hpath (by omega : 2 * M - 2 ≤ 3 * M + 4) (by omega)
+  -- `Nat.lt_or_ge` rather than `by_cases`: the latter goes through `Decidable` and pulls in
+  -- `Classical.choice` (see CLASSICAL_CHOICE_AUDIT.md). This case split is constructive.
+  rcases Nat.lt_or_ge (3 * M + 4) Cf with hlt | h
+  · -- Cf exceeds the horizon cap: derive a contradiction to hcount
+    obtain ⟨sp, Cp, r, Cr, q, hpre, hstep, hbelow, hcross, hq, hr⟩ :=
+      moving_horizon_path_first_crossing hpath (by omega : 2 * M - 2 ≤ 3 * M + 4) hlt
     have hr2 : 2 ≤ r := by have := hstep.1.1; have := hstep.2.1; omega
     have hcap := hmax.1 r hr2 hr
     have hMbound := canonical_old_crossing_event_count hM hcanon hpre hstep hcap hbelow hcross
     have hmul := Nat.mul_le_mul_left 48 (Nat.mul_le_mul hq hq)
     omega
+  · exact h
 
 /-- A bound on the index of the last old event bounds the horizon. -/
 theorem canonical_horizon_bound_of_short_travel {M sf Cf p : Nat}
@@ -179,11 +197,11 @@ theorem canonical_travel_bound_of_event_count {M sf Cf p : Nat}
   have hCU : Cf ≤ 3 * M + 3 := by omega
   have hgap := moving_horizon_path_travel_bound hpath hCU
   change sf - (M + 2) ≤ p * isqrt (4 * (3 * M + 4)) at hgap
-  by_cases h : 2 * (sf - (M + 2)) ≤ M
-  · exact h
+  rcases Nat.lt_or_ge M (2 * (sf - (M + 2))) with hlt | h
   · have hlong : M < 2 * (p * isqrt (4 * (3 * M + 4))) := by omega
     have hb := previous_record_le_of_long_travel (by omega) hlong
     omega
+  · exact h
 
 /-- The uniform travel hypothesis used in the return and primality proof. -/
 def CanonicalTravelBoundFrom (lower : Nat) : Prop :=

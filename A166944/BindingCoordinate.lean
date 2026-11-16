@@ -218,7 +218,21 @@ theorem canonical_joint_ledger {M sf Cf p : Nat}
 theorem cap_iff_joint_form {M Cf p E : Nat} (hM : 4 ≤ M)
     (hled : Cf + p = (2 * M - 2) + E) :
     8 * E ≤ 3 * M - 9 ↔ 8 * Cf + 8 * p ≤ 19 * M - 25 := by
-  omega
+  -- Done by explicit rewriting rather than `omega`: the mixed-`omega` closure of this goal
+  -- shape pulls in `Classical.choice` (see CLASSICAL_CHOICE_AUDIT.md). Only linear
+  -- distributive and subtraction lemmas are used, so the result stays constructive.
+  have hbase : 8 * (2 * M - 2) = 16 * M - 16 := by
+    have h1 : 2 * M - 2 + 2 = 2 * M := Nat.sub_add_cancel (by omega)
+    have hsub : 8 * (2 * M - 2) = 8 * (2 * M - 2 + 2) - 8 * 2 := by
+      rw [Nat.mul_sub]; omega
+    rw [hsub, h1]
+    omega
+  have key : 8 * Cf + 8 * p = 16 * M - 16 + 8 * E := by
+    have h1 : 8 * Cf + 8 * p = 8 * (Cf + p) := (Nat.mul_add 8 Cf p).symm
+    rw [h1, hled, Nat.mul_add 8]
+    rw [hbase]
+  rw [key]
+  constructor <;> intro h <;> omega
 
 /-- **The joint system is vacuous for the cap.**  For every `M ≥ 4` and every `R`
 there are `Cf, p, E` satisfying the joint ledger, the per-event floor `3p ≤ E`, the

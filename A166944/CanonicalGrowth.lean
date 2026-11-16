@@ -66,21 +66,33 @@ private theorem moving_horizon_step_gap_le_three_growth {s C r C' : Nat}
   have hgap := moving_horizon_step_gap_le_twice_increment hstep
   omega
 
-/-- A first-hit path travels at most three indices per unit of horizon growth. -/
+/-- A first-hit path travels at most three indices per unit of horizon growth.
+
+The inductive step is done in explicit `Nat` arithmetic rather than `omega`. That is not
+stylistic: closing this particular mixed goal with `omega` pulls in `Classical.choice`, which
+propagated to four downstream declarations (`excess_le_two_travel_add_six`,
+`cap_of_travel_bound`, `cap_iff_joint_form`, `state_bound_iff_excess_bound`). See
+`CLASSICAL_CHOICE_AUDIT.md`. The explicit chain below audits to `[propext, Quot.sound]`. -/
 theorem moving_horizon_path_gap_le_three_growth {s C sf Cf p : Nat}
     (hpath : HasMovingHorizonPathTo s C sf Cf p) :
     s ≤ sf ∧ C ≤ Cf ∧ sf - s ≤ 3 * (Cf - C) := by
   induction p generalizing s C with
   | zero =>
       obtain ⟨rfl, rfl, _⟩ := hpath
-      omega
+      exact ⟨Nat.le_refl _, Nat.le_refl _, by omega⟩
   | succ p ih =>
-      obtain ⟨_, r, C', hstep, htail⟩ := hpath
+      obtain ⟨hstate, r, C', hstep, htail⟩ := hpath
       obtain ⟨hrf, hCf, htailgap⟩ := ih htail
-      have hsr := hstep.2.1
-      have hup := moving_horizon_step_update hstep
-      have hgap := moving_horizon_step_gap_le_three_growth hstep
-      omega
+      have hsr : s < r := hstep.2.1
+      have hsle : s ≤ r := Nat.le_of_lt hsr
+      have hup : C' = C + (d r - 1) := moving_horizon_step_update hstep
+      have hCC' : C ≤ C' := by omega
+      have hgap : r - s ≤ 3 * (C' - C) := moving_horizon_step_gap_le_three_growth hstep
+      have hstep_le : sf - s ≤ (r - s) + (sf - r) := by omega
+      refine ⟨Nat.le_trans hsle hrf, Nat.le_trans hCC' hCf, ?_⟩
+      calc sf - s ≤ (r - s) + (sf - r) := hstep_le
+        _ ≤ 3 * (C' - C) + 3 * (Cf - C') := Nat.add_le_add hgap htailgap
+        _ = 3 * (Cf - C) := by omega
 
 private theorem dvd_le_sum_of_differences {e x y : Nat}
     (hx : e ∣ x) (hy : e ∣ y) (hne : x ≠ y) :
