@@ -190,3 +190,55 @@ bounded by `c*p`; small-prime truncation fails (`q <= 100` gives 16.5% of the su
 gives 97.1% of `S` at M=91793059); the largest contributions come from large `q` at large
 records (`q = 12433` at M=91793059). The many small gaps do not help: `gap <= 6` holds at 63.1%
 of steps, yet at M=22933441 over 94% of `travel` sits in the 72 gaps above 6.
+
+
+---
+
+# Round 2, close: the generalization landed, and a range correction
+
+`A166944/LpfGap.lean` (CI green) generalizes `Mod3Gap` from `3` to any `q >= 2`:
+
+```
+gap_le_twice_of_dvd_even : 2 <= q -> q | C - 1               ->  r - s <= 2*q
+gap_le_twice_of_dvd_odd  : 2 <= q -> q % 2 = 1 -> q | C + 1  ->  r - s <= 2*q
+```
+
+The parity question has an **asymmetric** answer, and the necessity is PROVED, not asserted:
+
+* even branch: no parity hypothesis needed — the witness `2*(q*k) + 2*q` is already an even
+  multiple of `q`;
+* odd branch: `q % 2 = 1` is REQUIRED — the witness is `q*m + 2` with `m` odd, which is never
+  odd when `q` is even, so no admissible `j` exists. Formalized as
+  `odd_branch_needs_q_odd : not (forall j, j % 2 = 1 -> 2 | j - 2)`.
+
+On this orbit the hypothesis is free: `C` is even at every state, which the tree already gives
+via `Lemmas.D_mod_two_eq_zero_of_two_le`, so `q % 2 = 1` follows
+(`horizon_even_of_state`, `q_odd_of_dvd_succ_of_even`). No hypothesis was added silently.
+
+Measured over 813 steps: zero violations of `gap <= 2*q`; even branch 538 (q odd 538/538), odd
+branch 275 (`C+1` even in 0/275), independently confirming `C` even.
+
+## Range correction (my error, verified)
+
+I recorded "`2*sum q <= M/2` at every record". **That is false at `M = 13` and `M = 43`**:
+
+| M | `2*sum q` | `M/2` | ratio | `travel` | `2*travel` vs M |
+|---|---|---|---|---|---|
+| 13 | 32 | 6 | 4.923 | 9 | 18 > 13 FAIL |
+| 43 | 60 | 21 | 2.791 | 34 | 68 > 43 FAIL |
+
+The cause of my error: my record list started at `M = 661`, so "every record" was never tested
+below that. The two failures are harmless **because the frontier fails at exactly the same two
+records and nowhere else** — the correspondence between `2*sum q <= M/2` and `travel <= M/2` is
+what matters, and both break together, well below the consumer's `M >= 968`.
+
+When quoting a margin, state the range:
+
+* `M >= 139`: worst `0.1610` at `M = 2659`, margin **6.21x**
+* including `M = 139, 313`: worst `0.5367` at `M = 313`, margin only **1.86x**
+
+## Where this leaves the frontier
+
+Unchanged: `sum q <= M/4` is still unproved, and `LpfGap` supplies only the per-step half
+(`travel <= 2*sum q`). The summation bound is the same wall localized earlier at the twin-prime
+structure, and no mechanism for it exists yet in this tree.
