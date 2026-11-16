@@ -10,9 +10,25 @@ import A166944.WindowControlsS
 at a terminal state. Round 9 recorded that this is the tree's ONLY route from a replay to
 statements about `C_f +- 1`, hence to the record spacing, hence to `S`.
 
-Six previous rounds assumed that producing this window required bounding `S` from above. It does
-not. This file proves that the frontier `travel <= M/2` ALONE produces the window at `S = 0`,
-with `S` entirely unbounded.
+**CORRECTION (round 14).** When this file was written I claimed the frontier alone produces the
+window, so that "no bound on `S` is needed". That claim is WRONG. `QuietReturn.lean` already
+contains, as a `private` theorem, `long_quiet_gap_of_short_travel`:
+
+    travel <= M/2  ->  2*M - 2 <= C  ->  C <= 3*M + 4  ->  2 * isqrt (C + 1) < C - s
+
+which covers ARBITRARY `C`, i.e. arbitrary `S`, and takes `C <= 3*M + 4` as a hypothesis. My
+result here is the special case `C = 2*M - 2` (i.e. `S = 0`), where `C <= 3*M + 4` holds
+trivially. So it is a derived special case, and **an `S`-bound IS needed** in general -- I only
+showed it is not needed in the `S = 0` case.
+
+I missed this because `long_quiet_gap_of_short_travel` is `private`, so a grep for the public
+lemma name did not surface it. The numeric lemmas below (`isqrt_mono`, `square_shift_bound`,
+`two_isqrt_bound`) are correct and independently useful; the surrounding SIGNIFICANCE claim was
+overstated.
+
+What the frontier does and does not buy, restated honestly: it produces the window when combined
+with `C <= 3*M + 4` (cap (A)), and `C <= 3*M + 4` is equivalent to `S <= M + 6`. So the open
+input is unchanged: an upper bound on `S`.
 
 ## The arithmetic
 
