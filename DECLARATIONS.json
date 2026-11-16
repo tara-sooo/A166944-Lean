@@ -42,6 +42,7 @@
   "CompositeRecord": 2,
   "CompositeThird": 4,
   "ConsecutiveEventGcd": 14,
+  "CoprimeEvents": 4,
   "CountBoundLimits": 2,
   "CountFromIndex": 4,
   "CreditDeficitStructure210": 2,
@@ -178,5 +179,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2551
+ "total": 2555
 }
