@@ -389,7 +389,24 @@ Two consequences, and they are the content of this section:
 This is the sharpest available statement of what is missing: a lower bound on
 `r₂ = 2 sf - Cf` that grows at rate `2` in `travel`.  The state bound supplies
 `r₂ ≥ 0` only, and `state_bound_route_vacuous` shows `r₂ ≥ 0` plus the index cap is
-provably not enough. -/
+provably not enough.
+
+**CORRECTION (2026-11-16).** The paragraph above invites the reading that `r₂` is the
+missing resource, and a campaign round was spent acting on that reading before it was
+measured.  It is not.  Substituting the measured `r₂`, `travel`, `p` into the normal
+form `16*travel + 8p + 57 ≤ 3M + 8*r₂` shows the REQUIRED lower bound on `r₂` is
+**negative** at every record with `M ≥ 139` (`-13` at `M = 139`, `-8_571_139` at
+`M = 22933441`): the `3M` term dominates `16*travel + 8p + 57` throughout.  So `r₂ ≥ 0`
+— which the tree already proves — discharges the normal form *automatically*, and no
+lower bound on `r₂` is missing.
+
+What the normal form actually costs is visible once the `r₂` term is dropped: it
+becomes `16*travel + 8p + 57 ≤ 3M`, i.e. roughly `travel ≤ 3M/16`, which is
+**stronger** than the frontier `travel ≤ M/2`, not weaker.  Measured, the worst
+`travel/(3M/16)` is `0.569` at `M = 313` (margin `1.76x`) against `travel/(M/2)` which
+is `0.58` at the same scale — so this is a change of coordinates on the same wall, not
+a new route.  The genuine missing input remains the `S`/`p` bound stated elsewhere;
+`r₂` is a derived quantity, not an independent one. -/
 
 /-- **The bridging identity.**  `r₂ + S = 2 * travel + 6` with
 `r₂ = 2 sf - Cf`, `S = Cf - (2M-2)`, `travel = sf - (M+2)`.  This is
