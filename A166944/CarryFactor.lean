@@ -84,6 +84,7 @@ theorem carried_prime_not_next_odd {q C' : Nat} (hq1 : 1 < q) (h : q ∣ C') :
 
 end A166944Research
 
+/-!
 ## Verified status (2026-11-16)
 
 Core-only build, `-DautoImplicit=false -DrelaxedAutoImplicit=false`: exit 0, no `sorry`,
@@ -102,3 +103,4 @@ so no truncation argument of the form "small primes are frequent, large primes a
 closes it; and the reuse count of a given prime along a replay grows roughly linearly in
 `p` (max reuse 81 at M = 22933441, p = 209).  Recorded so the next attempt does not
 repeat the truncation idea.
+-/
