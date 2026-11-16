@@ -123,3 +123,70 @@ The correct record list through the verified prefix is therefore
 **Method note:** use the jump form to verify a record table, never a long linear scan. The jump
 form derives `M_next` directly from `M`; a linear stream to `n = 7.9e8` accumulates state error
 and cannot be trusted at its boundary values without independent re-verification.
+
+
+---
+
+# Round 2 (2026-11-16, later): the minimality technique, and why every route converges
+
+## A new provable per-step bound, and the technique behind it
+
+`A166944/Mod3Gap.lean` (CI green) proves, core-only and axiom-free:
+
+```
+gap_le_six_of_three_dvd_even : (3 | C-1)  =>  r - s <= 6
+gap_le_six_of_three_dvd_odd  : (3 | C+1)  =>  r - s <= 6
+```
+
+Measured 362/362 steps with zero exceptions before proving. The mechanism is NOT the tree's
+`gap <= 2*v`: that lemma requires `3` to divide the EVENT VALUE, which `3 | C+-1` does not
+force. It is **MINIMALITY of the event index** (`FirstHitForm.step_is_first_gcd_hit`): no `j`
+with `s < j < r` passes the gcd test, so exhibiting one admissible `j <= s + 6` suffices. On the
+even branch any even multiple of 3 works; on the odd branch take `j` odd with `3 | j - 2`. Both
+exist among any six consecutive integers, by a mod-6 case analysis with concrete witnesses.
+
+**This minimality technique is the most reusable finding of the round**: it converts a *lower*
+structural fact (a small admissible index exists) into an *upper* bound on `r`, which is the
+direction the campaign lacked. It generalizes from `3` to any odd prime `q`, giving
+`gap <= 2*q`; that generalization is being landed separately.
+
+## Supporting structure measured
+
+* **`C` is even at every state** (903/903). Hence `C - 1` and `C + 1` are both odd, hence every
+  divisor `q >= 2` of either is ODD (measured `q % 2 = 1` at 903/903), so `q = 2` never occurs
+  (908/908). A parity hypothesis in the general lemma is therefore implied on this orbit.
+* **`C mod 3` never (or almost never) equals 2**: pooled over 926 states, `C%3=0` 60.9%,
+  `C%3=1` 37.0%, `C%3=2` only 2.1%. Follows from `M%3 = 1` (records are twin-prime larger
+  members) giving `C_0 = 2M-2 = 0 mod 3`, and then `C' = C + (e-1)` stays in `{0,1}` unless
+  `e = 0 mod 3`.
+* **`q = 3` fires exactly when `3` divides the branch term**: 345/345 agreement, no exceptions.
+
+## Why every route hits the same wall — the convergence theorem
+
+This is the round's most important negative result, and it is measurable in three lines:
+
+```
+Sigma q <= 2*S                      holds at EVERY record (worst ratio 0.5833 at M=5419)
+Sigma q / S in [0.47, 1.17]
+travel / S in [0.50, 1.39]          (pooled 0.61)
+travel <= 2 * Sigma q               (from the per-step gap <= 2q)
+```
+
+So `travel`, `Sigma q`, `S`, `Sigma e`, `Sigma min lpf` and `M_next` are **all the same quantity
+up to a bounded factor**. Introducing any of them as a new target does not lower the difficulty;
+it renames it. This is why the campaign has repeatedly re-derived the same wall.
+
+Two concrete consequences:
+
+1. **`Sigma q <= M/4` cannot be reached through `S`.** From `Sigma q <= 2S` and (hypothetically)
+   `S <= (3M-9)/12` one gets `Sigma q <= (3M-9)/6`, and `(3M-9)/6 <= M/4` only for `M <= 6`.
+2. **`Sigma q / p` grows without bound** (7.00 at M=1321 -> 521.9 at M=91793059), so no
+   `Sigma q <= c * p` for a constant `c` can exist. Any bound must be in terms of `M`.
+
+## Still open
+
+`Sigma q <= M/4` (equivalently any of the earlier forms). What is known about it: it cannot be
+bounded by `c*p`; small-prime truncation fails (`q <= 100` gives 16.5% of the sum, and `q > 1000`
+gives 97.1% of `S` at M=91793059); the largest contributions come from large `q` at large
+records (`q = 12433` at M=91793059). The many small gaps do not help: `gap <= 6` holds at 63.1%
+of steps, yet at M=22933441 over 94% of `travel` sits in the 72 gaps above 6.
