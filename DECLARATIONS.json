@@ -158,6 +158,7 @@
   "TravelResidues": 5,
   "TravelSigned210": 7,
   "TravelTarget": 11,
+  "TwinCentreClosed": 18,
   "TwinCrossingBudget210": 7,
   "TwinReserveTarget210": 5,
   "TwinSignedReserveTarget210": 6,
@@ -173,5 +174,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2504
+ "total": 2522
 }
