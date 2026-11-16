@@ -183,7 +183,8 @@
   "VerifiedRecordExtension": 12,
   "VerifiedRecordPrefix": 10,
   "VerifiedTravelExtension": 11,
-  "VerifiedTwinPrimePrefix": 2
+  "VerifiedTwinPrimePrefix": 2,
+  "WindowControlsS": 3
  },
- "total": 2613
+ "total": 2616
 }
