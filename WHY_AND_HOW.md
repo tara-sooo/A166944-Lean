@@ -119,21 +119,43 @@ From `HalfWindow.gap_le_twice_min_factor`, `gap <= 2*min(e, cofactor)`, and
 travel <= 2 * Sum_i min( lpf(C_i - 1), lpf(C_i + 1) )
 ```
 
-**Measured: holds at 17/17 records.**  And `2*Sum <= (3M-9)/4` holds at 15/17 —
-it fails only at `M = 13` and `M = 43`, both **below** the `45895573` threshold the
-top of the development already uses.  (Note the two conditions differ: the
-inequality `travel <= 2*Sum` itself holds at 17/17 including `M = 13` and `43`.)
+**Measured: holds at 17/17 records.**
 
-So the target lemma is (the `/8` is forced: `travel <= 2*Sum` and
-`travel <= (3M-9)/4` give `2*Sum <= (3M-9)/4`):
+So the target lemma is:
 
 ```
-Sum_i min( lpf(C_i - 1), lpf(C_i + 1) )  <=  (3M - 9) / 8
+Sum_i min( lpf(C_i - 1), lpf(C_i + 1) )  <=  M / 4
 ```
 
-Measured `Sum / ((3M-9)/8)`: 0.016 at `M = 355723` (2129 vs 133395, margin
-62.7x), 0.0095 at `M = 1427749` (5076 vs 535405, margin 105.5x).  The tightest
-record is `M = 139` at 0.235 (margin 4.2x).
+**Why `M/4` and not the `(3M-9)/8` an earlier draft of this file said.** The real
+frontier is `CanonicalTravelBoundFrom`, i.e. `2*(sf - (M+2)) <= M`, equivalently
+`travel <= M/2`. With `travel <= 2*Sum`, the statement `Sum <= M/4` gives
+`travel <= 2*Sum <= M/2`, which **is** the frontier and implies `Target` directly
+via `target_of_travel_bound_from_22933441`. The `(3M-9)/8` form only reaches
+cap (B) `4*sf <= 7*M-1`, and `TwoCapTarget` shows cap (B) **alone** does not yield
+`Target` — it needs cap (A) `Cf <= 3*M+4` too. The earlier `/8` target was
+therefore insufficient, and the sentence "`travel <= (3M-9)/4`" that justified it
+was wrong: the frontier is `travel <= M/2`.
+
+Measured margins for `Sum` vs `M/4`:
+
+| M | Sum | M/4 | margin |
+| --- | --- | --- | --- |
+| 139 | 12 | 34.8 | 2.90x |
+| 313 | 42 | 78.2 | **1.86x (tightest)** |
+| 2659 | 95 | 664.8 | 7.00x |
+| 10891 | 251 | 2722.8 | 10.85x |
+| 355723 | 2129 | 88930.8 | 41.8x |
+| 1427749 | 5076 | 356937 | 70.3x |
+| 2860771 | 2559 | 715193 | 279x |
+
+The tightest record is `M = 313` at 1.86x. `M = 13` and `M = 43` fail `M/4`
+(Sum 16 and 30 versus 3.2 and 10.8), but both are far below the `45895573`
+threshold the top of the development already discharges by a verified prefix.
+
+The composition `r - s <= 2*min v1 v2` from `1 < v1`, `v1 | C-1`, `1 < v2`,
+`v2 | C+1` is already typechecked (`frontier/ScratchMinLpf.lean`, axioms
+`propext`/`Quot.sound`).
 
 **Why it is hard:** `min-lpf` is unbounded along the replay (max observed 1129 at
 `M = 1427749`, 719 at `M = 355723`), so no constant bound exists, and the
@@ -173,8 +195,29 @@ Measured:
 | 1427749 | 44 | 172.4 | 3.92x |
 | 2860771 | 50 | 244.1 | 4.88x |
 
-**The route closes numerically at every record `>= 1321`.**  The full budget
-`2*(6p + cover*corr) <= M` holds at every record from `M = 1321` upward.
+**The route closes numerically at every record `>= 1321`**, and (2026-11-16) this was
+extended by an independent campaign to `N = 3e9`: no violation above `45895573`, margins
+42x to 1844x, `cover/sqrt(M)` falling from 0.116 to 0.00008.  Caveat: `p` is not monotone
+(209 at `M = 22933441` versus 37 at `M = 45895573`), so single-record margins are partly
+luck.  The full budget `2*(6p + cover*corr) <= M` holds at every record from `M = 1321`
+upward.
+
+**Update 2026-11-16 — the cover count is discharged, and the route collapses into `p`.**
+`cover` counts event states, and the consumer's hypothesis is *existential* over covers,
+so it suffices that a cover of length `<= p` **exists**; route-b proved exactly that
+(`routeB/LemmaB.lean: exists_six_cover_length_le_p`, `exists_six_cover_of_p_bound`).  The
+route therefore needs only the scalar bound
+
+```
+(L)   6p + p*(isqrt(4*(3M+4)) - 6)  <=  M/2        i.e.   p <= 0.1443*sqrt(M)
+```
+
+which is **the same bound the event-count route needs**.  The cover-counting problem is
+solved; the difficulty is relocated, not removed.  (An earlier claim in this file that
+`cover <= p` follows from `cover` being a subset of the `p` event states is **wrong as
+stated**: the containment hypothesis is a *lower* bound, so `List.range sf` satisfies it
+with length `sf`.  Route-b's `range_is_a_cover` and
+`cover_length_le_p_not_forced_by_containment` are the Lean corrections.)
 
 Measured `cover/sqrt(M)` : 0.116 at `M = 2659`, falling to 0.030 at `M = 2860771`.
 The allowed 0.1443 is therefore not tight — but it is not implied by anything in
@@ -203,6 +246,16 @@ Measured and worth recording:
 So the mod-3 split *is* Route B, and the tree already knows it.  Recording it here
 so it is not rediscovered a fourth time.
 
+**Update 2026-11-16 — the mod-3 dynamics were measured properly, and they are a DEAD END
+for this route.**  `P(0->0) = 0.4304` versus `P(1->0) = 0.8997` over 921 transitions, with
+stationary `pi_0 = 0.6004` matching the measured `P(3 | C_i)`; a scrambled control (2000
+shuffles) put the observed effect outside the null (null max +0.1259), and a structural
+zero was found (`P(0->2) = P(2->2) = 0` exactly).  The lead's independent control to
+`M = 6e6` agreed and showed the two probabilities constant to three digits across four
+decades of `M`.  **But a stationary density bounds a proportion, not a count**: since
+`cover ~ 0.58p`, the bound forces `p <= 0.2475*sqrt(M)` on the *mean*, so no
+variance/CLT argument can rescue it.  Do not re-attempt this angle.
+
 ---
 
 ## 6. What would actually move the barrier
@@ -216,8 +269,9 @@ Ranked by (chance of success) x (value if it succeeds).
    Anything that bounds how often the horizon can be divisible by 6 while the
    increment stays bounded is progress.
 
-2. **State Route A's sum lemma.** New, has 4x-105x margin, fails only below the
-   threshold. The lemma is `Sum min(lpf(C_i-1), lpf(C_i+1)) <= (3M-9)/8`. It
+2. **State Route A's sum lemma.** New, has 1.9x-279x margin, fails only below the
+   threshold. The lemma is `Sum min(lpf(C_i-1), lpf(C_i+1)) <= M/4`, sufficient
+   because `travel <= 2*Sum` and the frontier is `travel <= M/2`. It
    requires new number theory about small factors, so it is harder than 1, but its
    margin is far larger.
 
