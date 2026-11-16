@@ -160,6 +160,7 @@ jobs:
           lake build A166944.Attempt \
             A166944.Baseline \
             A166944.Bridge \
+            A166944.CarryFactor \
             A166944.CanonicalGrowth \
             A166944.CanonicalTravel \
             A166944.ChargedPhaseCredits210 \

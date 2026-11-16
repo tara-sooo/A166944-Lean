@@ -33,6 +33,7 @@
   "CanonicalRecord": 16,
   "CanonicalTravel": 18,
   "CapBCandidates": 18,
+  "CarryFactor": 5,
   "ChargedPhaseCredits210": 2,
   "CompSweep1000": 20,
   "CompSweepComplete": 2,
@@ -177,5 +178,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2546
+ "total": 2551
 }
