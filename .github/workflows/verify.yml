@@ -121,6 +121,7 @@ jobs:
             A166944.FrontierGivesWindow \
             A166944.FrontierIsForced \
             A166944.FrontierMargin \
+            A166944.LargeIncrementInactive \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
             A166944.AbsorptionCriterion \

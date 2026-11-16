@@ -78,6 +78,7 @@
   "HorizonCrossing": 27,
   "HorizonLedger": 7,
   "Isqrt": 7,
+  "LargeIncrementInactive": 4,
   "LeastDivisorRoute": 28,
   "Lemmas": 295,
   "LpfGap": 15,
@@ -189,5 +190,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2630
+ "total": 2634
 }
