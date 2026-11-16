@@ -101,6 +101,7 @@ jobs:
             A166944.HalfWindow \
             A166944.FirstHitForm \
             A166944.Mod3Gap \
+            A166944.LpfGap \
             A166944.GapTwoSided \
             A166944.LeastDivisorRoute \
             A166944.DoublingReadoff \

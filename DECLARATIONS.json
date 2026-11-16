@@ -74,6 +74,7 @@
   "Isqrt": 7,
   "LeastDivisorRoute": 28,
   "Lemmas": 295,
+  "LpfGap": 15,
   "MinFactorSumRoute": 7,
   "Mod3Gap": 4,
   "OrphanHarvest": 5,
@@ -181,5 +182,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2579
+ "total": 2594
 }
