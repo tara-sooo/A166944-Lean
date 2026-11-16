@@ -70,6 +70,7 @@
   "FirstHitForm": 4,
   "FrontierGivesWindow": 4,
   "FrontierIsForced": 5,
+  "FrontierMargin": 5,
   "FundedPhaseCredits210": 7,
   "GapBound": 2,
   "GapTwoSided": 3,
@@ -188,5 +189,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2625
+ "total": 2630
 }
