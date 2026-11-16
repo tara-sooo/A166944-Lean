@@ -71,6 +71,7 @@
   "Isqrt": 7,
   "LeastDivisorRoute": 28,
   "Lemmas": 295,
+  "MinFactorSumRoute": 7,
   "OrphanHarvest": 5,
   "PinnedCharacterization": 33,
   "PinnedExclusion": 15,
@@ -138,6 +139,7 @@
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
   "Sharp48": 17,
+  "SixCoverRoute": 13,
   "SqrtFreeTransport": 3,
   "StoppingCriterion": 4,
   "TailReduction": 12,
@@ -174,5 +176,5 @@
   "VerifiedTravelExtension": 11,
   "VerifiedTwinPrimePrefix": 2
  },
- "total": 2522
+ "total": 2542
 }
