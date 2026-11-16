@@ -44,9 +44,10 @@ gates are quantified (`TwinPrimeTravelBoundFrom 22933441`, and `45895573` at the
 of `TravelTarget`); see the caveat at the head of `BCapDictionary`.  The theorems are
 about an UNBOUNDED cap-B proposition, not about any gate that is actually consumed.
 
-`cap_b_fails_at_forty_three` additionally gives a kernel-checked witness for the
-lead's independent finding that `M = 43` is itself a canonical start violating the
-cap.
+`cap_b_fails_at_thirteen` and `cap_b_fails_at_forty_three` give kernel-checked
+witnesses for the two canonical starts at which the UNBOUNDED cap-B form fails,
+the second of which confirms the lead's independent finding that `M = 43` is
+itself a canonical start violating the cap.
 
 Core-only: `decide` / `omega` / `Nat.mul_le_mul`.  No Mathlib, no `Nat.Prime`,
 no `Nat.sqrt`.
@@ -151,9 +152,10 @@ theorem cap_b_holds_at_three_hundred_thirteen : 8 * (36 + 6) ≤ 3 * 313 - 9 := 
 
 /-- **The lower bound on `M` is load-bearing.**  Among the four certified canonical
 starts `13, 43, 139, 313`, cap B fails at the two smallest and holds at the two
-largest.  Any uniform statement implying cap B for canonical starts must therefore
-carry an explicit `M`-threshold, and `M = 43` is the largest start at which the
-unbounded form fails. -/
+largest.  So any uniform statement implying cap B for canonical starts must carry
+an explicit `M`-threshold.  (The measurement, `sbound/REPORT.md` section 3, shows
+that among all canonical starts with `M <= 2*10^6` the unbounded form fails ONLY at
+`M = 13, 43`; this theorem does not assert that, it asserts the four cases.) -/
 theorem canonical_start_threshold_is_necessary :
     (¬ (8 * (18 + 4) ≤ 3 * 13 - 9)) ∧ (¬ (8 * (54 + 6) ≤ 3 * 43 - 9)) ∧
       (8 * (36 + 2) ≤ 3 * 139 - 9) ∧ (8 * (36 + 6) ≤ 3 * 313 - 9) := by
