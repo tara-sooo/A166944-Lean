@@ -57,6 +57,7 @@
   "DNodes": 6,
   "DoublingReadoff": 25,
   "DroppingPIsWorse": 4,
+  "EventCountAboveThreshold": 4,
   "EventCountCounterexample": 5,
   "EventCountFails": 7,
   "ExcessCriterion": 8,
@@ -201,5 +202,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2674
+ "total": 2678
 }

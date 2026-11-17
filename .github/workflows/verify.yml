@@ -131,6 +131,7 @@ jobs:
             A166944.MinFactorLeExcess \
             A166944.SumBoundBasic \
             A166944.PlatformLeafReductions \
+            A166944.EventCountAboveThreshold \
             A166944.RecordStructureNumerals \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
