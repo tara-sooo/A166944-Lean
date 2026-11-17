@@ -83,6 +83,7 @@
   "LeastDivisorRoute": 28,
   "Lemmas": 295,
   "LpfGap": 15,
+  "MinFactorMargin": 4,
   "MinFactorSumRoute": 7,
   "Mod3Gap": 4,
   "OrphanHarvest": 5,
@@ -191,5 +192,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2638
+ "total": 2642
 }
