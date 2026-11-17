@@ -127,6 +127,7 @@ jobs:
             A166944.CoprimeHorizonPair \
             A166944.RouteADoesNotBypassS \
             A166944.QuantityCollapse \
+            A166944.RouteAMinFac \
             A166944.RecordStructureNumerals \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
