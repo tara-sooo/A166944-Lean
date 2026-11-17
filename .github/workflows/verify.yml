@@ -256,6 +256,7 @@ jobs:
             A166944.VerifiedBoundaryRecordExtension \
             A166944.VerifiedFiftyMillionBridge \
             A166944.VerifiedLaterRecordExtension \
+            A166944.VerifiedThirdExtension \
             A166944.VerifiedRecordExtension \
             A166944.VerifiedRecordPrefix \
             A166944.VerifiedTravelExtension \
