@@ -125,6 +125,7 @@ jobs:
             A166944.DroppingPIsWorse \
             A166944.MinFactorMargin \
             A166944.CoprimeHorizonPair \
+            A166944.RouteADoesNotBypassS \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
             A166944.AbsorptionCriterion \

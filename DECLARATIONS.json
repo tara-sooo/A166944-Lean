@@ -151,6 +151,7 @@
   "RoomInvariant": 31,
   "RoomLedger": 32,
   "RoomQuantum": 8,
+  "RouteADoesNotBypassS": 4,
   "SBoundLemma": 20,
   "SelfHit": 1,
   "SeparatorBlocks210": 9,
@@ -193,5 +194,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2646
+ "total": 2650
 }
