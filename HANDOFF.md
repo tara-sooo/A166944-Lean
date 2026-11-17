@@ -120,9 +120,16 @@ while `S = 5274`).
   the disk to 91 percent. v4.29 verification belongs in CI (`verify-v429.yml`), which
   installs the toolchain alongside the repository's own and builds the core-only modules
   with the toolchain's `lean`, no lake.
-* Regenerable Mathlib side artifacts (`*.private`, `*.server`, `*.trace`, `*.sig`,
-  `*.hash`) are 3.7 GB of the 7 GB in `prove2me_workspace/.lake` and can be deleted
-  freely; `olean`/`ilean`/`ir` are what the local `LEAN_PATH` checks need.
+* **Mathlib side artifacts are NOT freely deletable — this correction matters.**
+  `*.trace`, `*.hash`, `*.ilean` are regenerable and cheap to lose. **`*.server` is NOT:**
+  `lake/Build/Module.lean:473` requires a `.olean.server` sidecar for every module declared
+  `module`, and all 8311 Mathlib files are. Deleting them makes `lean` abort with
+  `failed to open file .../Defs.olean.server`, and the only recovery is rebuilding Mathlib.
+  Measured on this device: 8321 of 8322 `.olean.server` files were missing, `lean` could not
+  import Mathlib at all, and a full rebuild is thousands of modules — it made the phone
+  unusable for hours and was abandoned. **Therefore: any check that needs Mathlib runs in CI**
+  (`.github/workflows/verify.yml` builds Mathlib itself). Do not delete, and do not rebuild
+  locally. Core-only modules are unaffected because they import nothing from Mathlib.
 * Local checks do not apply the lakefile's `autoImplicit = false`. Use
   `~/p2m_scratch/check-module.sh <Module>`, which passes `-DautoImplicit=false`, before
   committing; two commits failed CI for this.
