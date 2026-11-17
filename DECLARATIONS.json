@@ -163,6 +163,7 @@
   "SixCoverRoute": 13,
   "SqrtFreeTransport": 3,
   "StoppingCriterion": 4,
+  "SumBoundBasic": 2,
   "TailReduction": 12,
   "TargetDefs": 3,
   "TerminalRigidity": 22,
@@ -199,5 +200,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2670
+ "total": 2672
 }
