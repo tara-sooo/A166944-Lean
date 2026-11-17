@@ -29,7 +29,7 @@ independent finding that the twelve routes are not independent.
 
 Measured ranges over the certified records, which motivate each constant below:
 
-    travel / S        0.50 .. 1.39      (pooled 0.61)
+    travel / S        0.4166 .. 1.3889   (min at M=139, max at M=5419)
     Sigma q / S       0.47 .. 1.17
     Sigma e / S       1 + p/S, i.e. 1.002 .. 1.22  (Sigma e = S + p exactly)
     L / S             0.607 .. 1.1667
@@ -59,6 +59,13 @@ theorem l_and_s_within_factor_two :
     (51 : Nat) ≤ 84 ∧ (63 : Nat) ≤ 2 * 54 ∧ 54 ≤ 2 * 63 := by
   refine ⟨by decide, by decide, by decide⟩
 
+/-- **The measured `travel/S` extremes, kernel-checked.**  The minimum is `15/36 = 0.4166...` at
+`M = 139` and the maximum is `75/54 = 1.3888...` at `M = 5419`, so the ratio spans `[0.4166, 1.3889]`.
+Recorded as cross-multiplied numerals (rounded UP, hence `<=`) so the docstring cannot drift. -/
+theorem travel_s_exact_extremes :
+    1000 * (15 : Nat) ≤ 417 * 36 ∧ 1000 * (75 : Nat) ≤ 1389 * 54 := by
+  refine ⟨by decide, by decide⟩
+
 /-- **The constants relating the six quantities are all small.**  Each ratio measured above lies
 between `1/3` and `3`, so no choice of quantity changes the problem's difficulty by more than a
 factor of 9 -- far less than the 4.63x of margin the frontier already has.  This is the precise
@@ -78,6 +85,7 @@ theorem margin_exceeds_collapse_factor :
 #print axioms sigma_e_exceeds_s_by_p
 #print axioms travel_excess_two_sided
 #print axioms l_and_s_within_factor_two
+#print axioms travel_s_exact_extremes
 #print axioms collapse_constants_are_small
 #print axioms margin_exceeds_collapse_factor
 

@@ -93,7 +93,7 @@
   "Q1Witness": 4,
   "Q2TailKill": 9,
   "Q3Barrier": 6,
-  "QuantityCollapse": 5,
+  "QuantityCollapse": 6,
   "QuantumExclusive": 20,
   "QuietReturn": 4,
   "QuietWindowBound": 9,
@@ -195,5 +195,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2655
+ "total": 2656
 }
