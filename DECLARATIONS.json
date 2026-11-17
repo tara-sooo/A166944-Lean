@@ -45,6 +45,7 @@
   "CompositeThird": 4,
   "ConsecutiveEventGcd": 14,
   "CoprimeEvents": 4,
+  "CoprimeHorizonPair": 4,
   "CountBoundLimits": 2,
   "CountFromIndex": 4,
   "CreditDeficitStructure210": 2,
@@ -192,5 +193,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2642
+ "total": 2646
 }
