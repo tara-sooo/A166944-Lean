@@ -35,6 +35,7 @@
   "CapBCandidates": 18,
   "CapBThreshold": 6,
   "CapWeakSalvage": 8,
+  "CappedAttackAudit": 9,
   "CarryFactor": 5,
   "ChargedPhaseCredits210": 2,
   "CompSweep1000": 20,
@@ -202,5 +203,5 @@
   "VerifiedTwinPrimePrefix": 2,
   "WindowControlsS": 3
  },
- "total": 2678
+ "total": 2687
 }
