@@ -27,7 +27,7 @@ private def hitsAfter1468965061 : List Nat := [
 set_option maxRecDepth 65536 in
 set_option maxHeartbeats 0 in
 private theorem replayAfter1468965061_accepted :
-    recordReplayCheck 1468965061 1468965063 2937930218 hitsAfter1468965061 2937930210 = true := by
+    recordReplayCheck 1468965061 1468965063 2937930120 hitsAfter1468965061 2937930210 = true := by
   decide +kernel
 
 set_option maxRecDepth 65536 in
