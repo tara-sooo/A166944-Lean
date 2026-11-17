@@ -134,6 +134,7 @@ jobs:
             A166944.EventCountAboveThreshold \
             A166944.CappedAttackAudit \
             A166944.PBoundSufficiency \
+            A166944.RouteSeparation \
             A166944.RecordStructureNumerals \
             A166944.HorizonLedger \
             A166944.AttainmentIsFree \
