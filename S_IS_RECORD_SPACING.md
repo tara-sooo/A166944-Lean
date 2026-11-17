@@ -67,7 +67,7 @@ values — another confirmation that the spacing is what matters.
 
 ## The mechanism, and the wall it names
 
-`C_f - 1` and `C_f + 1` are **both prime at 26 of 26 records** (one distinct prime factor each):
+`C_f - 1` and `C_f + 1` are **both prime at 25 of 25 consecutive record pairs** (one distinct prime factor each):
 `M=13 -> 41,43`; `M=2659 -> 5417,5419`; `M=22933441 -> 45895571,45895573`.
 
 So every stopping horizon is a **twin-prime centre**. The chain is:

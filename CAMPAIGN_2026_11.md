@@ -79,7 +79,7 @@ as operational lessons (`job_output` waits without freeing the process; `pkill -
 ## The structural conclusion
 
 `S = M' - 2M + 1`, and every record `M >= 7` is the larger member of a twin prime, with `C_f +- 1`
-both prime at 26 of 26 records. So the frontier is a bound on **the twin-prime gap above `2M-2`**
+both prime at 25 of 25 consecutive record pairs. So the frontier is a bound on **the twin-prime gap above `2M-2`**
 -- a relative gap of 0.19%, far weaker than any quantitative twin-prime statement, but still
 requiring a mechanism the tree does not have.
 
