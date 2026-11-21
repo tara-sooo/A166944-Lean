@@ -185,7 +185,7 @@ For larger \(G\) the required \(H/G\) becomes weaker; thus ruling out the narrow
 Two legitimate proof routes emerge:
 
 1. **Direct sample / anti-reset route:** establish \(X(K)\) above the explicit threshold (2) for every genuine canonical record, or prove a slow interval / terminal twin-prime horizon before \(K\). Local twin-prime starting conditions alone do not control repeated resets (the exact 28-event example).
-2. **Selective-growth route:** prove Cap A and the bound (5), or prove the mixed bound (4) directly, for every relevant capped path. This focuses effort on the events classified in `large_relative_gap_cases` rather than on every unit of horizon growth.
+2. **One-parameter selective-growth route:** prove `26*H <= 3*M-45` from (4b) on every relevant capped path. This requires **neither Cap A nor a separate G estimate**; the older mixed condition (4), or Cap A together with (5), remains a possible fallback. The remaining issue is the global aggregate of the short/long-prime events classified in `large_relative_gap_cases`.
 
 Neither the required \(X(K)\) lower bound nor the uniform \(H\) control is currently proved. Both routes are at least expressed in the **correct direction**, whereas a travel-upper-bound potential alone never forces a horizon-growth upper bound.
 
