@@ -87,6 +87,9 @@ The synthetic start M in the first example is a genuine pair of twin primes, but
 
 Inequality (2) *does* combine the forced small-prime hits and their growth costs. But the paths in section 3 have A_q=0 for every fixed small prime q throughout their entire (arbitrarily many-event) local segments. In particular, the lower bound becomes 0<=G; it places no restriction on prime-event count or F.
 
+
+There is also a **coefficient obstruction independent of the synthetic construction**. On a canonical interval of length T=K-(M+2), each A_q is at most T, all q>=3, and sum lambda_q<=1. Therefore the left-hand side of (2) is <=T/3, asymptotically M/4. The available growth allowance G<=2K-(2M-2) is asymptotically (3/2)M. Thus this *particular linear phase-charge inequality cannot exceed the horizon budget*, even if every index were active for every small prime: its strongest possible coefficient is at least a factor six too small. A successful theorem needs stronger event-specific first-hit and index/horizon coupling, not merely additional fixed wheel primes.
+
 The construction does not disprove an asymptotic global packing theorem for **actual records**. It pinpoints what such a theorem must additionally control: **time spent in inert states with large, changing or reused prime increment values**, charged against the true horizon budget G<=2K-(2M-2), with enough strength to force a large F drawup or a slow interval. A finite fixed wheel alone cannot supply that conclusion from bounded local event patterns, even when those events obey the exact first-hit gcd equation.
 
 Validation status: new symbolic paper arguments, independently executed standard-library Python certificate, GitHub persistence verified separately. No new Lean kernel proof and no proof of Cap B or twin-prime infinitude.
