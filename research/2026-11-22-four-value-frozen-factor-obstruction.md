@@ -66,7 +66,7 @@ A complementary first-hit fact addresses the *index travel*, which the horizon-c
 
 Proof: the intermediate growth `d(n)-1` is divisible by `q`, so `D(n)≡D(s) (mod q)` up to index `t-1`. If `q|D(s)-1`, every even multiple of `q` forces an increment divisible by `q`; if `q|D(s)+1`, every odd index `n` satisfying `n-2≡0 (mod q)` does the same. Either residue class has period `2q`. If `t-s>=2q`, there is a forced `q`-hit in `(s,t]`, contradicting the intermediate congruence or the terminal coprimality. QED.
 
-This is a **whole-run** bound: several large-prime events with increments `1 mod q` cannot use up `2q` index positions while `q\) remains an active divisor of the horizon's adjacent number. It is stronger than merely applying the ordinary `gap<=2q` estimate separately to each event. For `q=3`, the full run has at most five index steps.
+This is a **whole-run** bound: several large-prime events with increments `1 mod q` cannot use up `2q` index positions while `q` remains an active divisor of the horizon's adjacent number. It is stronger than merely applying the ordinary `gap<=2q` estimate separately to each event. For `q=3`, the full run has at most five index steps.
 
 ## 4. First-hit exclusion of an earlier four-value congruence witness
 
