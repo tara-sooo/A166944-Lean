@@ -111,4 +111,12 @@ An important limit: if all primes in such a word are distinct, the horizon-only 
 
 An alleged first Cap B crossing at the official M=45,895,573 requires H≥5,291,742 on its predecessor prefix (from existing Lean trace bounds and the square-gap bound). A short-only run beginning at offset X≤10 contributes **at most 234** to H. If *every* contribution came from low-offset-starting short-only runs with **no long H events**, there would have to be at least ceil(5,291,742/234)=**22,615** separate runs, with other event types intervening.
 
+A useful three-way numerical necessary condition follows. Split the predecessor prefix into maximal consecutive short-H runs. Let R count the runs that **start** with X≤10, let S_high count short-H events in all other runs (those starting with X>10), and let L count long-prime H events. Every low-start run costs at most 234; every other short event costs at most 32; every long-prime H event contributes at most 31,038 at this M. Consequently any first crossing requires
+
+\[
+\boxed{234R+32S_{\rm high}+31,038L\ge5,291,742.}
+\]
+
+For instance, if L=0 and S_high=0 it needs R≥22,615; if L≤169 and S_high=0 it needs R≥198. This is a **necessary condition**, not an asserted global bound on these counts. It locates the precise remaining packing problem.
+
 The missing global step is now more localized: control **(a)** long-prime H events, **(b)** short H runs starting at higher offset X>10, and **(c)** repeated transitions/returns that allow many low-X short blocks. Nothing in the present certificate globally bounds the number of those returns. **The universal Cap B theorem, fixed-sample upper bound and twin-prime infinitude remain unproved.**
