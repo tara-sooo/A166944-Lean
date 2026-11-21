@@ -136,6 +136,12 @@ The verifier exhibits a **25-event fake cycle** in the modulus-210 first-clipped
 
 The cycle is **not a real gcd trajectory**: its second and third events have \(e=13\) consecutively, violating (B) with \(q=13\) and \(H_{\rm between}=0\). This precisely demonstrates why additional prime-factor divisibility and cross-event cooldown must be represented. The full prime-factor modulus for all odd e<=33 is \(2\,\mathrm{lcm}(3,5,\ldots,33)=9,025,222,055,850\), which is too large for a naive finite-state expansion.
 
+## 6b. Even an adjacent shared-gcd filter does not finish the mod-210 argument
+
+A second executable [25-event fake cycle](cap_b_H_adjacent_cycle.py) strengthens the obstruction. Beginning at \((s,C)=(116,162)\), it ends at \((326,372)\), so \(T=G=210\) and \(X\) increases from 70 to 280. Every step passes the **first clipped gcd modulo 210**, \(r\le C\), and the short-H definition, **and every pair of adjacent event increments has gcd either 1 or 3** (with gap 1 whenever the shared gcd is 3).
+
+Yet events **2 and 4** both have increment \(e=13\), separated by \(e=19\), giving intervening horizon growth \(H_{\rm between}=18\). Both 13-events are odd, so the exact congruence (B) requires \(H_{\rm between}\equiv1\bmod13\), while \(18\equiv5\bmod13\). Hence this candidate is false as a full gcd trajectory. The finite example proves that **adding only adjacent common-divisor restrictions to a mod-210 potential remains insufficient**. The useful missing state is a signed phase/cooldown for the most recently hit occurrence of each relevant divisor.
+
 ## 7. Remaining proof gap
 
 The reductions (B)–(D) give an exact obstruction and a feasible target for future computational/Lean work, but **neither bounds S or L over all authentic large canonical records**. Events with arbitrarily many distinct long primes, and many short events whose increments vary, are not globally controlled. The finite checks do not prove an asymptotic estimate. In particular (A) is still a sufficient, not yet established, bound. Further work needs a quantified *multi-prime* packing or anti-return theorem (using the entire gcd factor phases and authentic record history), not another bound derived solely from mod-210 cycle-free potential.
