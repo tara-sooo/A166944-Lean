@@ -36,6 +36,14 @@ The kernel-proved cofactor gap estimate g*p<=2*(C+1) then yields
 
 for every overdraw event with p>=61. In particular, on a canonical cutoff interval with pre-event C<=2K, such p is <=isqrt(2K+1)+15. This is a stronger size restriction for these exceptional events than for arbitrary positive-debt events.
 
+**Sharpness on an exact local first-hit path.** Start from the *artificial* but admissible moving-horizon state (s,C)=(76,112,87,402); it has even C and s<C<=2s. At every index in (s,s+142) the actual parity-dependent gcd is 1, and at r=76,254 the gcd is exactly p=71. The 210-potential has V(before)=0 and V(after)=29. Consequently
+
+    g=142=2p,  b=142-(71-1)+29=101=p+30,
+    eta=b-(p-1)=31.
+
+Thus **the constant 31 cannot be reduced using the exact local first-hit rule and this 210-state potential alone**. This synthetic state is NOT claimed to occur in the authentic A166944 history.
+
+
 ## 2. Main new theorem: overlap-free startup credit for arbitrary prime keys
 
 Consider a genuine first-hit path, and select a finite set P of distinct primes >=61. For each p in P, select 2m_p+1 chronological **positive-debt** p-event occurrences, m_p>=1. The first occurrence is the free **startup event**; the remaining 2m_p occurrences are demand events, grouped into m_p adjacent paired requests. Other, unselected events may occur anywhere. Let
@@ -125,9 +133,9 @@ This deduction relies on the **finite 210-potential certificate** and the previo
 The companion [cross_key_startup_credit_audit.py](cross_key_startup_credit_audit.py) imports the original [210-potential verifier](cap_b_prime_debt_210.py) and rechecks its 22,050-state certificate, then performs:
 
 1. 1,200 seeded abstract event-word accounting tests, of which 649 satisfy the stronger key-count certificate (6). These stress only the exact growth accounting, not first-hit realizability.
-2. A **direct exact-gcd synthetic** sequence from state (s,C)=(8,289,324,16,578,642), with three 61-event pre-horizons 16,578,642, 16,578,762, 16,579,008 and b=(28,40,12). The selected span has B-A=366, paired debt b2+b3=52, Excess=0. This is an artificial start, not a certified canonical record.
-3. The **actual** recurrence from a(1)=2 through 2,500,000: 250 nonunit events, just 5 positive-debt **prime p>=61** events, 5 distinct p keys, and zero eta>0 among those five. All individual bounds (3)-(4) were checked wherever applicable. Finite evidence is not an asymptotic estimate.
-4. The official previously certified threshold M=45,895,573: exact replay of 37 events from its canonical state gives terminal (S,C)=(45,896,532,91,793,058), G_M=1,914, and H_M=2, corresponding to (p,g,b,eta)=(17,30,24,8),(47,90,48,2). Both 91,793,057 and 91,793,059 are prime, certifying no further hits before K=80,317,252. For (13):
+2. A synthetic exact first-hit **sharpness witness** at (s,C)=(76,112,87,402) with p=71, gap=142, b=101, eta=31: all 141 preceding gcd tests are 1. This establishes local optimality of the 31 overdraw constant.\n3. A **direct exact-gcd synthetic** sequence from state (s,C)=(8,289,324,16,578,642), with three 61-event pre-horizons 16,578,642, 16,578,762, 16,579,008 and b=(28,40,12). The selected span has B-A=366, paired debt b2+b3=52, Excess=0. This is an artificial start, not a certified canonical record.
+4. The **actual** recurrence from a(1)=2 through 2,500,000: 250 nonunit events, just 5 positive-debt **prime p>=61** events, 5 distinct p keys, and zero eta>0 among those five. All individual bounds (3)-(4) were checked wherever applicable. Finite evidence is not an asymptotic estimate.
+5. The official previously certified threshold M=45,895,573: exact replay of 37 events from its canonical state gives terminal (S,C)=(45,896,532,91,793,058), G_M=1,914, and H_M=2, corresponding to (p,g,b,eta)=(17,30,24,8),(47,90,48,2). Both 91,793,057 and 91,793,059 are prime, certifying no further hits before K=80,317,252. For (13):
 
     left side = 2*1914+31*2+41+2*12674 = 29,279;
     right side = 80,317,252-(45,895,573+2) =34,421,677.
