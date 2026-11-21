@@ -99,6 +99,25 @@ def reset_potential_upper(p, V):
     return best
 
 
+def small_prime_envelopes(V):
+    """Residues of pre-event C that can support positive prime debt."""
+    out = {}
+    for p in (11, 13, 17, 19, 23, 29):
+        positive_c = set()
+        highest = 0
+        for s, c in STATES:
+            hit = clipped_hit(s, c)
+            maxgap = min(2 * p, hit[1] - 1 if hit else 2 * p)
+            for gap in range(1, maxgap + 1):
+                r = (s + gap) % MOD
+                score = gap - (p - 1) + V[INDEX[(r, (c + p - 1) % MOD)]] - V[INDEX[(s, c)]]
+                if score > 0:
+                    positive_c.add(c)
+                    highest = max(highest, score)
+        out[p] = (len(positive_c), highest)
+    return out
+
+
 def primes_through(n):
     sieve = bytearray(b'\x01') * (n + 1)
     sieve[0:2] = b'\x00\x00'
@@ -143,6 +162,15 @@ def main():
     print('PASS: p=43..61 low-offset reset upper debt:', max_reset)
     print('PAPER: every positive-debt prime p>=43 exits with X\' >= 2p')
     print('PAPER: every positive-debt prime p>=61 has Delta X >= p-57 >= 4')
+
+    # For each small prime, any positive-debt pre-horizon C belongs to
+    # at most nu residue classes mod 210. Together with p | C +/- 1,
+    # this gives exactly <= 2*nu admissible classes mod 210*p.
+    small = small_prime_envelopes(V)
+    expected_small = {11:(43,41),13:(41,42),17:(31,46),
+                      19:(32,49),23:(28,52),29:(17,58)}
+    assert small == expected_small, small
+    print('PASS: small-prime (horizon classes mod 210, max debt):', small)
 
     M = 45895573
     K, U, nprime, Bfirst = first_use_upper(M)
