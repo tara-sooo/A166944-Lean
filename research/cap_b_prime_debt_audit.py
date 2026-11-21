@@ -141,6 +141,49 @@ def first_use_upper(M):
     return K, U, count, bound
 
 
+def is_prime(n):
+    if n < 2:
+        return False
+    for q in range(2, isqrt(n) + 1):
+        if n % q == 0:
+            return False
+    return True
+
+
+def offset_ledger_control(M, steps, V):
+    """Direct true-gcd events; verify the global signed offset ledger."""
+    s, C = M + 2, 2 * M - 2
+    startX = 2 * s - C
+    growth_down = Bbig = Btotal = surcharge = large_credit = 0
+    for _ in range(steps):
+        hit = None
+        for r in range(s + 1, min(C, s + isqrt(4 * (C + 1))) + 1):
+            e = gcd(r, C - 1) if r % 2 == 0 else gcd(r - 2, C + 1)
+            if e > 1:
+                hit = (r, e)
+                break
+        assert hit is not None, (M, s, C)
+        r, e = hit
+        Cnext = C + e - 1
+        dx = 2 * (r - s) - (e - 1)
+        if dx < 0:
+            growth_down += e - 1
+        net = (r - s) - (e - 1) + V[INDEX[(r % MOD, Cnext % MOD)]] - V[INDEX[(s % MOD, C % MOD)]]
+        if e >= 11 and is_prime(e) and net > 0:
+            Btotal += net
+            if e >= 61:
+                Bbig += net
+                large_credit += e - 59
+                assert dx >= e - 57
+            else:
+                surcharge += 59 - e
+        s, C = r, Cnext
+    endX = 2 * s - C
+    assert 2 * Bbig + large_credit <= endX - startX + growth_down
+    assert 2 * Btotal + large_credit <= endX - startX + growth_down + surcharge
+    return endX, growth_down, Bbig, large_credit, Btotal, surcharge
+
+
 def main():
     V = potential()
     inert_residues = [c for c in range(0, MOD, 2) if inert(c)]
@@ -177,6 +220,14 @@ def main():
     assert (K,U,nprime,Bfirst) == (80317252,160634505,2052,12241507)
     print(f'PASS: first-use envelope M={M}: K={K}, U={U}, '
           f'{nprime} positive-prime candidates, budget={Bfirst}')
+    controls = {
+        45895573: (37, (6,1154,144,184,216,54)),
+        5875882249: (26, (60276,296,15091,30052,15106,30)),
+    }
+    for M, (steps, expected) in controls.items():
+        got = offset_ledger_control(M, steps, V)
+        assert got == expected, (M, got, expected)
+        print(f'PASS: actual-gcd offset ledger M={M}, steps={steps}: {got}')
     print('Cap B and the global repeated-prime debt bound remain open.')
 
 
