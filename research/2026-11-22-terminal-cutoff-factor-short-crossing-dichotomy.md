@@ -99,7 +99,53 @@ At actually attained small record M=43, K=75, C=132, and the next event is J=79 
 
 **Self-renewing prime generator, CONDITIONAL:** If the apparent synthetic terminal-primality property could be proved for **every** odd M>=307, then choosing any such M and iterating the exact renewal map `M'=D(K)+1` would generate a strictly increasing infinite sequence of twin primes (M'−2,M'); (4) returns to a canonical-shaped state, and `M'>M`. This would prove twin-prime infinitude. The finite scan supplies NO proof of that universal property.
 
-## 5. What is still mathematically missing
+## 5. An INFINITE family of locally valid BAD crossings, even with substantial growth
+
+A further obstruction tests whether the final gcd constraints and generic global 4/9 growth accounting alone would prohibit the BAD branch. They do not.
+
+For integer t>=0 set
+
+    M=1,000,005+840*t,
+    K=1,750,008+1,470*t=floor((7*M-1)/4),
+    C=2,000,256+2,100*t,
+    s=K-1, H=C-2.
+
+Here M is odd, K is even, and C is even and divisible by 6. Also C-1 is divisible by 5 and C+1 by 7, so **both horizon neighbors are composite** for all t>=0.
+
+At the base parameter t=30,000:
+
+    M=26,200,005; K=45,850,008; C=65,000,256;
+    s=45,850,007; H=65,000,254.
+
+The exact local parity-gcd tests give
+
+    gcd(K,H-1)=3,     gcd(K-1,C+1)=7.
+
+Thus from the artificial state (s,H), there is a first hit at K with increment 3, immediately followed by another hit at K+1 with increment 7. The first event changes the horizon to C, and the second is the short BAD cutoff crossing.
+
+This is **not just a small-growth artifact**: the canonical starting horizon would be 2*M-2=52,400,008; the required growth to the artificial pre-state is H-(2*M-2)=12,600,246, or approximately 0.481*M. The travel from M+2 to s is 19,650,000. The generic globally proved W-potential necessary growth inequality is amply satisfied:
+
+    4*19,650,000=78,600,000
+       < 9*12,600,246=113,402,214.
+
+The known size constraints 2*M-2<=H<=2*s and C<=2*K also hold. The previous events needed to connect the genuine canonical state at M+2 to (s,H) have **not** been constructed, so this remains an artificial *terminal* trajectory, not a full first-hit path.
+
+**Unbounded local family with a genuine arithmetic proof.** Put
+
+    A=1,750,008; B=2,000,256; u=1,470; v=2,100,
+    D1=abs(A*v-(B-3)*u)=734,644,890,
+    D2=abs((A-1)*v-(B+1)*u)=734,636,910,
+    L=lcm(D1,D2)=2,569,986,913,985,190.
+
+For every n>=0 choose t=30,000+n*L. The gcd gcd(A+ut, B-3+vt) divides D1 and is identical to gcd(A+u*30,000, B-3+v*30,000)=3, because the two arguments are congruent to the base arguments modulo D1. Similarly gcd(A+ut-1, B+vt+1)=7, using D2. Thus the same **two exact consecutive local first hits 3,7** cross K for infinitely many arbitrarily large M. As n grows, the putative growth fraction
+
+    (H-(2*M-2))/M = (246+420*t)/(1,000,005+840*t) -> 1/2,
+
+satisfying the generic global 4T<=9G+32 budget with a macroscopic margin.
+
+**Conclusion of the obstruction test:** first-hit arithmetic only at the last step, the adjacent postcutoff step, the canonical range inequalities, and even the existing *aggregate* W-potential growth inequality are jointly compatible with such BAD crossings at arbitrarily large scales. Any successful proof must use the **realizability and correlation of the COMPLETE earlier event history**, not just its total growth. This family does not refute the full original recurrence or Cap B.
+
+## 6. What is still mathematically missing
 
 The next-hit map and the dichotomy eliminate ambiguous postcutoff behavior, but do NOT eliminate the **short-crossing branch**. The situation is sharper than merely a long or short terminal unit suffix:
 
@@ -107,6 +153,6 @@ The next-hit map and the dichotomy eliminate ambiguous postcutoff behavior, but 
 
 The right-to-left implication invokes the previously verified Lean `cap_iff_twins_at_cutoff` and (1)-(3); it is not a stand-alone elementary implication for arbitrary artificial starts.
 
-Hence the missing global input is an asymptotic theorem excluding this precise **near-cutoff small-increment crossing** on sufficiently many genuinely attained canonical records, or a direct proof of the terminal twin pair. The early real M=43 crossing and arbitrarily constructed local endpoint states demonstrate that immediate first-hit divisibility is compatible with the bad branch. The exhaustive synthetic finite success up to 1,000,000 is powerful experimental guidance but not a proof of the asymptotic exclusion.
+Hence the missing global input is an asymptotic theorem excluding this precise **near-cutoff small-increment crossing** on sufficiently many genuinely attained canonical records, or a direct proof of the terminal twin pair. The early real M=43 crossing and the unbounded explicit two-step endpoint family in section 5 demonstrate that immediate first-hit divisibility plus coarse global growth budgets are compatible with the bad branch. The exhaustive synthetic finite success up to 1,000,000 is powerful experimental guidance but not a proof of the asymptotic exclusion.
 
-**Reproduction:** `c++ -O3 -std=c++17 research/terminal_cutoff_factor_audit.cpp -o /tmp/terminal-audit && /tmp/terminal-audit 1000000`. The program ran successfully in the local container (~6 seconds), with direct-gcd cross-check and stated totals. The note and C++ code were persisted and read back from GitHub. No new Lean kernel build and no proof of twin primes.
+**Reproduction:** `c++ -O3 -std=c++17 research/terminal_cutoff_factor_audit.cpp -o /tmp/terminal-audit && /tmp/terminal-audit 1000000`. The updated program ran successfully in the local container (~6 seconds), with direct-gcd cross-check, the large synthetic two-step witness, and stated totals. The note and C++ code were persisted and read back from GitHub. No new Lean kernel build and no proof of twin primes.
