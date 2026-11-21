@@ -129,7 +129,50 @@ PASS: all 5632 arithmetic candidates excluded
 
 The executable returns nonzero if the candidate counts disagree, a feasible configuration is found, or a bounded search reaches its node cap. Local GNU C++17 validation: exit 0, no warnings with `-Wall -Wextra -pedantic`, approximately 5 seconds. The exact source was committed and read back from GitHub. The deterministic search is still a **finite computational certificate**, not a formal Lean proof.
 
-## 5. What remains and a possible stronger sieve charge
+## 5. All repeat counts for at most four distinct prime keys: a long-window bound
+
+The inert-residue restriction provides an elementary **uniform bound for arbitrarily many repeated windows**, when the number of *distinct* participating primes is at most four.
+
+For a fixed prime \(p\ge61\), a positive-debt event's pre-horizon \(C\) satisfies both \(C\bmod210\in\mathrm{inert}\) (15 residues) and \(C\bmod p\in\{-1,+1\}\) (two residues). Because \(\gcd(210,p)=1\), CRT gives **exactly 30 residue classes modulo \(210p\)**. Thus for any half-open horizon interval \(J=[A,B)\) of length \(L=B-A\), the number \(N_p(J)\) of candidate pre-horizons is bounded by
+
+\[
+N_p(J)\le\frac{30L}{210p}+30=\frac{L}{7p}+30. \tag{D1}
+\]
+
+Select *any number* \(m_p\) of adjacent paired requests for that key \(p\), using \(2m_p+1\) ordered positive-debt occurrences from \(C_{p,1}\) to \(C_{p,2m_p+1}\). Suppose **all requests for every selected key lie in \(J=[A,B)\)**, except that a request's final pre-horizon may equal \(B\). For each key, at most one of its \(2m_p+1\) selected event pre-horizons lies at \(B\); all the others lie in \([A,B)\). Hence \(2m_p\le N_p(J)+1\), and by \(b_i\le p+30\),
+
+\[
+\sum_{\text{paired debt of key }p}b_i
+  \le 2m_p(p+30)
+  \le (p+30)\left(\frac{L}{7p}+31\right). \tag{D2}
+\]
+
+For any set \(\mathcal P\) of \(d\) *distinct* prime keys, each with any number of adjacent paired requests, put \(A_{\mathcal P}=\sum_{p\in\mathcal P}(p+30)\) and
+\(c_{\mathcal P}=\sum_{p\in\mathcal P}(p+30)/(7p)\). Summing (D2) gives
+
+\[
+\boxed{\quad B_{\mathrm{paired}} \le c_{\mathcal P}L+31A_{\mathcal P}.\quad} \tag{D3}
+\]
+
+The function \((p+30)/(7p)\) decreases with \(p\). The largest possible \(c_{\mathcal P}\) for \(d=4\) occurs at primes \(61,67,71,73\):
+
+\[
+c_{\mathcal P}\le
+\frac{122290244}{148280447}
+=0.8247226554\ldots<1.
+\]
+
+Therefore **for at most four distinct prime keys, with arbitrarily many paired reuse windows**, all selected paired debt is paid by \(L\) whenever
+
+\[
+\boxed{L\ge177\,A_{\mathcal P}.} \tag{D4}
+\]
+
+Likewise, for at most three keys, the maximum coefficient (from \(61,67,71\)) is \(1265781/2031239=0.623157\ldots\), so \(L\ge83\,A_{\mathcal P}\) suffices.
+
+This is an elementary paper bound (CRT/counting plus previously established event prerequisites), not a new kernel-checked Lean theorem or a finite-program output. It leaves the shorter-width cases \(L<177\,A_{\mathcal P}\) for four or fewer keys, and arbitrary intervals with five or more participating keys. The \(d=5\) maximum coefficient already exceeds one, so (D3) alone cannot settle that regime.
+
+## 6. What remains and a possible stronger sieve charge
 
 The full overlap problem involves several distinct primes with **several paired windows per key**. A one-window-per-prime certificate does not automatically imply a multi-window Hall condition: windows of the same key are disjoint, but windows of other keys may bridge them.
 
