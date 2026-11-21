@@ -72,11 +72,19 @@ The increments are positive odd numbers, the nonunit size is `<M`, `D*(n)<=2n`, 
 
 Moreover this artificial path has **no slow interval** in `[s0,K]`: any interval of length `l` containing `m` events satisfies `l<=g*(m+1)` and `D*(j)-D*(i)=m*(g-1)`. For `g>=2`,
 
-`4*l-9*(D*(j)-D*(i)) <= 4g+(9-5g)*m <=4g < 32+8*sqrt(2M-1) <=32+8*sqrt(D*(j)+1)`.
+`4*l-9*(D*(j)-D*(i)) <= 4g+(9-5g)*m <=4g < 32+8*isqrt(2M-1) <=32+8*isqrt(D*(j)+1)`.
 
 Therefore the elementary height, parity, event gap, and coarse growth bounds alone cannot establish the desired asymptotic event-count bound, or even force a slow interval. The omitted **exact divisibility and no-earlier-gcd-hit conditions** (and potentially authentic record attainment from `a(1)=2`) must be exploited. This is a countermodel to the *coarse abstraction*, not to A166944 or to Cap B.
 
 There is also a finite exact-gcd diagnostic: the twin-shaped artificial start `M=28,549` has both `M` and `M-2` prime and produces **177 nonunit events** up to `K=49,960`, or `N/sqrt(M)≈1.0476`. A direct index-by-index gcd replay finds a slow interval nonetheless. This is not an attained record from the original A166944 sequence and is not an asymptotic counterexample. It illustrates that the event-count condition is sufficient, not necessary.
+
+## Exact alternative: drawups rather than total event count
+
+Define the integer potential `F(n)=4*n-9*D(n)`. For any `2<=i<=j`, the slow condition is **exactly equivalent** to
+
+`F(j)-F(i) >= 32+8*isqrt(D(j)+1)`.
+
+Therefore proving cofinally many upward excursions of this potential exceeding the square-root barrier is another sufficient route, weaker than proving the event count itself is small. At a unit increment, `F` rises by 4; at a nonunit increment `e>=3`, it changes by `4-9*(e-1)<=-14`. Local divisibility and first-hit rules govern whether these downward jumps can prevent long upward excursions indefinitely. This reformulation is algebraic; the unbounded-excursion assertion remains unproved.
 
 ## Current missing step
 
