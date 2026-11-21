@@ -47,8 +47,15 @@ def audit(M,word):
   else:i+=1
  complete=[z for z in groups if z[2]!='unfinished'];N=len(complete)
  assert 5*jump<=2*G-H+16*N
- print('M',M,'events',len(arr),'G',G,'H',H,'completed low-high-return groups',complete,'unfinished', [z for z in groups if z[2]=='unfinished'])
+ unfinished=[z for z in groups if z[2]=='unfinished']
+ jump_all=jump+sum(z[1]-1 for z in unfinished)
+ n_all=N+len(unfinished)
+ assert len(unfinished)<=1
+ allowance=2*G-H+16*n_all+2*max(0,2*s-C-10)
+ assert 5*jump_all<=allowance,(M,5*jump_all,allowance)
+ print('M',M,'events',len(arr),'G',G,'H',H,'completed low-high-return groups',complete,'unfinished',unfinished)
  print(' completed jump-H',jump,'global budget',2*G-H+16*N,'<= check',5*jump)
+ print(' all jump-H',jump_all,'with terminal offset',2*s-C,'ledger',5*jump_all,'<=',allowance)
  return arr
 
 def low_prime_branch_bounds(M):
