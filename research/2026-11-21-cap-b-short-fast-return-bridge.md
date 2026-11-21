@@ -104,6 +104,46 @@ Suppose, conditionally, a path could be partitioned into exactly \(m\) of these 
 
 At \(M=45895573\), \(m\le22629\) is sufficient. **No upper bound on the actual number of macros is established**; this is a conditional arithmetic reduction, not a general theorem for all capped paths.
 
+## 4b. Stronger macro lemma: **any number of consecutive fast events**
+
+The single-fast terminal restriction is unnecessary for a **coarser but stronger-in-scope** budget. After the low-start short-H-only prefix, allow **any nonempty number \(n\)** of consecutive fast events, with no intervening H events, ending at \(X_{\rm end}\le10\).
+
+Let the fast-tail start offset be \(Y\le138\), from (A), and let the total travel, horizon growth and offset decrease on the fast tail be \(T_F,G_F,\Delta=Y-X_{\rm end}\). Summing the fast inequality \(e_i-1\ge3(g_i+1)\) gives
+
+\[
+G_F\ge3T_F+3n,\qquad \Delta=G_F-2T_F.
+\]
+
+Consequently
+
+\[
+\Delta\ge T_F+3n\ge4n,\quad
+T_F\le\Delta-3n,\quad
+G_F=2T_F+\Delta\le3\Delta-6n.
+\]
+
+As \(0\le X_{\rm end}\le Y\le138\) and \(n\ge1\), the fast tail always satisfies
+
+\[
+\boxed{n\le34,\quad T_F\le135,\quad G_F\le408.} \tag{F1}
+\]
+
+Combining with the 31-step/234-growth/152-travel short-H prefix yields a **fully general short-then-fast-only return macro** (the fast tail may have 1,2,...,34 events):
+
+\[
+\boxed{\#\mathrm{events}\le65,\quad H\le234,\quad G\le642,\quad T\le287.} \tag{F2}
+\]
+
+For the **first canonical-residue root** \(X_0=6,s_0\equiv3\bmod6\), \(Y\le90\) and the sharper 26/204/129 short-H bounds imply
+
+\[
+\boxed{\#\mathrm{events}\le48,\quad H\le204,\quad G\le468,\quad T\le216.} \tag{F3}
+\]
+
+This conclusion **does not** assert that every true low-offset return consists of a short-only segment followed by a fast-only tail. A *long prime-H event*, or interleaving short-H/fast/short-H after the first fast event, breaks this macro grammar. Bounding the number and mass of such interleavings remains open.
+
+The proofs of (F1)–(F3) use finite fact (A)/(B) plus *elementary signed offset accounting*, not another numerical graph calculation. The 283 and 239 exact **individual fast-increment** bounds in §3 apply only when the fast tail has **exactly one event**; they are **not** asserted for every event in the multi-fast case.
+
 ## 5. Why the low-start hypothesis matters: an infinite fast reset family
 
 For **every odd \(e\ge7\)** (prime or composite), define
