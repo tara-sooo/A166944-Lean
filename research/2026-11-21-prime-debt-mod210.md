@@ -113,7 +113,31 @@ The script uses the *unclipped* gcd first-hit rule for fixed numbers of steps, n
 
 The authentic-record status of the starting `M` values comes from the existing A166944 verified record prefix; this script verifies only the subsequent fixed number of first-hit steps, not primality or the entire original sequence history.
 
-## 4. Open part
+## 4. An unconditional dichotomy conditional on a first Cap B failure
+
+The first-crossing condition (FC210) yields a clean structural dichotomy. **If a first crossing exists at any canonical record `M>=45,895,573`, then at least one of**
+
+```text
+(i)  G = D(K)-(2M-2) >= 3M/8;
+(ii) N_bad > sqrt(M)/6
+```
+
+**must hold**, where `N_bad` counts prior events with prime increment `p>=11` and strictly positive potential debt. This is a paper consequence of the finite certificate, not a Lean declaration and not a Cap B proof.
+
+Proof: assume instead `G<3M/8`. Let `u=sqrt(M)`. From `K=floor((7M-1)/4)` obtain
+`K-M-1 >= 3M/4 - 2`. At the predecessor of a first crossing, `C=D(K)<=2K`, hence `U=C+1<4M`; thus `sqrt(U)<2u` and `floor(sqrt(4U))<4u`. If also `N_bad<=u/6`, then (FC210) gives
+
+```text
+3M/4 - 2
+  < 3M/8 + 27 + (u/6)*(2u+30) + 4u
+  = 17M/24 + 27 + 9u.
+```
+
+Therefore `M/24 < 29+9*sqrt(M)`, which is false for every `M>=45,895,573` (indeed true in the opposite direction by a large margin already at the threshold, and the quadratic left side grows faster). Contradiction.
+
+This separates a hypothetical breach into either **linear horizon growth** or **at least order-sqrt(M) positive-cost larger-prime events**. The second branch concerns only primes `>=11`, after all composite and prime 3/5/7 events have been paid by the 210-state potential.
+
+## 5. Open part
 
 The finite potential pays all composite and prime 3/5/7 events, **but does not uniformly bound the total debt from larger prime increments**. In particular the still-open statement needed to close Cap B is a bound on either the sum of positive prime debts (and `G`) along all actual canonical prefixes, or another invariant excluding first crossings. The original [Cap B statement](https://prove2.me/theorems/839fceee-b6d0-4f3c-96f2-510625db787a) remains Open, and this Python certificate is not a Lean proof or an official submission.
 
