@@ -96,7 +96,7 @@ print('PASS: mod-30 constraints for e<=39; e>=41 analytic')
 print('PASS: zero-slack increments prime <=31; finite p37,41,43 slack>=30')
 print('PASS: repeated-prime interval H>=p-1; prime count 15*N<=2*G+3')
 print('strict-slope common multiple Q:', Q)
-print('general strict bound: 4*T <= (9 - 1/(Q+13))*G + 33 - 15/(Q+13)')
+print('general strict bound: 4*T <= (9 - 2/(Q+28))*G + 34 - 60/(Q+28)')
 print('threshold M',M,'K',K,'first-crossing necessary G>=',Gmin)
 print('at first threshold: Cmod30', (H+Gmin)%30,
       'slack budget',9*Gmin+mx[(H+Gmin)%30]-W0+4*gap_bound(H+Gmin)-LIMIT)
