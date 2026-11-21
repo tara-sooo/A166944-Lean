@@ -41,17 +41,26 @@ def short_roots():
     total = 0
     global_max_x = 0
     canonical_max_x = 0
+    reset_max_x = reset_max_growth = reset_max_travel = reset_max_steps = 0
     high = []
     canonical = []
+    reset = []
     for x0 in range(0, 11, 2):
         for root in range(6):
             def dfs(t, x, a, L, word):
                 nonlocal total, global_max_x, canonical_max_x
+                nonlocal reset_max_x, reset_max_growth, reset_max_travel, reset_max_steps
                 total += 1
                 global_max_x = max(global_max_x, x)
                 if x0 == 6 and root == 3:
                     canonical_max_x = max(canonical_max_x, x)
                     canonical.append((x0,root,t,x,a,L,word))
+                if (x0==0 and root%2==0) or (x0==6 and root%2==1):
+                    reset.append((x0,root,t,x,a,L,word))
+                    reset_max_x=max(reset_max_x,x)
+                    reset_max_growth=max(reset_max_growth,2*t+x0-x)
+                    reset_max_travel=max(reset_max_travel,t)
+                    reset_max_steps=max(reset_max_steps,len(word))
                 if x >= 96:
                     high.append((x0,root,t,x,a,L,word))
                 for g in range(1, 11):
@@ -73,7 +82,8 @@ def short_roots():
                             dfs(t+g,xn,b,m,w)
             dfs(0,x0,root,6,())
     assert (total,global_max_x,canonical_max_x,len(high),len(canonical)) == (214780,138,90,108,5123)
-    return high,canonical
+    assert (len(reset),reset_max_x,reset_max_growth,reset_max_travel,reset_max_steps) == (35103,90,232,143,31)
+    return high,canonical,reset
 
 
 def bridge_max(nodes, limit):
@@ -130,19 +140,24 @@ CANONICAL=((7,7),(10,5),(4,3),(9,7),(3,11),(2,7),(4,3),(7,19),
 
 
 def main():
-    high,canonical = short_roots()
+    high,canonical,reset = short_roots()
     # At x<96, a fast bridge has e<=3*x-5<=277<283.
     overall,all_crt,all_valid = bridge_max(high,409)
     canon,can_crt,can_valid = bridge_max(canonical,265)
     assert (overall[0],all_crt,all_valid) == (283,5272,768)
     assert (canon[0],can_crt,can_valid) == (239,45647,14947)
+    resetbest,rcrt,rvalid=bridge_max(reset,265)
+    assert (resetbest[0],rcrt,rvalid)==(239,281101,90120)
     assert check_witness(124860554,6,GENERAL,283,(124860732,249721464))
     assert check_witness(1703085153,6,CANONICAL,239,(1703085320,3406170640))
     print('PASS 214780 low-offset short-H prefixes: max end X=138; canonical root max=90')
     print('PASS 108 high-X roots (X>=96), 5272 CRT bridges, 768 projected valid: max fast e=283')
     print('PASS 5123 canonical roots, 45647 CRT bridges, 14947 projected valid: max fast e=239')
+    print('PASS 35103 parity-compatible reset roots: Xend<=90, Hshort<=232, Tshort<=143, events<=31')
+    print('PASS after reset: 281101 CRT bridges, 90120 projected valid, maximal fast e=239')
     print('PASS exact full-gcd witnesses: e=283 (18 events) and canonical-shaped e=239 (16 events)')
     print('Consequently each low-start short-only + one fast-low-return macro has Hshort<=234 and G<=516.')
+    print('PAPER: reset-compatible short + fast-only tail: <=53 events, H<=232, G<=496, T<=230')
     print('These are synthetic local witnesses and conditional macros. Unrestricted Cap B remains OPEN.')
 
 if __name__=='__main__':
