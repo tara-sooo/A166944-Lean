@@ -82,6 +82,17 @@ Over a block of events with horizon growth `L` and index displacement `T`, its c
 
 This is also why paying every reappearance of prime `p` by the known `p-1` horizon growth (from [`TravelFactors.lean`](../A166944/TravelFactors.lean)) is not yet sufficient: events of other prime values can pay multiple overlapping reuse windows simultaneously, while the total available horizon growth at the canonical cutoff is `G<=2K-(2M-2)=(3/2)M+O(1)`.
 
+
+## 5a. Exact multi-key charge and the coefficient gap
+
+The `p-1` growth reuse lemma also yields an exact **aggregate accounting inequality** for arbitrary overlapping reuse intervals. Select any collection `R` of consecutive reuses of factors `p>=5`; a reuse interval begins just after an event using `p` and ends just before its next use. Define `mu_j` to be the number of such open reuse intervals containing event `j`, and `h_j=e_j-1`. Summing the proved per-factor reuse bounds gives
+
+`sum_{(p,I) in R} (p-1) <= sum_j mu_j * h_j <= (max_j mu_j)*G.`    (C)
+
+This exhibits *exactly where* the overlap multiplier enters. In particular, showing `mu_j<=1` would yield `sum(p-1)<=G`, but that **still would not contradict** the canonical cutoff bound `G<=(3/2)*M+O(1)` unless the accumulated reuse demand itself exceeds that allowance. For sparse long-prime paths the crude per-prime demand is often only of order `M` with an insufficient leading constant. Accordingly, an overlap theorem by itself is not the one missing final inequality: it must be combined with a **quantitatively stronger growth/travel or F-drawup estimate** that beats the available capacity.
+
+This makes the open target more precise: a global, cross-key, phase-sensitive charging theorem whose **actual coefficients** force a slow interval or violate the horizon budget, not merely a qualitative assertion that repeated prime costs can be allocated.
+
 ## 6. Verification and next open target
 
 The standard-library [finite audit](reuse_word_congruence_audit.py) checks:
