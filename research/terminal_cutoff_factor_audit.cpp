@@ -101,11 +101,37 @@ void directCrossCheck() {
       throw runtime_error("direct gcd cross-check mismatch");
   }
 }
+void localBadCrossingWitness() {
+  // Exactly valid last two gcd tests, NOT a path from canonical s0.
+  // This synthetic endpoint also satisfies the coarse 4T<=9G budget.
+  const ll t=30000;
+  ll M=1000005+840*t;
+  ll K=1750008+1470*t; // floor((7*M-1)/4)
+  ll C=2000256+2100*t;
+  ll s=K-1,H=C-2,canonical=2*M-2;
+  if(!(K==(7*M-1)/4&&s<H&&H<=2*s&&
+       canonical<=H&&C<=2*K))
+    throw runtime_error("synthetic endpoint size");
+  if(gcd(K,H-1)!=3||gcd(K-1,C+1)!=7)
+    throw runtime_error("synthetic local 3,7 first hits");
+  if((C-1)%5||(C+1)%7)
+    throw runtime_error("not composite neighbors");
+  if(!(4*(s-(M+2))+32 <=9*(H-canonical)))
+    throw runtime_error("synthetic coarse W growth");
+  // Consecutive events at K and K+1.
+  if(nextHit(s,H)!=pair<ll,ll>{K,3}||
+     nextHit(K,C)!=pair<ll,ll>{K+1,7})
+    throw runtime_error("synthetic exact first-hit branch");
+  cout<<"Artificial endpoint (NOT canonical-attained): M="<<M
+      <<" K="<<K<<" C="<<C<<" gcd(K)="<<3
+      <<" gcd(K+1)="<<7<<" PASS\n";
+}
 int main(int argc,char**argv) {
   int maxM=argc>1?atoi(argv[1]):1000000;
   if(maxM<2201)throw runtime_error("maxM must be >=2201");
   initPrimes(maxM);
   directCrossCheck();
+  localBadCrossingWitness();
   int tested=0,notSlow=0,notTwin=0;
   ll largestNotSlow=0,largestNotTwin=0;
   vector<ll> badTwin;
