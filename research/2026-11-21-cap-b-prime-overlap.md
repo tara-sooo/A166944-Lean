@@ -110,14 +110,14 @@ This eliminates one minimal pattern with a repeated prime key. **It does not eli
 
 From the repository root:
 
-\`\`\`sh
+```sh
 g++ -O3 -Wall -Wextra -std=c++17 research/cap_b_overlap_finite_check.cpp -o /tmp/cap_b_overlap_check
 /tmp/cap_b_overlap_check
-\`\`\`
+```
 
 Expected key output (wall time varies):
 
-\`\`\`text
+```text
 single k=3 candidates=303 possible=0 unfinished=0
 single k=4 candidates=1215 possible=0 unfinished=0
 single k=5 candidates=1347 possible=0 unfinished=0
@@ -125,9 +125,9 @@ single k=6 candidates=540 possible=0 unfinished=0
 single k=7 candidates=43 possible=0 unfinished=0
 repeat(2,1,1) candidates=2184 possible=0 unfinished=0
 PASS: all 5632 arithmetic candidates excluded
-\`\`\`
+```
 
-The executable returns nonzero if the candidate counts disagree, a feasible configuration is found, or a bounded search reaches its node cap. Local GNU C++17 validation: exit 0, no warnings with \`-Wall -Wextra -pedantic\`, approximately 5 seconds. The exact source was committed and read back from GitHub. The deterministic search is still a **finite computational certificate**, not a formal Lean proof.
+The executable returns nonzero if the candidate counts disagree, a feasible configuration is found, or a bounded search reaches its node cap. Local GNU C++17 validation: exit 0, no warnings with `-Wall -Wextra -pedantic`, approximately 5 seconds. The exact source was committed and read back from GitHub. The deterministic search is still a **finite computational certificate**, not a formal Lean proof.
 
 ## 5. What remains and a possible stronger sieve charge
 
