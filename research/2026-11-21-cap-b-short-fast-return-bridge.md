@@ -144,6 +144,45 @@ This conclusion **does not** assert that every true low-offset return consists o
 
 The proofs of (F1)–(F3) use finite fact (A)/(B) plus *elementary signed offset accounting*, not another numerical graph calculation. The 283 and 239 exact **individual fast-increment** bounds in §3 apply only when the fast tail has **exactly one event**; they are **not** asserted for every event in the multi-fast case.
 
+## 4c. Reset-parity refinement: the **repeatable** macro has better bounds
+
+The broad 36-root enumeration in §2 includes low-offset combinations that **cannot arise immediately after an e≥7 return to low offset**. Exact post-offset divisibility (1) forces:
+
+* an **even** hit returning to X≤10 has **X'=0 and terminal index even**;
+* an **odd** hit returning to X≤10 has **X'=6 and terminal index odd**.
+
+The canonical start itself has \(X=6,\ s\equiv3\bmod6\), so is in this family. There are only **6 allowed root combinations** modulo 6: \((0,0),(0,2),(0,4),(6,1),(6,3),(6,5)\).
+
+The updated standalone verifier re-enumerates all **35,103 prefix nodes** from just these parity-compatible roots. It finds
+
+\[
+\boxed{
+X_{\rm short,end}\le90,\quad H_{\rm short}\le232,\quad
+T_{\rm short}\le143,\quad\#\mathrm{short}\le31.}\tag{F4}
+\]
+
+For **exactly one fast return** it tests **281,101** CRT-consistent last-hit candidates, of which **90,120** pass the complete projected-gcd word test. The maximum final increment is again
+
+\[
+\boxed{e_{\rm fast}\le239.}\tag{F5}
+\]
+
+The earlier \(e=283\) example in §3 starts at \(X_0=6,\ s_0\equiv2\bmod6\); it is **not** parity-compatible with a preceding e≥7 low-offset return. The synthetic canonical-residue \(e=239\) full-gcd witness **is** parity-compatible and attains (F5).
+
+For **any number of consecutive fast events** after the short run, (F4) gives start offset at most 90. The signed-offset computation of §4b improves to
+
+\[
+n_{\rm fast}\le22,\qquad T_F\le87,\qquad G_F\le264.
+\]
+
+Therefore every *repeatable parity-compatible short-then-fast-only low-return macro* satisfies
+
+\[
+\boxed{\#\mathrm{events}\le53,\quad H\le232,\quad G\le496,\quad T\le230.}\tag{F6}
+\]
+
+This macro grammar is closed under repetition: each fast last hit returning to X≤10 produces exactly one of the six allowed starting parity states. **But no upper bound on the number of repeats is currently proved.** A first crossing at \(M=45,895,573\), if its H consisted exclusively of such short-then-fast-only macro/terminal-short blocks, would require at least \(\lceil5,291,742/232\rceil=22,810\) short blocks. Long-prime H events or fast/short interleavings must be analyzed separately.
+
 ## 5. Why the low-start hypothesis matters: an infinite fast reset family
 
 For **every odd \(e\ge7\)** (prime or composite), define
