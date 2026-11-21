@@ -145,6 +145,5 @@ def main():
     print('Consequently each low-start short-only + one fast-low-return macro has Hshort<=234 and G<=516.')
     print('These are synthetic local witnesses and conditional macros. Unrestricted Cap B remains OPEN.')
 
-
 if __name__=='__main__':
     main()
