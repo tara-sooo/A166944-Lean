@@ -126,6 +126,40 @@ Direct genuine-event checks (not new Lean proofs):
 
 Both examples have \(H\) tiny compared with \(M\), despite different terminal offsets.
 
+## 3b. Stronger one-parameter condition: **no Cap A and no G upper bound**
+
+The mixed condition (4) can be superseded by an even simpler direct bound using only the **same already Lean-proved** inequality (3). Substitute the exact canonical identity \(G=2T+6-X_f\) into \(3X_f+G\le13H+24\):
+
+\[
+\boxed{2T+2X_f\le13H+18.} \tag{4a}
+\]
+
+Since the horizon is at most twice the index, \(X_f\ge0\); hence \(4T\le26H+36\). Since \(s_f=M+2+T\), the following **single sufficient hypothesis** implies Cap B on the path:
+
+\[
+\boxed{
+26H\le3M-45
+\quad\Longrightarrow\quad
+4s_f\le7M-1.
+} \tag{4b}
+\]
+
+**Cap A is not assumed, and G is eliminated entirely.** The remaining unproved claim becomes: every relevant authentic capped canonical path has **selective long-relative-gap growth** \(H\le(3M-45)/26\). This is mathematically a different and potentially more tractable target than \(D(K)\le2.335M\). It relies only on the existing Lean trace estimate, the canonical initial offset, and the fact \(X\ge0\); the finite mod-210 dual certificate is not used.
+
+For \(M=45895573\), (4b) allows **\(H\le5295641\)**. The measured 37-event control path has \(H=766\).
+
+There is also a useful **first-crossing predecessor** test that is independent of the unknown \(G\): with \((s,C)\to(r,C')\) the first step across \(K\), \(s\le K<r\), and \(R=\lfloor\sqrt{4(C+1)}\rfloor\), use \(T=s-(M+2)\ge K-M-1-R\) and (4a) to obtain
+
+\[
+\boxed{
+13H+2R+18\ge2(K-M-1).
+} \tag{4c}
+\]
+
+The global bound \(C=D(K)\le2K\) gives \(R\le\lfloor\sqrt{4(2K+1)}\rfloor\). At \(M=45895573\), \(R\le25348\), so a first violation needs **at least \(H=5291742\)** already in its predecessor prefix. Compared with the current actual \(H=766\), this is a large gap. The more specialized bound (6) below forces about 13.5 million \(H\) when \(G\) is near its previously computed minimal violating value.
+
+**Important:** Neither (4a) nor (4b) proves the required upper bound on \(H\). The proof obstacle has been **concentrated in one selective-growth quantity** instead of solved. The source's classification of H events remains the natural next avenue.
+
 ## 4. First crossing makes the missing H bound quantitative
 
 Suppose a capped path has a **first** event \((s,C)\to(r,C')\) with \(s\le K<r\). Let \(G=C-(2M-2)\) and \(H\) be the selective growth **up to its predecessor**. Let \(R=\lfloor\sqrt{4(C+1)}\rfloor\). The existing single-step gap bound gives \(g=r-s\le R\), hence \(s\ge K+1-R\). Substitution in (3) yields
