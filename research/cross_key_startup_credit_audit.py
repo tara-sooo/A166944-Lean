@@ -160,10 +160,30 @@ def check_canonical_slow_certificate(V):
           'finite sufficient bound=',bound, 'PASS')
 
 
+def check_sharp_local_overdraw(V):
+    """The constant 31 is sharp even for an exact artificial first hit."""
+    s, C, p = 76_112, 87_402, 71
+    g=2*p
+    assert s<C<=2*s and s+g<=C and C%2==0
+    for r in range(s+1,s+g+1):
+        e=gcd(r if r%2==0 else r-2, C-1 if r%2==0 else C+1)
+        assert e==(p if r==s+g else 1), (r,e)
+    before=V[base.INDEX[(s%210,C%210)]]
+    after=V[base.INDEX[((s+g)%210,(C+p-1)%210)]]
+    b=g-(p-1)+after-before
+    eta=b-(p-1)
+    assert (before,after,b,eta)==(0,29,101,31)
+    assert p*(p-15)<=C+1
+    print('Sharp synthetic first hit: s',s,'C',C,
+          'p',p,'gap',g,'debt',b,'overdraw',eta, 'PASS')
+
+
+
 if __name__=='__main__':
     V=base.potential(base.make_edges())
     random_abstract_words()
     synthetic_61(V)
+    check_sharp_local_overdraw(V)
     check_canonical_slow_certificate(V)
     scan_original(V)
     print('PASS; paper inequality audited, not Lean-proved or asymptotically closed')
