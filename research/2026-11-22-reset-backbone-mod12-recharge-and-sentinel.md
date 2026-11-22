@@ -81,6 +81,12 @@ For a long run all of whose consecutive gaps exceed 6, EVERY event with a follow
 
 This result uses not just the increment's prime factorization, but the absence of all earlier gcd hits during two complete gaps. It is stronger than the simple residue property of a single event.
 
+**Additional 12-wheel strengthening of the sentinel.** If both the incoming and outgoing first-hit gaps around a prime k=1 event are >6, then both pre- and post-horizons are 0 mod3, hence p=1 mod12. For the sentinel q|C-1, q=3 mod4 and q!=3 (since C=0 mod3), so q=7 or11 mod12 and 3q=9 mod12. Equation (2) consequently strengthens to the UNIFORM
+
+    boxed: p <=3q-8.                                      (2b)
+
+This is sharp for an exact aligned local event with a sufficiently long incoming gap: from (s,C)=(396,792), X=0, the next hit at r=405 has g=9 and p=13, while q=7 divides C-1, and 13=3*7-8. The following gap in this particular local example is short; the sharpness claim is for the incoming-gap and p-residue/sentinel argument, not for an indefinitely long 12-frozen run.
+
 ## 4. Oriented fuel is amplified from p to 9p and 11p
 
 Take two uses of the SAME prime p>=13 on an aligned k=1 backbone, with **all intervening increments 1 mod12** and p=1 mod12. Let R>=0 be the actual even horizon growth from immediately after the first use to immediately BEFORE the second use.
