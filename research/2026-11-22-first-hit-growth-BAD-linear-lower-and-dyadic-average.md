@@ -104,6 +104,17 @@ Summary:
     M≥1,000,000: max ratio=0.014495168123884536 at M=1086431 (G=15748).
     Largest absolute growth G=69652 at M=7209299.
 
+The same complete 10M scan also checked the dyadic MEAN-growth criterion (10):
+
+    dyadic odd M interval    number inputs      sum G / sum M       mean G
+    [1,000,2,000)                  500            0.0627493           94.124
+    [10,000,20,000)              5,000            0.0201192          301.788
+    [100,000,200,000)           50,000            0.00480948         721.422
+    [1,000,000,2,000,000)      500,000            0.00115964        1739.46
+    [5,000,000,10,000,000)   2,500,000            0.000440867       3306.50
+
+These averages are far below 1/4 and empirically decrease with scale, offering a *much weaker target* than the pointwise bound. They are FINITE observations; an unbounded family of block estimates is still required to prove twin prime infinitude.
+
 The global GOOD and growth hypotheses remain unproved outside this finite interval. Strongest suggested simple *testable target* is G(M)≤M/4 for all odd M≥1443; an eventually valid version is sufficient. A less stringent eventual bound G(M)≤(9/32−epsilon)M would also suffice asymptotically.
 
 ## 5. A weaker *AVERAGE* route to infinitude, with exact dyadic criterion
