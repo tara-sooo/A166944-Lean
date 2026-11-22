@@ -141,6 +141,38 @@ The complementary UNSAFE set for a fixed p>7 also has an exact energy budget. Le
 
 This is just deterministic counting/Markov, not an upper bound on unsafe insertion COST. It identifies the remaining bootstrap difficulty: even if unsafe starts are sparse, one needs a bound on how expensive a single unsafe insertion may be.
 
+## 3b. A NEW sufficient restricted L2 criterion WITHOUT the 2/p split-frequency assumption
+
+Let B=B_X=ceil sqrt(7X), I_X the odd M in [X,2X), and let p be a safe SQUAREFREE fresh-prime insertion p≤B, p≥11, with old wheel L. For the early-one-shot class, the compact inequality (F') depends only on
+
+    T_p(X,L)=Σ_{u odd in [X,2X+7B/12+5), u modp∈{0,1,3,5}} G_L(u)^2.
+
+**Precise conditional subtheorem (proved implication, unproved hypothesis):** Suppose for some constant A independent of X,p,L,
+
+    BOXED: T_p(X,L) ≤ A * X*B²/p.                   (L2)
+
+Then the ENTIRE early-safe-one-shot portion of the p-stage has positive growth contribution bounded by O_A(XB). Indeed N≤X/2, and (F') yields
+
+    Σ_(early one-shot) Delta_p
+        ≤ (p+7)X/2
+          +XB*sqrt(A*(p+5)/(24p))
+        =O_A(XB).
+
+Dividing by |I_X|=X/2 gives O_A(B) per p, exactly the scale needed by the existing global squarefree-prime-stage mean reduction. NO ESTIMATE of the first-divergence frequency N≈2|I|/p is used here; the whole N≤|I| is sufficient. The technical difficulty has been relocated from adaptive split CRT dispersion to a **restricted four-residue old-growth L2 estimate**, plus the excluded late/refiring/unsafe contributions.
+
+The natural L2 scale B²/p is RMS old growth O(B) over O(X/p) target starts. A global all-residue L2 bound alone lacks the 1/p saving; an actual residue-class dispersion of the old growth SQUARES is needed. The criterion is genuinely sufficient ONLY for this subset, not a completed dyadic average inequality.
+
+**Independent finite exploration:** [four_residue_squarefree_growth_moment_audit.cpp](four_residue_squarefree_growth_moment_audit.cpp) tested all squarefree prefix primes p>=11 up to B, exact first-hit old growth at every target u in the four residue classes, and the normalized maximum R_X=max_p [p*T_p/(X*B²)]:
+
+    X        B       max observed R_X       maximizing p     T_p        #target u
+    4096    170         9.17093                 167         6500616        49
+    16384   339        14.8873                  257       109069248       131
+    65536   678         5.94403                 587       305057696       224
+
+These are modest but non-monotone finite ratios. No universal constant A has been established and these computations cannot establish (L2) for all X.
+
+**Remaining hard work EVEN IF (L2) were proved:** analogous control for late-phase p-hit X=2p or2p+6, unsafe starts p≤6G_L(M)+7, and actual p-refirings. The gap has become more sharply partitioned but has not disappeared.
+
 ## 4. Independent checks in genuine squarefree prime insertion stages
 
 The exact C++ original parity-gcd stage auditor was extended to trace ALL early MINUS branches, not just 3-step-quiet cases. For dyadic intervals I_X (squarefree old wheels are all preceding odd primes, p inserted once):
