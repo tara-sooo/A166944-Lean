@@ -15,7 +15,6 @@ For a frozen plateau `(t,C)`, `z=2t-C` is the nonnegative horizon deficit. If tw
 * All-state maximum: **22 nonunit low-only events**, and **1156 cumulative low-only growth** (the earlier crude estimate was 22*(1155-1)=25,388). This gives 0<=e<=1156 for EVERY low-only prefix, starting from any event origin/state.
 * The exact union of all prefix growths across all states has **138 distinct even values**; its largest value is 1156. There are **58 primes q>=13** dividing at least one nonzero integer in `{e-3,e-1,e+1}` for those 138 values; the largest is q=1153. These are only *potential* immediate refiring primes, not 58 proven realizable paths.
 * A second independent enumeration of the **1155 odd canonical residue classes M mod 2310**, starting always with `t=M+2,C=2M-2`, yields **4940 plateau visits**, maximum 18 low-only events, maximum total low-only growth **98**, and, crucially, **z<=146 at EVERY canonical low-only plateau**. The orbit and the offset `C-(2M-2)` depend only on M mod 2310, so these 1155 classes cover all canonical starts at all sizes. Initial z=6.
-* For S={3}, {3,5}, {3,5,7}, {3,5,7,11}, separate all-state finite scans also yield maximum cumulative low-only growth **4,16,106,1156** respectively, equal to P+1 in these four examples. No general P+1 theorem for arbitrary S is asserted.
 
 The finite 11-low results are bounded exhaustive computational certificates: all 2,668,050 states are checked by a compiled finite program. They do not assert Lean-kernel verification. The known 11-low event maximum F=22 is reproduced independently of previous files.
 
@@ -98,6 +97,8 @@ These are **unconditional paper derivations using the finite 11-wheel certificat
 Every first high event has exactly one high factor in these finite scans (also a paper conclusion). Some have simultaneous low factors, with first-high composite counts 16,90,307,1255,5090, respectively; all first-high event increments d<=B for these five scales. The exact shift signatures were independently checked across all occupied repeated history cells (not only one example); X=1,048,576 yielded 348,205 such repeated-cell comparisons and zero mismatches. The observed maximum low-only growth between consecutive high events at the five scales was 80,116,384,384,1154; the universal all-state cap is 1156.
 
 The high-event depth distribution remains substantial: at X1048576, 85,746 of 524,288 starts had at least 20 high events, 4,813 had >=50, 693 had >=75 and 141 had >=100. Its maximum was 112. Therefore limiting the number of waves to two (or any fixed number) does not resolve the dynamic tail.
+
+Extra non-dyadic and small-window full regressions also passed at X=256,512,1024,500000,1000000,1999998. At X=1999998 the original recurrence produced 39,296,118 nonunit events and 11,695,485 high events, with maximum 123 high events on one start; all first-high, CRT-affine and refractory assertions passed. These are further finite tests, not a uniform estimate.
 
 ## 6. The remaining analytic lemma and reproducibility
 
