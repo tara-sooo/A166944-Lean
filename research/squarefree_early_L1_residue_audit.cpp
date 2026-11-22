@@ -41,22 +41,26 @@ int main(int argc,char**argv) {
   iota(spf.begin(),spf.end(),0);
   for(int p=2;1LL*p*p<Z;p++)if(spf[p]==p)
     for(int j=p*p;j<Z;j+=p)if(spf[j]==j)spf[j]=p;
-  ll bestSum=0;int bestP=0,bestCount=0,stages=0;
-  double bestRatio=-1,averaged=0;
-  int upper=2*X+7*B/12+4;
+  ll bestSum=0,bestSum2=0;int bestP=0,bestCount=0,bestP2=0,bestCount2=0,stages=0;
+  double bestRatio=-1,bestRatio2=-1,averaged=0;
+  int upper=2*X+7*B/12+4; 
+  int upper2=2*X+(3*B+7)/2+5; // h<=2p postfreeze k0 targets
   for(int p=11;p<=B;p+=2)if(spf[p]==p) {
     int prev=1;
     for(int j=3;j<p;j+=2)if(spf[j]==j)prev=j;
-    ll sum=0;int count=0;
-    for(int u=X+1;u<upper;u+=2) {
+    ll sum=0,sum2=0;int count=0,count2=0;
+    for(int u=X+1;u<upper2;u+=2) {
       int r=u%p;
       if(r!=0 && r!=1 && r!=3 && r!=5)continue;
       int h=growth(u,prev);
-      sum+=h;++count;
+      sum2+=h;++count2;
+      if(u<upper){sum+=h;++count;}
     }
     double R=double(p)*sum/(double(X)*B);
+    double R2=double(p)*sum2/(double(X)*B);
     averaged+=R;++stages;
     if(R>bestRatio){bestRatio=R;bestP=p;bestSum=sum;bestCount=count;}
+    if(R2>bestRatio2){bestRatio2=R2;bestP2=p;bestSum2=sum2;bestCount2=count2;}
   }
   const struct {int x,b,n,p,sum,count;} regression[]={
     {4096,170,35,149,13330,56},
@@ -67,11 +71,22 @@ int main(int argc,char**argv) {
     if(B!=q.b||stages!=q.n||bestP!=q.p
         ||bestSum!=q.sum||bestCount!=q.count)
       throw runtime_error("four-AP L1 exact regression changed");
+  const struct {int x,p,sum,count;} regression2[]={
+    {4096,149,14218,59},
+    {16384,269,58206,125},
+    {65536,619,148842,216}
+  };
+  for(auto q:regression2)if(X==q.x)
+    if(bestP2!=q.p||bestSum2!=q.sum||bestCount2!=q.count)
+      throw runtime_error("c2 four-AP L1 exact regression changed");
   cout<<setprecision(11)<<"PASS X="<<X<<" B="<<B
       <<" prime_stages="<<stages
       <<" max_p_times_AP_L1_over_XB="<<bestRatio
       <<" at_p="<<bestP<<" total_growth="<<bestSum
       <<" #old_wheel_targets="<<bestCount
-      <<" mean_normalized_ratio="<<averaged/stages<<"\n";
+      <<" mean_normalized_ratio="<<averaged/stages<<"\n"
+      <<"c2_expanded_window max_normalized_AP_L1="<<bestRatio2
+      <<" at_p="<<bestP2<<" sum="<<bestSum2
+      <<" targets="<<bestCount2<<"\n";
   cout<<"Uniform dyadic four-AP L1 bound remains OPEN\n";
 }
