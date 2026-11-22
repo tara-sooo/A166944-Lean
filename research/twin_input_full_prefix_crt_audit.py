@@ -60,6 +60,7 @@ def cutoff_index_sieve(M, radius=8):
     K = (7*M - 1)//4
     zeta = 7*M - 1 - 4*K
     assert zeta in (0, 2)
+    twin = prime(M) and prime(M-2)
     # General identity 7M=4*(r-2*(r odd))+A.
     for delta in range(-radius, radius + 1):
         r = K + delta
@@ -71,12 +72,12 @@ def cutoff_index_sieve(M, radius=8):
         for q in (3, 5, 7, 11, 13, 17, 19, 23, 29):
             if index % q == 0:
                 assert (7*M-A) % q == 0
-                if prime(M) and prime(M-2) and M > q+2 and q != 7:
+                if twin and M > q+2 and q != 7:
                     assert A % q not in (0, 14 % q)
     # The cutoff itself can never have 7 as an increment factor,
     # for ANY odd M, regardless of input primality.
     assert (K if K % 2 == 0 else K - 2) % 7 != 0
-    if prime(M) and prime(M-2) and M >= 7:
+    if twin and M >= 7:
         if K % 2 == 1 or M % 24 != 7:
             assert (K if K % 2 == 0 else K-2) % 3 != 0
         if M % 24 == 7:
