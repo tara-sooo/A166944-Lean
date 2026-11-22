@@ -40,6 +40,8 @@ int main(int argc, char** argv) {
                 if (!spf[n]) spf[n] = int(p);
 
     const array<int,5> threshold{377,1000,10000,100000,1000000};
+    const array<int,5> dyadicLower{1000,10000,100000,1000000,5000000};
+    array<i64,5> dyadicGrowth{}, dyadicStarts{}, dyadicCount{};
     array<i64,5> bestG{}, bestM{}, countOverQuarter{};
     i64 tested = 0, bad = 0, late = 0;
     i64 largestQuarterM = 0, largestBadM = 0, largestLateM = 0;
@@ -63,6 +65,12 @@ int main(int argc, char** argv) {
             last=pos=next;
         }
         i64 G=C-(2LL*M-2), L=last-s;
+        for (int j=0; j<5; ++j)
+            if (M>=dyadicLower[j] && i64(M)<2LL*dyadicLower[j]) {
+                dyadicGrowth[j]+=G;
+                dyadicStarts[j]+=M;
+                ++dyadicCount[j];
+            }
         // Exact paper theorem; no large-M/prime assumptions.
         if (3*L>8*G+(M%3==1?0:21)) {
             cerr<<"growth/last-event inequality failed M="<<M; return 4;
@@ -91,6 +99,11 @@ int main(int argc, char** argv) {
                  <<"/"<<bestM[j]<<" = "<<double(bestG[j])/bestM[j]
                  <<"; violations G>=M/4: "<<countOverQuarter[j]<<"\n";
     cout<<"Last G>=M/4 for M>=377: "<<largestQuarterM<<"\n";
+    for (int j=0; j<5; ++j) if (dyadicCount[j])
+        cout<<"DYADIC ["<<dyadicLower[j]<<","<<2LL*dyadicLower[j]
+            <<"): inputs="<<dyadicCount[j]
+            <<" sumG/sumM="<<double(dyadicGrowth[j])/dyadicStarts[j]
+            <<" averageG="<<double(dyadicGrowth[j])/dyadicCount[j]<<"\n";
     if (maxM==10000000) {
         const vector<int> expected{11,13,23,25,39,41,43,45,305};
         if (tested!=4999997 || badStarts!=expected || late!=21
