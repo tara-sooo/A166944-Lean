@@ -126,7 +126,7 @@ The 9-fold amplification is for a short one-separator p,q,p arrangement; it is n
 
 ## 5. An asymptotic global necessity: macroscopic pure-reset paths need MANY REUSES
 
-Assume there is a genuinely attained canonical record M, s0=M+2, K=floor((7M-1)/4), and consider a contiguous aligned k=1-only run whose start a>=s0 and last hit b<=K. Every hit in the run has increment >=9, no small (3,5,7) or k=3 events intervene. Put
+Assume there is a genuinely attained canonical record M>=23, s0=M+2, K=floor((7M-1)/4), and consider a contiguous aligned k=1-only run whose start a>=s0 and last hit b<=K. Every hit in the run has increment >=9, no small (3,5,7) or k=3 events intervene. Put
 
     T=b-a,    h=floor(sqrt(2*K+1)),     P=4h+7.
 
