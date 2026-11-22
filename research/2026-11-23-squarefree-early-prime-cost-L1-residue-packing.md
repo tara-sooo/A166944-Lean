@@ -9,6 +9,8 @@ Follows:
 
 Reproducibility: [squarefree_early_L1_residue_audit.cpp](squarefree_early_L1_residue_audit.cpp) checks L1 AP sums from the original parity-specific first-hit clock. [safe_first_split_residue_audit.py](safe_first_split_residue_audit.py) checks the exact residue enumerator over primes and the deterministic energy packing.
 
+Local equivalent C++ checks with the exact squarefree first-event search passed at X=4096,16384,65536. The stdlib Python arithmetic certificate passed for all 299 primes 11<=p<=2000. The GitHub-committed artifacts have been re-fetched at a pinned commit after writing, but no new Lean kernel build was run.
+
 ## 1. NEW EXACT first-moment transfer (strictly weaker than prior second-moment hypothesis)
 
 Let X be even, B=ceil(sqrt(7X)), and p be a fresh odd prime with 11<=p<=B inserted into the squarefree wheel L of all earlier odd primes. Let I_X be odd M∈[X,2X), and S be ANY subset satisfying:
