@@ -35,6 +35,17 @@ Therefore the POST-hit deficit belongs to {0,6,2p,2p+6}. This is an exact **four
 
 The "early" phase eps=0 is equivalent to p+h==1 (mod 4); "late" eps=1 otherwise. With eps=1, X=2p or2p+6 and no immediate canonical reset is claimed.
 
+### Universal p-hit residue invariant (no safe assumption)
+
+There is a more general rule for ANY odd prime p dividing an actual odd nonunit increment e(n), with no truncation/safe/frozen condition. For the original parity gcd evaluated at any EVEN previous horizon D(n−1) and updated by e−1:
+
+    BOXED: n even AND p|e(n) ==> X(n)=2n−D(n) == 0 mod 2p;
+           n odd  AND p|e(n) ==> X(n)=2n−D(n) == 6 mod 2p. (U)
+
+Proof: at even n, p|n and p|D(n−1)−1, so n==0, D(n−1)==p+1 and e==p mod2p (n even, D previous even, e odd). Hence D(n)==0 and X(n)==0 mod2p. At odd n, p|n−2 and p|D(n−1)+1, so n==p+2, D previous==p−1 and e==p mod2p. Hence D(n)==−2, 2n==4 and X(n)==6 mod2p.
+
+Thus **any** p-hit with 0<=X(n)<2p must land at X=0 (even index), or X=6 (odd index), with the latter giving an immediate canonical renewal at artificial odd start M'=n−2. More general hits land on the lattice X=2kp or X=6+2kp. The safe insertion condition (A) ensures k∈{0,1}, producing the four-state special case (C). This invariant is valid for unsafe insertions too; it does not upper-bound how often the higher k values occur.
+
 ## 2. Early-phase canonical regeneration, including an exact bridge of length THREE
 
 Define the **regeneration map**
