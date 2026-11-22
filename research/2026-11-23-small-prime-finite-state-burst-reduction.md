@@ -57,6 +57,25 @@ For the fixed small set `{3,5,7,11}`, every restricted-wheel nonunit increment i
 
 This yields a further exact qualitative decomposition between consecutive events that carry prime q>=13: either the next large event interrupts a bounded (<=484-step) small-wheel transient, or the small wheel has already relaxed to an **11-rough frozen state** and the next event is won by a prime >=13 from that plateau. It suggests attacking the adaptive large-prime count through a *finite-state relaxation map plus a rough-state sieve* rather than through all high/low prime clocks simultaneously. No quantitative distribution theorem for the resulting adaptively selected relaxed states is proved.
 
+### NEW CRT counting lemma for the FIRST large-prime event (paper, relying on the finite F=22 certificate)
+
+Let `N=X/2` be the number of canonical odd M, and write `C_j^(11)(M)` for the j-th plateau state (including the initial and final plateau) of the unrestricted-in-time `{3,5,7,11}`-only wheel from the canonical seed. By F=22, at most 23 plateau states occur. Given an odd residue `r=M mod 2310`, the event clock choices and all successive small-prime increments depend only on `(t=M+2 mod 2310,C=2M−2 mod2310)`. Therefore for every j along that residue-class path,
+
+    C_j^(11)(M)=2M−2+h_j(r)
+
+for an even integer `h_j(r)` independent of M in this residue class. For any odd prime `q>=13`, `gcd(q,2310)=1`, so each condition `q|C_j^(11)(M)−1` or `q|C_j^(11)(M)+1` selects exactly one residue class of M modulo q inside that fixed r class. There are at most 1155 odd r classes, 23 plateaus per class and two signs. Let `A_q(X)` be the number of M for which q divides either neighbor at SOME plateau of the small-only wheel. CRT yields the explicit universal bound
+
+    BOXED: A_q(X) <= 46*N/q + 46*1155
+                    = 23*X/q + 53,130.                       (CRT1)
+
+This is a UNION upper bound; overlapping plateaus/residue classes only reduce the left side. Sum with weights q and use `pi(B)=O(B/log B)`, `sum_{q<=B}q<=B*pi(B)` and `B²=Theta(X)`:
+
+    BOXED: sum_{13<=q<=B prime} q*A_q(X)
+           <= 23*X*pi(B)+53,130*B*pi(B)
+           = O(X*B/log B).                                   (CRT2)
+
+If a full-wheel trajectory has a FIRST event whose increment contains at least one q>=13, all earlier events were small-only, hence follow an initial segment of the restricted wheel. Each q>=13 in that first large event is therefore included in the corresponding `A_q` set. Thus its total **large-prime-factor weight**, summed across all M at the first large event only, is bounded by (CRT2). This is an exact first-wave arithmetic estimate and requires NO equidistribution of adaptively generated full-wheel plateaus. The analogous estimate for the SECOND and later large events remains OPEN: their restart states depend on earlier high-prime hits and are not periodic functions of M modulo 2310 alone.
+
 ## 5. Explicit new sufficient OPEN target
 
 Let `N_X=X/2` starts and `T_X=sum_(M in I_X) T_{>11}(M)`. Sum A1 over M:
