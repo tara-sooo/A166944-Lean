@@ -96,6 +96,26 @@ Using (T), b≤8, and Cauchy-Schwarz,
 
 This is a genuine, non-probabilistic transfer estimate covering ALL early phase one-shot events and all 3/5 bridge outcomes. It is NOT yet an upper bound O(sqrt X) on an individual prime stage averaged over dyadic starts: restricted second moments G_L(v)^2 and unsafe/late/refire contributions remain uncontrolled.
 
+### A small but useful self-normalized safe/unsafe fibre budget
+
+Under the safe condition p>6h(M)+7, every relevant source has h(M)<(p−7)/6. Therefore within any fixed-p, fixed-bridge-growth fibre v, consecutive distinct odd starts have old growth values decreasing by at least4 and so
+
+    BOXED: k_v < 1+(p−7)/24.
+
+Moreover W_r<(p−7)N_r/6, so the collision part of (F) is bounded without any unknown W_r:
+
+    BOXED: sum_(v∈V_r)k_v²
+           ≤N_r+W_r/2
+           <N_r(1+(p−7)/12).                         (S)
+
+These inequalities do not control the large and adaptive restricted second moments of G_L(v), but make the multiplicity cost explicitly O(p).
+
+The complementary UNSAFE set for a fixed p>7 also has an exact energy budget. Let U_p={M∈I_X: p≤6G_L(M)+7}. Then
+
+    BOXED: |U_p| ≤ [6/(p−7)] sum_(M∈I_X)G_L(M).   (U)
+
+This is just deterministic counting/Markov, not an upper bound on unsafe insertion COST. It identifies the remaining bootstrap difficulty: even if unsafe starts are sparse, one needs a bound on how expensive a single unsafe insertion may be.
+
 ## 4. Independent checks in genuine squarefree prime insertion stages
 
 The exact C++ original parity-gcd stage auditor was extended to trace ALL early MINUS branches, not just 3-step-quiet cases. For dyadic intervals I_X (squarefree old wheels are all preceding odd primes, p inserted once):
