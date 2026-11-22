@@ -40,7 +40,8 @@ Path old_run(int m,int P){
   }
   return {int(C-(2LL*m-2)),last,move(ev)};
 }
-int new_growth(int m,int P){
+pair<int,int> new_growth(int m,int P){
+  int watched_p_hits=0;
   ll pos=m+2,K=(7LL*m-1)/4,C=2LL*m-2;
   while(pos<K){
     ll n=K+1;
@@ -52,9 +53,10 @@ int new_growth(int m,int P){
     int raw=int(gcd((n&1)?n-2:n,(n&1)?C+1:C-1)),e=1;
     for(int p:factor(raw))if(p<=P)e*=p;
     if(e<=1)throw runtime_error("nonunit first-hit missing");
+    if(e%P==0)++watched_p_hits;
     pos=n;C+=e-1;
   }
-  return int(C-(2LL*m-2));
+  return {int(C-(2LL*m-2)),watched_p_hits};
 }
 struct Split{bool found;ll n;int post_deficit;bool post_freeze;};
 Split first_split(int m,int p,const Path& old){
@@ -94,11 +96,13 @@ int main(int argc,char**argv){
   // 2 post-freeze X in {2p,2p+6};
   // 3 post-freeze OTHER X (typically >=4p, with p=3 special).
   array<ll,4>positive{},negative{},npos{},nneg{};
+  ll low2_count=0,low2_cost=0,oneshot_count=0,oneshot_cost=0;
   for(size_t j=0;j<primes.size();++j){
     int p=primes[j],oldP=j?primes[j-1]:1;
     for(int m=X+1;m<2*X;m+=2){
       Path old=old_run(m,oldP);
-      int delta=new_growth(m,p)-old.growth;
+      auto new_path=new_growth(m,p);
+      int delta=new_path.first-old.growth;
       if(!delta)continue;
       Split z=first_split(m,p,old);
       if(!z.found)throw runtime_error("new wheel grew without initial p divergence");
@@ -110,6 +114,12 @@ int main(int argc,char**argv){
       }
       if(delta>0){positive[group]+=delta;++npos[group];}
       else{negative[group]-=delta;++nneg[group];}
+      if(p>=11&&group==1&&old.growth<=2*p){
+        ++low2_count;low2_cost+=delta;
+        if(new_path.second==1){
+          ++oneshot_count;oneshot_cost+=delta;
+        }
+      }
       if(group>0&&delta<0)
         throw runtime_error("post-freeze negative insertion contradicts exact theorem");
     }
@@ -122,6 +132,12 @@ int main(int argc,char**argv){
   for(const auto& row:expected)if(X==row.x)
     if(positive!=row.p || negative!=row.n)
       throw runtime_error("finite signed partition regression mismatch");
+  if(X==4096 && (low2_count!=883 || low2_cost!=85116
+      || oneshot_count!=865 || oneshot_cost!=82806))
+    throw runtime_error("4k moderate-postfreeze cost regression mismatch");
+  if(X==16384 && (low2_count!=3960 || low2_cost!=690942
+      || oneshot_count!=3791 || oneshot_cost!=655098))
+    throw runtime_error("16k moderate-postfreeze cost regression mismatch");
   cout<<"PASS X="<<X<<" B="<<B<<" (category: positive,negative,count_pos,count_neg)\n";
   for(int i=0;i<4;++i)
     cout<<i<<": "<<positive[i]<<" "<<negative[i]
@@ -129,5 +145,9 @@ int main(int argc,char**argv){
   ll net=accumulate(positive.begin(),positive.end(),0LL)
          -accumulate(negative.begin(),negative.end(),0LL);
   cout<<"net="<<net<<"; post-freeze negative cost exactly zero\n";
+  cout<<"postfreeze X0/6 p>=11 oldgrowth<=2p count="<<low2_count
+      <<" positive_cost="<<low2_cost
+      <<" one_shot_count="<<oneshot_count
+      <<" one_shot_cost="<<oneshot_cost<<"\n";
   cout<<"Full dyadic insertion mean theorem remains OPEN\n";
 }
