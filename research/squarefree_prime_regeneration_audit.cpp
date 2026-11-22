@@ -39,7 +39,15 @@ Replay replay(int M,int P,int watched=0,i64 explicitK=0) {
     for(int p:factors(raw))if(p<=P)e*=p;
     if(e<=1)throw runtime_error("wrong first-hit event");
     if(watched && e%watched==0)++watched_hits;
-    C+=e-1;pos=last=next;
+    C+=e-1;
+    // Universal p-hit congruence, including all UNSAFE multi-prime events.
+    for(int q:factors(e)) {
+      i64 deficit=2*next-C;
+      bool correct=(next&1)?((deficit-6)%(2*q)==0)
+                            :(deficit%(2*q)==0);
+      if(!correct)throw runtime_error("universal post-hit X mod 2p failed");
+    }
+    pos=last=next;
   }
   return {int(C-(2LL*M-2)),watched_hits,last};
 }
