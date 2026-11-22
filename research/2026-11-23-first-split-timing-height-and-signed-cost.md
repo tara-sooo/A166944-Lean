@@ -79,12 +79,13 @@ These are deterministic Markov-style high-height frequency bounds paid for by OL
 
 All odd M in [X,2X), primes p<=B_X=ceil sqrt(7X) inserted into ascending squarefree prefixes. The exact first divergence τ is found using each OLD event horizon and its p clock, not a guess from the final old horizon. Every signed stage difference is checked by exact recomputation of the full Lp wheel.
 
-    X     pre-last +     pre-last −     post k0 +     post k1 +    post k>=2 +
+    X      pre-last +    pre-last −    post X=0/6 +   post X=2p/(2p+6) +  post other X +
     1024      6726            486           12268          16452          4980
     4096     57960          46536           99878         162170        125670
     16384   369372         524112          761250        1556242        752574
 
-All negative differences were PRE-last in these scans, as (2) proves universally. There were ZERO negative post-last first splits.
+All negative differences were PRE-last in these scans, as (2) proves universally.
+The table includes small inserted primes p=3,5,7, so the post-freeze labels are literal X categories rather than the k>=0 height classification, whose simple non-overlapping form is stated for p>=11. There were ZERO negative post-last first splits.
 
 A crucial empirical research PRIORITY: the previously studied "growth-adaptive SAFE" comparisons cover only a small portion of total positive costs. Classifying by actual first split, not p>6h+7, covers far more of the dynamics. At X=16384, post-last starts contribute ~3.07 million of the ~3.44 million positive growth-difference total, and pre-last net is negative:
     369372−524112=−154740.
