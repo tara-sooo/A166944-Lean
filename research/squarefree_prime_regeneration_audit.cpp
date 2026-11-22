@@ -55,6 +55,8 @@ struct Counts {
   i64 safe=0,splits=0,early=0,late=0,plus=0,minus=0;
   i64 plus_oneshot=0,plus_actual_refires=0;
   i64 minus_bridge=0,minus_oneshot=0,minus_bridge_refires=0;
+  i64 bridge3=0,bridge5=0,bridge7=0;
+  i64 minus_all_oneshot=0,minus_all_refires=0;
 };
 int main(int argc,char**argv) {
   int X=argc>1?atoi(argv[1]):4096;
@@ -112,18 +114,46 @@ int main(int argc,char**argv) {
         ++out.minus;
         if(u!=n+1 || u%p!=1 || expectedX!=0)
           throw runtime_error("minus seed failed");
-        if(n+3>K)continue;
-        bool bridge= (oldP<3 || (n-1)%3!=0)
-                  && (oldP<5 || (n+2)%5!=0);
-        if(!bridge)continue;
-        ++out.minus_bridge;
-        int tail=replay(int(u),oldP,0,K).growth;
-        if(tail<p-1) {
-          ++out.minus_oneshot;
-          if(newer.growth!=h+p-1+tail)
-            throw runtime_error("minus three-step identity failed");
+        // UNIVERSAL seven-step bridge from an even X(n)=0:
+        // Until X=6, only e=1,3,5 may occur. This includes both
+        // 3-step-quiet and 3/5-interrupted bridges (p>=11 cannot refire).
+        int x=0,bridgeGrowth=0,k=0;
+        i64 at=n;
+        while(x!=6) {
+          ++at;++k;
+          int raw=(at&1)?int(gcd(at-2,i64(abs(x-3))))
+                         :int(gcd(at,i64(x+3)));
+          int e=1;
+          for(int q:factors(raw))if(q<=oldP)e*=q;
+          if(e!=1&&e!=3&&e!=5)
+            throw runtime_error("unexpected non-small bridge factor");
+          x+=3-e;bridgeGrowth+=e-1;
+          if(k>7)throw runtime_error("universal bridge exceeded seven");
         }
-        if(newer.prime_hits>1)++out.minus_bridge_refires;
+        if(bridgeGrowth!=2*k-6 || (k!=3&&k!=5&&k!=7)
+           || (at&1)==0 || i64(2*at-6)!=2*(at-2)-2)
+          throw runtime_error("universal bridge identity failed");
+        if(k==3)++out.bridge3;
+        if(k==5)++out.bridge5;
+        if(k==7)++out.bridge7;
+        if(k==3)++out.minus_bridge;
+        if(at>K)continue;
+        int v=int(at-2);
+        if(v!=u+bridgeGrowth/2 || v%p!=(1+bridgeGrowth/2)%p)
+          throw runtime_error("bounded canonical target wrong");
+        int tail=replay(v,oldP,0,K).growth;
+        // The post-p even horizon is 0 mod p: p cannot refire if
+        // the total hypothetical L-only growth stays below p-1.
+        if(bridgeGrowth+tail<p-1) {
+          ++out.minus_all_oneshot;
+          if(k==3)++out.minus_oneshot;
+          if(newer.growth!=h+p-1+bridgeGrowth+tail)
+            throw runtime_error("universal minus one-shot identity failed");
+        }
+        if(newer.prime_hits>1) {
+          ++out.minus_all_refires;
+          if(k==3)++out.minus_bridge_refires;
+        }
       }
     }
   }
@@ -131,17 +161,23 @@ int main(int argc,char**argv) {
     throw runtime_error("count partition wrong");
   Counts expected;
   if(X==4096) {
-    expected={12030,501,254,247,128,126,77,3,111,62,3};
+    expected={12030,501,254,247,128,126,77,3,111,62,3,
+              111,2,13,67,3};
   } else {
-    expected={105280,2463,1183,1280,597,586,356,18,498,266,22};
+    expected={105280,2463,1183,1280,597,586,356,18,498,266,22,
+              498,37,51,322,26};
   }
   if(tie(out.safe,out.splits,out.early,out.late,out.plus,out.minus,
          out.plus_oneshot,out.plus_actual_refires,out.minus_bridge,
-         out.minus_oneshot,out.minus_bridge_refires)
+         out.minus_oneshot,out.minus_bridge_refires,
+         out.bridge3,out.bridge5,out.bridge7,
+         out.minus_all_oneshot,out.minus_all_refires)
      !=tie(expected.safe,expected.splits,expected.early,expected.late,
          expected.plus,expected.minus,expected.plus_oneshot,
          expected.plus_actual_refires,expected.minus_bridge,
-         expected.minus_oneshot,expected.minus_bridge_refires))
+         expected.minus_oneshot,expected.minus_bridge_refires,
+         expected.bridge3,expected.bridge5,expected.bridge7,
+         expected.minus_all_oneshot,expected.minus_all_refires))
     throw runtime_error("finite regression counts changed");
   cout<<"PASS X="<<X<<" safe="<<out.safe<<" first_p_splits="<<out.splits
       <<" early="<<out.early<<" late="<<out.late
@@ -150,6 +186,10 @@ int main(int argc,char**argv) {
       <<" plus_actual_refires="<<out.plus_actual_refires
       <<" minus_quiet_bridge="<<out.minus_bridge
       <<" minus_one_shot="<<out.minus_oneshot
-      <<" minus_actual_refires="<<out.minus_bridge_refires<<"\n"
+      <<" minus_actual_refires="<<out.minus_bridge_refires
+      <<" bridge3="<<out.bridge3<<" bridge5="<<out.bridge5
+      <<" bridge7="<<out.bridge7
+      <<" minus_all_oneshot="<<out.minus_all_oneshot
+      <<" minus_all_refires="<<out.minus_all_refires<<"\n"
       <<"Universal dyadic mean bound remains UNPROVED\n";
 }
