@@ -105,7 +105,28 @@ A further example M=28549 has two exact GOOD predecessor candidates 14083 (N=27)
 
 **These directed paths have artificial roots** and do not constitute original A166944 records. The authentic record orbit from a(1)=2 is ONE PARTICULAR chain among all possible canonical-shaped starts; assuming all its large stages GOOD is exactly the conjectural step under investigation.
 
-## 5. Mathematically precise next targets
+## 5. Exact phase collision between a GENUINE record and high-R synthetic starts
+
+For L=3465, the canonical initial truncated-gcd-wheel state is
+
+    (s mod 2L, C mod L) = ((M+2) mod6930, (2M-2) mod3465).
+
+Three actual twin-prime input integers with the SAME initial phase (45,84), since M==43 mod6930:
+
+    M=713833:    GENUINELY attained in original a(1)=2 recurrence,
+                 strict record at n=713835; N=11,R=6,G=84.
+    M=124783:    ARTIFICIAL canonical start, N=93,R=72,G=2226.
+    M=291103:    ARTIFICIAL canonical start, N=142,R=117,G=7248.
+
+All three terminal cutoff neighbor pairs are prime. They share the EXACT same L=3465 truncated recurrence, whose six nonunit events have relative index/increment pairs:
+
+    (2,5),(3,3),(6,7),(15,5),(21,33),(34,7).
+
+After the sixth truncated event C==138 mod3465 and both neighbors C-1,C+1 are coprime to3465; hence the small-factor wheel is permanently quiet. Nevertheless, the original gcd recurrence yields very different R counts from larger prime-factor hits.
+
+This explicit finite example refutes a claimed universal R bound based ONLY on the canonical initial residue state modulo6930. It does NOT exclude stronger growing-modulus invariants or properties tied to the exact genuinely attained F-orbit. The original attainment of M=713833 is independently confirmed by direct per-index gcd from the original a(1)=2 seed in the companion Python audit.
+
+## 6. Mathematically precise next targets
 
 The requested global upper bound on R_M or H_(>=13) remains open. The new examples show that one-parent quietness and up to seven prior GOOD steps cannot establish the desired inequality. Since the full future is determined by the reached M, any effective history-sensitive invariant P must be a restriction on reachable M, proved at a genuinely attained base value and stable under the canonical successor F.
 
