@@ -127,7 +127,7 @@ These are finite tests, not an asymptotic upper-bound proof.
 
 This is a **GOOD** artificial path with many reuses. Hence the desired uniform bound cannot hold for all canonical-shaped states EVEN IF their starting inputs M and M-2 are twin primes and their terminal neighbors are prime. It must exploit **actual historical reachability** of M from a(1)=2, or use a different branch-specific criterion.
 
-The independent C++ index scan and exact event-jump scan agree on the stated witness. The compiled finite-wheel exploration took ~3.3 seconds for L=3465 and ~140 MiB peak resident memory in the local container; both final C++ sources were saved and verified via GitHub remote readback. No new Lean compilation.
+An independent per-index parity-gcd replay and the factorized first-hit C++ scan agree on the stated synthetic witness. The compiled finite-wheel exploration took ~3.3 seconds for L=3465 and ~140 MiB peak resident memory in the local container; both final C++ sources were saved and verified via GitHub remote readback. No new Lean compilation.
 
 ## 5. Resulting strategic conclusion and exact open core
 
