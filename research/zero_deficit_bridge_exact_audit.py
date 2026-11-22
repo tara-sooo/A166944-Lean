@@ -31,6 +31,8 @@ def run():
     expected={
         1:{3:15}, 3:{3:10,5:5},
         5:{3:12,5:3}, 15:{3:8,5:5,7:2},
+        7:{3:15}, 21:{3:10,5:5},
+        35:{3:12,5:3}, 105:{3:8,5:5,7:2},
     }
     for L,hist_expected in expected.items():
         hist=Counter(bridge(30000+r,L)[0] for r in range(0,30,2))
