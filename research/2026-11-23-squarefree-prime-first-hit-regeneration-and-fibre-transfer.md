@@ -44,7 +44,7 @@ There is a more general rule for ANY odd prime p dividing an actual odd nonunit 
 
 Proof: at even n, p|n and p|D(n−1)−1, so n==0, D(n−1)==p+1 and e==p mod2p (n even, D previous even, e odd). Hence D(n)==0 and X(n)==0 mod2p. At odd n, p|n−2 and p|D(n−1)+1, so n==p+2, D previous==p−1 and e==p mod2p. Hence D(n)==−2, 2n==4 and X(n)==6 mod2p.
 
-Thus **any** p-hit with 0<=X(n)<2p must land at X=0 (even index), or X=6 (odd index), with the latter giving an immediate canonical renewal at artificial odd start M'=n−2. More general hits land on the lattice X=2kp or X=6+2kp. The safe insertion condition (A) ensures k∈{0,1}, producing the four-state special case (C). This invariant is valid for unsafe insertions too; it does not upper-bound how often the higher k values occur.
+For **p>=5**, a p-hit with 0<=X(n)<2p must land at X=0 (even index), or X=6 (odd index), with the latter giving an immediate canonical renewal at artificial odd start M'=n−2. For p=3 the odd-index congruence is X==0 mod6, so an odd hit with X=0 is possible and the X=6 conclusion does not follow from the bound X<2p. More general hits land on the lattice X=2kp or X=6+2kp. The safe insertion condition (A) ensures k∈{0,1}, producing the four-state special case (C). This invariant is valid for unsafe insertions too; it does not upper-bound how often the higher k values occur.
 
 ## 2. Early-phase canonical regeneration, including an exact bridge of length THREE
 
