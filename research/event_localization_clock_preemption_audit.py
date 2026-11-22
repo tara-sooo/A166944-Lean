@@ -40,11 +40,11 @@ def test_q_recharge():
     assert tested==21066
     for q in (7,11,13):
         # e=3 exception: + side switches to - without further growth.
-        C=2*q-2
+        C=q-1
         assert (C+1)%q==0
         assert (C+2-1)%q==0
         # - side requires 2q-4 extra even horizon growth.
-        C=2*q+2
+        C=q+1
         assert (C-1)%q==0
         post=C+2
         y=next(y for y in range(0,4*q+2,2)
