@@ -11,6 +11,8 @@ The supplied user archive \`A166944-Lean.zip\` contains:
 - \`mission_scan/twin_proof/cap_bound/refire_source_audit.md\`
 - \`mission_scan/twin_proof/cap_bound/refire_independent_audit.md\`.
 
+A second [independent standard-library reproduction script](wheel_signed_growth_dyadic_audit.py) is committed alongside this note for the new X=512 calculations, including the q=43 and q=31 signed insertion totals.
+
 The Python audit was **executed from the ZIP byte content** and passed: 41,034 wheel-pair checks, 914 complete-lift residue-class experiments, and the cited X=256 signed decomposition. The Lean file **contains** proofs of \`even_barrier\` and \`insertion_iff\` and prints their axioms; a Lean toolchain was not present in this assessment runtime, so its claimed successful mission-environment build was **not rerun**. The exact \`2/p\` full-lift count and the global signed mean are NOT part of these two kernel theorems.
 
 ## 1. Exact first divergence and the necessary qualification
