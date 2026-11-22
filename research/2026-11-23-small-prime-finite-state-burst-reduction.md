@@ -51,6 +51,12 @@ The same verifier recomputes the full original parity-specific squarefree B-whee
 
 Finite proportions are not asymptotic upper bounds. In particular, the fraction 26–28% could vary with X. The crude A1 numerical bound is not tight but removes the need to analyze the independent long-run survival of the smallest four primes directly.
 
+### A bounded transient before a rough frozen plateau
+
+For the fixed small set `{3,5,7,11}`, every restricted-wheel nonunit increment is at most `P=1155`. During a restricted low-prime run, the next event is within `2a<=22` time steps when the active set is nonempty, and the run contains at most 22 events. Consequently, starting from **any** even state/time, if no high-prime event interrupts it, the low-prime transient ends in **at most 484 clock steps** and changes the state by **at most `22*(1155-1)=25,388`**. At its endpoint the frozen even state `C` satisfies `gcd(1155,(C-1)(C+1))=1`. These very coarse constant bounds do not depend on X.
+
+This yields a further exact qualitative decomposition between consecutive events that carry prime q>=13: either the next large event interrupts a bounded (<=484-step) small-wheel transient, or the small wheel has already relaxed to an **11-rough frozen state** and the next event is won by a prime >=13 from that plateau. It suggests attacking the adaptive large-prime count through a *finite-state relaxation map plus a rough-state sieve* rather than through all high/low prime clocks simultaneously. No quantitative distribution theorem for the resulting adaptively selected relaxed states is proved.
+
 ## 5. Explicit new sufficient OPEN target
 
 Let `N_X=X/2` starts and `T_X=sum_(M in I_X) T_{>11}(M)`. Sum A1 over M:
