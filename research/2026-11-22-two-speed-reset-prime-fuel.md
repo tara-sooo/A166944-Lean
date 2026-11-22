@@ -41,14 +41,14 @@ Thus any significant abrupt drop of a large X requires a primitive hit, while pr
 
 ## 2. Main two-speed lemma: NEXT first hit after low-offset state
 
-Let (s,C) be an exact moving-horizon state, with **X_s=2s-C=xi in {0,6}**. Let r=s+g be its next nonunit event and e=d(r)>=9. By definition all increments in (s,r) are 1, so at r-1 the offset is Xpre=xi+2(g-1).
+Let (s,C) be an exact recurrence state with C=D(s), with **X_s=2s-C=xi in {0,6}**. Let r=s+g be its next nonunit event and e=d(r)>=9. By definition all increments in (s,r) are 1, so at r-1 the offset is Xpre=xi+2(g-1).
 
 The event cofactor congruence becomes
 
     e | (2g+xi+1)     if r even;
     e | (2g+xi-5)     if r odd.                          (6)
 
-Because e>=9, the divisor arguments are positive at an actual event. Each is odd, e is odd, and the kernel-proved first-hit bound says g<=2e. Therefore its positive integer quotient k satisfies
+Because e>=9, the divisor arguments are positive at an actual event. Each is odd and e is odd. The bound g<=2e follows **even when r>C**, by elementary gcd periodicity: if g>2e, the preceding index r-2e has the same parity and lies strictly between s and r; its constant-horizon gcd is divisible by e, contradicting first-hit minimality. The existing Lean theorem covers r<=C; this elementary argument covers post-horizon returns such as the genuine s=9, C=12 to r=15, e=13. Therefore its positive integer quotient k satisfies
 
     k is odd, 1<=k<(4e+7)/e<5,
 
