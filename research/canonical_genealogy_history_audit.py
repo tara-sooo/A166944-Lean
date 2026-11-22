@@ -47,6 +47,49 @@ def check_relays(chain):
         assert row['C']+child-1 == 2*child-2
     return rows
 
+
+def phase_collision_audit():
+    """One actual record and two synthetic starts share the same 3465-wheel phase."""
+    L=3465
+    sources=(713833,124783,291103)
+    expected=((2,5),(3,3),(6,7),(15,5),(21,33),(34,7))
+    assert all(((m+2)%(2*L),(2*m-2)%L)==(45,84) for m in sources)
+    for m in sources:
+        s=m+2
+        C=2*m-2
+        hits=[]
+        for n in range(s+1,s+100):
+            e=gcd(gcd(n if n%2==0 else n-2,
+                      C-1 if n%2==0 else C+1),L)
+            if e>1:
+                hits.append((n-s,e))
+                C+=e-1
+        assert tuple(hits)==expected
+        assert C%L==138 and gcd((C-1)*(C+1),L)==1
+
+    expected_stats={713833:(11,6,84),
+                    124783:(93,72,2226),
+                    291103:(142,117,7248)}
+    for m,stats in expected_stats.items():
+        z=replay(m)
+        assert (z['N'],z['R'],z['G'])==stats
+        assert z['initial_twin'] and z['final_twin']
+
+    # Independent attainment test from the ORIGINAL initial recurrence D(1)=1.
+    C=1
+    record=1
+    last=None
+    for n in range(2,713833+3):
+        e=gcd(n if n%2==0 else n-2,
+              C-1 if n%2==0 else C+1)
+        C+=e-1
+        if e>record:
+            record=e
+            last=(n,e)
+    assert last==(713835,713833) and C==2*713833-2
+    print('PASS shared exact L=3465 phase (45,84), R values (6,72,117)')
+    print('PASS independently attained original record M=713833 at n=713835')
+
 def main():
     chain=[859,1723,3463,6961,13999,28183,56713,113623,230563]
     rows=check_relays(chain)
@@ -73,6 +116,7 @@ def main():
     assert (child['N'],child['R'],child['G'],child['F'])==(401,357,41262,39768343)
     print('PASS quiet parent 9931771 -> busy child 19863541, N=401 R=357')
     print('PASS exact original parity gcd and prime tests; global bound OPEN')
+    phase_collision_audit()
 
 if __name__=='__main__':
     main()
