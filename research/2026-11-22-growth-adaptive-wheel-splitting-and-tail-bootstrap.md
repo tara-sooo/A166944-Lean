@@ -86,6 +86,8 @@ neither lift can have a second p-event. The actual Lp trajectory after the first
 
 This extends the former "far p>12L+7" mean formula to **p much smaller than L**, provided the *observed old growth* h_a and the two *one-shot renewal tails* B± are small compared with p. Neither full-lift averaging nor the tail criterion automatically holds at a natural variable cutoff, so boundary-error and incomplete-period control remain indispensable.
 
+**Exact zero-tail residue class, even when p<<L:** let R=rad(L), the product of the distinct old primes. If p≥5 is fresh and satisfies p≡1 (mod R), then after the p-event the new horizon C'=C+p−1 satisfies C'≡C (mod every old prime), so the L-wheel remains frozen. Moreover modulo p the active neighbor becomes inert (C'≡0 or −2, neither ±1 for p≥5). There can be NO later nonunit event at all. Thus each divergent lift has EXACT signed gain Δ=p−1, without any conditional tail estimate. Concrete dense case L315, R105, p211<2L: for a=1 mod630, the two divergent lifts are M22051 and110881, each with Δ=210, while the other 209 lifts have Δ=0. This proves a genuine one-step p-insertion formula despite p being far below L. Its rarity when rad(L)>>X limits direct dyadic application.
+
 This suggests a precise two-stage bootstrap:
 - control the distribution/mean of old terminal growth h_a to classify most prime insertions as safe, with higher prime powers inert;
 - prove a signed/positive MEAN bound for the two one-shot L-tail renewal costs B±, and separately control exceptional q≤6h+7 and q refirings when B≥p−1.
