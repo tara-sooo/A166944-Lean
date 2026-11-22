@@ -98,3 +98,22 @@ assert wheel(1339,2658,2674,16)==(0,[])
 assert (2676-16)%70==0 and 2676<=2690
 print('Genuine [1339,2674]: CRT 16(mod 70), wheel16=0, first hit e=2659, forced H=2676')
 print('PASS: BAD-path multiscale gap sieve and first-hit/CRT certificates')
+
+
+# Prime-factor reuse counts on all AUTHENTIC attained canonical records.
+records=[]
+for n,e,c in ev:
+ if e>=7 and n==e+2 and (7*e-1)//4<=2_500_000:
+  M=e; K=(7*M-1)//4; seen=set(); repeats=0; events=0
+  for r,d,postC in ev:
+   if M+2<r<=K:
+    fs=set(factors(d)); events+=1
+    if fs & seen: repeats+=1
+    seen |= fs
+  records.append((M,events,repeats))
+assert len(records)==17
+assert {M:R for M,N,R in records if M in (43,2659,5419,355723,1427749)} == {
+ 43:2,2659:5,5419:4,355723:40,1427749:51}
+assert all(1024*R*R<9*M for M,N,R in records if M>=5419)
+print('Authentic records (M, hits, reused-factor hits):',records)
+print('All 9 records M>=5419 have R/sqrt(M) < 3/32; finite evidence only')
