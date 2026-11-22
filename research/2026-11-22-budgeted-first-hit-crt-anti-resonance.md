@@ -146,7 +146,37 @@ Proof. At most h/2 nonunit hits can occur under growth budget h, since each has 
 
 At h=8: ANY actual growth-at-most-8 interval of length >=90 has, by index u+72, an 8-rough state and subsequently only unit increments. This is an exact *bounded-growth => early terminal quiet* result. For global Cap B this applies only when some sufficiently long subinterval has independently established small growth; it does not itself bound the canonical G_M or force bad terminal crossings away.
 
-## 6. Independent audits and the remaining precise gap
+## 6. A new LOCAL low-growth criterion sufficient for Cap B
+
+Let M>=23 be a genuinely attained canonical record, s0=M+2, K=floor((7M-1)/4), and put t=isqrt(D(K)+1). Choose any u in [s0,K] and an even h>=0 with
+
+    D(K)-D(u) <= h.
+
+If the terminal subwindow length L=K-u satisfies BOTH
+
+    L >= (h+2)*(h+1),
+    L >= h*(h+1)+2*t+8,                            (9)
+
+then D(K)-1 and D(K)+1 are twin primes, and Cap B holds at that record.
+
+**Proof.** The terminal-roughness theorem on [u,K] gives a rough state r<=u+h(h+1) after which all increments up to K are 1. Hence D(r)=D(K) and
+
+    K-r >= L-h(h+1) >= 2*t+8.
+
+The already kernel-checked AllIndices.twins_of_slow_interval applies to [r,K]: D(K)>=4, and
+
+    9*(D(K)-D(r))+32+8*t = 32+8*t <=4*(K-r).
+
+It concludes that D(K)-1,D(K)+1 are prime. The previously checked CapSampleExact.cap_iff_twins_at_cutoff then yields Cap B for genuinely attained sufficiently large records (its Lean statement has M>=968); for smaller M the twin conclusion stands independently and any Cap B use should match its own hypotheses.
+
+For **h=8**, (9) becomes the concrete, simple condition
+
+    boxed: D(K)-D(u)<=8 and K-u>=max(90, 80+2*isqrt(D(K)+1))
+          ==> D(K)-1,D(K)+1 prime.                  (10)
+
+This criterion is **LOCAL**: it does not constrain the accumulated growth before u. In principle it can be certified using the CRT first-hit wheel on a terminal core; the missing *global* assertion is the existence of such an adequately long low-growth terminal subwindow on unbounded genuinely attained canonical records. A bounded h is a strong hypothesis; this is not a proof of Cap B for all records.
+
+## 7. Independent audits and the remaining precise gap
 
 Companion [first_hit_budgeted_crt_audit.py](first_hit_budgeted_crt_audit.py) computes the original A166944 through n=2,500,000 (250 nonunit hits including n=2) and all 125 consecutive large-prime reuse intervals p>=5. Their intersections give **968** distinct selected TWO-key overlapping-return configurations.
 
