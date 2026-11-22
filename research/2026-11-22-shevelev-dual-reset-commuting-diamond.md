@@ -67,6 +67,16 @@ This gives a direct mechanism behind the OEIS conditional A174216 theorem. **Wha
 
 OEIS data nuance: A174216 has **seed a(1)=15**, but at n=15 the equality is NOT satisfied, because R(15)=26. Its first actual equality term is n=27 (R(27)=39). The literal Maple code in that OEIS entry accidentally references A173214 instead of A174214; its definition and Mathematica implementation correctly reference A174214.
 
+**Exact shared-fundamental synchronization lemma:** If at an odd index k both the additive dual B and the reset R satisfy
+
+    B(k)=R(k)=3(k-1)/2,
+
+then at the next even index k+1 their gcd tests use the same input k-1, and
+
+    gcd(k-1, 3(k-1)/2)=(k-1)/2.
+
+The additive dual therefore gains the main increment q=(k-1)/2, while the reset sequence jumps to 2(k+1)-4=2k-2. Both post-states are EXACTLY 2k-2, so the two paths are synchronized again. For k=27, q=13; for k=38283, q=19141. This is a deterministic local merging theorem, not a global assertion that their future fundamental indices must coincide.
+
 Direct checks:
 - A167493's fundamental indices through 50000: 7,27,63,123,279,567,1143,2307,4623,9303,18687,38283.
 - A174214 equalities through 50000: 27,63,123,279,567,1143,2307,4623,9447,18927,38283.
