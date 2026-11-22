@@ -4,7 +4,7 @@
 
 Context: [full prime-power wheel review](2026-11-22-wheel-insertion-signed-growth-review.md), [growth-adaptive split condition](2026-11-22-growth-adaptive-wheel-splitting-and-tail-bootstrap.md), [first-hit travel / BAD linear growth](2026-11-22-first-hit-growth-BAD-linear-lower-and-dyadic-average.md).
 
-Reproduce from [squarefree_sqrt_wheel_scan.cpp](squarefree_sqrt_wheel_scan.cpp) with C++17 and -O3.
+Reproduce the exhaustive all-odd scan from [squarefree_sqrt_wheel_scan.cpp](squarefree_sqrt_wheel_scan.cpp) and the fixed-dyadic signed prime-stage checks from [squarefree_prime_stage_audit.cpp](squarefree_prime_stage_audit.cpp), both using C++17 with -O3.
 
 ## 1. A different recurrence: retain ONLY the distinct small primes
 
