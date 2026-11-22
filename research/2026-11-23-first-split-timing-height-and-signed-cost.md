@@ -75,6 +75,49 @@ These are deterministic Markov-style high-height frequency bounds paid for by OL
 
 **Why this improves the earlier safety partition:** the old condition p>6h+7 guaranteed no early split and k∈{0,1}, but it is only sufficient. Many comparisons with p<=6h+7 actually split AFTER S_L, enjoy nonnegative signed cost, and may have k0 canonical regeneration. The splitting-time / post-deficit-height taxonomy is more exhaustive.
 
+## 3b. NEW bounded-old-growth k=0 L1 transfer without safety
+
+The safety test p>6h+7 is NOT required for the post-freeze k=0 regeneration. Fix c>0. Consider all fresh-prime p>=11 stages with:
+- first split τ>S_L, so the old wheel has already frozen and its first split increment is exactly p;
+- post-deficit X(τ) in {0,6} (height k=0);
+- old terminal growth 0<=h(M)<=c*p;
+- the canonical 3/5 bridge, if needed, completes before K;
+- no p refire before the cutoff (ONE-SHOT).
+
+The earlier universal <=7-step bridge gives v=(C+p+1+b)/2, b∈{0,4,8}, v modp∈{0,1,3,5}, and exact gain
+
+    Delta_p(M)=p−1+b+H_L(v;K(M)) <=p+7+G_L(v).
+
+Here the OLD horizon is C=2M−2+h(M). Because h<=cp, the regeneration shift is still controlled, now by c instead of the prior growth-adaptive safety:
+
+    BOXED: (p−1)/2 <=v−M <=((1+c)p+7)/2.           (T1)
+
+Each fixed target v determines b by its distinct residue among {0,1,3,5} (modp), hence determines C. Different odd sources M mapping to the same v have h decreasing by >=4 as M increases by2. Thus
+
+    BOXED: k_v <= 1+cp/4.                             (T2)
+
+Define the expanded AP first moment
+    T1^(c)_p(X,L)= sum_{u odd, X<=u<2X+((c+1)B+7)/2+5,
+                           u modp∈{0,1,3,5}} G_L(u).
+
+Then for the entire post-freeze k0 ONE-SHOT subset with h<=cp,
+
+    BOXED: sum Delta_p <=(p+7)N + (1+cp/4)*T1^(c)_p. (T3)
+
+The conditional AP first moment estimate T1^(c)_p<=A X B/p would yield O_(A,c)(XB) aggregate at each p stage. This is a direct extension of the earlier safe-early L1 theorem to **actually post-freeze UNSAFE** insertions with old growth up to c*p. It still does NOT cover k>=1, refirings, or pre-freeze signed costs.
+
+**Finite relevant sizes with c=2, p>=11** (the stage scan was extended to count p-events in the enlarged wheel):
+    X       post-freeze X0/6 and h<=2p     growth sum    subset with exactly ONE p-hit    growth sum
+    4096                883                  85116               865                     82806
+    16384              3960                 690942              3791                    655098
+
+For the **wider c=2** target window, independent exact old-wheel four-AP means give max p*T1^(2)/(X B):
+    X4096: 3.042397174 at p149;
+    X16384: 2.819034543 at p269;
+    X65536: 2.073511849 at p619.
+
+These finite results support studying the larger post-freeze k0 class but are not a uniform L1 theorem. They also show that numerous post-freeze X0/6 contributions come from sources that fail p>6h+7, so the earlier safe-only partition was too narrow to prioritize.
+
 ## 4. Full prime-stage dyadic signed COST partition, from EXACT original parity-gcd
 
 All odd M in [X,2X), primes p<=B_X=ceil sqrt(7X) inserted into ascending squarefree prefixes. The exact first divergence τ is found using each OLD event horizon and its p clock, not a guess from the final old horizon. Every signed stage difference is checked by exact recomputation of the full Lp wheel.
