@@ -152,3 +152,25 @@ This is not a refutation of budget-wheel soundness: the actual growth is >8. It 
 Companion [bad_path_forced_structure_audit.py](bad_path_forced_structure_audit.py) executes the original parity-sensitive gcd recurrence and the displayed finite structural identities. On all 997 synthetic canonical-shaped odd inputs 7<=M<=2000, exactly nine are terminal BAD: 11,13,23,25,39,41,43,45,305. Every BAD path satisfies (1),(7),(8). The actual A166944 is checked through n=2,500,000 (250 nonunit events including n=2); both genuine CRT lift examples and the real 719 hidden-prime hit are independently reproduced. An additional artificial M=4,000,001 checks the large-number first-hit roughness property on an exact path; this start is GOOD and is NOT evidence for a large BAD example.
 
 **Unresolved theorem needed for Cap B:** exclude BOTH branches (A dense repeated-factor path, B sparse path traversing Omega(sqrt M) simultaneous P_2/P_2 rough-neighbor states with repeated prime increments) on all sufficiently large ACTUALLY attained canonical records; or prove that their compulsory prime-return histories contain mutually inconsistent CRT+first-hit cores whose disjoint growth charges exceed G_M. The known factor reuse/CRT/excursion lemmas alone do not supply such an upper bound. Finite tests and paper deductions are not Lean kernel proofs.
+
+## 8. A particularly sharp SUFFICIENT missing upper bound, and actual-record baseline
+
+Define `R_M` on the canonical window `(M+2,K]` as the number of nonunit EVENT INDICES whose increment shares at least one odd prime factor with an EARLIER increment inside that same window. Each event is counted once, irrespective of its number of prime factors. Theorem A establishes the universal necessary implication
+
+    BAD at large attained M  ==> R_M >= (3/32-o(1))*sqrt(M).  (15)
+
+Thus a uniform, **non-circular** induction target is to prove, for every genuinely attained canonical M beyond an EXPLICIT reachable threshold M0,
+
+    boxed: R_M <= (3/32-epsilon)*sqrt(M)                (16)
+
+for some fixed epsilon>0, together with a finite verification of any smaller attained records needed to reach M0 and of the finite range where the `o(1)` error in (15) is material. An effective `R_M=o(sqrt M)` theorem valid on these reachable canonical windows would also suffice. This reformulates the missing result as a quantitative **prime-factor recycling upper bound**, without needing to predict all individual CRT cores. Merely postulating an already-unbounded attained-record chain would be circular for a proof of twin-prime infinitude.
+
+On the authentic A166944 trajectory through n=2,500,000, 17 attained canonical records have complete cutoffs. Selected exact results (M,N,R_M):
+
+    (43,5,2)       BAD early, R/sqrt(M)=0.3050;
+    (2659,11,5)    GOOD,      R/sqrt(M)=0.0970;
+    (5419,9,4)     GOOD,      R/sqrt(M)=0.0543;
+    (355723,57,40) GOOD,      R/sqrt(M)=0.0671;
+    (1427749,72,51) GOOD,     R/sqrt(M)=0.0427.
+
+All NINE checked attained records with M>=5419 have `R_M/sqrt(M)<3/32`. This is finite evidence only, and the inequality is NOT necessary for GOOD. Artificial independent canonical-shaped starts can exceed it even with terminal twin primes, so (16) is an **attained-record-specific conjectural route**, not a universal theorem about arbitrary synthetic starts.
