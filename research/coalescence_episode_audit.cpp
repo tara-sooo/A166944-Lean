@@ -1,0 +1,16 @@
+// Exact parity-GCD wheel excursion audit: compares horizons after each event.
+// Independent of the future four-residue weight; displays cancellation before natural cutoff.
+#include <bits/stdc++.h>
+using namespace std; using ll=long long;
+vector<int> spf,primes;
+vector<int> factors(int n){vector<int>a;while(n>1){int p=spf.at(n);a.push_back(p);while(n%p==0)n/=p;}return a;}
+ll next_hit(ll pos,int p,ll r){ll d=(r-pos)%(2LL*p);if(d<=0)d+=2LL*p;return pos+d;}
+vector<pair<int,int>> events(int v,int cap){ll pos=v+2,K=(7LL*v-1)/4,C=2LL*v-2;vector<pair<int,int>>o;while(pos<K){ll n=K+1;for(int p:factors(int(C-1)))if(p<=cap)n=min(n,next_hit(pos,p,0));for(int p:factors(int(C+1)))if(p<=cap)n=min(n,next_hit(pos,p,p+2));if(n>K)break;int g=int(gcd((n&1)?n-2:n,(n&1)?C+1:C-1)),d=1;for(int p:factors(g))if(p<=cap)d*=p;if(d==1)throw runtime_error("clock discrepancy");o.push_back({int(n-v-2),d-1});C+=d-1;pos=n;}return o;}
+int main(int argc,char**argv){int X=argc>1?atoi(argv[1]):1024,q=argc>2?atoi(argv[2]):59;int B=int(ceil(sqrt(7.0*X))),U=2*X+(3*B+7)/2+5,Z=7*U+100;spf.resize(Z);iota(spf.begin(),spf.end(),0);for(int p=2;1LL*p*p<Z;++p)if(spf[p]==p)for(int j=p*p;j<Z;j+=p)if(spf[j]==j)spf[j]=p;for(int p=3;p<=B;p+=2)if(spf[p]==p)primes.push_back(p);auto it=find(primes.begin(),primes.end(),q);if(it==primes.end()||it==primes.begin())return 2;int prev=*(it-1);
+ll vcount=0,touched=0,terminal=0,finished=0,unfinished=0,maxEpisodeDuration=0,maxH=0,timeMass=0,endMass=0,maxTime=0,zeroedWithActivity=0;
+ll D=0;for(int v=X+1;v<U;v+=2){auto a=events(v,q),b=events(v,prev);ll H=0,absTime=0,opening=-1;bool any=false;int ia=0,ib=0;while(ia<(int)a.size()||ib<(int)b.size()) {int t=min(ia<(int)a.size()?a[ia].first:INT_MAX,ib<(int)b.size()?b[ib].first:INT_MAX);ll da=(ia<(int)a.size()&&a[ia].first==t)?a[ia++].second:0,db=(ib<(int)b.size()&&b[ib].first==t)?b[ib++].second:0;ll dd=da-db;if(!dd)continue;any=true;if(H==0){opening=t;} H+=dd;maxH=max(maxH,llabs(H));absTime+=llabs(dd);if(H==0){finished++;ll duration=t-opening;maxEpisodeDuration=max(maxEpisodeDuration,duration);opening=-1;}maxTime=max(maxTime,ll(t));}if(any && H==0 && X==1024 && q==59) cout<<"COMPLETE_EXCURSION_START="<<v<<"\n";if(any)touched++;if(H!=0){terminal++;unfinished++;}else if(any)zeroedWithActivity++;endMass+=llabs(H);timeMass+=absTime;ll W=0;int J=0;for(int p:primes)if(p>q&&p>=11){J++;int r=v%p;if(r==0||r==1||r==3||r==5)W+=p;}D+=H*(W-4*J);vcount++;}
+if(X==1024 && q==59 && (touched!=1 || finished!=1 || terminal!=0 || maxEpisodeDuration!=109 || maxH!=72 || timeMass!=264 || endMass!=0))throw runtime_error("q59 rejoin regression changed");
+if(X==4096 && q==149 && (touched!=2 || terminal!=2 || timeMass!=1056 || endMass!=120 || D!=-1920))throw runtime_error("q149 regression changed");
+cout<<"PASS X="<<X<<" q="<<q<<" prev="<<prev<<" totalV="<<vcount<<" touched="<<touched<<" terminalNonzero="<<terminal<<" touchedButTerminalZero="<<zeroedWithActivity<<" completedExcursions="<<finished<<" unresolvedExcursions="<<unfinished<<" maxDuration="<<maxEpisodeDuration<<" maxAbsH="<<maxH<<"\n";
+cout<<"timeL1="<<timeMass<<" terminalL1="<<endMass<<" ratio="<<(endMass?double(timeMass)/endMass:-1)<<" corrD="<<D<<" lastActiveRelativeTime="<<maxTime<<"\n";
+}
