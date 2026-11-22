@@ -125,6 +125,16 @@ Moreover W_r<(p−7)N_r/6, so the collision part of (F) is bounded without any u
 
 These inequalities do not control the large and adaptive restricted second moments of G_L(v), but make the multiplicity cost explicitly O(p).
 
+In particular, applying Cauchy-Schwarz once more across the FOUR disjoint residue groups, and writing N=Σ_r N_r, V=∪_r V_r, gives the compact all-early one-shot transfer:
+
+    BOXED: Σ_(M∈safe-early-one-shot) Δ_p(M)
+         ≤ (p+7)N
+           +sqrt(N*(1+(p−7)/12))
+             *sqrt(Σ_(v∈V)G_L(v)^2).                  (F')
+
+The target set V consists ONLY of v∈[X,2X+7B_X/12+3), with v modp∈{0,1,3,5} for dyadic M∈I_X and p≤B_X. This is a precise local **four-residue second-moment** proof obligation. It does not bound N, the old-wheel second moment, or the excluded unsafe/late/refiring contributions.
+
+
 The complementary UNSAFE set for a fixed p>7 also has an exact energy budget. Let U_p={M∈I_X: p≤6G_L(M)+7}. Then
 
     BOXED: |U_p| ≤ [6/(p−7)] sum_(M∈I_X)G_L(M).   (U)
