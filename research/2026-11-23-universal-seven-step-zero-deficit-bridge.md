@@ -96,6 +96,21 @@ Using (T), b≤8, and Cauchy-Schwarz,
 
 This is a genuine, non-probabilistic transfer estimate covering ALL early phase one-shot events and all 3/5 bridge outcomes. It is NOT yet an upper bound O(sqrt X) on an individual prime stage averaged over dyadic starts: restricted second moments G_L(v)^2 and unsafe/late/refire contributions remain uncontrolled.
 
+### NEW local transport bound: regeneration moves less than ~0.584p
+
+For safe early insertion p>6h(M)+7, the regeneration target in (R) obeys
+
+    v−M=(p+h(M)−1+b)/2,  b∈{0,4,8},
+    (p−1)/2 <= v−M < (7p+35)/12 < 7p/12+3.      (V)
+
+Thus all early SAFE regenerated canonical starts M∈[X,2X) for primes p<=B_X=ceil sqrt(7X) lie in the SAME dyadic window augmented by a boundary layer of width O(sqrt X):
+
+    BOXED: v∈[X, 2X+(7/12)B_X+3).
+
+This is a stronger geometric restriction than the earlier general map v>M. It localizes the required restricted AP SECOND MOMENT to starts in [X,2X+O(sqrt X)], rather than to all later artificial starts or larger scales. The displacement differs from p/2 by less than p/12+3. The four target residues {0,1,3,5} modp are exact.
+
+The open core is a short-interval estimate for the old-wheel growth second moment on these four residue classes; bounded transport alone does not give a 1/p frequency estimate because fibres may have several sources.
+
 ### A small but useful self-normalized safe/unsafe fibre budget
 
 Under the safe condition p>6h(M)+7, every relevant source has h(M)<(p−7)/6. Therefore within any fixed-p, fixed-bridge-growth fibre v, consecutive distinct odd starts have old growth values decreasing by at least4 and so
