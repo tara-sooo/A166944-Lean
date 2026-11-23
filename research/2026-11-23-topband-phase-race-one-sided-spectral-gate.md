@@ -118,6 +118,7 @@ Important falsifications:
 2. A blanket **signed** claim `D_J<=0` for every X is false: X2048 has R_J=24 while P_J=11.7810, so D_J=12.2190>0. However `D_J/T_J approx 0.0343`, which is below the proposed 1/8 threshold. Finite checking of DISCREPANCY-1/8 over the listed X is not an asymptotic theorem.
 3. More total q-free growth than the minimum q recharge does NOT imply q return. At X65536 there are 4,028 FIRST tagged top-q trajectories with enough total ghost growth and zero actual top-q returns.
 4. 'Nearby-prime one-donor sieve alone suffices' fails empirically: all 31 top-q returns at X524288 and all five at X1048576 have three or more foreign-high donor events.
+5. The proposed one-sided discrepancy is **NOT pointwise**. A real original-GCD state in the literal oracle at X256, M423, q23 has the first q hit at t485 and next at t552, with the ghost's exact shifted winning set A={0,2,11,19,21}. Thus at that ONE tag 1{0 in A} - |A|/q = 1-5/23 = 18/23 >1/8. The bound requires cancellation/averaging over the whole source-selected ensemble, not a per-state potential inequality.
 
 ## 5. LOW7 clock racing and the new analytic subproblem
 
