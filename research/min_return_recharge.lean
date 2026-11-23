@@ -32,7 +32,7 @@ private theorem even_multiple_below_four
   by_cases h2 : d=2*p
   · exact h2
   have hgt : 2*p < d := by omega
-  have hpd : p ∣ d-(2*p) := Nat.dvd_sub dvd (by exact dvd_mul_right p 2)
+  have hpd : p ∣ d-(2*p) := Nat.dvd_sub dvd (by exact ⟨2, by omega⟩)
   have hpos : 0 < d-2*p := by omega
   have hlt : d-2*p < 2*p := by omega
   have heven : (d-2*p)%2 = 0 := by omega
