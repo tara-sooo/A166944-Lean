@@ -2,6 +2,7 @@
 // g++ -std=c++17 -O3 -Wall -Wextra -Werror weighted_high_clock_criterion_audit.cpp -o audit
 // ./audit 4096 16384 65536 262144 1048576
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -21,6 +22,7 @@ static void run(int X){
  const int B=int(ceill(sqrtl(7.L*X)));
  ll T=0,P=0,allPrimeWeight=0,Hsum=0,fullSink=0,maxCost=0,W=0;
  ll jumpGapMax=0,sourceCount=0;
+ array<ll,5> bandEvents{},bandPrimeMass{};
  vector<int>f;
  for(int M=X+1;M<2*X;M+=2){
    const ll start=M+2,K=(7LL*M-1)/4;ll c=2LL*M-2,t=start,lastHigh=start;
@@ -45,6 +47,8 @@ static void run(int X){
        if(elapsed>133+2LL*pMin)throw runtime_error("weighted high-to-high gap failed");
        lastHigh=n;ownT++;ownP+=pMin;
        T++;P+=pMin;allPrimeWeight+=factorWeight;
+       const int band=(pMin<=B/16?0:pMin<=B/8?1:pMin<=B/4?2:pMin<=B/2?3:4);
+       bandEvents[band]++;bandPrimeMass[band]+=pMin;
        jumpGapMax=max(jumpGapMax,elapsed);
      }
      W+=d-1; c+=d-1;t=n;
@@ -71,7 +75,9 @@ static void run(int X){
      <<" primeOverX2="<<double(P)/(double(X)*X)
      <<" highOverXB="<<double(T)/(double(X)*B)<<" originalW="<<W<<" growthOverX2="<<double(W)/(double(X)*X)
      <<" maxSourceClockCost="<<maxCost<<" maxGap="<<jumpGapMax<<" fullSinkStarts="<<fullSink
-     <<" actualHorizonSum="<<Hsum<<" expectedHorizonSum="<<expected<<"\n";
+     <<" actualHorizonSum="<<Hsum<<" expectedHorizonSum="<<expected;
+ for(int b=0;b<5;b++)cout<<" band"<<b<<"_count="<<bandEvents[b]<<" band"<<b<<"_primeMass="<<bandPrimeMass[b];
+ cout<<"\n";
 }
 int main(int argc,char**argv){
  if(argc<2)return 2;
