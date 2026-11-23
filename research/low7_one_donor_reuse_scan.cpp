@@ -32,6 +32,7 @@ int main(int argc,char**argv){
  sieve(8*X+200);
  vector<int> f;
  int repeatedPair=0,maxPairInSource=0,witnessM=0,witnessQ=0,witnessR=0;
+ int maximalM=0,maximalQ=0,maximalR=0;
  ll one=0,multi=0,zero=0;
  map<tuple<int,int>,ll> perPair;
  for(int M=X+1;M<2*X;M+=2){
@@ -69,7 +70,7 @@ int main(int argc,char**argv){
       repeatedPair++;
       if(!witnessM){witnessM=M;witnessQ=q;witnessR=r;}
      }
-     maxPairInSource=max(maxPairInSource,v);
+     if(v>maxPairInSource){maxPairInSource=v;maximalM=M;maximalQ=q;maximalR=r;}
     } else multi++;
    }
    last[q]=k;
@@ -87,6 +88,7 @@ int main(int argc,char**argv){
      <<" largest_same_M_pair="<<maxPairInSource
      <<" repeated_source_pairs="<<repeatedPair
      <<" witness_M="<<witnessM<<" q="<<witnessQ<<" r="<<witnessR
+     <<" maximum_M="<<maximalM<<" max_q="<<maximalQ<<" max_r="<<maximalR
      <<" max_total_for_pair="<<maxTotalPerPair<<" at_q="<<qtop<<" at_r="<<rtop
      <<" unique_pairs="<<perPair.size()<<"\n";
 }
