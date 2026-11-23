@@ -83,6 +83,9 @@ Compiled `research/weighted_high_clock_criterion_audit.cpp` with `g++ -std=c++17
 
 The thresholds for these normalized columns are 9/16≈0.5625 for the clock cost, 39/848≈0.04599 for Lambda, and 9/212≈0.04245 for W, respectively. These finite decreases are not asymptotic proofs.
 
+A second finite classification sorts high events by their **smallest** high prime p_i relative to B. At X1048576, 4,583,782 of 5,516,751 high events (83.1%) have p_i<=B/16, but they account for only 177,774,206 of 775,265,653 units of prime-weight budget (22.9%). At the opposite end, only 99,276 events (1.80%) have p_i>B/2, but they account for 178,352,288 (23.0%) of prime weight. In X262144 the corresponding low-end and high-end masses are 26,418,285 and 26,989,619 of total119,219,840. Therefore a proof should distinguish the frequent low-q refiring contribution from rare expensive q~B hits; a raw event count can hide their arithmetic costs. The same auditor prints five disjoint p_i bands: (0,B/16], (B/16,B/8], (B/8,B/4], (B/4,B/2], (B/2,B].
+
+
 ## 4. Concrete proposed proof route: prime-hit incidence and arithmetic transport
 
 Let H_q(X) count ALL ACTUAL high events across all canonical starts whose clipped increment d contains q>=13 (even if q is not their minimum high factor). The arithmetic identity/upper bound is
