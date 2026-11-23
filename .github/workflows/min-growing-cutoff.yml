@@ -29,3 +29,5 @@ jobs:
         run: lake exe cache get
       - name: Check finite MIN growing-cutoff lemmas
         run: lake env lean research/min_growing_cutoff.lean
+      - name: Verify source-weighted MIN finite audit
+        run: python3 research/min_weighted_first_top_audit.py 256 1024 4096
