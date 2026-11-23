@@ -1,0 +1,37 @@
+name: Canonical MIN sampled prefix
+on:
+  push:
+    branches: [research/canonical-min-sampled-prefix]
+    paths:
+      - research/canonical_min_prefix.lean
+      - research/min_growing_cutoff.lean
+      - .github/workflows/canonical-min-prefix.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: canonical-min-prefix-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+      - name: Load pinned dependencies
+        run: |
+          lake update
+          lake exe cache get Mathlib.Tactic Mathlib.Data.Nat.Prime.Basic
+      - name: Check the canonical wheel and finite certificate
+        run: |
+          set -euo pipefail
+          lake env lean -o research/min_growing_cutoff.olean research/min_growing_cutoff.lean
+          lake env bash -c 'LEAN_PATH="$PWD:$LEAN_PATH" lean research/canonical_min_prefix.lean' | tee "$RUNNER_TEMP/kernel.log"
+          if grep -Fq sorryAx "$RUNNER_TEMP/kernel.log"; then exit 1; fi
