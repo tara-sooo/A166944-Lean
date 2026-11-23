@@ -96,6 +96,23 @@ The candidate route is now more precise:
 
 This is a corrected research target, not a theorem that the twin prime conjecture has been resolved.
 
+
+## 6a. New per-source necessary condition for a failed terminal twin certificate
+
+Let H_7(M) be the number of events carrying any prime >=11 and let F_7(M) be the number of distinct *minimum high owners* q>=11 used on the given original source orbit (one owner per high event). Define R_7(M)=H_7(M)-F_7(M). Any high event has preceding frozen gap <=2B; between high events pure-LOW7 blocks have total travel <=56. Thus for its last nonunit-event time S,
+
+    S-(M+2) <= (2B+56)*H_7(M)+56.
+
+If the terminal even pair C(K)-1,C(K)+1 is NOT twin prime, the terminal squarefree certificate forces K-S<2B. Because K-(M+2)>=(3M-11)/4>=(3X-11)/4 and F_7(M)<=pi(B), it follows that
+
+    R_7(M) > [3X/4 - 11/4 - 2B - 56]/(2B+56) - pi(B).
+
+Using B^2=7X+O(B) and the prime number theorem, the right side is
+
+    (3/56 - o(1))*B.
+
+So EACH individual canonical source that fails to yield a terminal twin pair must carry at least (3/56-o(1))*B repeated minimum high-owner events. This is a pointwise refinement of the prior dyadic **average** R7/(XB) >=9/224 obstruction, not a proof that such source histories cannot exist. The new insertion theorem prevents a repeat when only one sufficiently large high prime is available; the missing all-prime proof must rule out the indicated O(B)-long cross-high renewal history.
+
 ## 7. Reproduce
 
 ```sh
