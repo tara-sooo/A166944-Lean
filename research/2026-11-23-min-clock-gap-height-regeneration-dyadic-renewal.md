@@ -141,6 +141,47 @@ All normalized values on these windows were <=1.265; that does NOT establish an 
 
 Suggested next mathematical experiment: build the exact source-pushforward transfer operator on the height-0/6 reset atoms, conditional on the low7 residue and dyadic q band, and estimate its **weighted** q-renewal Green kernel. For nonreset top-q events, use the three possible height multiples from SIX-ATOMS and charge the h>=B excursions. Search for an operator norm or large-sieve estimate at scale Q leading to DYADIC-RENEWAL. A counterexample to this particular bound, or growing family of r-q near-prime oscillations, would redirect the attempt.
 
+## 7a. NEW owner-history-free first-reset transfer identity (quantitative fresh test)
+
+The reset quotient can completely discard the seen-prime history if one counts TOTAL selected high events H=F+R rather than repeated-owner R. Since F<=(X/2)*pi(B)=o(XB), the requirements H=o(XB) and R=o(XB) are EQUIVALENT asymptotically along any dyadic sequence, and both suffice for the twin-prime conclusion.
+
+For every canonical M, let rho(M) be its FIRST selected p>=11 event whose post-height h is 0 (even) or 6 (odd). If no such event by K(M), assign no reset and count all its high events in H_pre(M). Otherwise put v(M)=(rho,C_rho) and count high events up to AND INCLUDING rho in H_pre(M). Let U_B(v;T) count subsequent MIN selected high events from the frozen state v, using the SAME cutoff B, until time T. Because the process after v depends only on v,B, and K(M), one has the exact identity
+
+    H_X = sum_M H_pre(M)
+          + sum_(first-reset atoms v) sum_(M:v(M)=v) U_B(v;K(M)).
+
+Define the fibre weight w_v=#{M:v(M)=v} and common Kmax=max_{M in I_X} K(M). Since K(M)<=Kmax and the event process is independent of the truncation until that truncation,
+
+    H_X <= H_pre,X + sum_v w_v U_B(v;Kmax).           (RESET-ENVELOPE)
+
+This is a deterministic source-weighted transport bound, not an unweighted Markov or random-phase argument. It is genuinely free of previously selected prime labels, unlike a compressed R count. A sufficient **still-open** analytic two-part goal is
+
+    H_pre,X = o(XB),
+    sum_v w_v U_B(v;Kmax) = o(XB)
+
+along unbounded X. A stronger but more explicit candidate is each = O(X*(log X)^A) for a fixed A>0.
+
+The strict C++17 min_prime_first_reset_transfer.cpp reconstructs the forward MIN ghost FROM EVERY DISTINCT first-reset atom v, extends to Kmax, and asserts the envelope always bounds the source-specific post-reset count. Finite exact data:
+
+    X        covered sources  distinct atoms  max source fibre   H_pre    H_post     sum w_v U(v;Kmax)
+    256               55              28               5         240        151                151
+    1024             265             126              17         608        540                540
+    4096            1294             544              16        4222       5177               5177
+    65536          23052            9064              35       83720     178835             178835
+    262144         96450           36726              74      365564     971997             971997
+    1048576       401179          148388              94     1593931    4971489            4971489
+
+The observed equality of H_post and the Kmax envelope in these windows means every reset orbit terminates its high events before the SMALLEST relevant source cutoff there. Equality for all X is NOT proved and not assumed in RESET-ENVELOPE. In the X1048576 sample, max high event count before the first reset on a source was 109, max high count after it was 122, and max U_B(v;Kmax) was 122 (separate local strict-compiled diagnostic). These pointwise polylogarithmic-looking maxima are finite evidence only. Every reachable reset atom still carries a potentially large source fibre, so the weighted term cannot be replaced by the number of distinct atoms.
+
+Replay:
+
+    g++ -std=c++17 -O3 -Wall -Wextra -Werror research/min_prime_first_reset_transfer.cpp -o /tmp/minfirst
+    /tmp/minfirst 256 1024 4096 65536 262144 1048576
+
+## 7b. Another strategy explicitly tested and kept OPEN
+
+A more localized alternative is the dyadic label sieve DYADIC-RENEWAL from §6. The actual MIN source-counted returns R_q scaled as R_q*q^2/(X*log(2X)) have occasional large q-specific spikes from coalescence (e.g. X262144, q601: 14.54; q967: 10.83), even while the dyadic Q-band aggregates stayed <=1.265 after scaling by Q/(Xlog(2X)). This favors a **bandwise averaged transfer** over any overly optimistic per-prime uniform estimate. No source-conditioned large-sieve upper bound has yet been proved.
+
 ## 8. Reproducible verification and status
 
 Sources committed alongside this note:
@@ -150,6 +191,7 @@ Sources committed alongside this note:
     research/min_prime_dyadic_return_audit.cpp                (actual MIN q-band counts)
     research/min_prime_height_reset_coalescence.cpp           (actual MIN height reset/fibre)
     research/min_prime_small_graph_exhaustive.cpp             (small MIN full CRT graphs)
+    research/min_prime_first_reset_transfer.cpp              (first-reset weighted future envelope)
 
 Replays (strict compiler flags -Wall -Wextra -Werror):
 
