@@ -125,8 +125,9 @@ Independent original parity-specific clipped GCD event-jump C++17 sources:
 Independent literal integer-by-integer Python:
 
 - `research/twin_prime_shadow_minowner_literal.py`: checks q-deleted shadow from actual post-q states for all q, sourcewise time and masked budget; X256/512/1024 PASS.
-- `research/twin_prime_low3_shadow_literal.py`: proves a finite 18-residue sharp LOW3 clock check and crosschecks high owner/clean shadow and fixed prior X-regressions using the original parity gcd advanced at every n; X256/512/1024 PASS. The arithmetic argument in §2 is independent of the finite enumeration.
+- `research/twin_prime_low3_shadow_literal.py`: proves a finite 18-residue sharp LOW3 clock check and crosschecks high owner/clean shadow and fixed prior X-regressions using the original parity gcd advanced at every n; X256/512/1024 PASS. The arithmetic argument in §2 is independent of the finite enumeration, and this literal oracle also verifies Z5_X and the high masking-cost bound for X256/512/1024.
 - `research/low_wheel_finite_graph.py`: separate exhaustive pair-residue graph for S={3}, {3,5}, {3,5,7}, sizes18/450/22050, zero cycles; max low-only travel7/19/56. This auxiliary enumeration is **not** relied upon as a proof of the LOW3 lemma.
+- `research/twin_prime_high_owner_moment_certificate.py`: consumes the C++ LOW_HIGH_PASS lines, recomputes prime-square coefficients using an independent sieve, and checks the **exact integer** sufficient test H6, with X65536/262144 regressions. It reports no finite certificate from H6 for X4096/16384; this is not a counterexample to the twin-prime output.
 
 Build/run:
 
@@ -139,6 +140,7 @@ g++ -std=c++17 -O3 -Wall -Wextra -Werror research/twin_prime_lowblock_highowner_
 /tmp/low_high 256 512 1024 4096 16384 65536 262144
 python3 research/twin_prime_low3_shadow_literal.py 256 512 1024
 python3 research/low_wheel_finite_graph.py
+/tmp/low_high 4096 16384 65536 262144 | python3 research/twin_prime_high_owner_moment_certificate.py
 ```
 
 | X | high>=5 repeat time | high>=5 return count | time+7count | clean time | high mask weighted (sum q) | high masking charge | Z5/(XB logB) |
