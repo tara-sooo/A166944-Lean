@@ -47,7 +47,7 @@ def audit(X):
             if len(tr)>=depth:
                 key=tuple((d,parity) for d,parity,_ in tr[:depth]); groups[depth][key].append(M)
     for depth in range(1,5):
-        peak=0; worst=None; nontrivial=0; total=0
+        peak=0; worst=None; nontrivial=0; total=0; total_bound=0
         for key,starts in groups[depth].items():
             residues={}; total+=len(starts)
             G=0
@@ -67,10 +67,11 @@ def audit(X):
             first=starts[0]%P
             assert all(m%P==first for m in starts),(X,depth,key,P,starts)
             bound=(X//2-1)//P+1
+            total_bound+=bound
             assert len(starts)<=bound,(X,depth,key,len(starts),bound,P)
             if len(starts)>1 and P>1: nontrivial+=1
             if len(starts)>peak:peak=len(starts);worst=(key,P,bound,starts[:7])
-        print('CRT_CYLINDER_PASS',f'X={X}',f'B={B}',f'depth={depth}',f'groups={len(groups[depth])}',f'tags={total}',f'with_multi_source_Pgt1={nontrivial}',f'peak={peak}',f'worst={worst}')
+        print('CRT_CYLINDER_PASS',f'X={X}',f'B={B}',f'depth={depth}',f'groups={len(groups[depth])}',f'tags={total}',f'crt_sum={total_bound}',f'with_multi_source_Pgt1={nontrivial}',f'peak={peak}',f'worst={worst}')
     untyped=defaultdict(list)
     for key,starts in groups[1].items(): untyped[key[0][0]].extend(starts)
     for d, starts in untyped.items():
