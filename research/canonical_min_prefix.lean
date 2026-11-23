@@ -105,8 +105,8 @@ def thirds : List ℕ → List ℕ
   | _ => []
 
 theorem thirds_length : ∀ w : List ℕ, (thirds w).length = w.length / 3
-  | [] => rfl
-  | [_] => rfl
+  | [] => by simp [thirds]
+  | [a] => by simp [thirds]
   | [a, b] => by simp [thirds]
   | _ :: _ :: _ :: t => by
     simp only [thirds, List.length_cons, thirds_length t]
@@ -423,5 +423,82 @@ theorem unbounded_twins_of_certificates
 
 #print axioms window_certificate
 #print axioms unbounded_twins_of_certificates
+
+
+theorem repeats_eq_sum (w : List ℕ) :
+    repeats w = ∑ p ∈ w.toFinset, (w.count p - 1) := by
+  have h : (∑ p ∈ w.toFinset, ((w.count p - 1)+1))=w.length := by
+    rw [← List.sum_toFinset_count_eq_length w]
+    apply Finset.sum_congr rfl
+    intro p hp
+    have hpos : 0 < w.count p := List.count_pos_iff.mpr (List.mem_toFinset.mp hp)
+    omega
+  simp only [Finset.sum_add_distrib, Finset.sum_const, smul_eq_mul, mul_one] at h
+  unfold repeats
+  omega
+
+private theorem repeat_le_pairs (n : ℕ) : n-1 ≤ n.choose 2 := by
+  cases n with
+  | zero => decide
+  | succ n =>
+    rw [show 2=1+1 by rfl, Nat.choose_succ_succ, Nat.choose_one_right]
+    omega
+
+def smallExcess (W a : ℕ) (w : List ℕ) : ℕ :=
+  ∑ p ∈ w.toFinset, if p≤W then w.count p-1-a else 0
+
+def largePairs (W : ℕ) (w : List ℕ) : ℕ :=
+  ∑ p ∈ w.toFinset, if W<p then (w.count p).choose 2 else 0
+
+theorem split_count (T : Finset ℕ) (a W : ℕ) (w : List ℕ)
+    (cover : ∀ p ∈ w, p≤W → p∈T) :
+    repeats w ≤ T.card*a + smallExcess W a w + largePairs W w := by
+  have sub : (w.toFinset.filter fun p => p≤W) ⊆ T := by
+    intro p hp
+    obtain ⟨hm,hw⟩ := Finset.mem_filter.mp hp
+    exact cover p (List.mem_toFinset.mp hm) hw
+  have cap : (∑ p ∈ w.toFinset, if p≤W then a else 0) ≤ T.card*a := by
+    rw [← Finset.sum_filter]
+    simpa using Nat.mul_le_mul_right a (Finset.card_le_card sub)
+  have hl : ∀ p ∈ w.toFinset, w.count p-1 ≤
+      (if p≤W then a else 0)+(if p≤W then w.count p-1-a else 0)+
+      (if W<p then (w.count p).choose 2 else 0) := by
+    intro p _
+    by_cases h : p≤W
+    · simp [h, Nat.not_lt.mpr h]; omega
+    · simpa [h, Nat.lt_of_not_ge h] using repeat_le_pairs (w.count p)
+  have hsum := Finset.sum_le_sum hl
+  simp only [Finset.sum_add_distrib] at hsum
+  rw [repeats_eq_sum]
+  unfold smallExcess largePairs
+  omega
+
+noncomputable def sampleAt (B y M : ℕ) :=
+  sample (highSet B y).card (highWord y (canonical B M).1)
+
+theorem window_certificate_of_split {u B y W a : ℕ} (u1 : 0<u)
+    (square : 7*(4*u)≤B*B)
+    (travel : 6*(highSet B y).card*(2*B+3*lowModulus B y)<3*u-2)
+    (budget : 2*u*(((highSet B y).filter (·≤W)).card*a) +
+        (∑ M ∈ sources u, smallExcess W a (sampleAt B y M)) +
+        (∑ M ∈ sources u, largePairs W (sampleAt B y M)) < 2*u*(highSet B y).card) :
+    ∃ p, 2*(4*u)-3≤p ∧ p.Prime ∧ (p+2).Prime := by
+  apply window_certificate u1 square travel
+  have one (M : ℕ) : repeatsAt B y M ≤ ((highSet B y).filter (·≤W)).card*a +
+      smallExcess W a (sampleAt B y M) + largePairs W (sampleAt B y M) := by
+    apply split_count
+    intro p hp hW
+    have hm := List.mem_of_mem_take (thirds_mem hp)
+    have hf := List.mem_filter.mp hm
+    exact Finset.mem_filter.mpr ⟨Finset.mem_filter.mpr
+      ⟨run_mem (canonical_spec B M) p hf.1, by simpa using hf.2⟩, hW⟩
+  have hh := Finset.sum_le_sum (s:=sources u) (fun M _ => one M)
+  simp only [Finset.sum_add_distrib, Finset.sum_const, smul_eq_mul] at hh
+  have card : (sources u).card=2*u := by simp [sources]
+  rw [card] at hh
+  exact lt_of_le_of_lt hh budget
+
+#print axioms repeats_eq_sum
+#print axioms window_certificate_of_split
 
 end CanonicalMinPrefix
