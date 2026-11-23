@@ -1,0 +1,41 @@
+name: Canonical MIN every-other sampled prefix
+on:
+  push:
+    branches: [research/canonical-odd-sampled-prefix-2026-11-24]
+    paths:
+      - research/canonical_min_odd_sample.lean
+      - research/min_odd_sample_audit.py
+      - .github/workflows/canonical-min-odd-sample.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: canonical-min-odd-sample-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+      - name: Load pinned dependencies
+        run: |
+          lake update
+          lake exe cache get Mathlib.Tactic Mathlib.Data.Nat.Prime.Basic
+      - name: Compile exact canonical MIN and odd-sample certificates
+        run: |
+          set -euo pipefail
+          lake env lean -o research/min_growing_cutoff.olean research/min_growing_cutoff.lean
+          lake env bash -c 'LEAN_PATH="$PWD:$LEAN_PATH" lean -o research/canonical_min_prefix.olean research/canonical_min_prefix.lean' | tee "$RUNNER_TEMP/base.log"
+          lake env bash -c 'LEAN_PATH="$PWD:$LEAN_PATH" lean research/canonical_min_odd_sample.lean' | tee "$RUNNER_TEMP/odd.log"
+          if grep -Fq sorryAx "$RUNNER_TEMP/base.log" "$RUNNER_TEMP/odd.log"; then exit 1; fi
+      - name: Verify real source-counted two-step sample and p-q-p inclusion
+        run: |
+          python3 research/min_odd_sample_audit.py 256 1024 4096 16384
