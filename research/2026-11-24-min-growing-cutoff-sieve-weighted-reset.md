@@ -309,3 +309,44 @@ all repeat owners R_y are not bounded.
   yet present as an end-to-end Lean derivation.
 - None of the arguments above proves the OPEN estimate
   liminf R_y/(XB)<9/224.
+
+
+## 6. Source-weighted finite audit of the partial top-band estimate
+
+The reproducible checker is [`min_weighted_first_top_audit.py`](min_weighted_first_top_audit.py).
+For each canonical odd source, it reconstructs the actual smallest-selected-prime
+parity clock and tracks the first reached high reset; on small X it crosschecks
+the next clock event against a literal integer-by-integer gcd oracle.
+For each possible reset time it independently scans the future first high
+prime up to common Kmax. It checks the exact 9X²-20X travel identity,
+H_y=F_y+R_y, the deterministic fibre energy
+2(sum w²-S)≤E, and weighted Cauchy.
+
+All reported counts are finite results. In these samples the growing-cutoff
+selector y is still 3, L=6; in particular the repeat breakdown here
+includes selected prime labels p>3, unlike previous fixed LOW7 scans.
+
+| X | all reset times with first top | reached first-top atoms | source-weighted first top | first-reset sum w² | R_y, m=0 | R_y, m=1 | R_y, m≥2 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 256 | 29 | 0 | 0 | 143 | 1 | 134 | 186 |
+| 1024 | 295 | 15 | 24 | 961 | 29 | 289 | 343 |
+| 4096 | 580 | 26 | 54 | 5148 | 252 | 2681 | 5236 |
+| 16384 | 1808 | 80 | 175 | 23017 | 1138 | 13262 | 33405 |
+| 65536 | 5142 | 261 | 661 | 113988 | 5568 | 63683 | 179091 |
+
+The last three repeat columns measure the number m of *intermediate
+selected labels p>y* between consecutive selections of the same prime.
+In the X=65536 window, m≥2 contributes 179091 of 248342 repeats,
+about 72.1%. This numerically localizes the remaining multi-donor
+issue without proving an asymptotic estimate.
+
+Reproduce from the repository root:
+
+```sh
+python3 research/min_weighted_first_top_audit.py 256 1024 4096 16384 65536
+```
+
+The finite checks were run successfully in the session producing this note.
+The manuscript's two-form upper-bound sieve and all claims in
+sections 2–4 are paper-level; the Lean module isolates only the deterministic
+local event inequalities and finite budget implication.
