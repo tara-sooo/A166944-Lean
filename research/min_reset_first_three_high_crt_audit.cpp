@@ -52,6 +52,7 @@ int main(int argc,char**argv){if(argc<2)return 2;int big=0;for(int i=1;i<argc;i+
    sumZ+=z;sumZ2+=1LL*z*z;
    one+=(t.a>=lo);two+=(t.a>=lo&&t.b>=lo);
    if(A.count(n)){oneReached+=(t.a>=lo);twoReached+=(t.a>=lo&&t.b>=lo);}
+   if(t.a>=37 && 2*(t.time1-n)<t.a-7){abort();}
    if(t.a>=lo&&t.c==t.a){all++;if(A.count(n))reached++;if(!witness){witness=n;wq=t.a;wr=t.b;wL=t.gain;}}
    if(t.a>=37&&t.c==t.a)allOther++;
    if(t.a>=lo&&t.c&&t.c!=t.a)allLastDifferent++;
