@@ -84,11 +84,13 @@ theorem low_path_budget {L J : Nat} {start finish : Nat × Nat}
         step.evenHorizon hJ_even step.odd
         (dvd_trans step.dividesL hLJ) step.active
       have hprime : 2 * step.primeLabel ≤ 3 * (step.primeLabel - 1) := by
+        have hp := step.atLeastThree
         omega
       constructor
       · rw [step.update]
         exact hbar
       · rw [step.update]
+        have hclock := step.clock
         omega
 
 /-- A low-only block has cumulative gain < L and event-clock travel < 3L,
