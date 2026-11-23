@@ -44,10 +44,12 @@ void scan(int X){int B=int(ceill(sqrtl(7.L*X)));vector<SinkHit>hits;hits.reserve
  }
  const auto cmp=[](const SinkHit&a,const SinkHit&b){if(a.n!=b.n)return a.n<b.n;if(a.c!=b.c)return a.c<b.c;return a.d<b.d;};
  sort(hits.begin(),hits.end(),cmp);
- ll unique=0,reactivated=0,weightedReact=0,weightedSurvive=0,uniqueMod3=0;long double modeledSurvive=0,modeledWeightedSurvive=0;
+ ll unique=0,reactivated=0,weightedReact=0,weightedSurvive=0,uniqueMod3=0;ll unitCounts[2310]={},primeOnly=0,composite=0;long double modeledSurvive=0,modeledWeightedSurvive=0;
  for(size_t i=0;i<hits.size();){size_t j=i+1;while(j<hits.size()&&hits[j].n==hits[i].n&&hits[j].c==hits[i].c){if(hits[j].d!=hits[i].d)throw runtime_error("same pre-state has different full increment");j++;}
    const auto&h=hits[i];ll mass=ll(j-i);bool remain=low_inactive(ll(h.c)+h.d-1);
-   unique++;if(!remain){reactivated++;weightedReact+=mass;}else weightedSurvive+=mass;
+   unique++;unitCounts[h.d%L]++;
+   if(h.d>1&&spf.at(int(h.d))==int(h.d))primeOnly++;else composite++;
+   if(!remain){reactivated++;weightedReact+=mass;}else weightedSurvive+=mass;
    if(h.d%3==2)uniqueMod3++;
    const int model=goodUnits[(h.c%L)/2];
    if(model<64||model>135)throw runtime_error("uniform model root count range");
@@ -58,12 +60,17 @@ void scan(int X){int B=int(ceill(sqrtl(7.L*X)));vector<SinkHit>hits;hits.reserve
  if(weightedReact+weightedSurvive!=weightedSink)throw runtime_error("mass partition fail");
  if((X==4096&&high!=7675)||(X==16384&&high!=45343)||(X==65536&&high!=224221)||(X==262144&&high!=1198498)||(X==1048576&&high!=5516751))throw runtime_error("previous GCD high regression");
  if((X==4096&&W!=399142)||(X==16384&&W!=2915326)||(X==65536&&W!=19826998))throw runtime_error("previous GCD growth regression");
+ long double totalDeviation=0;int minCount=1000000,maxCount=0;
+ for(int d=1;d<L;d+=2)if(gcd(d,P)==1){ll cnt=unitCounts[d];
+  totalDeviation+=fabsl(static_cast<long double>(cnt)/unique-1.0L/480)/2;
+  minCount=min(minCount,int(cnt));maxCount=max(maxCount,int(cnt));
+ }
  cout<<setprecision(9)<<"ACTUAL_SINK_PASS X="<<X<<" B="<<B<<" high="<<high<<" highAtLeast17="<<high17<<" high13Only="<<only13<<" high17Ratio="<<double(high17)/high<<" normHigh17="<<double(high17)/(double(X)*B)<<" lowSinkHighWeighted="<<weightedSink
      <<" distinctSinkHigh="<<unique<<" reactivatedUnique="<<reactivated<<" actualReactivation="<<double(reactivated)/unique
      <<" modelReactivation="<<1-double(modeledSurvive)/unique
      <<" signedReactivationDifference="<<(double(reactivated)/unique-(1-double(modeledSurvive)/unique))
      <<" weightedReactivated="<<weightedReact<<" weightedActualReactivation="<<double(weightedReact)/weightedSink
      <<" weightedModelReactivation="<<1-double(modeledWeightedSurvive)/weightedSink
-     <<" mod3ActivatedUnique="<<uniqueMod3<<" highGrowth="<<W<<" totalEvents="<<allEvents<<"\n";
+     <<" primeOnlyUnique="<<primeOnly<<" compositeUnique="<<composite<<" unitClassTV="<<double(totalDeviation)<<" minUnitClassCount="<<minCount<<" maxUnitClassCount="<<maxCount<<" mod3ActivatedUnique="<<uniqueMod3<<" highGrowth="<<W<<" totalEvents="<<allEvents<<"\n";
 }
 int main(int argc,char**argv){if(argc<2)return 2;int mx=0;vector<int>Xs;for(int k=1;k<argc;k++){int X=atoi(argv[k]);if(X<256||X%4||X>2000000)return 2;Xs.push_back(X);mx=max(mx,X);}setup(8*mx+1000);init_model();for(int X:Xs)scan(X);}
