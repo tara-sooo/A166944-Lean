@@ -1,0 +1,31 @@
+name: MIN growing-cutoff arithmetic checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - research/min_growing_cutoff.lean
+      - .github/workflows/min-growing-cutoff.yml
+
+permissions:
+  contents: read
+
+jobs:
+  lean-research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+      - name: Fetch pinned dependencies
+        run: lake update
+      - name: Fetch Mathlib precompiled cache
+        run: lake exe cache get
+      - name: Check finite MIN growing-cutoff lemmas
+        run: lake env lean research/min_growing_cutoff.lean
