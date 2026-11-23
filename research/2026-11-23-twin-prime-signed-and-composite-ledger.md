@@ -43,6 +43,36 @@ For every sufficiently large dyadic interval attaining the strict inequality, on
 
 Two genuinely different obstructions therefore remain in this route: **weighted same-prime returns**, and **simultaneous multi-prime surplus**. The second cannot be dropped as a deterministic consequence of the first: the exact source `M=49`, cutoff `B=31` has nonunit events `(n,d)=(60,5),(66,33),(79,7)`. Every prime factor is first-used, so `Repeat(M)=0`, yet the `3*11` event contributes `e(33)=20`.
 
+### 2a. New pairwise simultaneous-clock upper bound
+
+For each squarefree d with prime-factor set S, define the weighted pair charge
+
+`pair(d)=sum_(p<q both divide d) (p-1)(q-1) * d/(pq)`.
+
+**Exact elementary inequality:** `0<=e(d)<=pair(d)` for every squarefree d, with equality when d has at most two distinct prime factors. To prove it, expand `d=prod_(p in S)(1+(p-1))`. Each monomial involving r>=2 distinct `(p-1)` factors occurs **once** in e(d), and exactly `binom(r,2)` times in pair(d), because the chosen pair may be any two factors in that monomial. This is a deterministic factor-expansion inequality with no independence assumption.
+
+Set `Pair_X=sum_(M,n)pair(d_S(n))`, so `Extra_X<=Pair_X`. Consequently the following stronger but potentially more accessible **OPEN sufficient estimate** also implies infinitely many twins:
+
+`liminf_(dyadic X) (Repeat_X+Pair_X)/X^2 < 3/16`. (L4)
+
+Unlike the exact higher-order surplus, Pair_X is an arithmetic weighted **two-prime same-event coincidence** statistic, so it gives a concrete target for cross-prime collision methods. It is *not* the within-one-prime across-time second moment Z from Issue #4. Numerical ratio Pair_X/Extra_X is exactly 1 for X<=4096 (no event with >=3 factors), 342248/331016=1.034 at X16384, and 9898872/9434664=1.049 at X262144. These are finite observations only.
+
+### 2b. Alternative first-use-fraction threshold
+
+Assume W_X>0 (automatic for all sufficiently large X if the twin-prime conclusion fails). By the prime number theorem,
+
+`First_X <= (7/4+o(1)) * X^2/log B`.
+
+If there were no twin-producing endpoints for any sufficiently large dyadic X, the terminal certificate would force `W_X >= (3/16-o(1))X^2`, and hence
+
+`(First_X/W_X)*log B <= 28/3+o(1)`.
+
+Therefore the following **OPEN** condition is independently sufficient for infinitely many twins:
+
+`limsup_(dyadic X) (First_X/W_X)*log B > 28/3`. (L5)
+
+A positive liminf First_X/W_X would imply (L5), but that stronger first-use share has not been established. This criterion needs no LOW17 finite graph, and the measured fractions are not an asymptotic theorem.
+
 ## 3. A matching exact SIGNED prime-stage decomposition
 
 For any fresh p and older squarefree prefix L (all odd primes <p), write `Lp=L union {p}`. Let `N_q^L(M)` be q incidence on the **L path**, not on the final S path, and `E_L(M)=sum_n e(d_L(n))` on the same K. Then the change after inserting p is exactly
@@ -81,7 +111,7 @@ The nonlinear surplus is precisely a sum of higher-order *same-event* prime corr
 
 ## 5. Reproducible computational cross-check
 
-`research/twin_prime_signed_and_composite_ledger.cpp` is the event-clock C++17 auditor. It evaluates every original parity-specific clipped GCD trajectory for X<=262144, every ascending prime-insertion prefix for X<=16384, checks both exact decompositions, all aggregate consistency identities, and known H/F/Z reference values. Independent `research/twin_prime_ledger_literal_oracle.py` advances every integer n rather than jumping between prime clocks, and reproduces both ledgers for X=256,512.
+`research/twin_prime_signed_and_composite_ledger.cpp` is the event-clock C++17 auditor. It evaluates every original parity-specific clipped GCD trajectory for X<=262144, every ascending prime-insertion prefix for X<=16384, checks both exact decompositions, the pairwise simultaneous-prime upper bound, all aggregate consistency identities, and known H/F/Z reference values. Independent `research/twin_prime_ledger_literal_oracle.py` advances every integer n rather than jumping between prime clocks, and reproduces both ledgers for X=256,512.
 
 Build and run:
 
@@ -101,13 +131,13 @@ python3 research/twin_prime_ledger_literal_oracle.py 256 512
 
 At X=16384, adding p=271 changes total G by **-203718** despite a positive fresh-p linear charge of **45900**; old-factor displacement is **-194886** and nonlinear-surplus change is **-54732**. This is an aggregate exact signed cancellation, not a reason to treat the insertion cost as nonnegative.
 
-The standalone final-wheel auditor also checked X=65536 and 262144: respectively `(W,First,Repeat,Extra)=(19826998,15228034,2920940,1678024)` and `(138903880,112025370,17443846,9434664)`; final high-q H/F/Z reproduced Issue #4. Only X<=16384 has the separate full stage-scan results above.
+The standalone final-wheel auditor also checked X=65536 and 262144 (both with the pair upper bound): respectively `(W,First,Repeat,Extra)=(19826998,15228034,2920940,1678024)` and `(138903880,112025370,17443846,9434664)`; pair upper bounds were 2049576 and 9898872 respectively, and final high-q H/F/Z reproduced Issue #4. Only X<=16384 has the separate full stage-scan results above.
 
 ## 6. Next mathematical tests and proof work
 
 1. **Target the signed interaction directly**: derive an averaged upper bound on `sum_(p,M)(old-factor drift+nonlinear drift)_+`, rather than bounding each post-freeze case by `G_L(v)` with no cancellation. The stage ledger identifies the exact signed object and makes negative-control tests reproducible.
 2. **For high-q returns, use the q-deleted shadow map** from Issue #4 to control `Repeat_X` or `RepeatStage_X`. These are different ensembles: changing prime insertion order is not innocuous; either prove a transfer inequality or analyze the *final* wheel directly.
-3. **For nonlinear surplus, develop multi-prime simultaneous-clock correlation bounds** on the actual transported source states. The factorial expansion above is an exact target. Rare composite events in finite scans do not imply small asymptotic surplus.
+3. **For nonlinear surplus, develop two-prime simultaneous-clock correlation bounds using Pair_X from (L4)** on the actual transported source states. The factorial expansion above is an exact target. Rare composite events in finite scans do not imply small asymptotic surplus.
 4. Try a **combined fixed-coefficient result** (`Repeat_X+Extra_X <(3/16-o(1))X^2` on arbitrarily large dyadic X) before attempting the stronger `o(X^2)` estimates individually. The 3/16 terminal threshold leaves substantial room.
 
 **Status: PARTIAL.** Exact paper algebra, two explicit obstruction witnesses, strict-compiled C++ finite verification plus independent literal Python confirmation; no Lean kernel theorem or universal asymptotic bound, and no claim of an unconditional proof of twin-prime infinitude.
