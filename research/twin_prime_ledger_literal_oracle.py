@@ -13,7 +13,7 @@ def path(M, prime_list):
     c = 2 * M - 2
     k = (7 * M - 1) // 4
     hit = {p: 0 for p in prime_list}
-    excess = linear = growth = events = compounds = compound_growth = 0
+    excess = linear = growth = events = compounds = compound_growth = pair_cap = 0
     for n in range(M + 3, k + 1):
         raw = gcd(n - 2 if n & 1 else n, c + 1 if n & 1 else c - 1)
         ps = [p for p in prime_list if raw % p == 0]
@@ -25,14 +25,16 @@ def path(M, prime_list):
             events += 1
             compounds += len(ps) >= 2
             compound_growth += (d - 1) if len(ps) >= 2 else 0
+            pair_cap += sum((d // p // q) * (p - 1) * (q - 1)
+                            for i, p in enumerate(ps) for q in ps[i + 1:])
             lin = sum(p - 1 for p in ps)
             linear += lin
             excess += d - 1 - lin
             growth += d - 1
             c += d - 1
-    assert linear + excess == growth
+    assert linear + excess == growth and excess <= pair_cap
     return dict(growth=growth, linear=linear, excess=excess, hit=hit,
-                events=events, compounds=compounds, compound_growth=compound_growth)
+                events=events, compounds=compounds, compound_growth=compound_growth, pair_cap=pair_cap)
 
 
 def audit(X):
@@ -59,12 +61,12 @@ def audit(X):
             stage['interaction_pos'] += max(displaced + nonlinear, 0)
             old[m] = a
     final = dict(growth=0, linear=0, excess=0, first=0, repeat=0,
-                 events=0, composites=0, composite_growth=0, h=0, f=0, zz=0)
+                 events=0, composites=0, composite_growth=0, pair_cap=0, h=0, f=0, zz=0)
     for m in starts:
         a = old[m]
         for k, key in [('growth', 'growth'), ('linear', 'linear'),
                        ('excess', 'excess'), ('events', 'events'),
-                       ('composites', 'compounds'), ('composite_growth', 'compound_growth')]:
+                       ('composites', 'compounds'), ('composite_growth', 'compound_growth'), ('pair_cap', 'pair_cap')]:
             final[k] += a[key]
         for p, n in a['hit'].items():
             final['first'] += (p - 1) * (n > 0)
@@ -74,6 +76,7 @@ def audit(X):
                 final['f'] += n > 0
                 final['zz'] += n * n
     assert final['growth'] == final['linear'] + final['excess']
+    assert final['excess'] <= final['pair_cap']
     assert final['linear'] == final['first'] + final['repeat']
     assert stage['delta'] == final['growth']
     assert stage['positive'] - stage['negative'] == stage['delta']
