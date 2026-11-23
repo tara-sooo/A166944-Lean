@@ -107,7 +107,7 @@ def thirds : List ℕ → List ℕ
 theorem thirds_length : ∀ w : List ℕ, (thirds w).length = w.length / 3
   | [] => rfl
   | [_] => rfl
-  | [_, _] => rfl
+  | [a, b] => by simp [thirds]
   | _ :: _ :: _ :: t => by
     simp only [thirds, List.length_cons, thirds_length t]
     omega
@@ -348,5 +348,80 @@ theorem twin_of_sample_deficit {B y L : ℕ} (sources : Finset ℕ)
 #print axioms clock_budget
 #print axioms nontwin_sample_lower
 #print axioms twin_of_sample_deficit
+
+
+theorem Run.horizon_mono {B K t C Z : ℕ} {w : List ℕ} (h : Run B K t C w Z) :
+    C ≤ Z := by
+  induction h with
+  | stop => rfl
+  | step _ _ _ ih => omega
+
+/-- Exactly the odd canonical starts for X = 4*u. -/
+def sources (u : ℕ) : Finset ℕ :=
+  (Finset.range (2*u)).map ⟨fun j => 4*u+2*j+1, by intro a b h; dsimp at h; omega⟩
+
+theorem mem_sources {u M : ℕ} :
+    M ∈ sources u ↔ 4*u ≤ M ∧ M < 8*u ∧ M%2=1 := by
+  constructor
+  · intro h
+    obtain ⟨j,hj,e⟩ := Finset.mem_map.mp h
+    simp only [Finset.mem_range] at hj
+    change 4*u+2*j+1=M at e
+    omega
+  · rintro ⟨a,b,c⟩
+    apply Finset.mem_map.mpr
+    refine ⟨(M-4*u)/2, Finset.mem_range.mpr (by omega), ?_⟩
+    change 4*u+2*((M-4*u)/2)+1=M
+    omega
+
+def lowModulus (B y : ℕ) : ℕ :=
+  2 * ∏ p ∈ (pool B).filter (fun q => q≤y), p
+
+theorem lowModulus_pos (B y : ℕ) : 0<lowModulus B y := by
+  apply Nat.mul_pos (by decide : 0<2)
+  apply Finset.prod_pos
+  intro p hp
+  exact (mem_pool.mp (Finset.mem_filter.mp hp).1).2.1.pos
+
+theorem lowModulus_cover {B y p : ℕ} (h : p ∈ pool B) (hy : p≤y) :
+    p ∣ lowModulus B y := by
+  apply dvd_mul_of_dvd_right _ 2
+  exact Finset.dvd_prod_of_mem (fun q : ℕ => q) (Finset.mem_filter.mpr ⟨h,hy⟩)
+
+theorem window_certificate {u B y : ℕ} (u1 : 0<u) (square : 7*(4*u)≤B*B)
+    (travel : 6*(highSet B y).card*(2*B+3*lowModulus B y)<3*u-2)
+    (deficit : (∑ M ∈ sources u, repeatsAt B y M) < 2*u*(highSet B y).card) :
+    ∃ p, 2*(4*u)-3 ≤ p ∧ p.Prime ∧ (p+2).Prime := by
+  have bounds : ∀ M ∈ sources u, 5≤M ∧ 2*finish M+1<B*B ∧
+      6*(highSet B y).card*(2*B+3*lowModulus B y)<finish M-start M := by
+    intro M hM
+    obtain ⟨lo,hi,odd⟩ := mem_sources.mp hM
+    unfold finish start
+    omega
+  obtain ⟨M,hM,tw⟩ := twin_of_sample_deficit (sources u)
+    (fun p hp hy => lowModulus_cover hp hy) (lowModulus_pos B y)
+    (by simp [lowModulus]) bounds (by simpa [sources] using deficit)
+  have hs := (mem_sources.mp hM).1
+  have mono := (canonical_spec B M).horizon_mono
+  unfold initial at mono
+  refine ⟨(canonical B M).2-1, by omega, tw.1, ?_⟩
+  have e : (canonical B M).2-1+2=(canonical B M).2+1 := by omega
+  rw [e]
+  exact tw.2
+
+/-- The remaining input is an actual sampled-word deficit in unbounded
+windows with explicit integer scale checks. No axiom asserts this input. -/
+theorem unbounded_twins_of_certificates
+    (windows : ∀ N : ℕ, ∃ u B y : ℕ, N<u ∧ 7*(4*u)≤B*B ∧
+      6*(highSet B y).card*(2*B+3*lowModulus B y)<3*u-2 ∧
+      (∑ M ∈ sources u, repeatsAt B y M)<2*u*(highSet B y).card) :
+    ∀ N : ℕ, ∃ p, N<p ∧ p.Prime ∧ (p+2).Prime := by
+  intro N
+  obtain ⟨u,B,y,hu,hs,ht,hd⟩ := windows N
+  obtain ⟨p,hp,h1,h2⟩ := window_certificate (u:=u) (by omega) hs ht hd
+  exact ⟨p,by omega,h1,h2⟩
+
+#print axioms window_certificate
+#print axioms unbounded_twins_of_certificates
 
 end CanonicalMinPrefix
