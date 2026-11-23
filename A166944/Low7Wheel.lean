@@ -23,20 +23,19 @@ def low7Budget (s C : Nat) : Nat × Nat :=
   let entry := row >>> (16 * (s % 210))
   (entry % 256, (entry >>> 8) % 256)
 
-/-- This predicate is re-evaluated from the true parity-GCD first-hit scanner,
-not assumed from the generated table. -/
-private def low7StateValid (s h : Nat) : Prop :=
+/-- Pure Boolean checker, independently recomputing every first GCD hit. -/
+private def low7StateChecked (s h : Nat) : Bool :=
   let C := 2 * h
   let here := low7Budget s C
-  here.1 ≤ 56 ∧ here.2 ≤ 106 ∧
+  (Nat.ble here.1 56 && Nat.ble here.2 106) &&
     match firstClippedHit210 s C with
-    | none => here = (0, 0)
+    | none => (here.1 == 0) && (here.2 == 0)
     | some (gap, e) =>
-        here = (gap + (low7Budget (s + gap) (C + e - 1)).1,
-                (e - 1) + (low7Budget (s + gap) (C + e - 1)).2)
+        (here.1 == gap + (low7Budget (s + gap) (C + e - 1)).1) &&
+        (here.2 == (e - 1) + (low7Budget (s + gap) (C + e - 1)).2)
 
 private def low7RowChecked (h : Nat) : Bool :=
-  (List.range 210).all (fun s => decide (low7StateValid s h))
+  (List.range 210).all (fun s => low7StateChecked s h)
 
 private def low7BandChecked (start : Nat) : Bool :=
   (List.range' start 15).all low7RowChecked
@@ -68,12 +67,12 @@ private theorem low7_all_rows_checked :
 
 theorem low7_residue_verified {s h : Nat}
     (hs : s < 210) (hh : h < 105) :
-    low7StateValid s h := by
+    low7StateChecked s h = true := by
   have hrow := List.all_eq_true.mp low7_all_rows_checked h
     (List.mem_range.mpr hh)
   unfold low7RowChecked at hrow
   have hcell := List.all_eq_true.mp hrow s (List.mem_range.mpr hs)
-  exact of_decide_eq_true hcell
+  exact hcell
 
 /-- Every state of the finite LOW7 residue graph has travel <= 56
 and clipped growth <= 106, with exact per-edge potential telescoping.
