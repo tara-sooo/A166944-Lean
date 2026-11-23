@@ -1,0 +1,36 @@
+name: Canonical MIN p-return recharge
+on:
+  push:
+    branches: [research/canonical-p-return-recharge-2026-11-24]
+    paths:
+      - research/min_return_recharge.lean
+      - research/min_return_frequency_audit.py
+      - .github/workflows/min-return-recharge.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: leanprover/lean-action@v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-mathlib-cache: false
+      - name: Fetch pinned Lean environment
+        run: |
+          lake update
+          lake exe cache get Mathlib.Tactic
+      - name: Kernel-check return lemmas and axioms
+        run: |
+          set -euo pipefail
+          lake env lean research/min_return_recharge.lean | tee "$RUNNER_TEMP/recharge.log"
+          if grep -Fq sorryAx "$RUNNER_TEMP/recharge.log"; then exit 1; fi
+      - name: Re-run finite canonical MIN oracle
+        run: |
+          python3 research/min_return_frequency_audit.py 256 1024 4096
