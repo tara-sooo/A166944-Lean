@@ -97,6 +97,8 @@ For ALL tested linear donor return paths, rank zero was not observed. This is FI
 
 **Signed prefix SOURCE-CRT** research/donor_word_crt_cylinder.py: direct exact event jump, all realised signed prefix words of depths 1..4 on X256,1024,4096. Every group has a consistent unique residue mod P(w), count<=floor((N-1)/P)+1, every timed event passes TIME-GAIN, and dropping parity already fails uniqueness at the first event d=3. For X4096, depth4: 896 distinct signed prefix groups, max group source weight65, all satisfy the bound.
 
+The source-CRT upper bound is not a substitute for the clock-race condition: even restricted to actual REALISED signed prefix groups at X4096, the depth-1 bound sum is 5,486 versus 1,996 true source prefixes; depth-4 sum 3,425 versus 1,659 true prefixes. For LONG fully specified q-return words at the same X, the bound is much tighter: 2,076 versus 2,034 actual all-q return tags. This contrast is finite, and shows that full-history information matters; the unbounded difficulty is enumerating the exponentially branching allowed long histories rather than bounding the occupancy of each one. The published cylinder checker prints `crt_sum` for these ratios.
+
 **Actual q-return FULL prefix check** research/donor_return_trace_criterion.py:
 
     X       all-q returns  owner returns  unique full signed q-return prefixes  sum CRT upper bound on REALISED prefixes
