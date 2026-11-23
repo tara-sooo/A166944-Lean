@@ -65,7 +65,7 @@ Any donor r occurring exactly once has A_r=a_j|105 coprime to q>=11, so guarante
 
     rank-zero implies 105*m >= k*q, i.e. m >= k*q/105. (DEGENERACY-BARRIER)
 
-In particular m<q/105 guarantees a nonzero rank. Rank zero does not imply impossibility for longer paths: it remains a separate arithmetic class.
+For m>=1, in particular m<q/105 guarantees a nonzero rank. Rank zero does not imply impossibility for longer paths: it remains a separate arithmetic class.
 
 ## 4. An exact SOURCE-WEIGHTED trace reduction
 
