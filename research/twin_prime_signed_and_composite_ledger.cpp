@@ -77,7 +77,7 @@ void audit(int X) {
       old[i]=now;
     }
   }
-  ll W=0,Lin=0,Ex=0,Fw=0,Rw=0,events=0,composites=0,H=0,F=0,Z=0;
+  ll W=0,Lin=0,Ex=0,PairCap=0,Fw=0,Rw=0,events=0,composites=0,H=0,F=0,Z=0;
   vector<int> qhit(B+1,0),touched,f;
   for (int M=X+1;M<2*X;M+=2) {
     ll t=M+2,C=2LL*M-2,K=(7LL*M-1)/4;
@@ -91,12 +91,16 @@ void audit(int X) {
       if (n>K) break;
       int raw=int(gcd((n&1)?n-2:n,(n&1)?C+1:C-1));
       factor(raw,f); int d=1,lin=0,omega=0;
+      vector<int> labels;
       for (int p:f) if (p<=B) {
-        d*=p; lin+=p-1; ++omega;
+        d*=p; lin+=p-1; ++omega; labels.push_back(p);
         if (qhit[p]++==0) touched.push_back(p);
       }
       if (d<=1) throw runtime_error("final clock mismatch");
       ++events; composites+=omega>=2;
+      for (size_t i=0;i<labels.size();++i)
+        for (size_t j=i+1;j<labels.size();++j)
+          PairCap+=ll(d/labels[i]/labels[j])*(labels[i]-1)*(labels[j]-1);
       W+=d-1; Lin+=lin; Ex+=d-1-lin;
       C+=d-1; t=n;
     }
@@ -106,7 +110,7 @@ void audit(int X) {
       if (p>=19) {H+=v; ++F; Z+=ll(v)*v;}
     }
   }
-  if (W!=Lin+Ex||Lin!=Fw+Rw||
+  if (W!=Lin+Ex||Lin!=Fw+Rw||Ex>PairCap||
       (stageScanned && (W!=positive-negative||
       W!=pNew+oldShift+compositeShift||Ex!=compositeShift||
       positive>stageFirst+stageRepeat+jointPositive)))
@@ -118,7 +122,7 @@ void audit(int X) {
       (X==16384&&(W!=2915326||H!=31042||F!=25450||Z!=47482)))
     throw runtime_error("historical regression failed");
   cout<<"LEDGER_PASS X="<<X<<" B="<<B<<" stageScanned="<<stageScanned<<" W="<<W<<" firstW="<<Fw
-      <<" repeatW="<<Rw<<" nonlinear="<<Ex<<" events="<<events
+      <<" repeatW="<<Rw<<" nonlinear="<<Ex<<" pairUpper="<<PairCap<<" events="<<events
       <<" compositeEvents="<<composites<<" highH="<<H<<" highF="<<F
       <<" highZ="<<Z<<" stagePositive="<<positive<<" stageNegative="<<negative
       <<" stageFirst="<<stageFirst<<" stageRepeat="<<stageRepeat
