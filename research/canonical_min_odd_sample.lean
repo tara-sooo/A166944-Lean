@@ -195,18 +195,21 @@ private theorem repeats_pp (p : ℕ) (w : List ℕ) :
   have hterm : 1 ≤ (p::p::w).count p-1 := by omega
   have hsum : (p::p::w).count p-1 ≤
       ∑ q ∈ (p::p::w).toFinset, ((p::p::w).count q-1) := by
-    exact Finset.single_le_sum (fun q _ => Nat.zero_le _) hp
+    exact Finset.single_le_sum
+      (s:=(p::p::w).toFinset)
+      (f:=fun q => (p::p::w).count q-1)
+      (fun q _ => Nat.zero_le _) hp
   omega
 
 /-- Honest first-high p,q,p is *directly* a collision in the new sample,
 unlike in the original every-third sample. -/
 theorem first_three_high_pqp_implies_odd_repeat {B y M p q : ℕ}
     {tail : List ℕ}
-    (prefix : highWord y (canonical B M).1 = p::q::p::tail)
+    (hprefix : highWord y (canonical B M).1 = p::q::p::tail)
     (positive : 0 < (highSet B y).card) :
     1 ≤ oddRepeatsAt B y M := by
   unfold oddRepeatsAt oddSampleAt
-  rw [prefix]
+  rw [hprefix]
   obtain ⟨rest,hr⟩ := sampleOdd_pqp (highSet B y).card p q tail positive
   rw [hr]
   exact repeats_pp p rest
