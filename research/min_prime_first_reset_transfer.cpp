@@ -47,14 +47,35 @@ int main(int argc,char**argv){
    }
    if(!reached)uncovered++;
   }
-  int maxWeight=0;
-  for(auto [key,w]:firstResetWeights){(void)key;maxWeight=max(maxWeight,w);}
-  if(covered+uncovered!=X/2||pre+post!=all)return 4;
+  int maxWeight=0,maxAtomFuture=0;
+  ll envelopeFuture=0;
+  ll Kmax=(7LL*(2*X-1)-1)/4;
+  for(auto [key,w]:firstResetWeights){
+   maxWeight=max(maxWeight,w);
+   ll t=key/2,C=2*t-6*(key%2);
+   int tail=0;
+   // Every source arriving at this reset follows this exact continuation
+   // until its own cutoff K(M), which is at most the common Kmax.
+   while(t<Kmax){
+    ll n=Kmax+1;
+    for(int p:fac(int(C-1)))if(p<=B)n=min(n,t+gap(t,p,0));
+    for(int p:fac(int(C+1)))if(p<=B)n=min(n,t+gap(t,p,p+2));
+    if(n>Kmax)break;
+    int raw=int(gcd((n&1)?n-2:n,(n&1)?C+1:C-1)),p=0;
+    for(int v:fac(raw))if(v<=B){p=v;break;}
+    if(!p)return 5;
+    C+=p-1;t=n;tail+=(p>=11);
+   }
+   envelopeFuture+=1LL*w*tail;
+   maxAtomFuture=max(maxAtomFuture,tail);
+  }
+  if(covered+uncovered!=X/2||pre+post!=all||post>envelopeFuture)return 4;
   cout<<"MIN_FIRST_RESET_PASS X="<<X<<" B="<<B
       <<" covered="<<covered<<" uncovered="<<uncovered
       <<" fraction="<<double(covered)/(X/2)
       <<" atoms="<<firstResetWeights.size()<<" maxFibre="<<maxWeight
       <<" highBeforeFirstReset="<<pre<<" highAfterFirstReset="<<post
+      <<" envelopeFuture="<<envelopeFuture<<" maxAtomFuture="<<maxAtomFuture
       <<" totalHigh="<<all<<"\n";
  }
 }
