@@ -28,6 +28,21 @@ For a common q-clock n, write the pre-event deficit z=2n−c (not the previous p
 
 Thus different c in one (q,n) fibre are exactly distinct integer carry layers k, separated by 2q. The earlier necessary congruence q|(c−c') is automatic for such q-hitting pairs: on its own it is NOT an analytic upper bound on J_distinct.
 
+## NEW unconditional first-high-wave q-clock fibre bound (PAPER + finite 4940-state certificate)
+
+Before its FIRST high event, every original start M follows a prefix of the deterministic {3,5,7,11}-only canonical trace. For each odd residue r=M mod2310, write its j-th low plateau as
+
+    t_(r,j)(M)=M+2+tau_(r,j),
+    C_(r,j)(M)=2M−2+h_(r,j),
+
+with fixed integers tau,h on that residue class. A full enumeration of all 1155 odd r classes gives EXACTLY **4940 distinct (r,j) plateau templates** in total, including the terminal template; the longest such trace has18 low events.
+
+Fix one high prime q>=13 and one absolute q-clock n. If q is present in the FIRST high event of M at n, there is some template (r,j) so that (a) M mod2310=r; (b) q|C_(r,j)(M)−sigma_n, fixing exactly ONE residue M modq because q is odd; and (c) 1<=n−t_(r,j)(M)<=2q, because the next q-clock from that plateau occurs within 2q. Thus all admissible M from this one template belong to one CRT class modulo 2310q AND a real interval of length 2q. That interval contains at most ONE such M. Summing the 4940 possible templates yields the strict, X- and q-INDEPENDENT bound
+
+    BOXED: mu^(first-high)_(q,n) <=4940 for every q>=13 and clock n.   (FIRST-FIBRE)
+
+There is also the elementary independent bound mu^(first-high)_(q,n) <=q+67, since the low-only trace takes at most133 steps and then the q clock waits at most2q; the M starts have spacing2. For any q, take the minimum of these two bounds. Actual maximum first-high synchronous multiplicity was only11,13,15,16,16,16 for X4096,16384,65536,262144,1048576,1999996, respectively (finite observation). FIRST-FIBRE and |C_q|=O(X/q) immediately imply that the entire first-high-wave weighted prime incidence A_first=O(X*pi(B))=O(XB/logB)=o(X²) unconditionally. This result is consistent with the previous direct first-/second-wave CRT estimates and closes the pointwise fibre subproblem for the FIRST wave alone. It does NOT control the second or later high events: their dynamically selected preceding plateau templates carry extra prime-history data.
+
 ## New direct, weaker peak-mass sufficient conditions (PAPER)
 
 Define q-specific maximal simultaneous incidence mu_q^* = max_(q-clocks n) mu_(q,n). Because each q has |C_q| <=5X/(2q)+2, the first weighted moment satisfies
@@ -79,7 +94,7 @@ For the nonjoined part, state differences satisfy 2q|(c−c'), and the exact car
 
 ## Finite exhaustive original-GCD audits (NOT asymptotic)
 
-`research/synchronous_pair_split.cpp` enumerates ALL canonical odd starts in every listed X interval with the exact parity-specific prime-clock jump recurrence. It stores every actual high hit as (q,n,C_M(n−1),M), sorts by q,n,c, and computes J_equal and J_distinct as literal integer sums. It validates old high-event totals, independently matches the literal-step GCD at M=7..119, asserts J=J_equal+J_distinct, CHARGE1, and CHARGE2. An **independent Python literal one-step implementation** `research/independent_literal_pair_reference.py` recomputes the ENTIRE pair split for each of X=256,512,1024 without using event clocks, confirming exact equality with C++.
+`research/synchronous_pair_split.cpp` enumerates ALL canonical odd starts in every listed X interval with the exact parity-specific prime-clock jump recurrence. It stores every actual high hit as (q,n,C_M(n−1),M), sorts by q,n,c, and computes J_equal and J_distinct as literal integer sums. It validates old high-event totals, independently matches the literal-step GCD at M=7..119, asserts J=J_equal+J_distinct, CHARGE1, CHARGE2, and FIRST-FIBRE (and its stronger q+67 temporal bound). An **independent Python literal one-step implementation** `research/independent_literal_pair_reference.py` recomputes the ENTIRE pair split for each of X=256,512,1024 without using event clocks, confirming exact equality with C++.
 
 | X | B | J_X | J_equal / J_X | J_distinct | max r_(q,n) | max state mass at hit | Σ_q mu_q^*/X |
 |--:|--:|--:|--:|--:|--:|--:|--:|
