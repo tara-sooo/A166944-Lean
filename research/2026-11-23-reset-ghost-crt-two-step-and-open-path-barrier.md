@@ -45,6 +45,23 @@ For P={p: B/2<=p<=B} and T=O(X), PNT/Mertens gives O(X/log B); the +|P| term is 
 
 The same 210-class ghost applies at every ordinary canonical start s=M+2, because s is odd and C(s)=2s-6.
 
+### First-high clock delay from a reset (additional deterministic lemma)
+
+There is also an exact **TIME** restriction, not only a source-residue restriction. Let p>=37 be the first selected high prime after v(n), chosen at time t=n+g>n, and let E be all selected LOW7 gain before this p event. Section 2 gives E even, 0<=E<=32. If t is even, the two event gcd divisibilities imply
+
+    2g == E-delta(n)-1 (mod p).
+
+If t is odd, they imply
+
+    2g == E+5-delta(n) (mod p).
+
+The right sides are ODD in [-7,37]. Since 2g is even and p odd, the multiple k in 2g=RHS+k*p is odd. For p>=37, k cannot be negative with g>0 (the borderline zero is excluded), so k>=1. Therefore
+
+    g >= (p-7)/2.                                (FIRST-HIGH-DELAY)
+
+Thus the first p>=B/2 selection cannot occur earlier than B/4-O(1) time after a reset, provided that p is the FIRST selected high. This does not bound the spacing after other high selections or the full U-tail. The strict C++ auditor additionally asserts this delay for every full all-time reset trajectory in the finite test windows through X1048576.
+
+
 ## 3. Two distinct first high selections in the same large band
 
 Suppose the FIRST TWO selected high-prime events after v(n) use p,q>=37. Their labels MUST differ: between two consecutive selections of p with no other HIGH selection, only LOW7 selected events intervene, with total growth <=34<p-1. Thus p≠q.
