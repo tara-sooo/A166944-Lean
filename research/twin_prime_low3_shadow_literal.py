@@ -59,7 +59,7 @@ def audit(x):
              high_first_count=0, high_repeat_count=0, high_first_weight=0,
              high_repeat_weight=0, high_clean_time=0, high_mask_time=0,
              high_clean_count=0, high_mask_count=0, masked_high_weight=0,
-             masked_high_hits=0, masks_cost=0, max_low_block=0, shadow_checks=0)
+             masked_high_hits=0, masks_cost=0, max_low_block=0, shadow_checks=0, Z5=0, Z5_q5=0, extra=0)
     for m in range(x + 1, 2 * x, 2):
         t = m + 2
         c = 2 * m - 2
@@ -75,6 +75,7 @@ def audit(x):
             d = prod(factors)
             delta = n - t
             z['total_travel'] += delta
+            z['extra'] += d - 1 - sum(p - 1 for p in factors)
             hi = [p for p in factors if p > 3]
             if not hi:
                 low_block += delta
@@ -114,6 +115,9 @@ def audit(x):
                 post_high[p] = (n, c + d - 1)
             c += d - 1
             t = n
+        z['Z5'] += sum(max(0, count - 1)**2 for count in seen_high.values())
+        z['Z5_q5'] += max(0, seen_high.get(5,0) - 1)**2
+    assert 8*z['masks_cost'] <= 7*z['extra']
     assert z['total_travel'] == z['low_time'] + z['high_first_time'] + z['high_repeat_time']
     assert z['high_repeat_time'] == z['high_clean_time'] + z['high_mask_time']
     assert z['high_repeat_count'] == z['high_clean_count'] + z['high_mask_count']
@@ -131,6 +135,9 @@ def audit(x):
             'high_repeat_weight','high_clean_time','high_mask_time')
     if x in regression:
         assert tuple(z[k] for k in keys) == regression[x], (x, z, regression[x])
+    z_regression={256:(644,329,500),512:(1546,1054,948),1024:(2404,1756,1164),4096:(31060,19622,36604)}
+    if x in z_regression:
+        assert (z['Z5'],z['Z5_q5'],z['extra']) == z_regression[x], (x,z,z_regression[x])
     print('LOW3_SHADOW_LITERAL_PASS',x,'B=',b,z)
 
 if __name__ == '__main__':
