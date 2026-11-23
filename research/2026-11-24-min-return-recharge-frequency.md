@@ -45,7 +45,15 @@ with Q<=p<=B, p prime. Intermediate LOW7 selections are unrestricted. The third 
 
 In particular, on dyadic windows with Q=6[pi(B)-pi(y)] (provided 840<=Q<=B), the prime number theorem gives Q ~ 6B/log B, so
 
-    N_Q(X) = O(B (log B)^2) = O(sqrt(X) (log X)^2) = o(X). (R5)
+    N_Q(X) = O(B log B) = O(sqrt(X) log X) = o(X).         (R5)
+
+The purely integer-summed proof of (R4) gives O(B(log B)^2) at Q~B/log B.
+For (R5) we retain the fact that p is PRIME and use the standard prime-counting
+upper bound pi(t)<<t/log t. Partial summation then yields
+sum_{p>=Q} p^-2 <<1/(Q log Q) and
+sum_{p>=Q} p^-3 <<1/(Q^2 log Q), as well as
+sum_{Q<=p<=B}1/p <<log(B/Q)/log Q. Substituting these into (R8)-(R10),
+with X~B^2 and Q~B/log B, gives the sharper O(B log B).
 
 This counts ORIGINAL sources without replacing multiplicities by distinct reset states.
 
