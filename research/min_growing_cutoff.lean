@@ -48,7 +48,7 @@ theorem even_barrier {C J p : Nat} (hC2 : 2 ≤ C) (hCJ : C ≤ J)
 /-- A LOW-only event: time and frozen-horizon state, with the
 prime-clock gap dt ≤ 2p. The recurrence-specific first-hit
 property is represented by the explicit clock premise. -/
-structure LowEvent (L : Nat) (a b : Nat × Nat) : Prop where
+structure LowEvent (L : Nat) (a b : Nat × Nat) : Type where
   primeLabel : Nat
   odd : primeLabel % 2 = 1
   atLeastThree : 3 ≤ primeLabel
@@ -110,7 +110,7 @@ theorem first_plus_repetitions (n : Nat) :
     n = (if n = 0 then 0 else 1) + (n - 1) := by
   cases n with
   | zero => simp
-  | succ k => simp [Nat.succ_eq_add_one, Nat.add_comm]
+  | succ k => simp [Nat.add_comm]
 
 /-- Summing a per-orbit interval bound. There is one LOW segment before
 each high event and one after the last high event. -/
