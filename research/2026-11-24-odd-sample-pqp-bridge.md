@@ -56,6 +56,14 @@ and at Q~B/log B, using prime counting in the p sum,
 
     N_Q(X) << B log B = o(X).
 
+Consequently, with the FIXED y=7 cutoff and W=4P_7,
+if 840<=W<B, the first-position upper-band pair mass satisfies
+
+    V_{1,2}^{>W}(X;B,7) <= N_{W+1}(X) << B log B = O(X/P_7).
+
+The last asymptotic is for W~4B/log B. It is a valid first case
+of the weighted positional correlation budget, but only at (1,2).
+
 This is a real source-counted bound for one early first-position pattern.
 Yet ONE fixed position pair contributes at most X/2, already o(XP)
 since P tends to infinity. Therefore this early-pattern theorem alone
@@ -160,3 +168,9 @@ the displayed tests have a larger D_odd. The long-history condition
 4P*(2B+3L) < 3X/4-2 does not hold at these sample scales.
 Neither the finite data nor the p,q,p bound establishes the global
 moment estimate or twin-prime infinitude.
+
+## 5. Formal and finite CI status
+
+- Workflow run [45251245450](https://github.com/tara-sooo/A166944-Lean/actions/runs/45251245450) successfully completed the Lean kernel check and finite oracle on X=256,1024,4096,16384; full job output lists the theorem axiom sets `[propext, Classical.choice, Quot.sound]` without `sorryAx`.
+- The finite oracle in section 4 was independently repeated locally through X=65536.
+- The new position-pair identity (CORR), the asymptotic 4P length implication, and the aggregate source-weighted correlation estimate remain at the stated paper/open status rather than part of the Lean kernel artifacts.
