@@ -1,0 +1,76 @@
+# Disjoint far witnesses and genuine low-block coalescences
+
+2026-11-24 JST. Continues 8f091a3a28ca45665c204770dd4e73581152973c on the SAME research/min-cycle-forest-2026-11-24 branch. New paper reduction and source-weighted nonreset low-block meeting estimate; exact finite audits. Not Lean-checked. The full anti-concentration estimate and twin-prime conjecture remain open.
+
+## 1. Replace all pair products by a disjoint matching of original sources
+
+Canonical MIN, X dyadic divisible by four, N=X/2 original odd sources M in [X,2X), B=ceil(sqrt(7X)), original t0=M+2, C0=2M-2, K(M)=floor((7M-1)/4). Fixed LOW7, L=210. Use source-preserving first-heavy absorption at projected selected high keys (p,C), p>7. Uniform cap T=B or the hybrid normalized cap tau_p=ceil(W max(B^eta,p)), as in the preceding note. For both, the previously proved R_pre=o(X^2) applies, with W a suitably small positive power of log B, eta fixed in (0,1). Thus no-twin windows require S=N-o(X) stopped tags. Let T_min be the minimum high stop threshold; it tends to infinity for these choices.
+
+Within each stopped group, sort the m distinct original roots M_1<...<M_m, put k=floor(m/2), and match M_i to M_(m-k+i) for i=1,...,k. These are disjoint unordered pairs, each at source distance >=2(m-k)>=m>=T_min, since the roots are odd and spaced by 2. At most one root is left unmatched per group. As stopped populations are disjoint, this defines a GLOBAL matching (degree at most one, not degree O(T)). Let V be the number of matched pairs. Then
+    2V >= S - #stopped groups >= S(1-1/T_min).
+Each matched pair has a first shared proposed projected key, at latest the stop itself. Charge once at that first projected contact. Therefore if for this matching, or any construction satisfying the same lower bound, one can prove liminf V/N<1/2 along unbounded dyadic windows, the stop-budget contradiction proves infinitely many twins. In particular V=o(X) suffices. This is a reformulation, not a proof of such an estimate.
+
+The important counting improvement is that for any two fixed executed preceding high keys a,b, the number of matched pairs with one member from each is <=min(m(a),m(b)), not m(a)m(b). This is true even when tags subsequently split into different projected groups and even when counting across all possible current p and clocks. The pairs were matched once globally by original identities. A pair of identical preceding projected keys cannot be the first projected contact. For physical first meetings, identical previous high keys and identical event clocks are possible if the meeting is precisely the common post-high vertex; that is an immediate same-label clock merge and must be distinguished from low-only coalescence. This distinction is essential.
+
+## 2. Compress the intervening LOW-only portions exactly
+
+Each actual low-only block between successive high events has gain <L and elapsed <=3L. A tag with an executed high predecessor (q,D) at time u has post-horizon H_a=D+q-1 and post-height h_a=2u-H_a=b_a+2kq, with b_a=0 or6 according to clock parity, k>=0. Use the corresponding q',D',u',H_b,h_b=b_b+2k'q' for its matched partner. At the considered contact horizon C, both preceding high post-horizons are C-g,C-g' for even g,g' in [0,L).
+
+We treat two types of matched-pair contact:
+
+(A) First projected contact (p,C) with the SAME proposed event clock n for both tags, and r(C)<=z. Their two physical arrival times at C both lie in the exact acceptance interval of length <=2r(C). Hence |u-u'|<=3L+2z, |H_a-H_b|<L.
+
+(B) First physical meeting at (t,C) where both tags have a last executed high event, followed only by LOW events up to this vertex (possibly zero low events). Exclude an immediate common high post-state produced by the SAME high key and event clock. Then |u-u'|<=3L, |H_a-H_b|<L. If the two high post-states were identical, the meeting must be there, not later. Distinct high labels at that same post-state are allowed.
+
+Neither case supposes equal entire earlier histories. Both are valid with original individual cutoffs, since only paths of tags that reach the specified contact are used. Case B can be counted independently even when the first projected contact happened earlier. A matched pair may have no physical meeting before its stop.
+
+For both, the exact low-block height relation is
+    2kq-2k'q' = e = 2(u-u')-(H_a-H_b)-b_a+b_b,
+    |e| <= 7L+4z+6
+in case A, or <=7L+6 in case B. It is the difference of the two post-heights after subtracting parity constants; e is even. No current selected-prime multiplier is present in case A precisely because the proposed event times agree. For different projected event clocks a term which is a multiple of 4p must be included in the bound on the time offset; one cannot use this short-relation estimate there.
+
+For q=q'>7L+4z+20 and distinct high post-states, the two clock residues of differing parity are separated by at least q-2 modulo 2q; same parity forces u=u' because the time difference is <2q. With same clock parity, the two even post-horizons have the same residue mod q (0 or -2), so their difference of absolute value <L forces H_a=H_b. Thus the post-states coincide, contradiction to distinct states. In case A, same q and same post-state would give the same prior projected key, contradicting first projected contact. In case B, same q and same post-state is exactly the immediate same-label case excluded above. Consequently for the two cases under the stated size separation we may assume q!=q'.
+
+If q,q'>7L+4z+20, one index k=0 and the other positive is impossible, since |e|<2 min(q,q'). Both zero is a genuine remaining reset/reset class. If both indices are positive and <=H, and q,q'>H, e=0 is impossible: kq=k'q' would imply q divides k' and q' divides k, contrary to the bounds. Thus distinct sufficiently large nonreset parents obey a nonzero short linear relation. This is a condition on actual contact between different ancestral groups, not on a normalized mass merely increasing because a label decreased.
+
+## 3. New all-depth matched-pair deletion across power-size prime bands
+
+Fix theta>0 with theta<1 and positive beta,gamma,delta with
+    2 beta + gamma + delta < 1.
+Let H=log^beta B, z=ceil(log^gamma B), W=log^delta B. Consider case A or B with both q,q'>=B^theta, both nonreset previous indices 1<=k,k'<=H, and WHOLE executed prior key masses
+    m(q,D)<=qW, m(q',D')<=q'W.
+The latter conditions follow automatically in the hybrid cap for theta>eta, or can be applied conditionally in the uniform cap. At sufficiently large B the exclusions in section2 apply. The number of all such matched pairs, in either case, is
+    O_(L,theta)(X W H^2 (1+z) (log log B)^2/log B) = o(X).
+In case B the factor 1+z may be omitted. The estimates are independent of the depth of the two ancestries and allow an arbitrary globally disjoint matching of source identities, including one chosen after the entire stopped process. They do not count every far original-source pair.
+
+Proof. For fixed positive k,k'<=H and nonzero even e in the short offset range, consider distinct primes q,q' satisfying kq-k'q'=e/2. The weighted sum of reciprocal max(q,q') is
+    sum_{q,q'>=B^theta, q,q'<=B prime, kq-k'q'=e/2} 1/max(q,q')
+        = O_theta((log log B)^2/log B).
+To see this, if gcd(k,k') does not divide e/2 there are no integer solutions; otherwise divide through and parameterize the integer solutions by two affine forms of one integer j, with positive coprime slopes and nonzero determinant. On a dyadic band P<=max(q,q')<2P, split into which label is larger. Then j ranges in an interval of length at most O(P); embed it in an interval of length comparable to P. Since P>=B^theta/2, the usual two-dimensional upper-bound sieve at level B^(theta/4), cutoff a sufficiently small fixed power of B, has negligible squarefree residue error O(B^(theta/4)log B). Both actual primes exceed the cutoff. Off primes dividing the nonzero integer 2kk'e, the two forbidden roots are distinct. The omitted-prime factor is O((log log B)^2), as in the previous power-band normalized transfer theorem (the integer 2kk'e is polylogarithmic). The count is O_theta(P (log log B)^2/log^2 B). Multiply by 1/P, then sum the O(log B) bands. This yields the weighted sum without an independence assumption or prime-pair lower bound.
+
+At a contact horizon C we have q|C-g or C-g+2, q'|C-g' or C-g'+2. For fixed distinct q,q',g,g',signs the count of even C is O_L(1+X/(qq'))=O_L(X/(qq')), since qq'<=B^2=O(X). D=C-g-q+1 and D'=C-g'-q'+1 are determined. All matching pairs between these previous keys, summed over every actual possible time and current selected prime, number at most min(m(q,D),m(q',D'))<=W min(q,q'). In particular one need NOT count clock multiplicities or sum over the current p. Multiplying this true source-matching bound by the CRT count leaves O_L(X W/max(q,q')). Sum the weighted prime-pair bound and the O_L(H^2(1+z)) coefficient/offset tuples. This proves the claim. Example beta=gamma=delta=1/8 gives O(X(log log B)^2/log^(1/2) B), or O(X(log log B)^2/log^(5/8) B) for physical case B.
+
+The normalized caps are used only on the executed parents, never on the current stop mass. Case B counts physical first coalescences after possibly empty low blocks, except the same-label immediate high merger; case A also includes first common projected keys whose common next event is not executed due to stopping. This yields a true bound on disjoint witnesses at genuine coalescences instead of mistaking a simple decrease of the selected label for mass growth.
+
+Additional elementary removal: if neither tag has executed a high event yet at a contact, both origins are within L of the common horizon; their source distance <L/2, so they cannot form a witness of section1 for large B. If just one is such an initial low-only tag, the other prior high post-height is O_L(1+z) in case A and O_L(1) in case B, by the same short time and horizon offsets relative to the initial root (height6). Thus a prior high label q>=B^theta must be reset. For q>=B/log^alpha B, even the reset/root witness class is o(X): the number of possible root identities is at most O_L(X sum_{q>=B/log^alpha B}1/q)=O_L(X log log B/log B), using the finitely many gains between initial root, post-high horizon and C. Each such root has at most one matching partner. For a general power band this harmonic bound is only O_theta(X). Two-reset contacts do not satisfy a nonzero linear relation and are not covered by the prime-pair deletion.
+
+## 4. Exact audit of matching witnesses
+
+Executed the function body of research/min_disjoint_far_matching_audit.mjs:
+    node research/min_disjoint_far_matching_audit.mjs 256 1024 4096 16384 65536 262144
+Two diagnostic rules: uniform cap floor(B/4) (at least2), hybrid cap 4 max(ceil(sqrt B),p). Original cutoffs preserved. First run all sources to recover every projected key mass and all final stop cohorts. Construct disjoint sorted-half matching; independently replay each paired root to its original first stop. Find first common projected high key and first physical state (if any) by exact key intersection in increasing horizon. Verify all witness separations >=own stop cohort mass, no repeated root, exact stop, source conservation, low-suffix gain/time bounds, preceding high height and clock identity, and actual previous mass caps. For the small X windows verify literal parity-GCD clock decisions against factor clocks. Explicitly separate same high label/same event clock immediate physical merges, which may occur even when the two tags had shared a projected key before their physical meeting. The initial exploratory version of the audit failed an assertion by excluding this class incorrectly; the corrected version includes and verifies it. Only the corrected script/data are committed. Exact remote readback at 8b5f31063ff7ee043cc50882b3eda87f1f8911ce.
+
+|X|uniform stopped|uniform disjoint pairs|same-clock first projected|different-clock first projected|physical meeting by stop|
+|--:|--:|--:|--:|--:|--:|
+|4096|505|249|126|123|101|
+|16384|1808|898|405|493|312|
+|65536|6093|3038|962|2076|1022|
+|262144|11112|5549|1888|3661|2366|
+
+At X262144 uniform cap338, 30 stops, 14 unmatched roots. Same-clock first projected: 460 with an initial parent, 509 both reset parents, 535 mixed reset/nonreset, 384 both nonreset. First physical meetings: 178 with initial parent, 304 both reset, 58 mixed, 17 both nonreset (excluding immediate same-label high merges), 1809 immediate same-label high merges. The 3183 pairs without physical meeting by stop cannot be accounted for by a physical forest estimate alone. The first projected different-clock class is 3661/5549, substantial. These are finite counts, not asymptotic statements. Earlier exact all-pair and stopped-source counts agree.
+
+At X262144 hybrid W4, 34194 stopped roots, 192 stopped keys, 104 unmatched, 17045 matched pairs. Of these 7329 same-clock and 9716 different-clock first projected contacts; 8301 meet physically by stop. The same-clock count splits 1993 with an initial parent, 2496 both reset, 1809 mixed, 1031 both nonreset. The finite nonreset diagnostic Q=max(11,ceil(B^.4))=18, H=4, z=31, W=4 uses h<=H q (stronger than k<=H) and both whole masses <=qW: 10 same-clock projected first contacts and 4 non-immediate physical first contacts satisfy its both-nonreset conditions with distinct labels and nonzero e. Example from a first projected meeting at C562440: q41,D562398,u281260,h82,m69; q'29,D'562398,u'281242,h58,m4; e24, k=k'=1. The analytic theorem uses fixed theta>0 and grows its thresholds; finite diagnostic conditions do not all satisfy the large-B separation inequalities. Do not infer the o(X) theorem from the observed counts.
+
+## 5. What actually remains
+
+The disjoint witness reduction changes the needed counting operation from a product of two potentially huge original-source masses to the smaller of them. This is a concrete simplification for a proof attempt, but it has not proved the overall matching bound. The new all-depth theorem handles the two-large-parent nonreset short-clock class (under normalized mass and relative-height conditions), not the dominant residual classes. In particular the finite data show a majority of first projected contacts may have distinct clocks, and many physical first meetings are immediate same-label high merges. Reset/reset has no nonzero height determinant. Small-parent labels, large relative heights and long clock acceptance also remain. A next direct target is the asynchronous first projected contacts: the two proposed event clocks at a common (p,C) differ by an exact multiple of 2p, hence the two post-height indices differ by that multiple divided by 2p; subtracting the height transition equations yields a three-label linear relation with a bounded error when both waits are short. Its coefficient of p can be nonzero, so the two-label proof above does not transfer. Need an aggregate source-matching bound on that residual, together with the reset/small-label residual, or an alternative choice of matching that demonstrably avoids them. Do not claim that the matching choice alone avoids those classes. No new branch, no main edits, no Lean compilation.
