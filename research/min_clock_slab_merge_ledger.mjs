@@ -37,14 +37,15 @@ function audit(X){
    check(u-t<=2*r&&C<=2*t,'wait and invariant');
    visit(v,M,dur/2);cost+=dur/2;events++;
    const w=get(u,C+p-1);
-   w.edges.set(key(t,C),{M,p,cost});
+   w.edges.set(key(t,C),{M,p,cost,enter:dur/2});
    visit(w,M,0);t=u;C+=p-1;v=w;
   }
   check(cost<=B,'per-source slab cost');costs[(M-X-1)/2]=cost;R+=cost;
  }
  let rep=0,same=0,sameCost=0,mixed=0,mixedCost=0,root=0,rootCost=0;
- const out=[Q,11].map(Q=>({Q,pairs:0,resetPairs:0,nonresetPairs:0,vertices:0,demotions:0,cost:0}));
+ const out=[Q,11].map(Q=>({Q,pairs:0,resetPairs:0,nonresetPairs:0,vertices:0,demotions:0,cost:0,rootDemotions:0,rootCost:0}));
  const demoted=new Set();
+ const cutoffs=[Q,Math.ceil(Math.log(B)**2),11].map(y=>({y,all:0,groupWinner:0,sameLoser:0,groupEvents:0}));
  function suffix(e){const x=costs[(e.M-X-1)/2]-e.cost;check(x>=0,'suffix cost');return x;}
  function demote(e){check(!demoted.has(e.M),'single demotion');demoted.add(e.M);return suffix(e);}
  for(const v of V.values()){
@@ -57,6 +58,7 @@ function audit(X){
   const winners=[];
   for(const g of groups.values()){
    g.sort((b,c)=>c.M-b.M);winners.push(g[0]);
+   for(const o of cutoffs)if(g[0].p>=o.y){o.groupEvents++;o.groupWinner+=g[0].enter;for(const e of g)o.all+=e.enter;for(const e of g.slice(1))o.sameLoser+=e.enter;}
    for(const e of g.slice(1)){same++;sameCost+=demote(e);}
   }
   winners.sort((b,c)=>c.M-b.M);
@@ -74,6 +76,7 @@ function audit(X){
      n++;o.pairs++;if(def===0)o.resetPairs++;else{o.nonresetPairs++;check(2*p*q<=2*(H+2*B)+6,'nonreset product bound');}
     }
    }
+   if(v.root&&winners.some(e=>e.p>=o.Q)){o.rootDemotions++;o.rootCost+=suffix(winners[0]);}
    if(n){
     o.vertices++;check(winners.length-1<=n,'large-label pair domination');
     o.demotions+=winners.length-1;
@@ -85,8 +88,9 @@ function audit(X){
   check(v.rep===(v.root||winners[0]?.M),'representative order');
  }
  check(rep+sameCost+mixedCost+rootCost===R,'exact slab ledger');
- for(const o of out)check(o.demotions<=o.pairs&&o.cost<=B*o.demotions,'large mixed bound');
- return {X,B,Q,events,vertices:V.size,finished,R,rep,same,sameCost,mixed,mixedCost,root,rootCost,out};
+ for(const o of out)check(o.demotions<=o.pairs&&o.cost<=B*o.demotions&&o.rootCost<=B*o.rootDemotions,'large mixed bound');
+ for(const o of cutoffs)check(o.all===o.groupWinner+o.sameLoser,'representative entering cost identity');
+ return {X,B,Q,events,vertices:V.size,finished,R,rep,same,sameCost,mixed,mixedCost,root,rootCost,out,cutoffs};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536,262144])console.log(JSON.stringify(audit(X)));
