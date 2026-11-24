@@ -1,7 +1,7 @@
 // Canonical MIN short-slab middle-pair categories, fast-high/LOW removal.
 // Run: node research/min_clock_slab_pair_audit.mjs 1024 4096 16384 65536 262144
-function audit(X){
- const B=Math.ceil(Math.sqrt(7*X)), H=4*B,a=2*B,N=X/2,d=Math.floor(4*Math.log(B));
+function audit(X,diagnostic=false){
+ const B=Math.ceil(Math.sqrt(7*X)), H=4*B,a=diagnostic?0:2*B,N=X/2,d=diagnostic?0:Math.floor(4*Math.log(B));
  const z=Math.max(1,Math.floor(Math.sqrt(Math.log(B)))),z2=Math.floor(Math.log(B)**1.5),Q=Math.ceil(B/Math.sqrt(Math.log(B)));
  const check=(x,m)=>{if(!x)throw Error(m)};
  const spf=new Int32Array(7*X+4);
@@ -66,7 +66,7 @@ function audit(X){
    if(!lists.has(rec.C))lists.set(rec.C,[]);
    lists.get(rec.C).push(rec);
   }
-  check(rc<=B,'slab duration');
+  check(rc<=(H-a)/2,'slab duration');
   if(paths)paths.set(M,path);
  }
  const names=['same','merge','parallel','change','different'];
@@ -146,7 +146,7 @@ function audit(X){
   check(boundedLagPremerge<=1.5*L*N*(2*Math.floor((H+3)/2))+1e-7*Math.max(1,boundedLagPremerge),'bounded-lag total');
   oracle={lateShared,shortMerge,boundedLagPremerge,mergers};
  }
- return {X,B,H,d,Q,y,L,z,z2,events,slabRecords,literal,finished,maxBig,lowBlocks,R,fastR,lowR,removedR,S0,full,trim,oracle};
+ return {X,B,H,a,d,diagnostic,Q,y,L,z,z2,events,slabRecords,literal,finished,maxBig,lowBlocks,R,fastR,lowR,removedR,S0,full,trim,oracle};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536,262144])console.log(JSON.stringify(audit(X)));
+for(const X of args.length?args:[1024,4096,16384,65536,262144]){console.log(JSON.stringify(audit(X)));if(X<=4096)console.log(JSON.stringify(audit(X,true)));}
