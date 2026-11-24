@@ -26,7 +26,10 @@
       "markedPositive": 60,
       "markedWeight": 125,
       "edgeDistinctStrong": 0,
-      "farFirst": 0
+      "farFirst": 0,
+      "denseWeight": 168,
+      "denseEvents": 12,
+      "coverageWeight": 168
     },
     {
       "U": 1024,
@@ -54,7 +57,10 @@
       "markedPositive": 0,
       "markedWeight": 0,
       "edgeDistinctStrong": 0,
-      "farFirst": 0
+      "farFirst": 0,
+      "denseWeight": 0,
+      "denseEvents": 0,
+      "coverageWeight": 0
     },
     {
       "U": 4096,
@@ -82,7 +88,10 @@
       "markedPositive": 112,
       "markedWeight": 199,
       "edgeDistinctStrong": 0,
-      "farFirst": 1
+      "farFirst": 1,
+      "denseWeight": 264,
+      "denseEvents": 20,
+      "coverageWeight": 264
     },
     {
       "U": 16384,
@@ -110,7 +119,10 @@
       "markedPositive": 48,
       "markedWeight": 142,
       "edgeDistinctStrong": 0,
-      "farFirst": 1
+      "farFirst": 1,
+      "denseWeight": 192,
+      "denseEvents": 16,
+      "coverageWeight": 192
     },
     {
       "U": 65536,
@@ -138,10 +150,25 @@
       "markedPositive": 96,
       "markedWeight": 72,
       "edgeDistinctStrong": 0,
-      "farFirst": 1
+      "farFirst": 1,
+      "denseWeight": 96,
+      "denseEvents": 8,
+      "coverageWeight": 96
     }
   ],
   "synthetic": {
-    "checks": 240
+    "checks": 240,
+    "edgeDistinctCombinatorialWord": [
+      0,
+      1,
+      2,
+      0,
+      3,
+      1,
+      4,
+      2,
+      3,
+      4
+    ]
   }
 }
