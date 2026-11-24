@@ -1,0 +1,1340 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "L": 210,
+    "cap": 10,
+    "R": 3868,
+    "events": 670,
+    "stopped": 65,
+    "sinks": 5,
+    "twin": 63,
+    "bad": 0,
+    "literal": 798,
+    "maxPassed": 9,
+    "clock": {
+      "groups": 291,
+      "multi": 9,
+      "parentLabelMulti": 9,
+      "allParentLabelMulti": 7,
+      "maxTimes": 2,
+      "maxRatio": 9.666666666666666,
+      "ratios": [
+        3,
+        1,
+        4,
+        1,
+        0
+      ],
+      "sameQWitnessTags": 57,
+      "examples": [
+        {
+          "C": 612,
+          "p": 13,
+          "q": 3,
+          "n": 338,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 5
+        },
+        {
+          "C": 684,
+          "p": 5,
+          "q": 3,
+          "n": 357,
+          "r": 5,
+          "w": 10,
+          "m": 2,
+          "mass": 4
+        },
+        {
+          "C": 690,
+          "p": 13,
+          "q": 3,
+          "n": 364,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 732,
+          "p": 17,
+          "q": 3,
+          "n": 374,
+          "r": 17,
+          "w": 30,
+          "m": 2,
+          "mass": 9
+        },
+        {
+          "C": 750,
+          "p": 7,
+          "q": 3,
+          "n": 392,
+          "r": 7,
+          "w": 14,
+          "m": 2,
+          "mass": 4
+        },
+        {
+          "C": 768,
+          "p": 13,
+          "q": 7,
+          "n": 416,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 6
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          46,
+          0,
+          0,
+          0,
+          82
+        ],
+        "stopFirst": [
+          0,
+          0,
+          0,
+          0,
+          65
+        ],
+        "firstTop": 33,
+        "firstComparable": 0,
+        "firstRoots": 43,
+        "roughKeys": 0,
+        "roughStopTags": 0,
+        "roughStopUnmarkedBefore": 0,
+        "roughStopMarkedEarlier": 0,
+        "roughStopMarkedHere": 0,
+        "roughWitnessStopTags": 0,
+        "roughWitnessStopMarkedHere": 0,
+        "firstMarkKeys": 10,
+        "firstMarkMass": 82,
+        "rareClassChecks": 15
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          128,
+          0,
+          0,
+          0,
+          0
+        ],
+        "stopFirst": [
+          65,
+          0,
+          0,
+          0,
+          0
+        ],
+        "firstTop": 0,
+        "firstComparable": 0,
+        "firstRoots": 0,
+        "roughKeys": 0,
+        "roughStopTags": 0,
+        "roughStopUnmarkedBefore": 0,
+        "roughStopMarkedEarlier": 0,
+        "roughStopMarkedHere": 0,
+        "roughWitnessStopTags": 0,
+        "roughWitnessStopMarkedHere": 0,
+        "firstMarkKeys": 0,
+        "firstMarkMass": 0,
+        "rareClassChecks": 0
+      },
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          46,
+          0,
+          0,
+          0,
+          82
+        ],
+        "stopFirst": [
+          0,
+          0,
+          0,
+          0,
+          65
+        ],
+        "firstTop": 33,
+        "firstComparable": 0,
+        "firstRoots": 43,
+        "roughKeys": 0,
+        "roughStopTags": 0,
+        "roughStopUnmarkedBefore": 0,
+        "roughStopMarkedEarlier": 0,
+        "roughStopMarkedHere": 0,
+        "roughWitnessStopTags": 0,
+        "roughWitnessStopMarkedHere": 0,
+        "firstMarkKeys": 10,
+        "firstMarkMass": 82,
+        "rareClassChecks": 15
+      },
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 7,
+        "first": [
+          46,
+          0,
+          0,
+          82,
+          0
+        ],
+        "stopFirst": [
+          0,
+          0,
+          0,
+          65,
+          0
+        ],
+        "firstTop": 33,
+        "firstComparable": 0,
+        "firstRoots": 43,
+        "roughKeys": 33,
+        "roughStopTags": 65,
+        "roughStopUnmarkedBefore": 40,
+        "roughStopMarkedEarlier": 25,
+        "roughStopMarkedHere": 40,
+        "roughWitnessStopTags": 65,
+        "roughWitnessStopMarkedHere": 40,
+        "firstMarkKeys": 10,
+        "firstMarkMass": 82,
+        "rareClassChecks": 15
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "L": 210,
+    "cap": 21,
+    "R": 23525,
+    "events": 3353,
+    "stopped": 136,
+    "sinks": 6,
+    "twin": 376,
+    "bad": 0,
+    "literal": 3865,
+    "maxPassed": 19,
+    "clock": {
+      "groups": 1200,
+      "multi": 34,
+      "parentLabelMulti": 35,
+      "allParentLabelMulti": 12,
+      "maxTimes": 3,
+      "maxRatio": 20.333333333333332,
+      "ratios": [
+        2,
+        13,
+        10,
+        9,
+        1
+      ],
+      "sameQWitnessTags": 208,
+      "examples": [
+        {
+          "C": 2100,
+          "p": 11,
+          "q": 3,
+          "n": 1069,
+          "r": 11,
+          "w": 22,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 2160,
+          "p": 17,
+          "q": 3,
+          "n": 1122,
+          "r": 17,
+          "w": 34,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 2250,
+          "p": 13,
+          "q": 3,
+          "n": 1144,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 2292,
+          "p": 29,
+          "q": 3,
+          "n": 1160,
+          "r": 29,
+          "w": 54,
+          "m": 2,
+          "mass": 6
+        },
+        {
+          "C": 2400,
+          "p": 7,
+          "q": 3,
+          "n": 1213,
+          "r": 7,
+          "w": 14,
+          "m": 2,
+          "mass": 5
+        },
+        {
+          "C": 2412,
+          "p": 19,
+          "q": 3,
+          "n": 1237,
+          "r": 19,
+          "w": 38,
+          "m": 2,
+          "mass": 8
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          214,
+          64,
+          67,
+          6,
+          161
+        ],
+        "stopFirst": [
+          0,
+          41,
+          26,
+          6,
+          63
+        ],
+        "firstTop": 123,
+        "firstComparable": 1,
+        "firstRoots": 125,
+        "roughKeys": 23,
+        "roughStopTags": 65,
+        "roughStopUnmarkedBefore": 27,
+        "roughStopMarkedEarlier": 38,
+        "roughStopMarkedHere": 27,
+        "roughWitnessStopTags": 44,
+        "roughWitnessStopMarkedHere": 16,
+        "firstMarkKeys": 41,
+        "firstMarkMass": 298,
+        "rareClassChecks": 53
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          512,
+          0,
+          0,
+          0,
+          0
+        ],
+        "stopFirst": [
+          136,
+          0,
+          0,
+          0,
+          0
+        ],
+        "firstTop": 0,
+        "firstComparable": 0,
+        "firstRoots": 0,
+        "roughKeys": 23,
+        "roughStopTags": 65,
+        "roughStopUnmarkedBefore": 65,
+        "roughStopMarkedEarlier": 0,
+        "roughStopMarkedHere": 0,
+        "roughWitnessStopTags": 44,
+        "roughWitnessStopMarkedHere": 0,
+        "firstMarkKeys": 0,
+        "firstMarkMass": 0,
+        "rareClassChecks": 0
+      },
+      {
+        "k": 8,
+        "Q": 59,
+        "Z": 31,
+        "first": [
+          214,
+          64,
+          67,
+          6,
+          161
+        ],
+        "stopFirst": [
+          0,
+          41,
+          26,
+          6,
+          63
+        ],
+        "firstTop": 63,
+        "firstComparable": 1,
+        "firstRoots": 125,
+        "roughKeys": 23,
+        "roughStopTags": 65,
+        "roughStopUnmarkedBefore": 27,
+        "roughStopMarkedEarlier": 38,
+        "roughStopMarkedHere": 27,
+        "roughWitnessStopTags": 44,
+        "roughWitnessStopMarkedHere": 16,
+        "firstMarkKeys": 41,
+        "firstMarkMass": 298,
+        "rareClassChecks": 53
+      },
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 9,
+        "first": [
+          214,
+          42,
+          9,
+          236,
+          11
+        ],
+        "stopFirst": [
+          0,
+          16,
+          6,
+          103,
+          11
+        ],
+        "firstTop": 123,
+        "firstComparable": 1,
+        "firstRoots": 125,
+        "roughKeys": 115,
+        "roughStopTags": 136,
+        "roughStopUnmarkedBefore": 49,
+        "roughStopMarkedEarlier": 87,
+        "roughStopMarkedHere": 49,
+        "roughWitnessStopTags": 136,
+        "roughWitnessStopMarkedHere": 49,
+        "firstMarkKeys": 41,
+        "firstMarkMass": 298,
+        "rareClassChecks": 53
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "L": 210,
+    "cap": 42,
+    "R": 252920,
+    "events": 23700,
+    "stopped": 505,
+    "sinks": 9,
+    "twin": 1543,
+    "bad": 0,
+    "literal": 0,
+    "maxPassed": 41,
+    "clock": {
+      "groups": 5513,
+      "multi": 199,
+      "parentLabelMulti": 203,
+      "allParentLabelMulti": 101,
+      "maxTimes": 3,
+      "maxRatio": 36.333333333333336,
+      "ratios": [
+        12,
+        58,
+        52,
+        38,
+        43
+      ],
+      "sameQWitnessTags": 1799,
+      "examples": [
+        {
+          "C": 8202,
+          "p": 13,
+          "q": 3,
+          "n": 4123,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 8310,
+          "p": 7,
+          "q": 3,
+          "n": 4172,
+          "r": 7,
+          "w": 14,
+          "m": 2,
+          "mass": 5
+        },
+        {
+          "C": 8328,
+          "p": 11,
+          "q": 7,
+          "n": 4202,
+          "r": 11,
+          "w": 22,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 8340,
+          "p": 19,
+          "q": 3,
+          "n": 4201,
+          "r": 19,
+          "w": 38,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 8412,
+          "p": 13,
+          "q": 3,
+          "n": 4238,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 5
+        },
+        {
+          "C": 8460,
+          "p": 11,
+          "q": 3,
+          "n": 4246,
+          "r": 11,
+          "w": 22,
+          "m": 2,
+          "mass": 3
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          576,
+          348,
+          470,
+          210,
+          444
+        ],
+        "stopFirst": [
+          0,
+          101,
+          207,
+          79,
+          118
+        ],
+        "firstTop": 1027,
+        "firstComparable": 42,
+        "firstRoots": 763,
+        "roughKeys": 187,
+        "roughStopTags": 195,
+        "roughStopUnmarkedBefore": 16,
+        "roughStopMarkedEarlier": 179,
+        "roughStopMarkedHere": 16,
+        "roughWitnessStopTags": 420,
+        "roughWitnessStopMarkedHere": 43,
+        "firstMarkKeys": 251,
+        "firstMarkMass": 1472,
+        "rareClassChecks": 267
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          1339,
+          65,
+          306,
+          188,
+          150
+        ],
+        "stopFirst": [
+          0,
+          61,
+          182,
+          161,
+          101
+        ],
+        "firstTop": 494,
+        "firstComparable": 62,
+        "firstRoots": 98,
+        "roughKeys": 187,
+        "roughStopTags": 195,
+        "roughStopUnmarkedBefore": 87,
+        "roughStopMarkedEarlier": 108,
+        "roughStopMarkedHere": 87,
+        "roughWitnessStopTags": 420,
+        "roughWitnessStopMarkedHere": 203,
+        "firstMarkKeys": 28,
+        "firstMarkMass": 709,
+        "rareClassChecks": 64
+      },
+      {
+        "k": 8,
+        "Q": 113,
+        "Z": 31,
+        "first": [
+          576,
+          348,
+          470,
+          210,
+          444
+        ],
+        "stopFirst": [
+          0,
+          101,
+          207,
+          79,
+          118
+        ],
+        "firstTop": 138,
+        "firstComparable": 0,
+        "firstRoots": 763,
+        "roughKeys": 187,
+        "roughStopTags": 195,
+        "roughStopUnmarkedBefore": 16,
+        "roughStopMarkedEarlier": 179,
+        "roughStopMarkedHere": 16,
+        "roughWitnessStopTags": 420,
+        "roughWitnessStopMarkedHere": 43,
+        "firstMarkKeys": 251,
+        "firstMarkMass": 1472,
+        "rareClassChecks": 267
+      },
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 10,
+        "first": [
+          576,
+          154,
+          113,
+          1188,
+          17
+        ],
+        "stopFirst": [
+          0,
+          26,
+          36,
+          434,
+          9
+        ],
+        "firstTop": 1027,
+        "firstComparable": 42,
+        "firstRoots": 763,
+        "roughKeys": 565,
+        "roughStopTags": 505,
+        "roughStopUnmarkedBefore": 53,
+        "roughStopMarkedEarlier": 452,
+        "roughStopMarkedHere": 53,
+        "roughWitnessStopTags": 505,
+        "roughWitnessStopMarkedHere": 53,
+        "firstMarkKeys": 251,
+        "firstMarkMass": 1472,
+        "rareClassChecks": 267
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "L": 210,
+    "cap": 84,
+    "R": 1659308,
+    "events": 124992,
+    "stopped": 1808,
+    "sinks": 18,
+    "twin": 6384,
+    "bad": 0,
+    "literal": 0,
+    "maxPassed": 83,
+    "clock": {
+      "groups": 22367,
+      "multi": 821,
+      "parentLabelMulti": 839,
+      "allParentLabelMulti": 387,
+      "maxTimes": 6,
+      "maxRatio": 80.33333333333333,
+      "ratios": [
+        47,
+        215,
+        208,
+        153,
+        216
+      ],
+      "sameQWitnessTags": 9644,
+      "examples": [
+        {
+          "C": 32892,
+          "p": 7,
+          "q": 3,
+          "n": 16459,
+          "r": 7,
+          "w": 14,
+          "m": 2,
+          "mass": 4
+        },
+        {
+          "C": 32898,
+          "p": 67,
+          "q": 7,
+          "n": 16482,
+          "r": 67,
+          "w": 129,
+          "m": 2,
+          "mass": 8
+        },
+        {
+          "C": 32898,
+          "p": 167,
+          "q": 7,
+          "n": 16535,
+          "r": 67,
+          "w": 53,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 32982,
+          "p": 13,
+          "q": 3,
+          "n": 16510,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 5
+        },
+        {
+          "C": 33000,
+          "p": 61,
+          "q": 3,
+          "n": 16533,
+          "r": 61,
+          "w": 122,
+          "m": 3,
+          "mass": 10
+        },
+        {
+          "C": 33024,
+          "p": 5,
+          "q": 3,
+          "n": 16527,
+          "r": 5,
+          "w": 10,
+          "m": 2,
+          "mass": 3
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          1854,
+          1427,
+          1962,
+          1050,
+          1899
+        ],
+        "stopFirst": [
+          0,
+          323,
+          587,
+          397,
+          501
+        ],
+        "firstTop": 4677,
+        "firstComparable": 191,
+        "firstRoots": 3232,
+        "roughKeys": 803,
+        "roughStopTags": 423,
+        "roughStopUnmarkedBefore": 11,
+        "roughStopMarkedEarlier": 412,
+        "roughStopMarkedHere": 11,
+        "roughWitnessStopTags": 1414,
+        "roughWitnessStopMarkedHere": 73,
+        "firstMarkKeys": 1064,
+        "firstMarkMass": 6338,
+        "rareClassChecks": 1168
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          3639,
+          754,
+          2047,
+          1060,
+          692
+        ],
+        "stopFirst": [
+          0,
+          259,
+          766,
+          536,
+          247
+        ],
+        "firstTop": 3809,
+        "firstComparable": 247,
+        "firstRoots": 928,
+        "roughKeys": 803,
+        "roughStopTags": 423,
+        "roughStopUnmarkedBefore": 39,
+        "roughStopMarkedEarlier": 384,
+        "roughStopMarkedHere": 39,
+        "roughWitnessStopTags": 1414,
+        "roughWitnessStopMarkedHere": 222,
+        "firstMarkKeys": 286,
+        "firstMarkMass": 4553,
+        "rareClassChecks": 525
+      },
+      {
+        "k": 8,
+        "Q": 219,
+        "Z": 31,
+        "first": [
+          1854,
+          1427,
+          1962,
+          1050,
+          1899
+        ],
+        "stopFirst": [
+          0,
+          323,
+          587,
+          397,
+          501
+        ],
+        "firstTop": 443,
+        "firstComparable": 0,
+        "firstRoots": 3232,
+        "roughKeys": 803,
+        "roughStopTags": 423,
+        "roughStopUnmarkedBefore": 11,
+        "roughStopMarkedEarlier": 412,
+        "roughStopMarkedHere": 11,
+        "roughWitnessStopTags": 1414,
+        "roughWitnessStopMarkedHere": 73,
+        "firstMarkKeys": 1064,
+        "firstMarkMass": 6338,
+        "rareClassChecks": 1168
+      },
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 12,
+        "first": [
+          1854,
+          1068,
+          1338,
+          3683,
+          249
+        ],
+        "stopFirst": [
+          0,
+          305,
+          371,
+          1077,
+          55
+        ],
+        "firstTop": 4677,
+        "firstComparable": 191,
+        "firstRoots": 3232,
+        "roughKeys": 1859,
+        "roughStopTags": 1385,
+        "roughStopUnmarkedBefore": 66,
+        "roughStopMarkedEarlier": 1319,
+        "roughStopMarkedHere": 66,
+        "roughWitnessStopTags": 1808,
+        "roughWitnessStopMarkedHere": 81,
+        "firstMarkKeys": 1064,
+        "firstMarkMass": 6338,
+        "rareClassChecks": 1168
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "L": 210,
+    "cap": 169,
+    "R": 12808293,
+    "events": 673175,
+    "stopped": 6093,
+    "sinks": 32,
+    "twin": 26675,
+    "bad": 0,
+    "literal": 0,
+    "maxPassed": 168,
+    "clock": {
+      "groups": 91475,
+      "multi": 3525,
+      "parentLabelMulti": 3632,
+      "allParentLabelMulti": 1607,
+      "maxTimes": 7,
+      "maxRatio": 166.33333333333334,
+      "ratios": [
+        164,
+        813,
+        873,
+        597,
+        1185
+      ],
+      "sameQWitnessTags": 55142,
+      "examples": [
+        {
+          "C": 131100,
+          "p": 31,
+          "q": 3,
+          "n": 65596,
+          "r": 31,
+          "w": 62,
+          "m": 2,
+          "mass": 6
+        },
+        {
+          "C": 131142,
+          "p": 199,
+          "q": 3,
+          "n": 65670,
+          "r": 199,
+          "w": 398,
+          "m": 4,
+          "mass": 12
+        },
+        {
+          "C": 131190,
+          "p": 17,
+          "q": 3,
+          "n": 65620,
+          "r": 17,
+          "w": 34,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 131208,
+          "p": 13,
+          "q": 3,
+          "n": 65639,
+          "r": 13,
+          "w": 26,
+          "m": 2,
+          "mass": 6
+        },
+        {
+          "C": 131232,
+          "p": 19,
+          "q": 3,
+          "n": 65647,
+          "r": 19,
+          "w": 38,
+          "m": 2,
+          "mass": 13
+        },
+        {
+          "C": 131280,
+          "p": 53,
+          "q": 3,
+          "n": 65669,
+          "r": 43,
+          "w": 51,
+          "m": 2,
+          "mass": 6
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          5736,
+          5855,
+          8223,
+          5038,
+          7916
+        ],
+        "stopFirst": [
+          0,
+          1335,
+          1863,
+          1380,
+          1515
+        ],
+        "firstTop": 20204,
+        "firstComparable": 621,
+        "firstRoots": 14213,
+        "roughKeys": 3457,
+        "roughStopTags": 2228,
+        "roughStopUnmarkedBefore": 67,
+        "roughStopMarkedEarlier": 2161,
+        "roughStopMarkedHere": 67,
+        "roughWitnessStopTags": 3881,
+        "roughWitnessStopMarkedHere": 146,
+        "firstMarkKeys": 4793,
+        "firstMarkMass": 27032,
+        "rareClassChecks": 4814
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          10964,
+          3513,
+          8468,
+          5571,
+          4252
+        ],
+        "stopFirst": [
+          0,
+          910,
+          2305,
+          1797,
+          1081
+        ],
+        "firstTop": 18480,
+        "firstComparable": 1009,
+        "firstRoots": 5246,
+        "roughKeys": 3457,
+        "roughStopTags": 2228,
+        "roughStopUnmarkedBefore": 102,
+        "roughStopMarkedEarlier": 2126,
+        "roughStopMarkedHere": 102,
+        "roughWitnessStopTags": 3881,
+        "roughWitnessStopMarkedHere": 222,
+        "firstMarkKeys": 1713,
+        "firstMarkMass": 21804,
+        "rareClassChecks": 2560
+      },
+      {
+        "k": 8,
+        "Q": 425,
+        "Z": 31,
+        "first": [
+          5736,
+          5855,
+          8223,
+          5038,
+          7916
+        ],
+        "stopFirst": [
+          0,
+          1335,
+          1863,
+          1380,
+          1515
+        ],
+        "firstTop": 1311,
+        "firstComparable": 11,
+        "firstRoots": 14213,
+        "roughKeys": 3457,
+        "roughStopTags": 2228,
+        "roughStopUnmarkedBefore": 67,
+        "roughStopMarkedEarlier": 2161,
+        "roughStopMarkedHere": 67,
+        "roughWitnessStopTags": 3881,
+        "roughWitnessStopMarkedHere": 146,
+        "firstMarkKeys": 4793,
+        "firstMarkMass": 27032,
+        "rareClassChecks": 4814
+      },
+      {
+        "k": 8,
+        "Q": 53,
+        "Z": 13,
+        "first": [
+          5736,
+          4189,
+          5396,
+          16350,
+          1097
+        ],
+        "stopFirst": [
+          0,
+          904,
+          1237,
+          3771,
+          181
+        ],
+        "firstTop": 16698,
+        "firstComparable": 290,
+        "firstRoots": 14213,
+        "roughKeys": 7603,
+        "roughStopTags": 4387,
+        "roughStopUnmarkedBefore": 135,
+        "roughStopMarkedEarlier": 4252,
+        "roughStopMarkedHere": 135,
+        "roughWitnessStopTags": 5576,
+        "roughWitnessStopMarkedHere": 189,
+        "firstMarkKeys": 4793,
+        "firstMarkMass": 27032,
+        "rareClassChecks": 4814
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "L": 210,
+    "cap": 338,
+    "R": 98554147,
+    "events": 3620133,
+    "stopped": 11112,
+    "sinks": 30,
+    "twin": 119960,
+    "bad": 0,
+    "literal": 0,
+    "maxPassed": 337,
+    "clock": {
+      "groups": 379092,
+      "multi": 14319,
+      "parentLabelMulti": 14844,
+      "allParentLabelMulti": 6394,
+      "maxTimes": 7,
+      "maxRatio": 340.3333333333333,
+      "ratios": [
+        652,
+        3258,
+        3233,
+        2425,
+        5276
+      ],
+      "sameQWitnessTags": 278607,
+      "examples": [
+        {
+          "C": 524310,
+          "p": 83,
+          "q": 3,
+          "n": 262199,
+          "r": 83,
+          "w": 166,
+          "m": 2,
+          "mass": 3
+        },
+        {
+          "C": 524400,
+          "p": 37,
+          "q": 3,
+          "n": 262221,
+          "r": 17,
+          "w": 13,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 524430,
+          "p": 41,
+          "q": 3,
+          "n": 262279,
+          "r": 41,
+          "w": 82,
+          "m": 2,
+          "mass": 7
+        },
+        {
+          "C": 524442,
+          "p": 367,
+          "q": 3,
+          "n": 262407,
+          "r": 367,
+          "w": 734,
+          "m": 2,
+          "mass": 10
+        },
+        {
+          "C": 524472,
+          "p": 43,
+          "q": 3,
+          "n": 262300,
+          "r": 43,
+          "w": 85,
+          "m": 3,
+          "mass": 12
+        },
+        {
+          "C": 524580,
+          "p": 11,
+          "q": 3,
+          "n": 262306,
+          "r": 11,
+          "w": 22,
+          "m": 2,
+          "mass": 21
+        }
+      ]
+    },
+    "modes": [
+      {
+        "k": 8,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          18525,
+          23763,
+          34521,
+          22944,
+          31319
+        ],
+        "stopFirst": [
+          0,
+          2192,
+          3392,
+          2526,
+          3002
+        ],
+        "firstTop": 86394,
+        "firstComparable": 2270,
+        "firstRoots": 60154,
+        "roughKeys": 15036,
+        "roughStopTags": 4835,
+        "roughStopUnmarkedBefore": 65,
+        "roughStopMarkedEarlier": 4770,
+        "roughStopMarkedHere": 65,
+        "roughWitnessStopTags": 7729,
+        "roughWitnessStopMarkedHere": 134,
+        "firstMarkKeys": 20574,
+        "firstMarkMass": 112547,
+        "rareClassChecks": 20092
+      },
+      {
+        "k": 32,
+        "Q": 37,
+        "Z": 31,
+        "first": [
+          34464,
+          15604,
+          36783,
+          27905,
+          16316
+        ],
+        "stopFirst": [
+          0,
+          1780,
+          3973,
+          3563,
+          1796
+        ],
+        "firstTop": 84053,
+        "firstComparable": 4128,
+        "firstRoots": 25383,
+        "roughKeys": 15036,
+        "roughStopTags": 4835,
+        "roughStopUnmarkedBefore": 138,
+        "roughStopMarkedEarlier": 4697,
+        "roughStopMarkedHere": 138,
+        "roughWitnessStopTags": 7729,
+        "roughWitnessStopMarkedHere": 314,
+        "firstMarkKeys": 8534,
+        "firstMarkMass": 96608,
+        "rareClassChecks": 11543
+      },
+      {
+        "k": 8,
+        "Q": 827,
+        "Z": 31,
+        "first": [
+          18525,
+          23763,
+          34521,
+          22944,
+          31319
+        ],
+        "stopFirst": [
+          0,
+          2192,
+          3392,
+          2526,
+          3002
+        ],
+        "firstTop": 3894,
+        "firstComparable": 0,
+        "firstRoots": 60154,
+        "roughKeys": 15036,
+        "roughStopTags": 4835,
+        "roughStopUnmarkedBefore": 65,
+        "roughStopMarkedEarlier": 4770,
+        "roughStopMarkedHere": 65,
+        "roughWitnessStopTags": 7729,
+        "roughWitnessStopMarkedHere": 134,
+        "firstMarkKeys": 20574,
+        "firstMarkMass": 112547,
+        "rareClassChecks": 20092
+      },
+      {
+        "k": 8,
+        "Q": 93,
+        "Z": 15,
+        "first": [
+          18525,
+          20849,
+          31000,
+          51178,
+          9520
+        ],
+        "stopFirst": [
+          0,
+          1902,
+          2899,
+          5413,
+          898
+        ],
+        "firstTop": 51937,
+        "firstComparable": 570,
+        "firstRoots": 60154,
+        "roughKeys": 25520,
+        "roughStopTags": 8221,
+        "roughStopUnmarkedBefore": 115,
+        "roughStopMarkedEarlier": 8106,
+        "roughStopMarkedHere": 115,
+        "roughWitnessStopTags": 10024,
+        "roughWitnessStopMarkedHere": 159,
+        "firstMarkKeys": 20574,
+        "firstMarkMass": 112547,
+        "rareClassChecks": 20092
+      }
+    ]
+  }
+]
