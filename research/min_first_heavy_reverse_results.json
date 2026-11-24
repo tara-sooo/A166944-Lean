@@ -1,0 +1,2246 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "maxLow": 17,
+    "maxGain": 34,
+    "runs": [
+      {
+        "cap": 5,
+        "sinks": 11,
+        "checked": 11,
+        "exactChecks": 85,
+        "memoNodes": 37569,
+        "queryTimes": 264,
+        "top": [
+          {
+            "p": 11,
+            "C": 978,
+            "m": 18,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 7,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 14,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 26
+              },
+              {
+                "h": 3,
+                "actual": 18,
+                "relaxed": 32
+              },
+              {
+                "h": 4,
+                "actual": 18,
+                "relaxed": 45
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 768,
+            "m": 9,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 8,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 9,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 9,
+                "relaxed": 30
+              },
+              {
+                "h": 4,
+                "actual": 9,
+                "relaxed": 39
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 558,
+            "m": 8,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 6,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 4,
+                "actual": 8,
+                "relaxed": 11
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 11,
+            "C": 978,
+            "m": 18,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 7,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 14,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 26
+              },
+              {
+                "h": 3,
+                "actual": 18,
+                "relaxed": 32
+              },
+              {
+                "h": 4,
+                "actual": 18,
+                "relaxed": 45
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 768,
+            "m": 9,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 8,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 9,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 9,
+                "relaxed": 30
+              },
+              {
+                "h": 4,
+                "actual": 9,
+                "relaxed": 39
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 558,
+            "m": 8,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 6,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 11
+              },
+              {
+                "h": 4,
+                "actual": 8,
+                "relaxed": 11
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 648,
+            "m": 8,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 2
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 29
+              },
+              {
+                "h": 4,
+                "actual": 8,
+                "relaxed": 32
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 900,
+            "m": 8,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 5
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 13
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 17
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 30
+              },
+              {
+                "h": 4,
+                "actual": 8,
+                "relaxed": 46
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 690,
+            "m": 7,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 9
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 3,
+                "actual": 7,
+                "relaxed": 27
+              },
+              {
+                "h": 4,
+                "actual": 7,
+                "relaxed": 34
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 612,
+            "m": 6,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 14
+              },
+              {
+                "h": 2,
+                "actual": 6,
+                "relaxed": 21
+              },
+              {
+                "h": 3,
+                "actual": 6,
+                "relaxed": 24
+              },
+              {
+                "h": 4,
+                "actual": 6,
+                "relaxed": 24
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 732,
+            "m": 6,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 6,
+                "relaxed": 17
+              },
+              {
+                "h": 3,
+                "actual": 6,
+                "relaxed": 24
+              },
+              {
+                "h": 4,
+                "actual": 6,
+                "relaxed": 30
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 714,
+            "m": 5,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 5,
+                "relaxed": 5
+              },
+              {
+                "h": 2,
+                "actual": 5,
+                "relaxed": 7
+              },
+              {
+                "h": 3,
+                "actual": 5,
+                "relaxed": 11
+              },
+              {
+                "h": 4,
+                "actual": 5,
+                "relaxed": 17
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 798,
+            "m": 5,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 5,
+                "relaxed": 23
+              },
+              {
+                "h": 2,
+                "actual": 5,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 5,
+                "relaxed": 33
+              },
+              {
+                "h": 4,
+                "actual": 5,
+                "relaxed": 40
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 870,
+            "m": 5,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 5,
+                "relaxed": 9
+              },
+              {
+                "h": 2,
+                "actual": 5,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 5,
+                "relaxed": 38
+              },
+              {
+                "h": 4,
+                "actual": 5,
+                "relaxed": 41
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 10,
+        "sinks": 5,
+        "checked": 5,
+        "exactChecks": 65,
+        "memoNodes": 24592,
+        "queryTimes": 104,
+        "top": [
+          {
+            "p": 11,
+            "C": 978,
+            "m": 17,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 7,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 13,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 16,
+                "relaxed": 26
+              },
+              {
+                "h": 3,
+                "actual": 17,
+                "relaxed": 32
+              },
+              {
+                "h": 4,
+                "actual": 17,
+                "relaxed": 45
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 798,
+            "m": 14,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 5,
+                "relaxed": 23
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 14,
+                "relaxed": 33
+              },
+              {
+                "h": 4,
+                "actual": 14,
+                "relaxed": 40
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 690,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 9
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 27
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 34
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 11,
+            "C": 978,
+            "m": 17,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 7,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 13,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 16,
+                "relaxed": 26
+              },
+              {
+                "h": 3,
+                "actual": 17,
+                "relaxed": 32
+              },
+              {
+                "h": 4,
+                "actual": 17,
+                "relaxed": 45
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 798,
+            "m": 14,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 5,
+                "relaxed": 23
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 14,
+                "relaxed": 33
+              },
+              {
+                "h": 4,
+                "actual": 14,
+                "relaxed": 40
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 690,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 9
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 27
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 34
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 732,
+            "m": 11,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 8
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 17
+              },
+              {
+                "h": 3,
+                "actual": 11,
+                "relaxed": 24
+              },
+              {
+                "h": 4,
+                "actual": 11,
+                "relaxed": 30
+              }
+            ]
+          },
+          {
+            "p": 23,
+            "C": 942,
+            "m": 11,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 15
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 23
+              },
+              {
+                "h": 3,
+                "actual": 11,
+                "relaxed": 27
+              },
+              {
+                "h": 4,
+                "actual": 11,
+                "relaxed": 40
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 21,
+        "sinks": 2,
+        "checked": 2,
+        "exactChecks": 51,
+        "memoNodes": 19707,
+        "queryTimes": 39,
+        "top": [
+          {
+            "p": 23,
+            "C": 990,
+            "m": 30,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 25,
+                "relaxed": 35
+              },
+              {
+                "h": 4,
+                "actual": 30,
+                "relaxed": 39
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 768,
+            "m": 21,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 8,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 13,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 20,
+                "relaxed": 30
+              },
+              {
+                "h": 4,
+                "actual": 20,
+                "relaxed": 39
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 23,
+            "C": 990,
+            "m": 30,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 25,
+                "relaxed": 35
+              },
+              {
+                "h": 4,
+                "actual": 30,
+                "relaxed": 39
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 768,
+            "m": 21,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 8,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 13,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 22
+              },
+              {
+                "h": 3,
+                "actual": 20,
+                "relaxed": 30
+              },
+              {
+                "h": 4,
+                "actual": 20,
+                "relaxed": 39
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "maxLow": 17,
+    "maxGain": 34,
+    "runs": [
+      {
+        "cap": 10,
+        "sinks": 20,
+        "checked": 20,
+        "exactChecks": 232,
+        "memoNodes": 412550,
+        "queryTimes": 1439,
+        "top": [
+          {
+            "p": 31,
+            "C": 2448,
+            "m": 16,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 5,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 21
+              },
+              {
+                "h": 2,
+                "actual": 16,
+                "relaxed": 33
+              },
+              {
+                "h": 3,
+                "actual": 16,
+                "relaxed": 51
+              },
+              {
+                "h": 4,
+                "actual": 16,
+                "relaxed": 66
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 15,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 15,
+                "relaxed": 42
+              },
+              {
+                "h": 4,
+                "actual": 15,
+                "relaxed": 67
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2322,
+            "m": 14,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 34
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 14,
+                "relaxed": 54
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 31,
+            "C": 2448,
+            "m": 16,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 5,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 21
+              },
+              {
+                "h": 2,
+                "actual": 16,
+                "relaxed": 33
+              },
+              {
+                "h": 3,
+                "actual": 16,
+                "relaxed": 51
+              },
+              {
+                "h": 4,
+                "actual": 16,
+                "relaxed": 66
+              }
+            ]
+          },
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 15,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 15,
+                "relaxed": 42
+              },
+              {
+                "h": 4,
+                "actual": 15,
+                "relaxed": 67
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2322,
+            "m": 14,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 34
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 14,
+                "relaxed": 54
+              }
+            ]
+          },
+          {
+            "p": 23,
+            "C": 3612,
+            "m": 14,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 10,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 14,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 14,
+                "relaxed": 42
+              },
+              {
+                "h": 4,
+                "actual": 14,
+                "relaxed": 56
+              }
+            ]
+          },
+          {
+            "p": 23,
+            "C": 2370,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 9,
+                "relaxed": 32
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 62
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 2772,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 10
+              },
+              {
+                "h": 2,
+                "actual": 9,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 50
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 63
+              }
+            ]
+          },
+          {
+            "p": 73,
+            "C": 3432,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 10
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 24
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 43
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 54
+              }
+            ]
+          },
+          {
+            "p": 31,
+            "C": 3690,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 13
+              },
+              {
+                "h": 2,
+                "actual": 12,
+                "relaxed": 30
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 49
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 60
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 3840,
+            "m": 12,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 5
+              },
+              {
+                "h": 1,
+                "actual": 4,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 12,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 12,
+                "relaxed": 64
+              }
+            ]
+          },
+          {
+            "p": 43,
+            "C": 2622,
+            "m": 11,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 6,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 9,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 11,
+                "relaxed": 50
+              },
+              {
+                "h": 4,
+                "actual": 11,
+                "relaxed": 62
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2850,
+            "m": 11,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 15
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 28
+              },
+              {
+                "h": 3,
+                "actual": 11,
+                "relaxed": 35
+              },
+              {
+                "h": 4,
+                "actual": 11,
+                "relaxed": 48
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2958,
+            "m": 11,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 1,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 11,
+                "relaxed": 36
+              },
+              {
+                "h": 3,
+                "actual": 11,
+                "relaxed": 51
+              },
+              {
+                "h": 4,
+                "actual": 11,
+                "relaxed": 61
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 2532,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 41
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 54
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 72
+              }
+            ]
+          },
+          {
+            "p": 29,
+            "C": 2580,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 5
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 11
+              },
+              {
+                "h": 2,
+                "actual": 8,
+                "relaxed": 23
+              },
+              {
+                "h": 3,
+                "actual": 8,
+                "relaxed": 41
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 53
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2982,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 1,
+                "relaxed": 3
+              },
+              {
+                "h": 1,
+                "actual": 3,
+                "relaxed": 9
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 19
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 35
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 49
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 3042,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 5,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 10,
+                "relaxed": 14
+              },
+              {
+                "h": 2,
+                "actual": 10,
+                "relaxed": 25
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 50
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 62
+              }
+            ]
+          },
+          {
+            "p": 19,
+            "C": 3174,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 1,
+                "relaxed": 1
+              },
+              {
+                "h": 1,
+                "actual": 4,
+                "relaxed": 10
+              },
+              {
+                "h": 2,
+                "actual": 7,
+                "relaxed": 27
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 41
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 54
+              }
+            ]
+          },
+          {
+            "p": 17,
+            "C": 3348,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 2,
+                "relaxed": 5
+              },
+              {
+                "h": 1,
+                "actual": 6,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 9,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 44
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 66
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 3510,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 10,
+                "relaxed": 28
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 41
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 59
+              }
+            ]
+          },
+          {
+            "p": 61,
+            "C": 3720,
+            "m": 10,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 8,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 10,
+                "relaxed": 35
+              },
+              {
+                "h": 3,
+                "actual": 10,
+                "relaxed": 56
+              },
+              {
+                "h": 4,
+                "actual": 10,
+                "relaxed": 68
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 21,
+        "sinks": 6,
+        "checked": 6,
+        "exactChecks": 136,
+        "memoNodes": 172991,
+        "queryTimes": 338,
+        "top": [
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 25,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 23,
+                "relaxed": 42
+              },
+              {
+                "h": 4,
+                "actual": 25,
+                "relaxed": 67
+              }
+            ]
+          },
+          {
+            "p": 23,
+            "C": 2370,
+            "m": 24,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 10,
+                "relaxed": 32
+              },
+              {
+                "h": 3,
+                "actual": 16,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 17,
+                "relaxed": 62
+              }
+            ]
+          },
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 22,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 14,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 22,
+                "relaxed": 46
+              },
+              {
+                "h": 4,
+                "actual": 22,
+                "relaxed": 58
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 25,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 9
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 18
+              },
+              {
+                "h": 2,
+                "actual": 13,
+                "relaxed": 29
+              },
+              {
+                "h": 3,
+                "actual": 23,
+                "relaxed": 42
+              },
+              {
+                "h": 4,
+                "actual": 25,
+                "relaxed": 67
+              }
+            ]
+          },
+          {
+            "p": 23,
+            "C": 2370,
+            "m": 24,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 7,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 10,
+                "relaxed": 32
+              },
+              {
+                "h": 3,
+                "actual": 16,
+                "relaxed": 47
+              },
+              {
+                "h": 4,
+                "actual": 17,
+                "relaxed": 62
+              }
+            ]
+          },
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 22,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 14,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 22,
+                "relaxed": 46
+              },
+              {
+                "h": 4,
+                "actual": 22,
+                "relaxed": 58
+              }
+            ]
+          },
+          {
+            "p": 11,
+            "C": 3510,
+            "m": 22,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 28
+              },
+              {
+                "h": 3,
+                "actual": 21,
+                "relaxed": 41
+              },
+              {
+                "h": 4,
+                "actual": 22,
+                "relaxed": 59
+              }
+            ]
+          },
+          {
+            "p": 61,
+            "C": 3720,
+            "m": 22,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 10,
+                "relaxed": 16
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 35
+              },
+              {
+                "h": 3,
+                "actual": 22,
+                "relaxed": 56
+              },
+              {
+                "h": 4,
+                "actual": 22,
+                "relaxed": 68
+              }
+            ]
+          },
+          {
+            "p": 43,
+            "C": 2622,
+            "m": 21,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 6,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 17
+              },
+              {
+                "h": 2,
+                "actual": 18,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 19,
+                "relaxed": 50
+              },
+              {
+                "h": 4,
+                "actual": 19,
+                "relaxed": 62
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 42,
+        "sinks": 1,
+        "checked": 1,
+        "exactChecks": 46,
+        "memoNodes": 18189,
+        "queryTimes": 18,
+        "top": [
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 46,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 14,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 22,
+                "relaxed": 46
+              },
+              {
+                "h": 4,
+                "actual": 25,
+                "relaxed": 58
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 46,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 4,
+                "relaxed": 7
+              },
+              {
+                "h": 1,
+                "actual": 11,
+                "relaxed": 19
+              },
+              {
+                "h": 2,
+                "actual": 14,
+                "relaxed": 31
+              },
+              {
+                "h": 3,
+                "actual": 22,
+                "relaxed": 46
+              },
+              {
+                "h": 4,
+                "actual": 25,
+                "relaxed": 58
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "maxLow": 17,
+    "maxGain": 34,
+    "runs": [
+      {
+        "cap": 21,
+        "sinks": 37,
+        "checked": 1,
+        "exactChecks": 41,
+        "memoNodes": 360636,
+        "queryTimes": 394,
+        "top": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 41,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 26,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 32,
+                "relaxed": 142
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 41,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 26,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 32,
+                "relaxed": 142
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 42,
+        "sinks": 9,
+        "checked": 1,
+        "exactChecks": 79,
+        "memoNodes": 460144,
+        "queryTimes": 394,
+        "top": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 79,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 31,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 39,
+                "relaxed": 142
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 79,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 31,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 39,
+                "relaxed": 142
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "cap": 85,
+        "sinks": 1,
+        "checked": 1,
+        "exactChecks": 121,
+        "memoNodes": 472500,
+        "queryTimes": 394,
+        "top": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 121,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 31,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 39,
+                "relaxed": 142
+              }
+            ]
+          }
+        ],
+        "all": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 121,
+            "depths": [
+              {
+                "h": 0,
+                "actual": 3,
+                "relaxed": 4
+              },
+              {
+                "h": 1,
+                "actual": 12,
+                "relaxed": 20
+              },
+              {
+                "h": 2,
+                "actual": 17,
+                "relaxed": 54
+              },
+              {
+                "h": 3,
+                "actual": 31,
+                "relaxed": 103
+              },
+              {
+                "h": 4,
+                "actual": 39,
+                "relaxed": 142
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
