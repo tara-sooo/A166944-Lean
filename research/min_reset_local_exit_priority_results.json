@@ -1,0 +1,447 @@
+{
+  "rows": [
+    {
+      "X": 16384,
+      "W": 2,
+      "B": 339,
+      "Z0": 34,
+      "origins": 12285,
+      "terminal": 296,
+      "exit": [
+        3275,
+        8714
+      ],
+      "tailExit": [
+        12,
+        0
+      ],
+      "tailWait": [
+        1762,
+        0
+      ],
+      "tailGain": [
+        3560,
+        0
+      ],
+      "totalCost": 95485,
+      "totalElapsed": 86525,
+      "checks": 12
+    },
+    {
+      "X": 16384,
+      "W": 6,
+      "B": 339,
+      "Z0": 74,
+      "origins": 12285,
+      "terminal": 805,
+      "exit": [
+        6426,
+        5054
+      ],
+      "tailExit": [
+        0,
+        0
+      ],
+      "tailWait": [
+        0,
+        0
+      ],
+      "tailGain": [
+        0,
+        0
+      ],
+      "totalCost": 236986,
+      "totalElapsed": 209752,
+      "checks": 0
+    },
+    {
+      "X": 16384,
+      "W": 30,
+      "B": 339,
+      "Z0": 314,
+      "origins": 12285,
+      "terminal": 1885,
+      "exit": [
+        5549,
+        4851
+      ],
+      "tailExit": [
+        0,
+        0
+      ],
+      "tailWait": [
+        0,
+        0
+      ],
+      "tailGain": [
+        0,
+        0
+      ],
+      "totalCost": 502772,
+      "totalElapsed": 438438,
+      "checks": 0
+    },
+    {
+      "X": 65536,
+      "W": 2,
+      "B": 678,
+      "Z0": 34,
+      "origins": 49149,
+      "terminal": 892,
+      "exit": [
+        13303,
+        34954
+      ],
+      "tailExit": [
+        210,
+        70
+      ],
+      "tailWait": [
+        41393,
+        37915
+      ],
+      "tailGain": [
+        82960,
+        25164
+      ],
+      "totalCost": 492177,
+      "totalElapsed": 444512,
+      "checks": 280
+    },
+    {
+      "X": 65536,
+      "W": 6,
+      "B": 678,
+      "Z0": 74,
+      "origins": 49149,
+      "terminal": 2482,
+      "exit": [
+        26207,
+        20460
+      ],
+      "tailExit": [
+        49,
+        0
+      ],
+      "tailWait": [
+        15024,
+        0
+      ],
+      "tailGain": [
+        30186,
+        0
+      ],
+      "totalCost": 1256429,
+      "totalElapsed": 1112699,
+      "checks": 49
+    },
+    {
+      "X": 65536,
+      "W": 30,
+      "B": 678,
+      "Z0": 314,
+      "origins": 49149,
+      "terminal": 5753,
+      "exit": [
+        23598,
+        19798
+      ],
+      "tailExit": [
+        0,
+        0
+      ],
+      "tailWait": [
+        0,
+        0
+      ],
+      "tailGain": [
+        0,
+        0
+      ],
+      "totalCost": 2778183,
+      "totalElapsed": 2403140,
+      "checks": 0
+    },
+    {
+      "X": 262144,
+      "W": 2,
+      "B": 1355,
+      "Z0": 34,
+      "origins": 196605,
+      "terminal": 2828,
+      "exit": [
+        53709,
+        140068
+      ],
+      "tailExit": [
+        1448,
+        762
+      ],
+      "tailWait": [
+        422844,
+        536859
+      ],
+      "tailGain": [
+        846456,
+        357228
+      ],
+      "totalCost": 2630647,
+      "totalElapsed": 2389150,
+      "checks": 2210
+    },
+    {
+      "X": 262144,
+      "W": 6,
+      "B": 1355,
+      "Z0": 74,
+      "origins": 196605,
+      "terminal": 7960,
+      "exit": [
+        106126,
+        82519
+      ],
+      "tailExit": [
+        1669,
+        451
+      ],
+      "tailWait": [
+        705438,
+        477205
+      ],
+      "tailGain": [
+        1414290,
+        317934
+      ],
+      "totalCost": 6865589,
+      "totalElapsed": 6153436,
+      "checks": 2120
+    },
+    {
+      "X": 262144,
+      "W": 30,
+      "B": 1355,
+      "Z0": 314,
+      "origins": 196605,
+      "terminal": 18607,
+      "exit": [
+        97279,
+        80719
+      ],
+      "tailExit": [
+        0,
+        0
+      ],
+      "tailWait": [
+        0,
+        0
+      ],
+      "tailGain": [
+        0,
+        0
+      ],
+      "totalCost": 15258952,
+      "totalElapsed": 13471991,
+      "checks": 0
+    }
+  ],
+  "periodic": [
+    {
+      "W": 2,
+      "Z": 4096,
+      "d": 0,
+      "tail": 272,
+      "none": 0.19295296543052706,
+      "nonresetGainShare": 0.44045022436931125,
+      "nonresetRawWaitShare": 0.7022270662945006,
+      "minRatio": 0.8492557980732629,
+      "maxRatio": 1.2578206024616823
+    },
+    {
+      "W": 2,
+      "Z": 4096,
+      "d": 2,
+      "tail": 272,
+      "none": 0.1929529654305264,
+      "nonresetGainShare": 0.43174602812880764,
+      "nonresetRawWaitShare": 0.6948038702291747,
+      "minRatio": 0.8435408840237966,
+      "maxRatio": 1.2511899571119938
+    },
+    {
+      "W": 6,
+      "Z": 4096,
+      "d": 0,
+      "tail": 592,
+      "none": 0.2848854166669658,
+      "nonresetGainShare": 0.4444917458399079,
+      "nonresetRawWaitShare": 0.7057359561787654,
+      "minRatio": 0.8566045680009595,
+      "maxRatio": 1.2136621512726398
+    },
+    {
+      "W": 6,
+      "Z": 4096,
+      "d": 2,
+      "tail": 592,
+      "none": 0.28488541666696643,
+      "nonresetGainShare": 0.4357551957272369,
+      "nonresetRawWaitShare": 0.6983286982263407,
+      "minRatio": 0.8559103837598154,
+      "maxRatio": 1.2138873391775014
+    },
+    {
+      "W": 30,
+      "Z": 4096,
+      "d": 0,
+      "tail": 2512,
+      "none": 0.486792562605362,
+      "nonresetGainShare": 0.4666609320504348,
+      "nonresetRawWaitShare": 0.72404941938945,
+      "minRatio": 0.9436594925475372,
+      "maxRatio": 1.165235126255574
+    },
+    {
+      "W": 30,
+      "Z": 4096,
+      "d": 2,
+      "tail": 2512,
+      "none": 0.48679256260536014,
+      "nonresetGainShare": 0.4475462458275584,
+      "nonresetRawWaitShare": 0.7083969704811715,
+      "minRatio": 0.9409520858260475,
+      "maxRatio": 1.1627811133607417
+    },
+    {
+      "W": 2,
+      "Z": 16384,
+      "d": 0,
+      "tail": 272,
+      "none": 0.14210334227697605,
+      "nonresetGainShare": 0.4459680089133384,
+      "nonresetRawWaitShare": 0.7070320536154124,
+      "minRatio": 0.8492557980732629,
+      "maxRatio": 1.2578206024616823
+    },
+    {
+      "W": 2,
+      "Z": 16384,
+      "d": 2,
+      "tail": 272,
+      "none": 0.14210334227697602,
+      "nonresetGainShare": 0.44027061274647267,
+      "nonresetRawWaitShare": 0.7022366481436508,
+      "minRatio": 0.8435408840237966,
+      "maxRatio": 1.2511899571119938
+    },
+    {
+      "W": 6,
+      "Z": 16384,
+      "d": 0,
+      "tail": 592,
+      "none": 0.20980848770070296,
+      "nonresetGainShare": 0.4476324830654513,
+      "nonresetRawWaitShare": 0.7084671530523605,
+      "minRatio": 0.8566045680009595,
+      "maxRatio": 1.2136621512726398
+    },
+    {
+      "W": 6,
+      "Z": 16384,
+      "d": 2,
+      "tail": 592,
+      "none": 0.2098084877007037,
+      "nonresetGainShare": 0.4420863194703636,
+      "nonresetRawWaitShare": 0.7038091782756104,
+      "minRatio": 0.8559103837598154,
+      "maxRatio": 1.2138873391775014
+    },
+    {
+      "W": 30,
+      "Z": 16384,
+      "d": 0,
+      "tail": 2512,
+      "none": 0.35850628150466385,
+      "nonresetGainShare": 0.4532310158038543,
+      "nonresetRawWaitShare": 0.7131603925547343,
+      "minRatio": 0.8784441907539128,
+      "maxRatio": 1.165235126255574
+    },
+    {
+      "W": 30,
+      "Z": 16384,
+      "d": 2,
+      "tail": 2512,
+      "none": 0.35850628150466235,
+      "nonresetGainShare": 0.4468936051215362,
+      "nonresetRawWaitShare": 0.7078936555198208,
+      "minRatio": 0.8767801677728283,
+      "maxRatio": 1.1627811133607417
+    },
+    {
+      "W": 2,
+      "Z": 65536,
+      "d": 0,
+      "tail": 272,
+      "none": 0.10894496557004434,
+      "nonresetGainShare": 0.45199305843563803,
+      "nonresetRawWaitShare": 0.7121236991613472,
+      "minRatio": 0.8492557980732629,
+      "maxRatio": 1.2578206024616823
+    },
+    {
+      "W": 2,
+      "Z": 65536,
+      "d": 2,
+      "tail": 272,
+      "none": 0.10894496557004295,
+      "nonresetGainShare": 0.44856283964928967,
+      "nonresetRawWaitShare": 0.7092775667726109,
+      "minRatio": 0.8435408840237966,
+      "maxRatio": 1.2511899571119938
+    },
+    {
+      "W": 6,
+      "Z": 65536,
+      "d": 0,
+      "tail": 592,
+      "none": 0.16085180054600107,
+      "nonresetGainShare": 0.45272463723424433,
+      "nonresetRawWaitShare": 0.7127462352164384,
+      "minRatio": 0.8566045680009595,
+      "maxRatio": 1.2136621512726398
+    },
+    {
+      "W": 6,
+      "Z": 65536,
+      "d": 2,
+      "tail": 592,
+      "none": 0.16085180054600065,
+      "nonresetGainShare": 0.4493942051132536,
+      "nonresetRawWaitShare": 0.7099849006363109,
+      "minRatio": 0.8559103837598154,
+      "maxRatio": 1.2138873391775014
+    },
+    {
+      "W": 30,
+      "Z": 65536,
+      "d": 0,
+      "tail": 2512,
+      "none": 0.2748524691209784,
+      "nonresetGainShare": 0.4548989177701766,
+      "nonresetRawWaitShare": 0.7145574343908433,
+      "minRatio": 0.8784441907539128,
+      "maxRatio": 1.165235126255574
+    },
+    {
+      "W": 30,
+      "Z": 65536,
+      "d": 2,
+      "tail": 2512,
+      "none": 0.2748524691209744,
+      "nonresetGainShare": 0.45149858713097824,
+      "nonresetRawWaitShare": 0.7117501589532884,
+      "minRatio": 0.8767801677728283,
+      "maxRatio": 1.1627811133607417
+    }
+  ]
+}
