@@ -10,7 +10,9 @@
     "deterministicScale": 6.29583686600433,
     "meanGap": 3,
     "maxGap": 3,
+    "maxGapBound": 3,
     "meanForward": 1,
+    "meanBound": 3,
     "checks": 2,
     "maxLocalRatio": 1,
     "results": [
@@ -49,7 +51,9 @@
     "deterministicScale": 48.9752214150371,
     "meanGap": 7.5,
     "maxGap": 9,
+    "maxGapBound": 15,
     "meanForward": 3.4,
+    "meanBound": 15,
     "checks": 6,
     "maxLocalRatio": 1,
     "results": [
@@ -121,7 +125,9 @@
     "deterministicScale": 418.8996683302173,
     "meanGap": 17.5,
     "maxGap": 54,
+    "maxGapBound": 105,
     "meanForward": 16.257142857142856,
+    "meanBound": 105,
     "checks": 12,
     "maxLocalRatio": 1,
     "results": [
@@ -204,7 +210,9 @@
     "deterministicScale": 4831.488380378708,
     "meanGap": 38.5,
     "maxGap": 99,
+    "maxGapBound": 1155,
     "meanForward": 30.010389610389623,
+    "meanBound": 1018.3646889348267,
     "checks": 22,
     "maxLocalRatio": 1,
     "results": [
@@ -309,7 +317,9 @@
     "deterministicScale": 59610.531250453656,
     "meanGap": 83.41666666666667,
     "maxGap": 219,
+    "maxGapBound": 15015,
     "meanForward": 58.43276723276725,
+    "meanBound": 9764.933729946099,
     "checks": 34,
     "maxLocalRatio": 1,
     "results": [
@@ -414,7 +424,9 @@
     "deterministicScale": 897487.9832976016,
     "meanGap": 177.26041666666666,
     "maxGap": 714,
+    "maxGapBound": 193666.50492055505,
     "meanForward": 143.79989422342356,
+    "meanBound": 107946.14912928305,
     "checks": 50,
     "maxLocalRatio": 1,
     "results": [
@@ -519,7 +531,9 @@
     "deterministicScale": 14386787.303247694,
     "meanGap": 374.2164351851852,
     "maxGap": 1785,
+    "maxGapBound": 2560877.1457901956,
     "meanForward": 316.8985107771495,
+    "meanBound": 1238466.98444091,
     "checks": 68,
     "maxLocalRatio": 1,
     "results": [
@@ -624,7 +638,9 @@
     "deterministicScale": 268863794.38315696,
     "meanGap": 782.4525462962963,
     "maxGap": 5355,
+    "maxGapBound": 40372618.98992958,
     "meanForward": 668.1765301059285,
+    "meanBound": 16142457.351580726,
     "checks": 90,
     "maxLocalRatio": 1,
     "results": [
