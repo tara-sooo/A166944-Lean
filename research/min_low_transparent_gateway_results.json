@@ -1,0 +1,1594 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 10,
+        "Y": 13,
+        "Z": 13,
+        "A": 430,
+        "low": 11,
+        "Llow": 210,
+        "S": 65,
+        "R": 3868,
+        "Rlo": 2214,
+        "Rhi": 1654,
+        "hi": 136,
+        "maxGain": 28,
+        "maxLowCost": 36,
+        "twin": 63,
+        "bad": 0,
+        "literal": 798,
+        "stopKeys": 5,
+        "first": 20,
+        "highMass": 48,
+        "lowMass": 17,
+        "rootOnly": 7,
+        "gateMass": 10,
+        "gateKeys": 3,
+        "gatePhys": 3,
+        "maxGateClasses": 1,
+        "maxSuffix": 26,
+        "gateTopMass": 4,
+        "gateTopKeys": 1,
+        "gateTopH": 24,
+        "gateTopI": 0.02702702702702703,
+        "gateTopU": 4,
+        "gateTopPhysical": 0,
+        "topMass": 48,
+        "topKeys": 4,
+        "topH": 2514,
+        "topI": 0.23804839661617158,
+        "topU": 39,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 12
+          },
+          {
+            "p": 17,
+            "m": 11
+          },
+          {
+            "p": 17,
+            "m": 14
+          },
+          {
+            "p": 23,
+            "m": 11
+          },
+          {
+            "p": 11,
+            "m": 17
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 10,
+        "Y": 13,
+        "Z": 13,
+        "A": 430,
+        "low": 13,
+        "Llow": 2310,
+        "S": 67,
+        "R": 4044,
+        "Rlo": 2846,
+        "Rhi": 1198,
+        "hi": 92,
+        "maxGain": 38,
+        "maxLowCost": 47,
+        "twin": 61,
+        "bad": 0,
+        "literal": 826,
+        "stopKeys": 5,
+        "first": 30,
+        "highMass": 67,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 67,
+        "topKeys": 5,
+        "topH": 3986,
+        "topI": 0.2815266574857368,
+        "topU": 50,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 12
+          },
+          {
+            "p": 17,
+            "m": 11
+          },
+          {
+            "p": 17,
+            "m": 14
+          },
+          {
+            "p": 23,
+            "m": 11
+          },
+          {
+            "p": 23,
+            "m": 19
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 10,
+        "Y": 13,
+        "Z": 13,
+        "A": 430,
+        "low": 13,
+        "Llow": 2310,
+        "S": 53,
+        "R": 6952,
+        "Rlo": 3976,
+        "Rhi": 2976,
+        "hi": 214,
+        "maxGain": 38,
+        "maxLowCost": 47,
+        "twin": 70,
+        "bad": 5,
+        "literal": 1204,
+        "stopKeys": 2,
+        "first": 9,
+        "highMass": 53,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 53,
+        "topKeys": 2,
+        "topH": 3496,
+        "topI": 0.09610983981693363,
+        "topU": 19,
+        "stopSummary": [
+          {
+            "p": 19,
+            "m": 23
+          },
+          {
+            "p": 23,
+            "m": 30
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 21,
+        "Y": 13,
+        "Z": 13,
+        "A": 1785,
+        "low": 11,
+        "Llow": 210,
+        "S": 136,
+        "R": 23525,
+        "Rlo": 9946,
+        "Rhi": 13579,
+        "hi": 829,
+        "maxGain": 28,
+        "maxLowCost": 36,
+        "twin": 376,
+        "bad": 0,
+        "literal": 3865,
+        "stopKeys": 6,
+        "first": 22,
+        "highMass": 114,
+        "lowMass": 22,
+        "rootOnly": 3,
+        "gateMass": 19,
+        "gateKeys": 3,
+        "gatePhys": 3,
+        "maxGateClasses": 1,
+        "maxSuffix": 14,
+        "gateTopMass": 12,
+        "gateTopKeys": 1,
+        "gateTopH": 0,
+        "gateTopI": 0.0136986301369863,
+        "gateTopU": 8,
+        "gateTopPhysical": 12,
+        "topMass": 114,
+        "topKeys": 5,
+        "topH": 2786,
+        "topI": 0.17497596750340969,
+        "topU": 48,
+        "stopSummary": [
+          {
+            "p": 23,
+            "m": 24
+          },
+          {
+            "p": 67,
+            "m": 22
+          },
+          {
+            "p": 43,
+            "m": 21
+          },
+          {
+            "p": 13,
+            "m": 25
+          },
+          {
+            "p": 11,
+            "m": 22
+          },
+          {
+            "p": 61,
+            "m": 22
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 21,
+        "Y": 13,
+        "Z": 13,
+        "A": 1785,
+        "low": 13,
+        "Llow": 2310,
+        "S": 114,
+        "R": 23959,
+        "Rlo": 12294,
+        "Rhi": 11665,
+        "hi": 631,
+        "maxGain": 58,
+        "maxLowCost": 73,
+        "twin": 398,
+        "bad": 0,
+        "literal": 3931,
+        "stopKeys": 5,
+        "first": 29,
+        "highMass": 114,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 114,
+        "topKeys": 5,
+        "topH": 2786,
+        "topI": 0.17497596750340969,
+        "topU": 48,
+        "stopSummary": [
+          {
+            "p": 23,
+            "m": 24
+          },
+          {
+            "p": 67,
+            "m": 22
+          },
+          {
+            "p": 43,
+            "m": 21
+          },
+          {
+            "p": 13,
+            "m": 25
+          },
+          {
+            "p": 61,
+            "m": 22
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 21,
+        "Y": 13,
+        "Z": 13,
+        "A": 1785,
+        "low": 13,
+        "Llow": 2310,
+        "S": 46,
+        "R": 31466,
+        "Rlo": 13883,
+        "Rhi": 17583,
+        "hi": 863,
+        "maxGain": 58,
+        "maxLowCost": 73,
+        "twin": 466,
+        "bad": 0,
+        "literal": 4520,
+        "stopKeys": 1,
+        "first": 5,
+        "highMass": 46,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 46,
+        "topKeys": 1,
+        "topH": 276,
+        "topI": 0.014925373134328358,
+        "topU": 8,
+        "stopSummary": [
+          {
+            "p": 67,
+            "m": 46
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 42,
+        "Y": 13,
+        "Z": 14,
+        "A": 7140,
+        "low": 11,
+        "Llow": 210,
+        "S": 505,
+        "R": 252920,
+        "Rlo": 68053,
+        "Rhi": 184867,
+        "hi": 6825,
+        "maxGain": 32,
+        "maxLowCost": 39,
+        "twin": 1543,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 9,
+        "first": 41,
+        "highMass": 505,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 237,
+        "topKeys": 5,
+        "topH": 31712,
+        "topI": 0.17120176203368054,
+        "topU": 88,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 75
+          },
+          {
+            "p": 31,
+            "m": 51
+          },
+          {
+            "p": 13,
+            "m": 43
+          },
+          {
+            "p": 13,
+            "m": 71
+          },
+          {
+            "p": 37,
+            "m": 43
+          },
+          {
+            "p": 37,
+            "m": 47
+          },
+          {
+            "p": 31,
+            "m": 54
+          },
+          {
+            "p": 19,
+            "m": 42
+          },
+          {
+            "p": 13,
+            "m": 79
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 42,
+        "Y": 13,
+        "Z": 14,
+        "A": 7140,
+        "low": 13,
+        "Llow": 2310,
+        "S": 505,
+        "R": 252920,
+        "Rlo": 81347,
+        "Rhi": 171573,
+        "hi": 5427,
+        "maxGain": 70,
+        "maxLowCost": 77,
+        "twin": 1543,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 9,
+        "first": 49,
+        "highMass": 505,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 237,
+        "topKeys": 5,
+        "topH": 31712,
+        "topI": 0.17120176203368054,
+        "topU": 88,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 75
+          },
+          {
+            "p": 31,
+            "m": 51
+          },
+          {
+            "p": 13,
+            "m": 43
+          },
+          {
+            "p": 13,
+            "m": 71
+          },
+          {
+            "p": 37,
+            "m": 43
+          },
+          {
+            "p": 37,
+            "m": 47
+          },
+          {
+            "p": 31,
+            "m": 54
+          },
+          {
+            "p": 19,
+            "m": 42
+          },
+          {
+            "p": 13,
+            "m": 79
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 42,
+        "Y": 13,
+        "Z": 14,
+        "A": 7140,
+        "low": 13,
+        "Llow": 2310,
+        "S": 0,
+        "R": 331583,
+        "Rlo": 102414,
+        "Rhi": 229169,
+        "hi": 7475,
+        "maxGain": 70,
+        "maxLowCost": 77,
+        "twin": 2048,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 0,
+        "first": 0,
+        "highMass": 0,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 0,
+        "topKeys": 0,
+        "topH": 0,
+        "topI": 0,
+        "topU": 0,
+        "stopSummary": []
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 84,
+        "Y": 13,
+        "Z": 19,
+        "A": 28476,
+        "low": 11,
+        "Llow": 210,
+        "S": 1808,
+        "R": 1659308,
+        "Rlo": 350850,
+        "Rhi": 1308458,
+        "hi": 37906,
+        "maxGain": 32,
+        "maxLowCost": 39,
+        "twin": 6384,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 18,
+        "first": 44,
+        "highMass": 1385,
+        "lowMass": 423,
+        "rootOnly": 10,
+        "gateMass": 413,
+        "gateKeys": 13,
+        "gatePhys": 23,
+        "maxGateClasses": 5,
+        "maxSuffix": 14,
+        "gateTopMass": 35,
+        "gateTopKeys": 1,
+        "gateTopH": 210,
+        "gateTopI": 0.004739336492890996,
+        "gateTopU": 8,
+        "gateTopPhysical": 35,
+        "topMass": 1104,
+        "topKeys": 11,
+        "topH": 187840,
+        "topI": 0.3294174698424181,
+        "topU": 193,
+        "stopSummary": [
+          {
+            "p": 17,
+            "m": 90
+          },
+          {
+            "p": 11,
+            "m": 115
+          },
+          {
+            "p": 11,
+            "m": 87
+          },
+          {
+            "p": 17,
+            "m": 88
+          },
+          {
+            "p": 19,
+            "m": 102
+          },
+          {
+            "p": 19,
+            "m": 109
+          },
+          {
+            "p": 271,
+            "m": 115
+          },
+          {
+            "p": 23,
+            "m": 89
+          },
+          {
+            "p": 227,
+            "m": 101
+          },
+          {
+            "p": 11,
+            "m": 91
+          },
+          {
+            "p": 139,
+            "m": 95
+          },
+          {
+            "p": 23,
+            "m": 95
+          },
+          {
+            "p": 17,
+            "m": 103
+          },
+          {
+            "p": 11,
+            "m": 130
+          },
+          {
+            "p": 19,
+            "m": 86
+          },
+          {
+            "p": 137,
+            "m": 107
+          },
+          {
+            "p": 19,
+            "m": 105
+          },
+          {
+            "p": 107,
+            "m": 100
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 84,
+        "Y": 13,
+        "Z": 19,
+        "A": 28476,
+        "low": 13,
+        "Llow": 2310,
+        "S": 1439,
+        "R": 1675227,
+        "Rlo": 428112,
+        "Rhi": 1247115,
+        "hi": 31135,
+        "maxGain": 70,
+        "maxLowCost": 77,
+        "twin": 6753,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 14,
+        "first": 53,
+        "highMass": 1439,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 1158,
+        "topKeys": 11,
+        "topH": 242520,
+        "topI": 0.3112686495157393,
+        "topU": 201,
+        "stopSummary": [
+          {
+            "p": 17,
+            "m": 90
+          },
+          {
+            "p": 17,
+            "m": 88
+          },
+          {
+            "p": 19,
+            "m": 102
+          },
+          {
+            "p": 19,
+            "m": 109
+          },
+          {
+            "p": 271,
+            "m": 115
+          },
+          {
+            "p": 23,
+            "m": 89
+          },
+          {
+            "p": 227,
+            "m": 101
+          },
+          {
+            "p": 139,
+            "m": 95
+          },
+          {
+            "p": 23,
+            "m": 95
+          },
+          {
+            "p": 17,
+            "m": 103
+          },
+          {
+            "p": 29,
+            "m": 140
+          },
+          {
+            "p": 137,
+            "m": 107
+          },
+          {
+            "p": 19,
+            "m": 105
+          },
+          {
+            "p": 107,
+            "m": 100
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 84,
+        "Y": 13,
+        "Z": 19,
+        "A": 28476,
+        "low": 13,
+        "Llow": 2310,
+        "S": 229,
+        "R": 2086247,
+        "Rlo": 531120,
+        "Rhi": 1555127,
+        "hi": 40027,
+        "maxGain": 70,
+        "maxLowCost": 77,
+        "twin": 7963,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 2,
+        "first": 0,
+        "highMass": 229,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 229,
+        "topKeys": 2,
+        "topH": 0,
+        "topI": 0.006657395950814108,
+        "topU": 16,
+        "stopSummary": [
+          {
+            "p": 271,
+            "m": 115
+          },
+          {
+            "p": 337,
+            "m": 114
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 169,
+        "Y": 13,
+        "Z": 27,
+        "A": 114582,
+        "low": 11,
+        "Llow": 210,
+        "S": 6093,
+        "R": 12808293,
+        "Rlo": 1832622,
+        "Rhi": 10975671,
+        "hi": 218621,
+        "maxGain": 32,
+        "maxLowCost": 39,
+        "twin": 26675,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 32,
+        "first": 110,
+        "highMass": 4557,
+        "lowMass": 1536,
+        "rootOnly": 29,
+        "gateMass": 1507,
+        "gateKeys": 34,
+        "gatePhys": 42,
+        "maxGateClasses": 2,
+        "maxSuffix": 32,
+        "gateTopMass": 11,
+        "gateTopKeys": 2,
+        "gateTopH": 6720,
+        "gateTopI": 0.004170629048559257,
+        "gateTopU": 11,
+        "gateTopPhysical": 0,
+        "topMass": 2228,
+        "topKeys": 12,
+        "topH": 1803300,
+        "topI": 0.10667638316045233,
+        "topU": 235,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 176
+          },
+          {
+            "p": 157,
+            "m": 178
+          },
+          {
+            "p": 11,
+            "m": 171
+          },
+          {
+            "p": 11,
+            "m": 197
+          },
+          {
+            "p": 43,
+            "m": 234
+          },
+          {
+            "p": 13,
+            "m": 170
+          },
+          {
+            "p": 389,
+            "m": 177
+          },
+          {
+            "p": 11,
+            "m": 187
+          },
+          {
+            "p": 11,
+            "m": 250
+          },
+          {
+            "p": 23,
+            "m": 184
+          },
+          {
+            "p": 53,
+            "m": 170
+          },
+          {
+            "p": 19,
+            "m": 188
+          },
+          {
+            "p": 97,
+            "m": 208
+          },
+          {
+            "p": 13,
+            "m": 174
+          },
+          {
+            "p": 199,
+            "m": 171
+          },
+          {
+            "p": 17,
+            "m": 201
+          },
+          {
+            "p": 19,
+            "m": 227
+          },
+          {
+            "p": 193,
+            "m": 170
+          },
+          {
+            "p": 11,
+            "m": 203
+          },
+          {
+            "p": 11,
+            "m": 176
+          },
+          {
+            "p": 241,
+            "m": 173
+          },
+          {
+            "p": 13,
+            "m": 243
+          },
+          {
+            "p": 61,
+            "m": 175
+          },
+          {
+            "p": 421,
+            "m": 213
+          },
+          {
+            "p": 13,
+            "m": 201
+          },
+          {
+            "p": 107,
+            "m": 183
+          },
+          {
+            "p": 11,
+            "m": 170
+          },
+          {
+            "p": 13,
+            "m": 195
+          },
+          {
+            "p": 353,
+            "m": 176
+          },
+          {
+            "p": 23,
+            "m": 201
+          },
+          {
+            "p": 11,
+            "m": 182
+          },
+          {
+            "p": 17,
+            "m": 169
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 169,
+        "Y": 13,
+        "Z": 27,
+        "A": 114582,
+        "low": 13,
+        "Llow": 2310,
+        "S": 6006,
+        "R": 12801594,
+        "Rlo": 2218162,
+        "Rhi": 10583432,
+        "hi": 180278,
+        "maxGain": 92,
+        "maxLowCost": 101,
+        "twin": 26762,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 31,
+        "first": 154,
+        "highMass": 6006,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 3445,
+        "topKeys": 18,
+        "topH": 2333950,
+        "topI": 0.23942868426893366,
+        "topU": 352,
+        "stopSummary": [
+          {
+            "p": 13,
+            "m": 176
+          },
+          {
+            "p": 157,
+            "m": 178
+          },
+          {
+            "p": 211,
+            "m": 208
+          },
+          {
+            "p": 29,
+            "m": 175
+          },
+          {
+            "p": 43,
+            "m": 234
+          },
+          {
+            "p": 13,
+            "m": 170
+          },
+          {
+            "p": 389,
+            "m": 177
+          },
+          {
+            "p": 43,
+            "m": 191
+          },
+          {
+            "p": 283,
+            "m": 253
+          },
+          {
+            "p": 23,
+            "m": 184
+          },
+          {
+            "p": 53,
+            "m": 170
+          },
+          {
+            "p": 19,
+            "m": 188
+          },
+          {
+            "p": 97,
+            "m": 208
+          },
+          {
+            "p": 13,
+            "m": 174
+          },
+          {
+            "p": 199,
+            "m": 171
+          },
+          {
+            "p": 17,
+            "m": 201
+          },
+          {
+            "p": 19,
+            "m": 227
+          },
+          {
+            "p": 193,
+            "m": 170
+          },
+          {
+            "p": 31,
+            "m": 207
+          },
+          {
+            "p": 29,
+            "m": 183
+          },
+          {
+            "p": 241,
+            "m": 173
+          },
+          {
+            "p": 13,
+            "m": 243
+          },
+          {
+            "p": 61,
+            "m": 175
+          },
+          {
+            "p": 421,
+            "m": 213
+          },
+          {
+            "p": 13,
+            "m": 201
+          },
+          {
+            "p": 107,
+            "m": 183
+          },
+          {
+            "p": 13,
+            "m": 232
+          },
+          {
+            "p": 13,
+            "m": 195
+          },
+          {
+            "p": 353,
+            "m": 176
+          },
+          {
+            "p": 23,
+            "m": 201
+          },
+          {
+            "p": 17,
+            "m": 169
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 169,
+        "Y": 13,
+        "Z": 27,
+        "A": 114582,
+        "low": 13,
+        "Llow": 2310,
+        "S": 0,
+        "R": 15481975,
+        "Rlo": 2591384,
+        "Rhi": 12890591,
+        "hi": 216287,
+        "maxGain": 92,
+        "maxLowCost": 101,
+        "twin": 32768,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 0,
+        "first": 0,
+        "highMass": 0,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 0,
+        "topKeys": 0,
+        "topH": 0,
+        "topI": 0,
+        "topU": 0,
+        "stopSummary": []
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T": 338,
+        "Y": 13,
+        "Z": 37,
+        "A": 457990,
+        "low": 11,
+        "Llow": 210,
+        "S": 11112,
+        "R": 98554147,
+        "Rlo": 9680345,
+        "Rhi": 88873802,
+        "hi": 1217430,
+        "maxGain": 34,
+        "maxLowCost": 39,
+        "twin": 119960,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 30,
+        "first": 115,
+        "highMass": 10048,
+        "lowMass": 1064,
+        "rootOnly": 18,
+        "gateMass": 1046,
+        "gateKeys": 11,
+        "gatePhys": 17,
+        "maxGateClasses": 4,
+        "maxSuffix": 36,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 5192,
+        "topKeys": 14,
+        "topH": 5422502,
+        "topI": 0.16072670872880382,
+        "topU": 352,
+        "stopSummary": [
+          {
+            "p": 17,
+            "m": 339
+          },
+          {
+            "p": 89,
+            "m": 338
+          },
+          {
+            "p": 17,
+            "m": 358
+          },
+          {
+            "p": 59,
+            "m": 367
+          },
+          {
+            "p": 13,
+            "m": 350
+          },
+          {
+            "p": 59,
+            "m": 431
+          },
+          {
+            "p": 127,
+            "m": 358
+          },
+          {
+            "p": 13,
+            "m": 373
+          },
+          {
+            "p": 167,
+            "m": 342
+          },
+          {
+            "p": 11,
+            "m": 344
+          },
+          {
+            "p": 521,
+            "m": 348
+          },
+          {
+            "p": 19,
+            "m": 504
+          },
+          {
+            "p": 13,
+            "m": 382
+          },
+          {
+            "p": 43,
+            "m": 357
+          },
+          {
+            "p": 13,
+            "m": 367
+          },
+          {
+            "p": 11,
+            "m": 380
+          },
+          {
+            "p": 101,
+            "m": 357
+          },
+          {
+            "p": 13,
+            "m": 355
+          },
+          {
+            "p": 43,
+            "m": 413
+          },
+          {
+            "p": 19,
+            "m": 406
+          },
+          {
+            "p": 19,
+            "m": 363
+          },
+          {
+            "p": 443,
+            "m": 359
+          },
+          {
+            "p": 149,
+            "m": 365
+          },
+          {
+            "p": 167,
+            "m": 452
+          },
+          {
+            "p": 11,
+            "m": 340
+          },
+          {
+            "p": 61,
+            "m": 348
+          },
+          {
+            "p": 19,
+            "m": 372
+          },
+          {
+            "p": 19,
+            "m": 347
+          },
+          {
+            "p": 29,
+            "m": 340
+          },
+          {
+            "p": 83,
+            "m": 357
+          }
+        ]
+      },
+      {
+        "mode": "transparent",
+        "T": 338,
+        "Y": 13,
+        "Z": 37,
+        "A": 457990,
+        "low": 13,
+        "Llow": 2310,
+        "S": 10763,
+        "R": 99033865,
+        "Rlo": 11633423,
+        "Rhi": 87400442,
+        "hi": 1017530,
+        "maxGain": 80,
+        "maxLowCost": 87,
+        "twin": 120309,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 29,
+        "first": 135,
+        "highMass": 10763,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 5192,
+        "topKeys": 14,
+        "topH": 5422502,
+        "topI": 0.16072670872880382,
+        "topU": 352,
+        "stopSummary": [
+          {
+            "p": 17,
+            "m": 339
+          },
+          {
+            "p": 89,
+            "m": 338
+          },
+          {
+            "p": 17,
+            "m": 358
+          },
+          {
+            "p": 59,
+            "m": 367
+          },
+          {
+            "p": 13,
+            "m": 350
+          },
+          {
+            "p": 59,
+            "m": 431
+          },
+          {
+            "p": 127,
+            "m": 358
+          },
+          {
+            "p": 13,
+            "m": 373
+          },
+          {
+            "p": 167,
+            "m": 342
+          },
+          {
+            "p": 19,
+            "m": 340
+          },
+          {
+            "p": 521,
+            "m": 348
+          },
+          {
+            "p": 19,
+            "m": 504
+          },
+          {
+            "p": 13,
+            "m": 382
+          },
+          {
+            "p": 43,
+            "m": 357
+          },
+          {
+            "p": 13,
+            "m": 367
+          },
+          {
+            "p": 101,
+            "m": 357
+          },
+          {
+            "p": 13,
+            "m": 355
+          },
+          {
+            "p": 43,
+            "m": 413
+          },
+          {
+            "p": 19,
+            "m": 406
+          },
+          {
+            "p": 19,
+            "m": 363
+          },
+          {
+            "p": 443,
+            "m": 359
+          },
+          {
+            "p": 149,
+            "m": 365
+          },
+          {
+            "p": 167,
+            "m": 452
+          },
+          {
+            "p": 13,
+            "m": 375
+          },
+          {
+            "p": 61,
+            "m": 348
+          },
+          {
+            "p": 19,
+            "m": 372
+          },
+          {
+            "p": 19,
+            "m": 347
+          },
+          {
+            "p": 29,
+            "m": 340
+          },
+          {
+            "p": 83,
+            "m": 357
+          }
+        ]
+      },
+      {
+        "mode": "truncatedInverse",
+        "T": 338,
+        "Y": 13,
+        "Z": 37,
+        "A": 457990,
+        "low": 13,
+        "Llow": 2310,
+        "S": 629,
+        "R": 107069391,
+        "Rlo": 12572668,
+        "Rhi": 94496723,
+        "hi": 1113777,
+        "maxGain": 80,
+        "maxLowCost": 87,
+        "twin": 130443,
+        "bad": 0,
+        "literal": 0,
+        "stopKeys": 1,
+        "first": 3,
+        "highMass": 629,
+        "lowMass": 0,
+        "rootOnly": 0,
+        "gateMass": 0,
+        "gateKeys": 0,
+        "gatePhys": 0,
+        "maxGateClasses": 0,
+        "maxSuffix": 0,
+        "gateTopMass": 0,
+        "gateTopKeys": 0,
+        "gateTopH": 0,
+        "gateTopI": 0,
+        "gateTopU": 0,
+        "gateTopPhysical": 0,
+        "topMass": 629,
+        "topKeys": 1,
+        "topH": 3774,
+        "topI": 0.0013458950201884253,
+        "topU": 8,
+        "stopSummary": [
+          {
+            "p": 743,
+            "m": 629
+          }
+        ]
+      }
+    ]
+  }
+]
