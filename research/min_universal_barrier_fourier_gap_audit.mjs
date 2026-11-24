@@ -12,6 +12,8 @@ function audit(Y){
  }
  let gaps=[],maxGap=0,meanForward=0;for(let i=0;i<positions.length;i++){let g=(positions[i+1]??P)-positions[i];gaps.push(g);maxGap=Math.max(maxGap,g);meanForward+=g*(g-1)/(2*P)}
  const density=positions.length/P;
+ const maxGapBound=Math.min(P,Math.sqrt(8*P*P*beta+1));ck(maxGap<=maxGapBound+1e-9,'max gap from tail');
+ let a=2*P*beta,meanBound=a>=P?P:a*(1+Math.log(P/a));ck(meanForward<=meanBound+1e-8,'integrated tail');
  const Rs=[...new Set([1,Math.ceil(1/density),Math.ceil(4/density),Math.ceil(16/density),Math.ceil(P*beta),Math.ceil(2*P*beta),Math.floor(P/2),P].map(x=>Math.max(1,Math.min(P,x))))].sort((a,b)=>a-b);
  const results=[];
  for(let R of Rs){
@@ -29,6 +31,6 @@ function audit(Y){
   ck(variance<=varBound+1e-8&&maxDisc<=discBound+1e-8&&no/P<=variance+1e-8,"Fourier global bound");
   results.push({R,mean,variance,varBound,noBarrier:no/P,maxDisc,discBound,minCount,maxCount});
  }
- return {Y,P,barriers:positions.length,density,beta,gamma,varianceScale:2*P*beta,deterministicScale:P*gamma*(1+Math.log(P)),meanGap:1/density,maxGap,meanForward,checks,maxLocalRatio,results}
+ return {Y,P,barriers:positions.length,density,beta,gamma,varianceScale:2*P*beta,deterministicScale:P*gamma*(1+Math.log(P)),meanGap:1/density,maxGap,maxGapBound,meanForward,meanBound,checks,maxLocalRatio,results}
 }
 for(const Y of [5,7,11,13,17,19,23,29])console.log(JSON.stringify(audit(Y)));
