@@ -34,7 +34,54 @@
       "bankPeakQuarter": 4,
       "allNoRepeat": 71
     },
-    "checks": 6337
+    "checks": 6337,
+    "blocks": [
+      {
+        "A": 5,
+        "initPeak": 2.2578125,
+        "freshBlockPos": 79.9609375,
+        "repeatBlockPos": 26.203125,
+        "repeatMediumPos": 26.203125,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 2,
+        "repeatLargePositive": 0,
+        "freshBlocks": 4.67578125,
+        "repeatBlocks": 2.681640625,
+        "peakAfterBlocks": 108.421875,
+        "repeatPosAboveTenth": 182,
+        "checks": 512
+      },
+      {
+        "A": 7,
+        "initPeak": 5.546875,
+        "freshBlockPos": 81.68359375,
+        "repeatBlockPos": 17.6171875,
+        "repeatMediumPos": 17.6171875,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 3.87890625,
+        "repeatBlocks": 1.357421875,
+        "peakAfterBlocks": 104.84765625,
+        "repeatPosAboveTenth": 123,
+        "checks": 512
+      },
+      {
+        "A": 11,
+        "initPeak": 10.1796875,
+        "freshBlockPos": 81.62890625,
+        "repeatBlockPos": 10.21875,
+        "repeatMediumPos": 10.21875,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 3.162109375,
+        "repeatBlocks": 0.548828125,
+        "peakAfterBlocks": 102.02734375,
+        "repeatPosAboveTenth": 77,
+        "checks": 512
+      }
+    ]
   },
   {
     "U": 1024,
@@ -71,7 +118,54 @@
       "bankPeakQuarter": 0,
       "allNoRepeat": 40
     },
-    "checks": 10834
+    "checks": 10834,
+    "blocks": [
+      {
+        "A": 5,
+        "initPeak": 2.38671875,
+        "freshBlockPos": 280.52734375,
+        "repeatBlockPos": 64.984375,
+        "repeatMediumPos": 62.80859375,
+        "repeatLargePos": 2.17578125,
+        "repeatLargeCount": 12,
+        "repeatLargePositive": 6,
+        "freshBlocks": 6.919921875,
+        "repeatBlocks": 6.08984375,
+        "peakAfterBlocks": 347.8984375,
+        "repeatPosAboveTenth": 115,
+        "checks": 512
+      },
+      {
+        "A": 7,
+        "initPeak": 5.37890625,
+        "freshBlockPos": 285.796875,
+        "repeatBlockPos": 50.44921875,
+        "repeatMediumPos": 50.44921875,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 6.052734375,
+        "repeatBlocks": 3.423828125,
+        "peakAfterBlocks": 341.625,
+        "repeatPosAboveTenth": 86,
+        "checks": 512
+      },
+      {
+        "A": 11,
+        "initPeak": 8.87109375,
+        "freshBlockPos": 291.2421875,
+        "repeatBlockPos": 35.4453125,
+        "repeatMediumPos": 35.4453125,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 5.27734375,
+        "repeatBlocks": 1.6953125,
+        "peakAfterBlocks": 335.55859375,
+        "repeatPosAboveTenth": 55,
+        "checks": 512
+      }
+    ]
   },
   {
     "U": 4096,
@@ -108,7 +202,54 @@
       "bankPeakQuarter": 0,
       "allNoRepeat": 38
     },
-    "checks": 17303
+    "checks": 17303,
+    "blocks": [
+      {
+        "A": 5,
+        "initPeak": 2.48046875,
+        "freshBlockPos": 855.48046875,
+        "repeatBlockPos": 129.3828125,
+        "repeatMediumPos": 120.44921875,
+        "repeatLargePos": 8.93359375,
+        "repeatLargeCount": 42,
+        "repeatLargePositive": 15,
+        "freshBlocks": 9.724609375,
+        "repeatBlocks": 11.337890625,
+        "peakAfterBlocks": 987.34375,
+        "repeatPosAboveTenth": 34,
+        "checks": 512
+      },
+      {
+        "A": 7,
+        "initPeak": 5.55859375,
+        "freshBlockPos": 866.015625,
+        "repeatBlockPos": 104.20703125,
+        "repeatMediumPos": 98.68359375,
+        "repeatLargePos": 5.5234375,
+        "repeatLargeCount": 4,
+        "repeatLargePositive": 3,
+        "freshBlocks": 8.80859375,
+        "repeatBlocks": 6.6640625,
+        "peakAfterBlocks": 975.78125,
+        "repeatPosAboveTenth": 22,
+        "checks": 512
+      },
+      {
+        "A": 11,
+        "initPeak": 9.30859375,
+        "freshBlockPos": 877.3046875,
+        "repeatBlockPos": 78.32421875,
+        "repeatMediumPos": 78.32421875,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 7.94140625,
+        "repeatBlocks": 3.54296875,
+        "peakAfterBlocks": 964.9375,
+        "repeatPosAboveTenth": 15,
+        "checks": 512
+      }
+    ]
   },
   {
     "U": 16384,
@@ -145,7 +286,54 @@
       "bankPeakQuarter": 0,
       "allNoRepeat": 31
     },
-    "checks": 23924
+    "checks": 23924,
+    "blocks": [
+      {
+        "A": 5,
+        "initPeak": 2.390625,
+        "freshBlockPos": 2938.1796875,
+        "repeatBlockPos": 208.98046875,
+        "repeatMediumPos": 193.4765625,
+        "repeatLargePos": 15.50390625,
+        "repeatLargeCount": 93,
+        "repeatLargePositive": 48,
+        "freshBlocks": 11.890625,
+        "repeatBlocks": 17.4609375,
+        "peakAfterBlocks": 3149.55078125,
+        "repeatPosAboveTenth": 1,
+        "checks": 512
+      },
+      {
+        "A": 7,
+        "initPeak": 5.484375,
+        "freshBlockPos": 2952.19140625,
+        "repeatBlockPos": 176.33984375,
+        "repeatMediumPos": 176.33984375,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 3,
+        "repeatLargePositive": 0,
+        "freshBlocks": 10.99609375,
+        "repeatBlocks": 10.740234375,
+        "peakAfterBlocks": 3134.015625,
+        "repeatPosAboveTenth": 1,
+        "checks": 512
+      },
+      {
+        "A": 11,
+        "initPeak": 9.37109375,
+        "freshBlockPos": 2969.3203125,
+        "repeatBlockPos": 140.9921875,
+        "repeatMediumPos": 140.9921875,
+        "repeatLargePos": 0,
+        "repeatLargeCount": 0,
+        "repeatLargePositive": 0,
+        "freshBlocks": 10.130859375,
+        "repeatBlocks": 6.15234375,
+        "peakAfterBlocks": 3119.68359375,
+        "repeatPosAboveTenth": 1,
+        "checks": 512
+      }
+    ]
   },
   {
     "U": 65536,
@@ -182,6 +370,53 @@
       "bankPeakQuarter": 0,
       "allNoRepeat": 11
     },
-    "checks": 15066
+    "checks": 15066,
+    "blocks": [
+      {
+        "A": 5,
+        "initPeak": 2.3359375,
+        "freshBlockPos": 10586.4453125,
+        "repeatBlockPos": 311.2734375,
+        "repeatMediumPos": 260,
+        "repeatLargePos": 51.2734375,
+        "repeatLargeCount": 77,
+        "repeatLargePositive": 44,
+        "freshBlocks": 14.04296875,
+        "repeatBlocks": 22.953125,
+        "peakAfterBlocks": 10900.0546875,
+        "repeatPosAboveTenth": 1,
+        "checks": 256
+      },
+      {
+        "A": 7,
+        "initPeak": 5.546875,
+        "freshBlockPos": 10604.421875,
+        "repeatBlockPos": 271.203125,
+        "repeatMediumPos": 246.8984375,
+        "repeatLargePos": 24.3046875,
+        "repeatLargeCount": 2,
+        "repeatLargePositive": 1,
+        "freshBlocks": 13.11328125,
+        "repeatBlocks": 14.19140625,
+        "peakAfterBlocks": 10881.171875,
+        "repeatPosAboveTenth": 1,
+        "checks": 256
+      },
+      {
+        "A": 11,
+        "initPeak": 8.7265625,
+        "freshBlockPos": 10624.265625,
+        "repeatBlockPos": 230.484375,
+        "repeatMediumPos": 206.1796875,
+        "repeatLargePos": 24.3046875,
+        "repeatLargeCount": 1,
+        "repeatLargePositive": 1,
+        "freshBlocks": 12.21875,
+        "repeatBlocks": 8.390625,
+        "peakAfterBlocks": 10863.4765625,
+        "repeatPosAboveTenth": 1,
+        "checks": 256
+      }
+    ]
   }
 ]
