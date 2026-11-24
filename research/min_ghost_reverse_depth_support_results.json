@@ -20,7 +20,7 @@
       "ownBad": 0,
       "knownBad": 0,
       "reverseChecks": 591,
-      "maxReverseDegree": 8,
+      "maxReverseDegree": 7,
       "maxFiber": 6,
       "fiberCases": 298,
       "histories": 32,
