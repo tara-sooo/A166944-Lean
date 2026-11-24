@@ -1,0 +1,77 @@
+# Short consecutive-return relations among known large labels and a two-label length bound
+
+2026-11-25 JST. Continues 406159c2e6d0fe67cf602ca9838d484df55d44e3 on the SAME research/min-cycle-forest-2026-11-24 branch. New deterministic two-label alternation bound and a probabilistic exclusion of bounded-support short consecutive returns at polynomial scales. Uses the already established exact CRT tick history and elementary prime-count bounds; no external search or Lean compilation. The result is unconditional on the random CRT ghost, not the actual weighted integer forest. The remaining signed peak limit and physical far-coalescence upper bound are open.
+
+## 1. Setup and consecutive-return relation
+
+Use the common infinite CRT ghost or a finite initial segment of odd primes, with initial independent horizon/clock coordinates conditional on common parity. At executed label p, gain increases by p-1 and the completed wait w<=2p. Fix time U. For positive-peak prefixes we may restrict to pre-gain g<=2U. Every actual event before such a peak has pre-gain at most 2U, and a label which has already executed before a subsequent gain-capped return must be <=2U+1. No bound on the unrestricted infinite path's final gain is asserted.
+
+Take A>=5 and L=L_A=2 product_(3<=ell<A prime)ell. Delete all labels <A from the event sequence to form its high subsequence. Between each pair of successive high labels the intervening low gain d is even and in [0,L), by the established permissive LOW barrier. This statement does not impose any bound on the number of low events. Consider two consecutive occurrences of a given high p in that subsequence (consecutive among occurrences of p, not necessarily adjacent high events). Write p, q_1,...,q_j, p, where no q_i equals p, and g0,g1 are the respective pre-gains at the two occurrences of p. Put n_q=#{i:q_i=q}; let d be the sum of the low gains over the j+1 intervening low runs. Then
+    g1-g0=(p-1)+sum_(q!=p) n_q(q-1)+d,
+    0<=d<(j+1)L.
+Since both pre-gains are eligible for the same p, there is a in {-2,0,2} equal to the difference between their actual eligibility signs, with
+    p | sum_(q!=p) n_q(q-1)+d-1-a.                 (1)
+This exact relation is between CONSECUTIVE occurrences of p. Unlike the earlier first-to-return sieve, the distance from its first selection may be arbitrary. No new unused-label probability is applied to p at this late return.
+
+If j=0 and p>L+3, such a consecutive high self-return is impossible: g1-g0=p-1+d is even, >=p-1 and <2p-2. In this interval no even integer is congruent to 0 or +/-2 mod odd p. The near-p possibilities p-2,p,p+2 are all odd.
+
+## 2. A deterministic bound of seven high events using only two large labels
+
+Let p<q be two odd primes, both >4L+10. Consider ANY contiguous segment of the high subsequence using only p,q. No fresh/known premise, time constraint, gain cap, or probability law is needed. By section1 it must alternate. If either label occurs just once, the segment has length <=3. Otherwise consider q,p,q and let d_q be its total intervening low gain (0<=d_q<2L). Its pre-gain difference is q+p-2+d_q, with p-2+d_q>2 and <2q-2. Thus the even residue condition forces p-2+d_q=q+a_q, a_q in {-2,0,2}: the alternatives congruent to 0 or +/-2 with other integer multiples of q are excluded by these strict inequalities. In particular
+    d_q>=q-p,  q-p<2L.                          (2)
+
+For each p,q,p return, write d_p for its total low gain. Reducing q-2+d_p mod p gives the integer
+    e_p=q-p-2+d_p.
+By (2), q-p>=2, 0<=d_p<2L and p>4L+10, this lies in [0,p-2). Consequently e_p is EXACTLY the sign difference a_p, and must be 0 or +2. Along the successive p returns the eligibility signs thus never decrease, and the sum of all e_p is at most 2 by telescoping (signs are -1,+1). It follows that the TOTAL low gain between the first and last occurrence of p is <=2, since each such return has disjoint intervening low runs and d_p<=e_p.
+
+If there are t occurrences of p, there are t-1 occurrences of q strictly between first and last p. The t-2 return intervals between these interior q's are disjoint subsets of the low runs between first and last p. Each needs low gain >=q-p>=2 by (2). Thus 2(t-2)<=2, so t<=3. Alternation gives at most t+1 occurrences of q, hence the segment length is <=7. This also proves a structural inequality (t-1)(q-p-2)+total low gain between first/last p<=2; when q-p>=4 it already gives t<=2. For q-p>=4 the q-interior gain condition is even stronger, but no optimization of the small constants is needed.
+
+This is a deterministic upper bound in a RELAXED high-word model: any even low gain in [0,L) is permitted between high events, and only high eligibility is imposed, not the actual low graph or clock priority. Section5 gives a length7 witness in that relaxation; we do not claim it is attained by the actual MIN process. The theorem does not bound alternating runs with one label <=4L+10, or arbitrary runs using three or more large labels.
+
+## 3. A probabilistic short-return exclusion at polynomial scales
+
+Fix integer k>=2, the maximum number of DISTINCT high labels in a return relation including p, and integer r>=2 bounding the high index difference between the two consecutive occurrences of p (j+1<=r). Let Q>=ceil(sqrt(2U)), Q>L+3, Q>r, and r,L<=U. We study an actual return by U, with pre-gain<=2U, whose entire intervening high segment has all labels >=Q and at most k distinct labels, and index difference <=r. In particular labels in [A,Q) are not allowed inside that segment. Initial first-selection times of the participating labels can be anywhere in the previous history, including before the segment begins. Define Bad_(k,r,Q) to be the existence of such a return. If k=2 we may omit r entirely: the intervening high labels would all be the same q>=Q, and cannot be consecutive equal labels by section1. Hence there is just one intervening q, with index difference2.
+
+Let K_s count the distinct previously selected labels in [Q,2U+1] strictly before tick s. By the exact conditional CRT history law, the conditional probability that the next tick selects a fresh label in this band is <=2 sum_(p>=Q) p^-2 <= a_Q=C/(Q log Q). Consequently the ordered falling factorial moments satisfy
+    E (K_s)_h <= (U a_Q)^h, h>=1.
+Proof: expand binomial(K_s,h) as the sum over h strictly increasing ticks of the product of their fresh-band-selection indicators. Iterating the conditional expectation from the last tick gives <=a_Q^h for each tuple; multiply by h! and use s<=U. This bound is valid even though the label identities and the selected history are adaptive. No independence of selected labels is assumed.
+
+In an actual relation (1), suppose there are t distinct labels (2<=t<=k; t=1 impossible by section1). Consider the LATEST FIRST-SELECTION tick among these t labels. At that tick all other t-1 labels are already known, while the last label x is still unused. Use a union bound over ordered lists of t-1 such known labels from the band and choices of roles (return label p versus intermediate labels). There are O_k((K_s)_(t-1)) choices. The coefficients n_q lie in [1,r], the offset d in [0,rL), and a has three possibilities. There are O_k((r+1)^t(L+1)) coefficient/offset choices per list (this deliberately overcounts all possible intervening words). For each fixed choice, there are two cases.
+
+- If x is the return label p, the integer N=sum n_q(q-1)+d-1-a is strictly positive (some other q>=Q for large U) and at most O_k(r(U+L)). The number of prime factors >=Q of N is O_k(1), because r,L<=U and Q>=sqrt(2U), so log N/log Q is bounded. Each candidate p has first-selection hazard <=2/p^2<=2/Q^2.
+- If x is one of the intermediate labels, p is known, and its coefficient n_x in [1,r] is invertible mod p, since r<Q<=p. Equation (1) fixes ONE residue of x modulo p. Sum the first-selection hazards over all integer candidates x>=Q in that residue, ignoring primality or the upper bound 2U+1. This is <=2(1/Q^2+1/(pQ))<=4/Q^2, by a decreasing-integral bound for the progression. The actual candidates in the band are a subset.
+
+Thus the conditional probability of a first selection closing any such necessary arithmetic relation is at most
+    O_k((r+1)^k(L+1) Q^-2 sum_(h=1..k-1) (K_s)_h).
+All candidate conditions depend only on known labels, coefficient/offset choices and the candidate last prime. No conditioning on a later successful return is used. An actual gain-capped short return must have produced such a closing first selection by U, even if its first-to-return span was much longer than the observed consecutive-return segment. Taking expectations and summing ticks proves
+    Pr(Bad_(k,r,Q))
+       <= O_k((r+1)^k(L+1) U/Q^2
+                * sum_(h=1..k-1) (U/(Q log Q))^h).            (3)
+The constants are uniform in the allowed U,Q,r,L, for fixed k. In the two-label case use r=2, so
+    Pr(Bad_(2,Q)) <= O((L+1) U^2/(Q^3 log Q)).
+At Q=ceil(U^(2/3)) and L<=log^(1/8) U this is O((log U)^(-7/8)), tending to zero. This excludes the actual p,q,p pattern with both p,q above that threshold, with arbitrary intervening LOW runs and arbitrary first-selection distances. It excludes ALL such returns, not just long-wait ones. It is substantially below the previous near-top scale U/log^b U, though its short-support restriction is essential.
+
+More generally for fixed k, take Q=ceil(U^(k/(k+1))), L<=log^(1/8) U and r=floor(log^((k-1)/(2k)) U) (at least2 eventually). Then U/(Q log Q) tends to infinity and (3) is
+    O_k((r+1)^k(L+1)/(log U)^(k-1))
+      = O_k((log U)^(-(k-1)/2+1/8)) = o(1).
+Here r tends to infinity, but k is fixed. This result does not assert that the same bound holds for unrestricted growing k with controlled implied constants. Q and r are asymptotic choices, not test parameters.
+
+## 4. Consequences for long known-only runs and signed surplus
+
+On the complement of Bad_(k,r,Q), with r>=k, every contiguous segment of the high subsequence through the pre-gain cap whose labels are all >=Q and belong to any set of <=k distinct labels has length AT MOST k. Indeed any k+1 such events contain two equal labels, take consecutive occurrences within the segment; their index difference <=k<=r, all intervening labels >=Q and support <=k. This applies to runs of known-only events just as to fresh-anchored runs. It removes the entire possibility of a long run confined to a small large-label stock, without any bound on the ratios of successive labels. It does not exclude long runs with a larger stock, or a run interrupted by an intermediate label in [A,Q).
+
+For any repeated high block with p>=Q>=5L+1, its positive signed block maximum b=[2w-(p-1)+d_peak]_+ (d_peak<=5L) is <=2w. Therefore the sum of b over all gain-capped blocks whose starting p has a consecutive-return relation satisfying section3 is <=2U deterministically, since completed waits are disjoint, and it is zero unless Bad occurs. Its expectation is at most 2U Pr(Bad)=o(U) for the displayed choices. This is an additional class of repeated-block surplus that may be deleted from the previous positive-peak majorant, even for p below the previous weighted top cutoff and with very long first-to-return spans. The result gives an upper bound on the positive surplus of this class, not a negative-height credit for every other block.
+
+Combining with the previously proved fresh-wait, weighted first-span sieve, comparable fresh-anchored chain and small-label early-rank deletions yields a further residual. In particular any remaining high repeated block with p>=Q needs either a previous consecutive p return interval containing a label in [A,Q), more than k distinct high labels, or more than r high-index steps. These are necessary disjunctive conditions for a residual block at that scale; no claim that they are mutually exclusive or individually sufficient for a large positive peak. The smaller p and the long/mixed-scale return contributions are unresolved. No proof of eta->0, and no bound on the separate physical far-coalescence target. The new theorem is for a fixed finite observation horizon with a gain cap, not an assertion about the full uncapped lifetime of an actual integer orbit.
+
+## 5. Finite diagnostics and persistence
+
+Saved research/min_ghost_short_consecutive_return_support_audit.mjs and research/min_ghost_short_consecutive_return_support_results.json, exact remote readback at dc03b8afda3817f133c24999d41bdde27faad163.
+
+Actual finite common-CRT simulation: finite alphabet <=4U, A5,L6, U=256,1024,4096,16384,65536; 128 samples each except 64 at U65536, fixed seeds. Compare every consecutive p return with high index difference <=4 and pre-gain<=2U to equation (1), low-gain range and actual sign difference. Check the arithmetic equation at the latest first-selected participating label: divisor case when it is p, linear residue case otherwise. Track relation counts for distinct-support thresholds2,3 at diagnostic lower threshold max(11,floor(ceil(sqrt(2U))/4)), root=ceil(sqrt(2U)), ceil(U^(2/3)), ceil(U^(3/4)). These are diagnostic fixed index lengths, not the growing analytic r. At U65536, 4293 executed events, 852 short consecutive-return checks, of which 140 divisor,686 residue,26 low-only cases. No relation with all participating labels above root in this sample. At U1024 there were 11 two-support and 23 at-most-three-support returns at diagnostic threshold11 (which is below root46); the tests exercise the relation nonvacuously at small scales. Check actual contiguous high words using only two labels >4L+10; longest observed at U4096 is3, not a test of sharpness of seven. No actual observation of the asymptotic rare relation at the higher thresholds; no empirical verification of the bound constant or limiting rate. The earlier finite-to-infinite O(1/log U) coupling bound is not a calibrated finite sampling error.
+
+Independent exhaustive relaxed-word check: for L=6,30 choose all odd prime pairs in [4L+11,4L+191); 630 and496 pairs, respectively. Start at either label with either initial eligibility sign, enumerate all even low-gain choices 0<=d<L between alternating labels and all possible sign choices on the other label's first occurrence. Once chosen, the label's initial horizon residue is fixed; extend only if its eligibility condition holds. Recursion terminates when no extension exists, and asserts length<=7 at every state. Check 19138 and79646 recursive states, respectively. Both cases attain length7 in this relaxed model (e.g. L6,p41,q43, label sequence43,41,43,41,43,41,43 with low gains 4,0,0,2,0,4 and signs +,-,+,-,-,+,-). This is a witness for the relaxed necessary conditions only, not an actual MIN trajectory. These diagnostics validate the combinatorial identity and bound in finite cases; the analytic probability bound is a paper proof.
+
+## 6. Next target
+
+The new consecutive-return relation can use the fresh hazard of the last first-selected participating label, irrespective of its chronological role in the late return. It excludes sparse-support short large-label cycles at polynomial thresholds and provides a deterministic seven-event bound for any two sufficiently large labels. The remaining research target is mixed-scale returns, particularly those interrupted by medium/small labels, and long large-label runs with many participating labels. The gain cap and exact signed bank remain available for their analysis. No main edit, no new branch, no twin-prime proof.
