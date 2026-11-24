@@ -26,7 +26,7 @@ function audit(Y,N=256){
     }
    }
    if(histories>=32)continue;histories++;
-   let fibers=new Map(),used=new Set(f.prior),min=f.g0+z-1,max=f.g0+V+k*z;
+   let fibers=new Map(),used=new Set(f.prior),min=2*Math.ceil((f.g0+z-1)/2),max=f.g0+V+k*z;
    let degree=0;
    for(let h=min;h<=max;h+=2){let n=0;for(let i=0;i<low;i++){let p=ps[i],a=mod(c[i]+h,p);if(a===0||a===p-2)n++;}degree=Math.max(degree,n);}
    maxReverseDegree=Math.max(maxReverseDegree,degree);
