@@ -1,0 +1,376 @@
+{
+  "rows": [
+    {
+      "U": 256,
+      "N": 128,
+      "A": 5,
+      "L": 6,
+      "V": 1024,
+      "events": 1482,
+      "shortReturnChecks": 217,
+      "divisorCases": 36,
+      "residueCases": 169,
+      "lowOnlyReturns": 12,
+      "thresholds": [
+        {
+          "Q": 11,
+          "short2": 6,
+          "short3": 6,
+          "paths2": 5,
+          "paths3": 5,
+          "weight2": 70,
+          "weight3": 70
+        },
+        {
+          "Q": 23,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 41,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 64,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        }
+      ],
+      "twoSupportRuns": 9,
+      "maxTwoSupportLength": 2
+    },
+    {
+      "U": 1024,
+      "N": 128,
+      "A": 5,
+      "L": 6,
+      "V": 4096,
+      "events": 2880,
+      "shortReturnChecks": 473,
+      "divisorCases": 64,
+      "residueCases": 395,
+      "lowOnlyReturns": 14,
+      "thresholds": [
+        {
+          "Q": 11,
+          "short2": 11,
+          "short3": 23,
+          "paths2": 10,
+          "paths3": 18,
+          "weight2": 153,
+          "weight3": 307
+        },
+        {
+          "Q": 46,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 102,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 182,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        }
+      ],
+      "twoSupportRuns": 80,
+      "maxTwoSupportLength": 2
+    },
+    {
+      "U": 4096,
+      "N": 128,
+      "A": 5,
+      "L": 6,
+      "V": 16384,
+      "events": 3839,
+      "shortReturnChecks": 662,
+      "divisorCases": 93,
+      "residueCases": 545,
+      "lowOnlyReturns": 24,
+      "thresholds": [
+        {
+          "Q": 22,
+          "short2": 1,
+          "short3": 1,
+          "paths2": 1,
+          "paths3": 1,
+          "weight2": 37,
+          "weight3": 37
+        },
+        {
+          "Q": 91,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 256,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 512,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        }
+      ],
+      "twoSupportRuns": 131,
+      "maxTwoSupportLength": 3
+    },
+    {
+      "U": 16384,
+      "N": 128,
+      "A": 5,
+      "L": 6,
+      "V": 65536,
+      "events": 5489,
+      "shortReturnChecks": 1047,
+      "divisorCases": 179,
+      "residueCases": 846,
+      "lowOnlyReturns": 22,
+      "thresholds": [
+        {
+          "Q": 45,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 182,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 646,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 1449,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        }
+      ],
+      "twoSupportRuns": 162,
+      "maxTwoSupportLength": 2
+    },
+    {
+      "U": 65536,
+      "N": 64,
+      "A": 5,
+      "L": 6,
+      "V": 262144,
+      "events": 4293,
+      "shortReturnChecks": 852,
+      "divisorCases": 140,
+      "residueCases": 686,
+      "lowOnlyReturns": 26,
+      "thresholds": [
+        {
+          "Q": 90,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 363,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 1626,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        },
+        {
+          "Q": 4096,
+          "short2": 0,
+          "short3": 0,
+          "paths2": 0,
+          "paths3": 0,
+          "weight2": 0,
+          "weight3": 0
+        }
+      ],
+      "twoSupportRuns": 139,
+      "maxTwoSupportLength": 2
+    }
+  ],
+  "two": [
+    {
+      "L": 6,
+      "P": 35,
+      "pairs": 630,
+      "states": 19138,
+      "maxLength": 7,
+      "witness": {
+        "p": 41,
+        "q": 43,
+        "seq": [
+          {
+            "p": 43,
+            "g": 0,
+            "d": 0,
+            "s": 1
+          },
+          {
+            "p": 41,
+            "g": 46,
+            "d": 4,
+            "s": -1
+          },
+          {
+            "p": 43,
+            "g": 86,
+            "d": 0,
+            "s": 1
+          },
+          {
+            "p": 41,
+            "g": 128,
+            "d": 0,
+            "s": -1
+          },
+          {
+            "p": 43,
+            "g": 170,
+            "d": 2,
+            "s": -1
+          },
+          {
+            "p": 41,
+            "g": 212,
+            "d": 0,
+            "s": 1
+          },
+          {
+            "p": 43,
+            "g": 256,
+            "d": 4,
+            "s": -1
+          }
+        ]
+      }
+    },
+    {
+      "L": 30,
+      "P": 131,
+      "pairs": 496,
+      "states": 79646,
+      "maxLength": 7,
+      "witness": {
+        "p": 137,
+        "q": 139,
+        "seq": [
+          {
+            "p": 139,
+            "g": 0,
+            "d": 0,
+            "s": -1
+          },
+          {
+            "p": 137,
+            "g": 144,
+            "d": 6,
+            "s": -1
+          },
+          {
+            "p": 139,
+            "g": 280,
+            "d": 0,
+            "s": 1
+          },
+          {
+            "p": 137,
+            "g": 418,
+            "d": 0,
+            "s": -1
+          },
+          {
+            "p": 139,
+            "g": 556,
+            "d": 2,
+            "s": -1
+          },
+          {
+            "p": 137,
+            "g": 694,
+            "d": 0,
+            "s": 1
+          },
+          {
+            "p": 139,
+            "g": 834,
+            "d": 4,
+            "s": -1
+          }
+        ]
+      }
+    }
+  ]
+}
