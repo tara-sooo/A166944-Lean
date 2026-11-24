@@ -1,0 +1,1150 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "R": 9044,
+    "events": 1354,
+    "literal": 1482,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 312,
+        "last": 1015,
+        "forest": 5242,
+        "surplus": 2475,
+        "chronological": 4092,
+        "allEdges": 668,
+        "surplusEdges": 321,
+        "cyclesAbove": [
+          {
+            "u": 7,
+            "count": 247,
+            "excess": 652
+          },
+          {
+            "u": 18,
+            "count": 11,
+            "excess": 99
+          },
+          {
+            "u": 40,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 32,
+        "high": 781,
+        "distinct": 460
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 593,
+        "last": 2359,
+        "forest": 4129,
+        "surplus": 1963,
+        "chronological": 2607,
+        "allEdges": 443,
+        "surplusEdges": 182,
+        "cyclesAbove": [
+          {
+            "u": 7,
+            "count": 146,
+            "excess": 904
+          },
+          {
+            "u": 18,
+            "count": 1,
+            "excess": 3
+          },
+          {
+            "u": 40,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 34,
+        "high": 548,
+        "distinct": 366
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 1019,
+        "last": 2598,
+        "forest": 4166,
+        "surplus": 1261,
+        "chronological": 1569,
+        "allEdges": 290,
+        "surplusEdges": 107,
+        "cyclesAbove": [
+          {
+            "u": 7,
+            "count": 83,
+            "excess": 642
+          },
+          {
+            "u": 18,
+            "count": 14,
+            "excess": 135
+          },
+          {
+            "u": 40,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 50,
+        "high": 391,
+        "distinct": 284
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 1466,
+        "last": 2798,
+        "forest": 3599,
+        "surplus": 1181,
+        "chronological": 1671,
+        "allEdges": 218,
+        "surplusEdges": 90,
+        "cyclesAbove": [
+          {
+            "u": 7,
+            "count": 66,
+            "excess": 664
+          },
+          {
+            "u": 18,
+            "count": 18,
+            "excess": 204
+          },
+          {
+            "u": 40,
+            "count": 1,
+            "excess": 16
+          }
+        ],
+        "maxWeight": 55,
+        "high": 313,
+        "distinct": 223
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 2099,
+        "last": 3090,
+        "forest": 2722,
+        "surplus": 1133,
+        "chronological": 1258,
+        "allEdges": 162,
+        "surplusEdges": 74,
+        "cyclesAbove": [
+          {
+            "u": 7,
+            "count": 50,
+            "excess": 712
+          },
+          {
+            "u": 18,
+            "count": 25,
+            "excess": 332
+          },
+          {
+            "u": 40,
+            "count": 5,
+            "excess": 52
+          }
+        ],
+        "maxWeight": 92,
+        "high": 245,
+        "distinct": 171
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "R": 33536,
+    "events": 4146,
+    "literal": 4658,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 1266,
+        "last": 4931,
+        "forest": 22652,
+        "surplus": 4687,
+        "chronological": 9811,
+        "allEdges": 1897,
+        "surplusEdges": 661,
+        "cyclesAbove": [
+          {
+            "u": 10,
+            "count": 20,
+            "excess": 83
+          },
+          {
+            "u": 32,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 78,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 61,
+        "high": 2351,
+        "distinct": 1690
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 2489,
+        "last": 7390,
+        "forest": 20993,
+        "surplus": 2664,
+        "chronological": 5297,
+        "allEdges": 1155,
+        "surplusEdges": 243,
+        "cyclesAbove": [
+          {
+            "u": 10,
+            "count": 140,
+            "excess": 752
+          },
+          {
+            "u": 32,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 78,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 64,
+        "high": 1573,
+        "distinct": 1330
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 3893,
+        "last": 9165,
+        "forest": 18880,
+        "surplus": 1598,
+        "chronological": 3751,
+        "allEdges": 767,
+        "surplusEdges": 109,
+        "cyclesAbove": [
+          {
+            "u": 10,
+            "count": 78,
+            "excess": 703
+          },
+          {
+            "u": 32,
+            "count": 6,
+            "excess": 60
+          },
+          {
+            "u": 78,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 64,
+        "high": 1148,
+        "distinct": 1039
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 5360,
+        "last": 12800,
+        "forest": 13777,
+        "surplus": 1599,
+        "chronological": 3177,
+        "allEdges": 552,
+        "surplusEdges": 85,
+        "cyclesAbove": [
+          {
+            "u": 10,
+            "count": 58,
+            "excess": 912
+          },
+          {
+            "u": 32,
+            "count": 17,
+            "excess": 137
+          },
+          {
+            "u": 78,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 78,
+        "high": 909,
+        "distinct": 824
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 6982,
+        "last": 13488,
+        "forest": 11664,
+        "surplus": 1402,
+        "chronological": 2434,
+        "allEdges": 449,
+        "surplusEdges": 66,
+        "cyclesAbove": [
+          {
+            "u": 10,
+            "count": 47,
+            "excess": 866
+          },
+          {
+            "u": 32,
+            "count": 16,
+            "excess": 134
+          },
+          {
+            "u": 78,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 78,
+        "high": 753,
+        "distinct": 687
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "R": 331583,
+    "events": 30191,
+    "literal": 0,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 5070,
+        "last": 40518,
+        "forest": 220661,
+        "surplus": 65334,
+        "chronological": 155574,
+        "allEdges": 16409,
+        "surplusEdges": 8169,
+        "cyclesAbove": [
+          {
+            "u": 14,
+            "count": 396,
+            "excess": 1768
+          },
+          {
+            "u": 58,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 154,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 127,
+        "high": 18311,
+        "distinct": 10142
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 9906,
+        "last": 51010,
+        "forest": 217873,
+        "surplus": 52794,
+        "chronological": 115099,
+        "allEdges": 11139,
+        "surplusEdges": 4391,
+        "cyclesAbove": [
+          {
+            "u": 14,
+            "count": 1932,
+            "excess": 6762
+          },
+          {
+            "u": 58,
+            "count": 2,
+            "excess": 14
+          },
+          {
+            "u": 154,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 135,
+        "high": 12955,
+        "distinct": 8564
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 15600,
+        "last": 58317,
+        "forest": 219883,
+        "surplus": 37783,
+        "chronological": 80515,
+        "allEdges": 7664,
+        "surplusEdges": 2174,
+        "cyclesAbove": [
+          {
+            "u": 14,
+            "count": 1311,
+            "excess": 11117
+          },
+          {
+            "u": 58,
+            "count": 2,
+            "excess": 14
+          },
+          {
+            "u": 154,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 147,
+        "high": 9399,
+        "distinct": 7225
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 22638,
+        "last": 69081,
+        "forest": 208870,
+        "surplus": 30994,
+        "chronological": 65211,
+        "allEdges": 5804,
+        "surplusEdges": 1315,
+        "cyclesAbove": [
+          {
+            "u": 14,
+            "count": 786,
+            "excess": 14998
+          },
+          {
+            "u": 58,
+            "count": 49,
+            "excess": 1154
+          },
+          {
+            "u": 154,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 181,
+        "high": 7475,
+        "distinct": 6160
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 30589,
+        "last": 80845,
+        "forest": 195090,
+        "surplus": 25059,
+        "chronological": 46222,
+        "allEdges": 4398,
+        "surplusEdges": 770,
+        "cyclesAbove": [
+          {
+            "u": 14,
+            "count": 653,
+            "excess": 15338
+          },
+          {
+            "u": 58,
+            "count": 58,
+            "excess": 1459
+          },
+          {
+            "u": 154,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 181,
+        "high": 5987,
+        "distinct": 5217
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "R": 2144640,
+    "events": 161096,
+    "literal": 0,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 20292,
+        "last": 165992,
+        "forest": 1571501,
+        "surplus": 386855,
+        "chronological": 1016293,
+        "allEdges": 90028,
+        "surplusEdges": 47805,
+        "cyclesAbove": [
+          {
+            "u": 19,
+            "count": 1039,
+            "excess": 8861
+          },
+          {
+            "u": 105,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 304,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 242,
+        "high": 97757,
+        "distinct": 49952
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 39441,
+        "last": 206016,
+        "forest": 1576938,
+        "surplus": 322245,
+        "chronological": 813944,
+        "allEdges": 62504,
+        "surplusEdges": 26731,
+        "cyclesAbove": [
+          {
+            "u": 19,
+            "count": 2706,
+            "excess": 14719
+          },
+          {
+            "u": 105,
+            "count": 4,
+            "excess": 252
+          },
+          {
+            "u": 304,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 244,
+        "high": 69924,
+        "distinct": 43193
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 62679,
+        "last": 257789,
+        "forest": 1605346,
+        "surplus": 218826,
+        "chronological": 533265,
+        "allEdges": 42922,
+        "surplusEdges": 12840,
+        "cyclesAbove": [
+          {
+            "u": 19,
+            "count": 4451,
+            "excess": 38044
+          },
+          {
+            "u": 105,
+            "count": 4,
+            "excess": 252
+          },
+          {
+            "u": 304,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 257,
+        "high": 50097,
+        "distinct": 37257
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 89507,
+        "last": 295824,
+        "forest": 1588970,
+        "surplus": 170339,
+        "chronological": 424359,
+        "allEdges": 33850,
+        "surplusEdges": 8198,
+        "cyclesAbove": [
+          {
+            "u": 19,
+            "count": 4435,
+            "excess": 48011
+          },
+          {
+            "u": 105,
+            "count": 4,
+            "excess": 252
+          },
+          {
+            "u": 304,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 257,
+        "high": 40826,
+        "distinct": 32628
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 119802,
+        "last": 339783,
+        "forest": 1528981,
+        "surplus": 156074,
+        "chronological": 327683,
+        "allEdges": 27740,
+        "surplusEdges": 5837,
+        "cyclesAbove": [
+          {
+            "u": 19,
+            "count": 4390,
+            "excess": 59572
+          },
+          {
+            "u": 105,
+            "count": 6,
+            "excess": 318
+          },
+          {
+            "u": 304,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 287,
+        "high": 34406,
+        "distinct": 28569
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "R": 15481975,
+    "events": 796161,
+    "literal": 0,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 81162,
+        "last": 1280295,
+        "forest": 12078887,
+        "surplus": 2041631,
+        "chronological": 7746363,
+        "allEdges": 458580,
+        "surplusEdges": 248342,
+        "cyclesAbove": [
+          {
+            "u": 27,
+            "count": 1156,
+            "excess": 36112
+          },
+          {
+            "u": 195,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 604,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 502,
+        "high": 489847,
+        "distinct": 241505
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 158087,
+        "last": 1693815,
+        "forest": 11977996,
+        "surplus": 1652077,
+        "chronological": 5904722,
+        "allEdges": 325666,
+        "surplusEdges": 142628,
+        "cyclesAbove": [
+          {
+            "u": 27,
+            "count": 2310,
+            "excess": 31694
+          },
+          {
+            "u": 195,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 604,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 502,
+        "high": 356049,
+        "distinct": 213421
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 250282,
+        "last": 2116667,
+        "forest": 11906095,
+        "surplus": 1208931,
+        "chronological": 4136378,
+        "allEdges": 232947,
+        "surplusEdges": 74022,
+        "cyclesAbove": [
+          {
+            "u": 27,
+            "count": 9293,
+            "excess": 78486
+          },
+          {
+            "u": 195,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 604,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 517,
+        "high": 262555,
+        "distinct": 188533
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 356404,
+        "last": 2404740,
+        "forest": 11762974,
+        "surplus": 957857,
+        "chronological": 3281458,
+        "allEdges": 187331,
+        "surplusEdges": 48236,
+        "cyclesAbove": [
+          {
+            "u": 27,
+            "count": 12523,
+            "excess": 132522
+          },
+          {
+            "u": 195,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 604,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 531,
+        "high": 216287,
+        "distinct": 168051
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 482553,
+        "last": 2678458,
+        "forest": 11502253,
+        "surplus": 818711,
+        "chronological": 2462324,
+        "allEdges": 154012,
+        "surplusEdges": 32779,
+        "cyclesAbove": [
+          {
+            "u": 27,
+            "count": 13379,
+            "excess": 170041
+          },
+          {
+            "u": 195,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 604,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 550,
+        "high": 182084,
+        "distinct": 149305
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "R": 107745566,
+    "events": 3946588,
+    "literal": 0,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 324654,
+        "last": 5552919,
+        "forest": 90499502,
+        "surplus": 11368491,
+        "chronological": 61063917,
+        "allEdges": 2326293,
+        "surplusEdges": 1319554,
+        "cyclesAbove": [
+          {
+            "u": 37,
+            "count": 5387,
+            "excess": 210461
+          },
+          {
+            "u": 364,
+            "count": 175,
+            "excess": 28431
+          },
+          {
+            "u": 1198,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 1021,
+        "high": 2452422,
+        "distinct": 1132868
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 632317,
+        "last": 7554709,
+        "forest": 90093362,
+        "surplus": 9465178,
+        "chronological": 48844273,
+        "allEdges": 1668330,
+        "surplusEdges": 774373,
+        "cyclesAbove": [
+          {
+            "u": 37,
+            "count": 5100,
+            "excess": 187667
+          },
+          {
+            "u": 364,
+            "count": 59,
+            "excess": 9751
+          },
+          {
+            "u": 1198,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 1021,
+        "high": 1791515,
+        "distinct": 1017142
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 1000920,
+        "last": 9801763,
+        "forest": 89576048,
+        "surplus": 7366835,
+        "chronological": 36499625,
+        "allEdges": 1217087,
+        "surplusEdges": 425129,
+        "cyclesAbove": [
+          {
+            "u": 37,
+            "count": 14859,
+            "excess": 263094
+          },
+          {
+            "u": 364,
+            "count": 162,
+            "excess": 35129
+          },
+          {
+            "u": 1198,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 1021,
+        "high": 1337561,
+        "distinct": 912432
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 1424698,
+        "last": 11207698,
+        "forest": 89027552,
+        "surplus": 6085618,
+        "chronological": 29309274,
+        "allEdges": 996742,
+        "surplusEdges": 290040,
+        "cyclesAbove": [
+          {
+            "u": 37,
+            "count": 24025,
+            "excess": 354432
+          },
+          {
+            "u": 364,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 1198,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 1021,
+        "high": 1115035,
+        "distinct": 824995
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 1919598,
+        "last": 12993405,
+        "forest": 87641183,
+        "surplus": 5191380,
+        "chronological": 22716255,
+        "allEdges": 821361,
+        "surplusEdges": 194011,
+        "cyclesAbove": [
+          {
+            "u": 37,
+            "count": 34415,
+            "excess": 579317
+          },
+          {
+            "u": 364,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 1198,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 1021,
+        "high": 936697,
+        "distinct": 742686
+      }
+    ]
+  },
+  {
+    "X": 1048576,
+    "B": 2710,
+    "R": 730547400,
+    "events": 19219036,
+    "literal": 0,
+    "st": [
+      {
+        "y": 3,
+        "L": 6,
+        "initial": 1298616,
+        "last": 28712136,
+        "forest": 640782375,
+        "surplus": 59754273,
+        "chronological": 431421101,
+        "allEdges": 11482995,
+        "surplusEdges": 6810947,
+        "cyclesAbove": [
+          {
+            "u": 53,
+            "count": 14187,
+            "excess": 625917
+          },
+          {
+            "u": 683,
+            "count": 94,
+            "excess": 6661
+          },
+          {
+            "u": 2382,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 2030,
+        "high": 11991029,
+        "distinct": 5180082
+      },
+      {
+        "y": 5,
+        "L": 30,
+        "initial": 2529253,
+        "last": 36922788,
+        "forest": 640697682,
+        "surplus": 50397677,
+        "chronological": 350229067,
+        "allEdges": 8272519,
+        "surplusEdges": 4062178,
+        "cyclesAbove": [
+          {
+            "u": 53,
+            "count": 11514,
+            "excess": 406444
+          },
+          {
+            "u": 683,
+            "count": 28,
+            "excess": 13216
+          },
+          {
+            "u": 2382,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 2037,
+        "high": 8770699,
+        "distinct": 4708521
+      },
+      {
+        "y": 7,
+        "L": 210,
+        "initial": 4003834,
+        "last": 47030474,
+        "forest": 639572753,
+        "surplus": 39940339,
+        "chronological": 268041338,
+        "allEdges": 6076084,
+        "surplusEdges": 2292324,
+        "cyclesAbove": [
+          {
+            "u": 53,
+            "count": 10976,
+            "excess": 390700
+          },
+          {
+            "u": 683,
+            "count": 52,
+            "excess": 2756
+          },
+          {
+            "u": 2382,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 2037,
+        "high": 6565420,
+        "distinct": 4273096
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "initial": 5698789,
+        "last": 58362426,
+        "forest": 632900658,
+        "surplus": 33585527,
+        "chronological": 218475293,
+        "allEdges": 4989920,
+        "surplusEdges": 1573671,
+        "cyclesAbove": [
+          {
+            "u": 53,
+            "count": 32276,
+            "excess": 761048
+          },
+          {
+            "u": 683,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 2382,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 2049,
+        "high": 5472035,
+        "distinct": 3898364
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "initial": 7693347,
+        "last": 69823634,
+        "forest": 624741965,
+        "surplus": 28288454,
+        "chronological": 169996584,
+        "allEdges": 4138153,
+        "surplusEdges": 1061702,
+        "cyclesAbove": [
+          {
+            "u": 53,
+            "count": 53646,
+            "excess": 1130844
+          },
+          {
+            "u": 683,
+            "count": 0,
+            "excess": 0
+          },
+          {
+            "u": 2382,
+            "count": 0,
+            "excess": 0
+          }
+        ],
+        "maxWeight": 2049,
+        "high": 4610092,
+        "distinct": 3548390
+      }
+    ]
+  }
+]
