@@ -1,8 +1,8 @@
 // MIN wheel: source-preserving SAME/ROOT demotions with recent large labels.
 // Run: node research/min_recent_large_merge_audit.mjs 256 1024 4096 16384 65536
-function audit(X,y) {
+function audit(X,y,qOverride,zOverride) {
   const B=Math.ceil(Math.sqrt(7*X)), L=y===3?6:210;
-  const Q=Math.ceil(B/Math.cbrt(Math.log(B))), z=Math.max(1,Math.floor(Math.sqrt(Math.log(B))));
+  const Q=qOverride??Math.ceil(B/Math.cbrt(Math.log(B))), z=zOverride??Math.max(1,Math.floor(Math.sqrt(Math.log(B))));
   const gate=Q>2*z+3*L+2;
   const spf=new Int32Array(7*X+4);
   for(let p=2;p<spf.length;p++) if(!spf[p]) {
@@ -94,4 +94,7 @@ function audit(X,y) {
   return {X,y,B,L,Q,z,gate,events,literal,same,root,near,rareSame,rareRoot,rareSameCost,rareRootCost};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[256,1024,4096,16384,65536])for(const y of [3,7])console.log(JSON.stringify(audit(X,y)));
+for(const X of args.length?args:[256,1024,4096,16384,65536]) {
+  for(const y of [3,7])console.log(JSON.stringify(audit(X,y)));
+  if(X>=4096)console.log(JSON.stringify(audit(X,3,29,3)));
+}
