@@ -1,0 +1,926 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "K": 447,
+    "N": 32,
+    "R": 1342,
+    "reached": 40,
+    "edges": 19,
+    "weightedReset": 23,
+    "weightedExc": 55,
+    "twin": 27,
+    "bad": 5,
+    "maxMass": 4,
+    "maxEdge": 18,
+    "maxEvents": 20,
+    "allEdges": 117,
+    "allHigh": 46,
+    "allOneHigh": 44,
+    "allMultiHigh": 2,
+    "oneHigh": 8,
+    "multiHigh": 1,
+    "noHigh": 10,
+    "weightedOne": 9,
+    "weightedMulti": 1,
+    "weightedNone": 13,
+    "allMax": 21,
+    "allCost": 3805,
+    "terminalMax": 4,
+    "lit": 230,
+    "tail": [
+      {
+        "k": 1,
+        "all": 117,
+        "reached": 19,
+        "weighted": 23
+      },
+      {
+        "k": 2,
+        "all": 117,
+        "reached": 19,
+        "weighted": 23
+      },
+      {
+        "k": 4,
+        "all": 53,
+        "reached": 8,
+        "weighted": 12
+      },
+      {
+        "k": 8,
+        "all": 28,
+        "reached": 3,
+        "weighted": 3
+      },
+      {
+        "k": 16,
+        "all": 8,
+        "reached": 1,
+        "weighted": 1
+      },
+      {
+        "k": 32,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 64,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 128,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 256,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 512,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 1024,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 118,
+        "rootComps": 27,
+        "largestRootComp": 2,
+        "largestVertexComp": 6,
+        "largestSpan": 16,
+        "reachableLong": 9,
+        "allLong": 46,
+        "allSingleHigh": 44,
+        "allMultiHigh": 2,
+        "maxRootCompsInBasin": 3,
+        "maxLongInBasin": 13,
+        "maxBound": 4
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 107,
+        "rootComps": 25,
+        "largestRootComp": 3,
+        "largestVertexComp": 9,
+        "largestSpan": 28,
+        "reachableLong": 6,
+        "allLong": 35,
+        "allSingleHigh": 33,
+        "allMultiHigh": 2,
+        "maxRootCompsInBasin": 2,
+        "maxLongInBasin": 8,
+        "maxBound": 4
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 95,
+        "rootComps": 22,
+        "largestRootComp": 4,
+        "largestVertexComp": 10,
+        "largestSpan": 40,
+        "reachableLong": 2,
+        "allLong": 23,
+        "allSingleHigh": 21,
+        "allMultiHigh": 2,
+        "maxRootCompsInBasin": 2,
+        "maxLongInBasin": 7,
+        "maxBound": 4
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "K": 1791,
+    "N": 128,
+    "R": 10793,
+    "reached": 160,
+    "edges": 112,
+    "weightedReset": 347,
+    "weightedExc": 475,
+    "twin": 128,
+    "bad": 0,
+    "maxMass": 51,
+    "maxEdge": 79,
+    "maxEvents": 18,
+    "allEdges": 539,
+    "allHigh": 248,
+    "allOneHigh": 213,
+    "allMultiHigh": 35,
+    "oneHigh": 58,
+    "multiHigh": 17,
+    "noHigh": 37,
+    "weightedOne": 143,
+    "weightedMulti": 47,
+    "weightedNone": 157,
+    "allMax": 81,
+    "allCost": 16734,
+    "terminalMax": 51,
+    "lit": 1377,
+    "tail": [
+      {
+        "k": 1,
+        "all": 539,
+        "reached": 112,
+        "weighted": 347
+      },
+      {
+        "k": 2,
+        "all": 539,
+        "reached": 112,
+        "weighted": 347
+      },
+      {
+        "k": 4,
+        "all": 282,
+        "reached": 77,
+        "weighted": 207
+      },
+      {
+        "k": 8,
+        "all": 181,
+        "reached": 55,
+        "weighted": 149
+      },
+      {
+        "k": 16,
+        "all": 87,
+        "reached": 33,
+        "weighted": 83
+      },
+      {
+        "k": 32,
+        "all": 51,
+        "reached": 22,
+        "weighted": 55
+      },
+      {
+        "k": 64,
+        "all": 12,
+        "reached": 8,
+        "weighted": 32
+      },
+      {
+        "k": 128,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 256,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 512,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 1024,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 474,
+        "rootComps": 105,
+        "largestRootComp": 3,
+        "largestVertexComp": 7,
+        "largestSpan": 20,
+        "reachableLong": 75,
+        "allLong": 248,
+        "allSingleHigh": 213,
+        "allMultiHigh": 35,
+        "maxRootCompsInBasin": 41,
+        "maxLongInBasin": 62,
+        "maxBound": 51
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 436,
+        "rootComps": 101,
+        "largestRootComp": 5,
+        "largestVertexComp": 12,
+        "largestSpan": 32,
+        "reachableLong": 65,
+        "allLong": 210,
+        "allSingleHigh": 175,
+        "allMultiHigh": 35,
+        "maxRootCompsInBasin": 39,
+        "maxLongInBasin": 56,
+        "maxBound": 51
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 394,
+        "rootComps": 94,
+        "largestRootComp": 6,
+        "largestVertexComp": 13,
+        "largestSpan": 36,
+        "reachableLong": 53,
+        "allLong": 168,
+        "allSingleHigh": 133,
+        "allMultiHigh": 35,
+        "maxRootCompsInBasin": 36,
+        "maxLongInBasin": 49,
+        "maxBound": 51
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "K": 7167,
+    "N": 512,
+    "R": 73124,
+    "reached": 620,
+    "edges": 438,
+    "weightedReset": 1031,
+    "weightedExc": 1543,
+    "twin": 512,
+    "bad": 0,
+    "maxMass": 45,
+    "maxEdge": 145,
+    "maxEvents": 39,
+    "allEdges": 2386,
+    "allHigh": 1219,
+    "allOneHigh": 972,
+    "allMultiHigh": 247,
+    "oneHigh": 223,
+    "multiHigh": 62,
+    "noHigh": 153,
+    "weightedOne": 465,
+    "weightedMulti": 159,
+    "weightedNone": 407,
+    "allMax": 167,
+    "allCost": 118740,
+    "terminalMax": 45,
+    "lit": 0,
+    "tail": [
+      {
+        "k": 1,
+        "all": 2386,
+        "reached": 438,
+        "weighted": 1031
+      },
+      {
+        "k": 2,
+        "all": 2386,
+        "reached": 438,
+        "weighted": 1031
+      },
+      {
+        "k": 4,
+        "all": 1357,
+        "reached": 292,
+        "weighted": 759
+      },
+      {
+        "k": 8,
+        "all": 941,
+        "reached": 208,
+        "weighted": 476
+      },
+      {
+        "k": 16,
+        "all": 583,
+        "reached": 131,
+        "weighted": 295
+      },
+      {
+        "k": 32,
+        "all": 334,
+        "reached": 76,
+        "weighted": 174
+      },
+      {
+        "k": 64,
+        "all": 155,
+        "reached": 41,
+        "weighted": 107
+      },
+      {
+        "k": 128,
+        "all": 24,
+        "reached": 3,
+        "weighted": 3
+      },
+      {
+        "k": 256,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 512,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 1024,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 1902,
+        "rootComps": 418,
+        "largestRootComp": 3,
+        "largestVertexComp": 7,
+        "largestSpan": 20,
+        "reachableLong": 285,
+        "allLong": 1219,
+        "allSingleHigh": 972,
+        "allMultiHigh": 247,
+        "maxRootCompsInBasin": 36,
+        "maxLongInBasin": 77,
+        "maxBound": 45
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 1752,
+        "rootComps": 400,
+        "largestRootComp": 4,
+        "largestVertexComp": 12,
+        "largestSpan": 36,
+        "reachableLong": 255,
+        "allLong": 1069,
+        "allSingleHigh": 822,
+        "allMultiHigh": 247,
+        "maxRootCompsInBasin": 34,
+        "maxLongInBasin": 71,
+        "maxBound": 45
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 1576,
+        "rootComps": 371,
+        "largestRootComp": 6,
+        "largestVertexComp": 16,
+        "largestSpan": 44,
+        "reachableLong": 210,
+        "allLong": 893,
+        "allSingleHigh": 646,
+        "allMultiHigh": 247,
+        "maxRootCompsInBasin": 30,
+        "maxLongInBasin": 60,
+        "maxBound": 45
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "K": 28671,
+    "N": 2048,
+    "R": 393084,
+    "reached": 2475,
+    "edges": 1782,
+    "weightedReset": 5027,
+    "weightedExc": 7075,
+    "twin": 2048,
+    "bad": 0,
+    "maxMass": 60,
+    "maxEdge": 257,
+    "maxEvents": 64,
+    "allEdges": 9544,
+    "allHigh": 4863,
+    "allOneHigh": 3910,
+    "allMultiHigh": 953,
+    "oneHigh": 953,
+    "multiHigh": 234,
+    "noHigh": 595,
+    "weightedOne": 2693,
+    "weightedMulti": 635,
+    "weightedNone": 1699,
+    "allMax": 418,
+    "allCost": 676253,
+    "terminalMax": 60,
+    "lit": 0,
+    "tail": [
+      {
+        "k": 1,
+        "all": 9544,
+        "reached": 1782,
+        "weighted": 5027
+      },
+      {
+        "k": 2,
+        "all": 9544,
+        "reached": 1782,
+        "weighted": 5027
+      },
+      {
+        "k": 4,
+        "all": 5421,
+        "reached": 1230,
+        "weighted": 3792
+      },
+      {
+        "k": 8,
+        "all": 3753,
+        "reached": 869,
+        "weighted": 2504
+      },
+      {
+        "k": 16,
+        "all": 2374,
+        "reached": 575,
+        "weighted": 1618
+      },
+      {
+        "k": 32,
+        "all": 1527,
+        "reached": 356,
+        "weighted": 996
+      },
+      {
+        "k": 64,
+        "all": 802,
+        "reached": 174,
+        "weighted": 443
+      },
+      {
+        "k": 128,
+        "all": 316,
+        "reached": 82,
+        "weighted": 174
+      },
+      {
+        "k": 256,
+        "all": 41,
+        "reached": 1,
+        "weighted": 5
+      },
+      {
+        "k": 512,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 1024,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 7604,
+        "rootComps": 1668,
+        "largestRootComp": 3,
+        "largestVertexComp": 7,
+        "largestSpan": 20,
+        "reachableLong": 1187,
+        "allLong": 4863,
+        "allSingleHigh": 3910,
+        "allMultiHigh": 953,
+        "maxRootCompsInBasin": 46,
+        "maxLongInBasin": 141,
+        "maxBound": 60
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 6999,
+        "rootComps": 1590,
+        "largestRootComp": 6,
+        "largestVertexComp": 12,
+        "largestSpan": 36,
+        "reachableLong": 1054,
+        "allLong": 4258,
+        "allSingleHigh": 3305,
+        "allMultiHigh": 953,
+        "maxRootCompsInBasin": 44,
+        "maxLongInBasin": 127,
+        "maxBound": 60
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 6290,
+        "rootComps": 1481,
+        "largestRootComp": 8,
+        "largestVertexComp": 18,
+        "largestSpan": 44,
+        "reachableLong": 876,
+        "allLong": 3549,
+        "allSingleHigh": 2596,
+        "allMultiHigh": 953,
+        "maxRootCompsInBasin": 42,
+        "maxLongInBasin": 113,
+        "maxBound": 60
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "K": 114687,
+    "N": 8192,
+    "R": 3518589,
+    "reached": 9945,
+    "edges": 7767,
+    "weightedReset": 31581,
+    "weightedExc": 39773,
+    "twin": 8192,
+    "bad": 0,
+    "maxMass": 225,
+    "maxEdge": 718,
+    "maxEvents": 181,
+    "allEdges": 40221,
+    "allHigh": 21498,
+    "allOneHigh": 16343,
+    "allMultiHigh": 5155,
+    "oneHigh": 4025,
+    "multiHigh": 1343,
+    "noHigh": 2399,
+    "weightedOne": 16644,
+    "weightedMulti": 5221,
+    "weightedNone": 9716,
+    "allMax": 767,
+    "allCost": 4401180,
+    "terminalMax": 225,
+    "lit": 0,
+    "tail": [
+      {
+        "k": 1,
+        "all": 40221,
+        "reached": 7767,
+        "weighted": 31581
+      },
+      {
+        "k": 2,
+        "all": 40221,
+        "reached": 7767,
+        "weighted": 31581
+      },
+      {
+        "k": 4,
+        "all": 23724,
+        "reached": 5531,
+        "weighted": 24988
+      },
+      {
+        "k": 8,
+        "all": 17046,
+        "reached": 4107,
+        "weighted": 17358
+      },
+      {
+        "k": 16,
+        "all": 11435,
+        "reached": 2904,
+        "weighted": 12449
+      },
+      {
+        "k": 32,
+        "all": 7970,
+        "reached": 2034,
+        "weighted": 8148
+      },
+      {
+        "k": 64,
+        "all": 5261,
+        "reached": 1354,
+        "weighted": 5610
+      },
+      {
+        "k": 128,
+        "all": 3097,
+        "reached": 723,
+        "weighted": 2558
+      },
+      {
+        "k": 256,
+        "all": 1009,
+        "reached": 259,
+        "weighted": 884
+      },
+      {
+        "k": 512,
+        "all": 83,
+        "reached": 14,
+        "weighted": 48
+      },
+      {
+        "k": 1024,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 30426,
+        "rootComps": 6674,
+        "largestRootComp": 3,
+        "largestVertexComp": 7,
+        "largestSpan": 20,
+        "reachableLong": 5368,
+        "allLong": 21498,
+        "allSingleHigh": 16343,
+        "allMultiHigh": 5155,
+        "maxRootCompsInBasin": 182,
+        "maxLongInBasin": 275,
+        "maxBound": 225
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 28005,
+        "rootComps": 6373,
+        "largestRootComp": 6,
+        "largestVertexComp": 12,
+        "largestSpan": 36,
+        "reachableLong": 4848,
+        "allLong": 19077,
+        "allSingleHigh": 13922,
+        "allMultiHigh": 5155,
+        "maxRootCompsInBasin": 175,
+        "maxLongInBasin": 252,
+        "maxBound": 225
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 25159,
+        "rootComps": 5924,
+        "largestRootComp": 8,
+        "largestVertexComp": 18,
+        "largestSpan": 44,
+        "reachableLong": 4130,
+        "allLong": 16231,
+        "allSingleHigh": 11076,
+        "allMultiHigh": 5155,
+        "maxRootCompsInBasin": 164,
+        "maxLongInBasin": 228,
+        "maxBound": 225
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "K": 458751,
+    "N": 32768,
+    "R": 23475259,
+    "reached": 39863,
+    "edges": 31707,
+    "weightedReset": 126608,
+    "weightedExc": 159376,
+    "twin": 32768,
+    "bad": 0,
+    "maxMass": 445,
+    "maxEdge": 1527,
+    "maxEvents": 159,
+    "allEdges": 164749,
+    "allHigh": 89850,
+    "allOneHigh": 66924,
+    "allMultiHigh": 22926,
+    "oneHigh": 16425,
+    "multiHigh": 5663,
+    "noHigh": 9619,
+    "weightedOne": 65551,
+    "weightedMulti": 20614,
+    "weightedNone": 40443,
+    "allMax": 1667,
+    "allCost": 26306165,
+    "terminalMax": 445,
+    "lit": 0,
+    "tail": [
+      {
+        "k": 1,
+        "all": 164749,
+        "reached": 31707,
+        "weighted": 126608
+      },
+      {
+        "k": 2,
+        "all": 164749,
+        "reached": 31707,
+        "weighted": 126608
+      },
+      {
+        "k": 4,
+        "all": 98756,
+        "reached": 22746,
+        "weighted": 96756
+      },
+      {
+        "k": 8,
+        "all": 72039,
+        "reached": 17029,
+        "weighted": 66002
+      },
+      {
+        "k": 16,
+        "all": 49596,
+        "reached": 12153,
+        "weighted": 47499
+      },
+      {
+        "k": 32,
+        "all": 35506,
+        "reached": 8757,
+        "weighted": 32963
+      },
+      {
+        "k": 64,
+        "all": 24481,
+        "reached": 6018,
+        "weighted": 22109
+      },
+      {
+        "k": 128,
+        "all": 16326,
+        "reached": 3995,
+        "weighted": 14451
+      },
+      {
+        "k": 256,
+        "all": 9299,
+        "reached": 2211,
+        "weighted": 7778
+      },
+      {
+        "k": 512,
+        "all": 2965,
+        "reached": 664,
+        "weighted": 2393
+      },
+      {
+        "k": 1024,
+        "all": 327,
+        "reached": 46,
+        "weighted": 142
+      },
+      {
+        "k": 2048,
+        "all": 0,
+        "reached": 0,
+        "weighted": 0
+      }
+    ],
+    "modes": [
+      {
+        "y": 7,
+        "L": 210,
+        "components": 121706,
+        "rootComps": 26696,
+        "largestRootComp": 3,
+        "largestVertexComp": 7,
+        "largestSpan": 20,
+        "reachableLong": 22088,
+        "allLong": 89850,
+        "allSingleHigh": 66924,
+        "allMultiHigh": 22926,
+        "maxRootCompsInBasin": 359,
+        "maxLongInBasin": 810,
+        "maxBound": 445
+      },
+      {
+        "y": 11,
+        "L": 2310,
+        "components": 112026,
+        "rootComps": 25493,
+        "largestRootComp": 6,
+        "largestVertexComp": 12,
+        "largestSpan": 36,
+        "reachableLong": 19978,
+        "allLong": 80170,
+        "allSingleHigh": 57244,
+        "allMultiHigh": 22926,
+        "maxRootCompsInBasin": 338,
+        "maxLongInBasin": 736,
+        "maxBound": 445
+      },
+      {
+        "y": 13,
+        "L": 30030,
+        "components": 100646,
+        "rootComps": 23705,
+        "largestRootComp": 8,
+        "largestVertexComp": 18,
+        "largestSpan": 44,
+        "reachableLong": 17124,
+        "allLong": 68790,
+        "allSingleHigh": 45864,
+        "allMultiHigh": 22926,
+        "maxRootCompsInBasin": 312,
+        "maxLongInBasin": 653,
+        "maxBound": 445
+      }
+    ]
+  }
+]
