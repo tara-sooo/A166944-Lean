@@ -49,3 +49,32 @@ function audit(Z,W){
  return {Z,W,D,DW,N,terminalPhases,lowerPhases:DW/2,predicted,noExit,terminalOnly,roughHorizons,forbidChecks,earlyExclusions,fullEvents,repChecks,maxLocalHeight,packets:packets.size,maxPacket,caps}
 }
 for(const Z of [5,7,11,13,17])for(const W of [2,6,30]){let D=2;for(let p of [3,5,7,11,13,17])if(p<=Z)D*=p;if(D%W===0)console.log(JSON.stringify(audit(Z,W)));}
+
+// Large-prime tail factor checks (conditional lower phases; W30 sampled).
+function tailAudit(W,N=256){
+ const ps=[];for(let p=3;p<=2000;p+=2)if(!ps.some(q=>p%q===0))ps.push(p);
+ const lo=ps.filter(p=>p<=W),hi=ps.filter(p=>p>W),D=2*lo.reduce((a,b)=>a*b,1),threshold=10*W+14;
+ const ck=(a,m)=>{if(!a)throw Error(m)},mod=(a,b)=>(a%b+b)%b,cell=C=>Math.floor((C-1)/W);
+ function inv(a,p){let r=1,n=p-2;while(n){if(n%2)r=r*a%p;a=a*a%p;n=Math.floor(n/2);}return r;}
+ function next(t,C,pr){let p=0,n=Infinity;for(let q of pr){let a=mod(C,q);if(a!==1&&a!==q-1)continue;let u=t+2*q-mod(t-(a===1?0:q+2),2*q);if(u<n||(u===n&&q<p)){p=q;n=u}}return {p,n}}
+ let rng=(0x32af71d9^W)>>>0;function u32(){rng^=rng<<13;rng^=rng>>>17;rng^=rng<<5;return rng>>>0}
+ let count=Math.min(N,D/2),term=0,earlyPairs=0,tailPairs=0,tailClockChecks=0,earlierMax=0,maxForbidden=0,exactZero=0;
+ for(let i=0;i<count;i++){
+  let M=count===D/2?3+2*i:3+2*(u32()%(D/2)),C=2*M-2,t=M+2,c=cell(C),rec=[];
+  let exit=false;for(;;){let a=next(t,C,lo);if(!a.p)break;let C1=C+a.p-1;if(cell(C1)!==c){exit=true;break;}rec.push({C,t,n:a.n});C=C1;t=a.n;}
+  if(exit)continue;term++;
+  for(let q of hi){let a=inv(mod(2*D,q),q),F=new Set([-1,1].map(s=>mod(mod(s-C,q)*a,q)));ck(F.size===2,"terminal signs");
+   for(let x of rec)for(let s of [-1,1]){
+    let j=mod(mod(s-x.C,q)*a,q),shift=D*j,e=next(x.t+shift,x.C+2*shift,[q]);ck(e.p===q,"eligible shift");
+    let h=2*e.n-(x.C+2*shift+q-1);ck(h>=0,"candidate height nonnegative");
+    if(q>threshold){tailClockChecks++;ck(e.n>=x.n+shift,"large candidate cannot preempt");}
+    if(e.n<x.n+shift)F.add(j);
+   }
+   if(q>threshold){ck(F.size===2,"exact tail factor");tailPairs++;}
+   if(F.size>2){earlyPairs++;earlierMax=Math.max(earlierMax,q);}
+   maxForbidden=Math.max(maxForbidden,F.size);if(F.size===q)exactZero++;
+  }
+ }
+ return {W,D,N:count,terminalPhases:term,threshold,tailPairs,tailClockChecks,earlyPairs,earlierMax,maxForbidden,exactZero};
+}
+for(const W of [2,6,30])console.log(JSON.stringify(tailAudit(W)));
