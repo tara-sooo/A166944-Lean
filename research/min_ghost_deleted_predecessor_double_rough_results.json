@@ -1,0 +1,207 @@
+[
+  {
+    "U": 256,
+    "N": 128,
+    "V": 1024,
+    "H": 3,
+    "A": 5,
+    "L": 6,
+    "base": 11,
+    "events": 1627,
+    "upwardPairs": 10,
+    "longTargetPairs": 6,
+    "shortPredecessor": 3,
+    "longPredecessor": 3,
+    "shortWeight": 69,
+    "longWeight": 47,
+    "phaseChecks": 6,
+    "deletedPrefixChecks": 6,
+    "roughChecks": 9,
+    "localChecks": 28672,
+    "nondegenerate": 16865,
+    "collisions": 4337,
+    "degenerate": 7470,
+    "exhaustive": [
+      {
+        "q": 5,
+        "pairs": 25,
+        "hits": 10,
+        "locations": 1,
+        "max": 10,
+        "maxShort": 1
+      },
+      {
+        "q": 7,
+        "pairs": 49,
+        "hits": 34,
+        "locations": 6,
+        "max": 12,
+        "maxShort": 2
+      }
+    ]
+  },
+  {
+    "U": 1024,
+    "N": 128,
+    "V": 4096,
+    "H": 3,
+    "A": 5,
+    "L": 6,
+    "base": 11,
+    "events": 2776,
+    "upwardPairs": 18,
+    "longTargetPairs": 14,
+    "shortPredecessor": 5,
+    "longPredecessor": 9,
+    "shortWeight": 129,
+    "longWeight": 177,
+    "phaseChecks": 14,
+    "deletedPrefixChecks": 14,
+    "roughChecks": 23,
+    "localChecks": 28672,
+    "nondegenerate": 16817,
+    "collisions": 4421,
+    "degenerate": 7434,
+    "exhaustive": [
+      {
+        "q": 5,
+        "pairs": 25,
+        "hits": 25,
+        "locations": 4,
+        "max": 10,
+        "maxShort": 1
+      },
+      {
+        "q": 7,
+        "pairs": 49,
+        "hits": 48,
+        "locations": 8,
+        "max": 14,
+        "maxShort": 2
+      }
+    ]
+  },
+  {
+    "U": 4096,
+    "N": 128,
+    "V": 16384,
+    "H": 3,
+    "A": 5,
+    "L": 6,
+    "base": 11,
+    "events": 4533,
+    "upwardPairs": 24,
+    "longTargetPairs": 15,
+    "shortPredecessor": 2,
+    "longPredecessor": 13,
+    "shortWeight": 46,
+    "longWeight": 301,
+    "phaseChecks": 15,
+    "deletedPrefixChecks": 15,
+    "roughChecks": 28,
+    "localChecks": 28672,
+    "nondegenerate": 16878,
+    "collisions": 4404,
+    "degenerate": 7390,
+    "exhaustive": [
+      {
+        "q": 5,
+        "pairs": 25,
+        "hits": 15,
+        "locations": 3,
+        "max": 10,
+        "maxShort": 1
+      },
+      {
+        "q": 7,
+        "pairs": 49,
+        "hits": 49,
+        "locations": 8,
+        "max": 13,
+        "maxShort": 2
+      }
+    ]
+  },
+  {
+    "U": 16384,
+    "N": 128,
+    "V": 65536,
+    "H": 3,
+    "A": 5,
+    "L": 6,
+    "base": 22,
+    "events": 6317,
+    "upwardPairs": 19,
+    "longTargetPairs": 12,
+    "shortPredecessor": 3,
+    "longPredecessor": 9,
+    "shortWeight": 299,
+    "longWeight": 1151,
+    "phaseChecks": 12,
+    "deletedPrefixChecks": 12,
+    "roughChecks": 21,
+    "localChecks": 28672,
+    "nondegenerate": 16938,
+    "collisions": 4356,
+    "degenerate": 7378,
+    "exhaustive": [
+      {
+        "q": 5,
+        "pairs": 25,
+        "hits": 23,
+        "locations": 7,
+        "max": 6,
+        "maxShort": 1
+      },
+      {
+        "q": 7,
+        "pairs": 49,
+        "hits": 41,
+        "locations": 8,
+        "max": 12,
+        "maxShort": 2
+      }
+    ]
+  },
+  {
+    "U": 65536,
+    "N": 64,
+    "V": 262144,
+    "H": 3,
+    "A": 5,
+    "L": 6,
+    "base": 45,
+    "events": 3090,
+    "upwardPairs": 5,
+    "longTargetPairs": 5,
+    "shortPredecessor": 1,
+    "longPredecessor": 4,
+    "shortWeight": 59,
+    "longWeight": 264,
+    "phaseChecks": 5,
+    "deletedPrefixChecks": 5,
+    "roughChecks": 9,
+    "localChecks": 14336,
+    "nondegenerate": 8339,
+    "collisions": 2168,
+    "degenerate": 3829,
+    "exhaustive": [
+      {
+        "q": 5,
+        "pairs": 25,
+        "hits": 25,
+        "locations": 6,
+        "max": 10,
+        "maxShort": 1
+      },
+      {
+        "q": 7,
+        "pairs": 49,
+        "hits": 49,
+        "locations": 13,
+        "max": 14,
+        "maxShort": 2
+      }
+    ]
+  }
+]
