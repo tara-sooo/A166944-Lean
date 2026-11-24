@@ -1,0 +1,2161 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 10,
+        "S": 65,
+        "R": 3868,
+        "twin": 63,
+        "bad": 0,
+        "stopKeys": 5,
+        "physicalNodes": 34,
+        "virtualClasses": 10,
+        "minority": 14,
+        "maxClocks": 3,
+        "oneClockStops": 1,
+        "largestPhysical": 14,
+        "branch": 25,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 2,
+            "terminal": 29.08696205755029,
+            "physGain": 26.370670995670995,
+            "virtGain": 2.716291061879297,
+            "physProxy": 34.1122113997114,
+            "virtProxy": 9.503565062388592,
+            "projClockVariance": 4.635735506323741,
+            "internalClockVariance": 1.9194444444444445,
+            "terminalClockVariance": 2.716291061879297,
+            "near": [
+              {
+                "d": 2,
+                "phys": 6.378084415584416,
+                "virt": 0.40508021390374327,
+                "unweighted": 9.044219505984213,
+                "bound": 48.75
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 39,
+                "terminal": 9.931547619047619,
+                "loss": 19.155414438502675
+              },
+              {
+                "A": 19,
+                "deleted": 54,
+                "terminal": 3.8333333333333335,
+                "loss": 25.25362872421696
+              }
+            ]
+          },
+          {
+            "D": 5,
+            "terminal": 25.388510313216194,
+            "physGain": 21.98412582972583,
+            "virtGain": 3.404384483490365,
+            "physProxy": 26.633063780663782,
+            "virtProxy": 8.867126559714794,
+            "projClockVariance": 6.406562261268143,
+            "internalClockVariance": 3.002177777777778,
+            "terminalClockVariance": 3.404384483490365,
+            "near": [
+              {
+                "d": 2,
+                "phys": 1.6327896103896107,
+                "virt": 0.10370053475935828,
+                "unweighted": 9.044219505984213,
+                "bound": 48.75
+              },
+              {
+                "d": 5,
+                "phys": 4.508301298701299,
+                "virt": 0.4486844919786096,
+                "unweighted": 14.635357779475425,
+                "bound": 74.20833333333333
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 39,
+                "terminal": 7.611349206349207,
+                "loss": 17.777161106866988
+              },
+              {
+                "A": 19,
+                "deleted": 54,
+                "terminal": 3.1457777777777776,
+                "loss": 22.242732535438417
+              }
+            ]
+          },
+          {
+            "D": 10,
+            "terminal": 20.23190960020372,
+            "physGain": 16.269242712842715,
+            "virtGain": 3.962666887361006,
+            "physProxy": 18.664704184704185,
+            "virtProxy": 7.798901960784313,
+            "projClockVariance": 7.053189109583229,
+            "internalClockVariance": 3.0905222222222224,
+            "terminalClockVariance": 3.962666887361006,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.4592220779220779,
+                "virt": 0.029165775401069516,
+                "unweighted": 9.044219505984213,
+                "bound": 48.75
+              },
+              {
+                "d": 4,
+                "phys": 1.4177259740259736,
+                "virt": 0.1441604278074866,
+                "unweighted": 14.635357779475425,
+                "bound": 67.70833333333333
+              },
+              {
+                "d": 10,
+                "phys": 7.798668398268398,
+                "virt": 1.087572192513369,
+                "unweighted": 27.820609455903572,
+                "bound": 95.19146825396825
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 39,
+                "terminal": 4.676920634920634,
+                "loss": 15.554988965283087
+              },
+              {
+                "A": 19,
+                "deleted": 54,
+                "terminal": 2.1417777777777776,
+                "loss": 18.090131822425946
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 28,
+        "S": 0,
+        "R": 9044,
+        "twin": 123,
+        "bad": 5,
+        "stopKeys": 0,
+        "physicalNodes": 0,
+        "virtualClasses": 0,
+        "minority": 0,
+        "maxClocks": 0,
+        "oneClockStops": 0,
+        "largestPhysical": 0,
+        "branch": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 7,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 3,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 7,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 19,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          },
+          {
+            "D": 14,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 3,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 5,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 14,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 19,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          },
+          {
+            "D": 28,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 7,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 9,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 28,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 43,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 19,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 21,
+        "S": 136,
+        "R": 23525,
+        "twin": 376,
+        "bad": 0,
+        "stopKeys": 6,
+        "physicalNodes": 72,
+        "virtualClasses": 10,
+        "minority": 15,
+        "maxClocks": 3,
+        "oneClockStops": 3,
+        "largestPhysical": 24,
+        "branch": 51,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 5,
+            "terminal": 58.72709385281385,
+            "physGain": 54.65597443609022,
+            "virtGain": 4.071119416723625,
+            "physProxy": 79.18879607351711,
+            "virtProxy": 11.080741818181819,
+            "projClockVariance": 7.008280068352699,
+            "internalClockVariance": 2.937160651629074,
+            "terminalClockVariance": 4.071119416723625,
+            "near": [
+              {
+                "d": 2,
+                "phys": 3.3033370699475975,
+                "virt": 0.05899636363636364,
+                "unweighted": 17.512153299916452,
+                "bound": 102
+              },
+              {
+                "d": 5,
+                "phys": 8.452537890179997,
+                "virt": 0.3375709090909091,
+                "unweighted": 26.935374420900736,
+                "bound": 155.26666666666665
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 6,
+                "terminal": 55.91008179539758,
+                "loss": 2.817012057416271
+              },
+              {
+                "A": 52,
+                "deleted": 44,
+                "terminal": 38.23872886762361,
+                "loss": 20.488364985190245
+              }
+            ]
+          },
+          {
+            "D": 10,
+            "terminal": 51.42429995670996,
+            "physGain": 46.348309033948524,
+            "virtGain": 5.07599092276145,
+            "physProxy": 64.93158152958154,
+            "virtProxy": 10.201698181818182,
+            "projClockVariance": 7.721928328776489,
+            "internalClockVariance": 2.6459374060150376,
+            "terminalClockVariance": 5.07599092276145,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.9290635509227616,
+                "virt": 0.016592727272727273,
+                "unweighted": 17.512153299916452,
+                "bound": 102
+              },
+              {
+                "d": 4,
+                "phys": 2.645463824333561,
+                "virt": 0.10945090909090908,
+                "unweighted": 26.935374420900736,
+                "bound": 141.66666666666666
+              },
+              {
+                "d": 10,
+                "phys": 13.625933350421507,
+                "virt": 0.9222436363636364,
+                "unweighted": 47.844644565960365,
+                "bound": 199.16984126984124
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 6,
+                "terminal": 48.92849344953292,
+                "loss": 2.4958065071770363
+              },
+              {
+                "A": 52,
+                "deleted": 44,
+                "terminal": 33.510190191387565,
+                "loss": 17.914109765322394
+              }
+            ]
+          },
+          {
+            "D": 21,
+            "terminal": 38.66674305879845,
+            "physGain": 33.37129679695405,
+            "virtGain": 5.2954462618444,
+            "physProxy": 45.316765112752115,
+            "virtProxy": 8.367489471979267,
+            "projClockVariance": 6.981247834532192,
+            "internalClockVariance": 1.6858015726877933,
+            "terminalClockVariance": 5.2954462618444,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.22293334075340113,
+                "virt": 0.003981506022322349,
+                "unweighted": 17.512153299916452,
+                "bound": 102
+              },
+              {
+                "d": 4,
+                "phys": 0.6631072581867938,
+                "virt": 0.027795152693111877,
+                "unweighted": 26.935374420900736,
+                "bound": 141.66666666666666
+              },
+              {
+                "d": 7,
+                "phys": 1.3798191944015685,
+                "virt": 0.07855582059663692,
+                "unweighted": 34.24768284347232,
+                "bound": 176.3142857142857
+              },
+              {
+                "d": 21,
+                "phys": 14.16338264209473,
+                "virt": 1.3626928173866948,
+                "unweighted": 69.42385300372142,
+                "bound": 247.8843919238656
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 6,
+                "terminal": 36.78489160476655,
+                "loss": 1.881851454031903
+              },
+              {
+                "A": 52,
+                "deleted": 44,
+                "terminal": 26.045253245978277,
+                "loss": 12.621489812820176
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 40,
+        "S": 0,
+        "R": 33536,
+        "twin": 512,
+        "bad": 0,
+        "stopKeys": 0,
+        "physicalNodes": 0,
+        "virtualClasses": 0,
+        "minority": 0,
+        "maxClocks": 0,
+        "oneClockStops": 0,
+        "largestPhysical": 0,
+        "branch": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 10,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 4,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 10,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 52,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          },
+          {
+            "D": 20,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 4,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 7,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 20,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 52,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          },
+          {
+            "D": 40,
+            "terminal": 0,
+            "physGain": 0,
+            "virtGain": 0,
+            "physProxy": 0,
+            "virtProxy": 0,
+            "projClockVariance": 0,
+            "internalClockVariance": 0,
+            "terminalClockVariance": 0,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 9,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 11,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              },
+              {
+                "d": 40,
+                "phys": 0,
+                "virt": 0,
+                "unweighted": 0,
+                "bound": 0
+              }
+            ],
+            "pruned": [
+              {
+                "A": 85,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              },
+              {
+                "A": 52,
+                "deleted": 0,
+                "terminal": 0,
+                "loss": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 42,
+        "S": 505,
+        "R": 252920,
+        "twin": 1543,
+        "bad": 0,
+        "stopKeys": 9,
+        "physicalNodes": 361,
+        "virtualClasses": 29,
+        "minority": 166,
+        "maxClocks": 5,
+        "oneClockStops": 0,
+        "largestPhysical": 63,
+        "branch": 196,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 10,
+            "terminal": 225.51648353295354,
+            "physGain": 197.03713155349814,
+            "virtGain": 28.479351979455373,
+            "physProxy": 303.800198570324,
+            "virtProxy": 106.38570376303522,
+            "projClockVariance": 98.29816122083582,
+            "internalClockVariance": 69.81880924138046,
+            "terminalClockVariance": 28.479351979455373,
+            "near": [
+              {
+                "d": 2,
+                "phys": 3.2763080826440545,
+                "virt": 0.053539686350397464,
+                "unweighted": 61.663847573971296,
+                "bound": 378.75
+              },
+              {
+                "d": 4,
+                "phys": 9.72260491868506,
+                "virt": 0.3038940583068369,
+                "unweighted": 96.54223928229142,
+                "bound": 526.0416666666666
+              },
+              {
+                "d": 10,
+                "phys": 47.7001464382854,
+                "virt": 2.8315157877934705,
+                "unweighted": 169.87078526715123,
+                "bound": 739.5644841269841
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 132,
+                "terminal": 161.40030209021484,
+                "loss": 64.11618144273871
+              },
+              {
+                "A": 156,
+                "deleted": 138,
+                "terminal": 158.49085030256586,
+                "loss": 67.02563323038768
+              }
+            ]
+          },
+          {
+            "D": 21,
+            "terminal": 201.23434465454636,
+            "physGain": 163.47707387421912,
+            "virtGain": 37.75727078032732,
+            "physProxy": 235.87670530026327,
+            "virtProxy": 99.71955093276479,
+            "projClockVariance": 119.43603044028825,
+            "internalClockVariance": 81.67875965996089,
+            "terminalClockVariance": 37.75727078032732,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.7861661406001408,
+                "virt": 0.0128471094675155,
+                "unweighted": 61.663847573971296,
+                "bound": 378.75
+              },
+              {
+                "d": 4,
+                "phys": 2.4393304841480723,
+                "virt": 0.07705093555503775,
+                "unweighted": 96.54223928229142,
+                "bound": 526.0416666666666
+              },
+              {
+                "d": 7,
+                "phys": 5.174878452880472,
+                "virt": 0.2217112756788295,
+                "unweighted": 123.98422400278241,
+                "bound": 654.6964285714284
+              },
+              {
+                "d": 21,
+                "phys": 48.6921537244296,
+                "virt": 5.415424725381855,
+                "unweighted": 244.5672896079102,
+                "bound": 920.4530729525892
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 132,
+                "terminal": 139.77303373216625,
+                "loss": 61.46131092238011
+              },
+              {
+                "A": 156,
+                "deleted": 138,
+                "terminal": 137.16357379795784,
+                "loss": 64.07077085658852
+              }
+            ]
+          },
+          {
+            "D": 42,
+            "terminal": 163.2375630626117,
+            "physGain": 118.96238931322729,
+            "virtGain": 44.27517374938439,
+            "physProxy": 162.60601819262047,
+            "virtProxy": 86.56166826674051,
+            "projClockVariance": 132.06666516339527,
+            "internalClockVariance": 87.79149141401088,
+            "terminalClockVariance": 44.27517374938439,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.20145507352878578,
+                "virt": 0.003292071801050847,
+                "unweighted": 61.663847573971296,
+                "bound": 378.75
+              },
+              {
+                "d": 8,
+                "phys": 2.5240665441980936,
+                "virt": 0.12463614769909796,
+                "unweighted": 148.59817758631888,
+                "bound": 686.2589285714284
+              },
+              {
+                "d": 12,
+                "phys": 5.675955774515341,
+                "virt": 0.4366875901228633,
+                "unweighted": 187.6914467812222,
+                "bound": 783.5606962481962
+              },
+              {
+                "d": 42,
+                "phys": 57.81584496695989,
+                "virt": 11.843205343124247,
+                "unweighted": 346.1716065383738,
+                "bound": 1092.5025586787056
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 132,
+                "terminal": 107.49749965596494,
+                "loss": 55.74006340664677
+              },
+              {
+                "A": 156,
+                "deleted": 138,
+                "terminal": 105.50932608871695,
+                "loss": 57.72823697389477
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 56,
+        "S": 384,
+        "R": 284089,
+        "twin": 1664,
+        "bad": 0,
+        "stopKeys": 6,
+        "physicalNodes": 265,
+        "virtualClasses": 20,
+        "minority": 129,
+        "maxClocks": 5,
+        "oneClockStops": 0,
+        "largestPhysical": 63,
+        "branch": 146,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 14,
+            "terminal": 167.5859797509798,
+            "physGain": 138.9408846899498,
+            "virtGain": 28.645095061029956,
+            "physProxy": 215.05941911184527,
+            "virtProxy": 81.58246121366729,
+            "projClockVariance": 84.86994151170212,
+            "internalClockVariance": 56.22484645067218,
+            "terminalClockVariance": 28.645095061029956,
+            "near": [
+              {
+                "d": 2,
+                "phys": 1.3355087686904605,
+                "virt": 0.011202110622921202,
+                "unweighted": 47.37659811328101,
+                "bound": 288
+              },
+              {
+                "d": 5,
+                "phys": 4.130608140852124,
+                "virt": 0.07126370467704184,
+                "unweighted": 74.57993731917031,
+                "bound": 438.4
+              },
+              {
+                "d": 14,
+                "phys": 38.35129500016548,
+                "virt": 2.097472844586315,
+                "unweighted": 155.92320371235292,
+                "bound": 624.2999666999667
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 195,
+                "terminal": 74.41925307932094,
+                "loss": 93.16672667165885
+              },
+              {
+                "A": 156,
+                "deleted": 201,
+                "terminal": 71.59750390294398,
+                "loss": 95.9884758480358
+              }
+            ]
+          },
+          {
+            "D": 28,
+            "terminal": 147.62379093269521,
+            "physGain": 110.45963049345654,
+            "virtGain": 37.164160439238685,
+            "physProxy": 161.13436439696693,
+            "virtProxy": 76.30078838421834,
+            "projClockVariance": 104.6839118955479,
+            "internalClockVariance": 67.51975145630922,
+            "terminalClockVariance": 37.164160439238685,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.3467186226407926,
+                "virt": 0.002908240257873773,
+                "unweighted": 47.37659811328101,
+                "bound": 288
+              },
+              {
+                "d": 5,
+                "phys": 1.103724702601244,
+                "virt": 0.019174921980864783,
+                "unweighted": 74.57993731917031,
+                "bound": 438.4
+              },
+              {
+                "d": 9,
+                "phys": 4.280375792658649,
+                "virt": 0.12626109638496932,
+                "unweighted": 114.89814826125215,
+                "bound": 543.1619047619047
+              },
+              {
+                "d": 28,
+                "phys": 42.97849392315585,
+                "virt": 5.01653787791194,
+                "unweighted": 221.1192107947721,
+                "bound": 754.0168394815427
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 195,
+                "terminal": 60.53621788282732,
+                "loss": 87.0875730498679
+              },
+              {
+                "A": 156,
+                "deleted": 201,
+                "terminal": 58.16002013511657,
+                "loss": 89.46377079757865
+              }
+            ]
+          },
+          {
+            "D": 56,
+            "terminal": 115.46436278231435,
+            "physGain": 74.04808069266839,
+            "virtGain": 41.416282089645925,
+            "physProxy": 101.73028659217934,
+            "virtProxy": 64.76147352286678,
+            "projClockVariance": 110.75605249312689,
+            "internalClockVariance": 69.33977040348097,
+            "terminalClockVariance": 41.416282089645925,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.08828483446872033,
+                "virt": 0.0007405241397363774,
+                "unweighted": 47.37659811328101,
+                "bound": 288
+              },
+              {
+                "d": 10,
+                "phys": 1.8053601928971035,
+                "virt": 0.06831267200072076,
+                "unweighted": 131.02206694780472,
+                "bound": 562.3619047619047
+              },
+              {
+                "d": 14,
+                "phys": 3.4492868891518462,
+                "virt": 0.20107640615781153,
+                "unweighted": 155.92320371235292,
+                "bound": 624.2999666999667
+              },
+              {
+                "d": 56,
+                "phys": 45.97029194142999,
+                "virt": 10.448484547439714,
+                "unweighted": 300.57811006602117,
+                "bound": 885.40211611838
+              }
+            ],
+            "pruned": [
+              {
+                "A": 170,
+                "deleted": 195,
+                "terminal": 41.341572011617764,
+                "loss": 74.12279077069658
+              },
+              {
+                "A": 156,
+                "deleted": 201,
+                "terminal": 39.618550125888156,
+                "loss": 75.8458126564262
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 84,
+        "S": 1808,
+        "R": 1659308,
+        "twin": 6384,
+        "bad": 0,
+        "stopKeys": 18,
+        "physicalNodes": 1296,
+        "virtualClasses": 60,
+        "minority": 674,
+        "maxClocks": 6,
+        "oneClockStops": 4,
+        "largestPhysical": 115,
+        "branch": 659,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 21,
+            "terminal": 801.6204901593502,
+            "physGain": 700.9729094221108,
+            "virtGain": 100.64758073723807,
+            "physProxy": 1156.599918847294,
+            "virtProxy": 394.27517430237583,
+            "projClockVariance": 458.71370491694347,
+            "internalClockVariance": 358.06612417970535,
+            "terminalClockVariance": 100.64758073723807,
+            "near": [
+              {
+                "d": 2,
+                "phys": 2.530572152859693,
+                "virt": 0.019556655483232297,
+                "unweighted": 196.8061907838661,
+                "bound": 1356
+              },
+              {
+                "d": 3,
+                "phys": 2.530572152859693,
+                "virt": 0.019556655483232297,
+                "unweighted": 196.8061907838661,
+                "bound": 1657.3333333333333
+              },
+              {
+                "d": 7,
+                "phys": 16.064474786553568,
+                "virt": 0.4386184372781683,
+                "unweighted": 384.37413868082956,
+                "bound": 2343.942857142857
+              },
+              {
+                "d": 21,
+                "phys": 146.51105174513174,
+                "virt": 11.181136602000269,
+                "unweighted": 734.9351061311405,
+                "bound": 3295.4042691055074
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 398,
+                "terminal": 610.7502114657872,
+                "loss": 190.87027869356302
+              },
+              {
+                "A": 483,
+                "deleted": 154,
+                "terminal": 724.8571482176544,
+                "loss": 76.76334194169578
+              }
+            ]
+          },
+          {
+            "D": 42,
+            "terminal": 719.3808639103058,
+            "physGain": 591.9574452740701,
+            "virtGain": 127.42341863623662,
+            "physProxy": 929.8393149594447,
+            "virtProxy": 365.82371755297305,
+            "projClockVariance": 507.40866633684317,
+            "internalClockVariance": 379.9852477006065,
+            "terminalClockVariance": 127.42341863623662,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.6484591141703017,
+                "virt": 0.005011392967578277,
+                "unweighted": 196.8061907838661,
+                "bound": 1356
+              },
+              {
+                "d": 7,
+                "phys": 4.275898942504681,
+                "virt": 0.11760962867663302,
+                "unweighted": 384.37413868082956,
+                "bound": 2343.942857142857
+              },
+              {
+                "d": 12,
+                "phys": 17.205966194559682,
+                "virt": 0.8335770763456081,
+                "unweighted": 570.4612356869644,
+                "bound": 2805.302453102453
+              },
+              {
+                "d": 42,
+                "phys": 178.4871851534459,
+                "virt": 25.05588254049633,
+                "unweighted": 1031.724338316498,
+                "bound": 3911.3754972100983
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 398,
+                "terminal": 535.9612360744189,
+                "loss": 183.4196278358869
+              },
+              {
+                "A": 483,
+                "deleted": 154,
+                "terminal": 642.0050524104245,
+                "loss": 77.37581149988137
+              }
+            ]
+          },
+          {
+            "D": 84,
+            "terminal": 579.6653450680654,
+            "physGain": 442.7219559617673,
+            "virtGain": 136.9433891062988,
+            "physProxy": 659.4215416239413,
+            "virtProxy": 306.67640094138824,
+            "projClockVariance": 479.96816825359264,
+            "internalClockVariance": 343.0247791472938,
+            "terminalClockVariance": 136.9433891062988,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.1640917880369958,
+                "virt": 0.0012681268789908444,
+                "unweighted": 196.8061907838661,
+                "bound": 1356
+              },
+              {
+                "d": 14,
+                "phys": 6.166194895084417,
+                "virt": 0.3507329133139433,
+                "unweighted": 615.8901863526805,
+                "bound": 2939.4123432123433
+              },
+              {
+                "d": 19,
+                "phys": 10.337487512371771,
+                "virt": 0.7430206995582768,
+                "unweighted": 698.7246161570911,
+                "bound": 3207.156650057889
+              },
+              {
+                "d": 84,
+                "phys": 211.36132046219444,
+                "virt": 51.92701984030341,
+                "unweighted": 1412.8637058598138,
+                "bound": 4532.631623264775
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 398,
+                "terminal": 413.18329189299163,
+                "loss": 166.48205317507382
+              },
+              {
+                "A": 483,
+                "deleted": 154,
+                "terminal": 501.39414622991626,
+                "loss": 78.27119883814919
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 76,
+        "S": 1767,
+        "R": 1694572,
+        "twin": 6425,
+        "bad": 0,
+        "stopKeys": 19,
+        "physicalNodes": 1211,
+        "virtualClasses": 68,
+        "minority": 687,
+        "maxClocks": 5,
+        "oneClockStops": 2,
+        "largestPhysical": 102,
+        "branch": 646,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 19,
+            "terminal": 790.8177099580429,
+            "physGain": 676.2161996340957,
+            "virtGain": 114.60151032394782,
+            "physProxy": 1092.79732821358,
+            "virtProxy": 415.9645722179896,
+            "projClockVariance": 362.95608321399953,
+            "internalClockVariance": 248.35457289005143,
+            "terminalClockVariance": 114.60151032394782,
+            "near": [
+              {
+                "d": 2,
+                "phys": 3.010669360896243,
+                "virt": 0.02103602464633138,
+                "unweighted": 192.5413633281156,
+                "bound": 1325.25
+              },
+              {
+                "d": 3,
+                "phys": 3.010669360896243,
+                "virt": 0.02103602464633138,
+                "unweighted": 192.5413633281156,
+                "bound": 1619.75
+              },
+              {
+                "d": 7,
+                "phys": 18.945233187258946,
+                "virt": 0.474051515662694,
+                "unweighted": 375.96764815981726,
+                "bound": 2290.7892857142856
+              },
+              {
+                "d": 19,
+                "phys": 139.42596886891303,
+                "virt": 9.111732849178829,
+                "unweighted": 681.4191536507386,
+                "bound": 3134.427987086443
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 484,
+                "terminal": 552.4531954223029,
+                "loss": 238.36451453574
+              },
+              {
+                "A": 483,
+                "deleted": 151,
+                "terminal": 714.1949998625302,
+                "loss": 76.62271009551273
+              }
+            ]
+          },
+          {
+            "D": 38,
+            "terminal": 718.5914222878976,
+            "physGain": 571.6406508494813,
+            "virtGain": 146.95077143841766,
+            "physProxy": 880.7794117274523,
+            "virtProxy": 391.79167766393283,
+            "projClockVariance": 413.96606255239476,
+            "internalClockVariance": 267.01529111397696,
+            "terminalClockVariance": 146.95077143841766,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.7735747663413917,
+                "virt": 0.005405089666071257,
+                "unweighted": 192.5413633281156,
+                "bound": 1325.25
+              },
+              {
+                "d": 6,
+                "phys": 5.079322493941736,
+                "virt": 0.1281526844408613,
+                "unweighted": 375.96764815981726,
+                "bound": 2164.575
+              },
+              {
+                "d": 11,
+                "phys": 14.563833846631526,
+                "virt": 0.5441868427449382,
+                "unweighted": 509.53999348671573,
+                "bound": 2668.061634199134
+              },
+              {
+                "d": 38,
+                "phys": 166.1593247178323,
+                "virt": 21.476974544305605,
+                "unweighted": 953.9165783749698,
+                "bound": 3735.351428746442
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 484,
+                "terminal": 486.4495255053682,
+                "loss": 232.1418967825294
+              },
+              {
+                "A": 483,
+                "deleted": 151,
+                "terminal": 640.5332955644922,
+                "loss": 78.0581267234054
+              }
+            ]
+          },
+          {
+            "D": 76,
+            "terminal": 594.2627648746244,
+            "physGain": 432.48477754283397,
+            "virtGain": 161.77798733178952,
+            "physProxy": 634.1408706409812,
+            "virtProxy": 338.1824912882499,
+            "projClockVariance": 410.69045002797685,
+            "internalClockVariance": 248.91246269618753,
+            "terminalClockVariance": 161.77798733178952,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.19600711985001573,
+                "virt": 0.0013695328545788657,
+                "unweighted": 192.5413633281156,
+                "bound": 1325.25
+              },
+              {
+                "d": 13,
+                "phys": 5.414903023435698,
+                "virt": 0.2507229883396334,
+                "unweighted": 558.159537510424,
+                "bound": 2809.6481726606726
+              },
+              {
+                "d": 17,
+                "phys": 9.56146013506596,
+                "virt": 0.5879635912524582,
+                "unweighted": 643.2151400126965,
+                "bound": 3038.84465375311
+              },
+              {
+                "d": 76,
+                "phys": 190.84027737304623,
+                "virt": 47.920375864521574,
+                "unweighted": 1296.324613527934,
+                "bound": 4341.972699593617
+              }
+            ],
+            "pruned": [
+              {
+                "A": 339,
+                "deleted": 484,
+                "terminal": 380.8350574556078,
+                "loss": 213.4277074190166
+              },
+              {
+                "A": 483,
+                "deleted": 151,
+                "terminal": 515.3859584473362,
+                "loss": 78.87680642728822
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 169,
+        "S": 6093,
+        "R": 12808293,
+        "twin": 26675,
+        "bad": 0,
+        "stopKeys": 32,
+        "physicalNodes": 4203,
+        "virtualClasses": 112,
+        "minority": 2044,
+        "maxClocks": 7,
+        "oneClockStops": 4,
+        "largestPhysical": 213,
+        "branch": 2145,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 42,
+            "terminal": 2729.3553779280887,
+            "physGain": 2400.7887247461745,
+            "virtGain": 328.5666531819177,
+            "physProxy": 4119.8150196152,
+            "virtProxy": 1274.655442478807,
+            "projClockVariance": 2073.920100433468,
+            "internalClockVariance": 1745.3534472515503,
+            "terminalClockVariance": 328.5666531819177,
+            "near": [
+              {
+                "d": 2,
+                "phys": 2.1237508126576117,
+                "virt": 0.004263007974659451,
+                "unweighted": 640.895479443106,
+                "bound": 4569.75
+              },
+              {
+                "d": 6,
+                "phys": 13.677553582733195,
+                "virt": 0.09885673845215125,
+                "unweighted": 1230.8646179552027,
+                "bound": 7463.924999999999
+              },
+              {
+                "d": 12,
+                "phys": 55.521797740004565,
+                "virt": 0.772919896297089,
+                "unweighted": 1811.763687871917,
+                "bound": 9453.931331168831
+              },
+              {
+                "d": 42,
+                "phys": 567.6072005380412,
+                "virt": 26.893134466833953,
+                "unweighted": 3163.576837435324,
+                "bound": 13181.421960454163
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 2201,
+                "terminal": 1678.6288357774533,
+                "loss": 1050.7265421506354
+              },
+              {
+                "A": 1543,
+                "deleted": 513,
+                "terminal": 2481.9930660755203,
+                "loss": 247.36231185256838
+              }
+            ]
+          },
+          {
+            "D": 84,
+            "terminal": 2479.2794273674454,
+            "physGain": 2048.701831640376,
+            "virtGain": 430.577595727078,
+            "physProxy": 3273.471544995025,
+            "virtProxy": 1206.7299751527457,
+            "projClockVariance": 2338.6257448356555,
+            "internalClockVariance": 1908.0481491085752,
+            "terminalClockVariance": 430.577595727078,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.5374125532029974,
+                "virt": 0.0010787489691973609,
+                "unweighted": 640.895479443106,
+                "bound": 4569.75
+              },
+              {
+                "d": 12,
+                "phys": 14.714040150658775,
+                "virt": 0.2062423091953019,
+                "unweighted": 1811.763687871917,
+                "bound": 9453.931331168831
+              },
+              {
+                "d": 19,
+                "phys": 32.985986592256076,
+                "virt": 0.7121272722246812,
+                "unweighted": 2195.263160821067,
+                "bound": 10808.188865488228
+              },
+              {
+                "d": 84,
+                "phys": 652.6706195178406,
+                "virt": 58.90380542606175,
+                "unweighted": 4178.49059509769,
+                "bound": 15275.068849862982
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 2201,
+                "terminal": 1481.5055406408003,
+                "loss": 997.7738867266451
+              },
+              {
+                "A": 1543,
+                "deleted": 513,
+                "terminal": 2243.1572942358807,
+                "loss": 236.12213313156462
+              }
+            ]
+          },
+          {
+            "D": 169,
+            "terminal": 2056.083641805137,
+            "physGain": 1552.1748887252688,
+            "virtGain": 503.90875307987625,
+            "physProxy": 2301.1722887868427,
+            "virtProxy": 1059.074425275455,
+            "projClockVariance": 2350.399663546819,
+            "internalClockVariance": 1846.4909104669457,
+            "terminalClockVariance": 503.90875307987625,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.1335724034039461,
+                "virt": 0.0002681200720497399,
+                "unweighted": 640.895479443106,
+                "bound": 4569.75
+              },
+              {
+                "d": 25,
+                "phys": 15.333903333660126,
+                "virt": 0.43873448811286286,
+                "unweighted": 2494.6391273981394,
+                "bound": 11625.316588526059
+              },
+              {
+                "d": 30,
+                "phys": 24.31486836430051,
+                "virt": 0.873256274625455,
+                "unweighted": 2744.409717326941,
+                "bound": 12170.72829434897
+              },
+              {
+                "d": 169,
+                "phys": 733.3547395848502,
+                "virt": 124.99946345224512,
+                "unweighted": 5425.6695835386845,
+                "bound": 17395.728382906822
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 2201,
+                "terminal": 1164.2238381581128,
+                "loss": 891.8598036470244
+              },
+              {
+                "A": 1543,
+                "deleted": 513,
+                "terminal": 1840.916576352481,
+                "loss": 215.1670654526563
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 108,
+        "S": 9065,
+        "R": 11680803,
+        "twin": 23703,
+        "bad": 0,
+        "stopKeys": 71,
+        "physicalNodes": 6081,
+        "virtualClasses": 226,
+        "minority": 2624,
+        "maxClocks": 7,
+        "oneClockStops": 10,
+        "largestPhysical": 160,
+        "branch": 3196,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 27,
+            "terminal": 4071.8524843585355,
+            "physGain": 3597.322016787055,
+            "virtGain": 474.5304675715022,
+            "physProxy": 6090.325132895125,
+            "virtProxy": 1679.1704875647654,
+            "projClockVariance": 2510.6100772624286,
+            "internalClockVariance": 2036.0796096909269,
+            "terminalClockVariance": 474.5304675715022,
+            "near": [
+              {
+                "d": 2,
+                "phys": 7.638777534807032,
+                "virt": 0.021811841245655446,
+                "unweighted": 966.5601326207868,
+                "bound": 6798.75
+              },
+              {
+                "d": 4,
+                "phys": 23.069385335029303,
+                "virt": 0.15264777337557575,
+                "unweighted": 1477.0532942606164,
+                "bound": 9442.708333333332
+              },
+              {
+                "d": 8,
+                "phys": 87.44795543060906,
+                "virt": 1.0953530639516988,
+                "unweighted": 2225.204233157541,
+                "bound": 12318.687499999998
+              },
+              {
+                "d": 27,
+                "phys": 756.639122446992,
+                "virt": 29.27731929079945,
+                "unweighted": 3976.126757848043,
+                "bound": 17638.02773411506
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 1719,
+                "terminal": 3233.942222848976,
+                "loss": 837.9102615095594
+              },
+              {
+                "A": 1543,
+                "deleted": 47,
+                "terminal": 4047.668113831682,
+                "loss": 24.1843705268534
+              }
+            ]
+          },
+          {
+            "D": 54,
+            "terminal": 3722.512335555967,
+            "physGain": 3106.634452264384,
+            "virtGain": 615.8778832915519,
+            "physProxy": 4920.383464964772,
+            "virtProxy": 1601.330775342798,
+            "projClockVariance": 2903.0822027625654,
+            "internalClockVariance": 2287.2043194710172,
+            "terminalClockVariance": 615.8778832915519,
+            "near": [
+              {
+                "d": 2,
+                "phys": 1.9464192756959942,
+                "virt": 0.005557824932787208,
+                "unweighted": 966.5601326207868,
+                "bound": 6798.75
+              },
+              {
+                "d": 8,
+                "phys": 23.292932540366415,
+                "virt": 0.29371853068724874,
+                "unweighted": 2225.204233157541,
+                "bound": 12318.687499999998
+              },
+              {
+                "d": 14,
+                "phys": 71.7215220341594,
+                "virt": 1.5792634729080721,
+                "unweighted": 2997.412881085529,
+                "bound": 14737.706245143747
+              },
+              {
+                "d": 54,
+                "phys": 913.3054214238837,
+                "virt": 68.79258548781378,
+                "unweighted": 5408.673259650696,
+                "bound": 20738.13825964589
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 1719,
+                "terminal": 2910.4550790261005,
+                "loss": 812.0572565298667
+              },
+              {
+                "A": 1543,
+                "deleted": 47,
+                "terminal": 3697.5999073516214,
+                "loss": 24.912428204345815
+              }
+            ]
+          },
+          {
+            "D": 108,
+            "terminal": 3146.3106129056628,
+            "physGain": 2430.397092762143,
+            "virtGain": 715.9135201435181,
+            "physProxy": 3597.7305913801915,
+            "virtProxy": 1435.800636418399,
+            "projClockVariance": 2956.927042341873,
+            "internalClockVariance": 2241.013522198356,
+            "terminalClockVariance": 715.9135201435181,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.49119543042327823,
+                "virt": 0.0014025643108684692,
+                "unweighted": 966.5601326207868,
+                "bound": 6798.75
+              },
+              {
+                "d": 16,
+                "phys": 24.7631085757155,
+                "virt": 0.6270777480305275,
+                "unweighted": 3197.226258481404,
+                "bound": 15323.154161810413
+              },
+              {
+                "d": 22,
+                "phys": 46.90309721674845,
+                "virt": 1.633907925946068,
+                "unweighted": 3694.613101625693,
+                "bound": 16728.6110566098
+              },
+              {
+                "d": 108,
+                "phys": 994.0775943190288,
+                "virt": 145.24166107705827,
+                "unweighted": 7028.96627310346,
+                "bound": 23858.941202278947
+              }
+            ],
+            "pruned": [
+              {
+                "A": 678,
+                "deleted": 1719,
+                "terminal": 2391.140616737408,
+                "loss": 755.1699961682548
+              },
+              {
+                "A": 1543,
+                "deleted": 47,
+                "terminal": 3120.016618912657,
+                "loss": 26.293993993005643
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 338,
+        "S": 11112,
+        "R": 98554147,
+        "twin": 119960,
+        "bad": 0,
+        "stopKeys": 30,
+        "physicalNodes": 8094,
+        "virtualClasses": 116,
+        "minority": 3763,
+        "maxClocks": 7,
+        "oneClockStops": 1,
+        "largestPhysical": 357,
+        "branch": 3993,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 84,
+            "terminal": 5037.424294107934,
+            "physGain": 4462.383607462707,
+            "virtGain": 575.0406866451588,
+            "physProxy": 7912.082782048358,
+            "virtProxy": 2345.391321839297,
+            "projClockVariance": 5057.33764720382,
+            "internalClockVariance": 4482.2969605586595,
+            "terminalClockVariance": 575.0406866451588,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.9841241148729044,
+                "virt": 0.0008659606328659513,
+                "unweighted": 1172.3043327561688,
+                "bound": 8334
+              },
+              {
+                "d": 11,
+                "phys": 18.718807491080028,
+                "virt": 0.0818069439435941,
+                "unweighted": 2997.100659785645,
+                "bound": 16778.438528138526
+              },
+              {
+                "d": 19,
+                "phys": 59.75094633312947,
+                "virt": 0.47661998215908064,
+                "unweighted": 3962.857765232385,
+                "bound": 19711.2415350903
+              },
+              {
+                "d": 84,
+                "phys": 1025.7456815411615,
+                "virt": 39.95317085155896,
+                "unweighted": 7012.951318900898,
+                "bound": 27857.63418015386
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 3535,
+                "terminal": 3313.878270059432,
+                "loss": 1723.5460240485017
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 5036.9968489603,
+                "loss": 0.4274451476339891
+              }
+            ]
+          },
+          {
+            "D": 169,
+            "terminal": 4644.034989725208,
+            "physGain": 3880.5122683533505,
+            "virtGain": 763.522721371864,
+            "physProxy": 6385.379758414111,
+            "virtProxy": 2242.670708482981,
+            "projClockVariance": 5629.772365843471,
+            "internalClockVariance": 4866.249644471597,
+            "terminalClockVariance": 763.522721371864,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.24460132627698797,
+                "virt": 0.00021523211971086371,
+                "unweighted": 1172.3043327561688,
+                "bound": 8334
+              },
+              {
+                "d": 23,
+                "phys": 23.090670741633076,
+                "virt": 0.22790430812787904,
+                "unweighted": 4323.690210729671,
+                "bound": 20747.723635598486
+              },
+              {
+                "d": 30,
+                "phys": 42.521812252747175,
+                "virt": 0.5964620482355019,
+                "unweighted": 4888.143628106736,
+                "bound": 22196.14849939369
+              },
+              {
+                "d": 169,
+                "phys": 1124.4912040537674,
+                "virt": 87.07677405944806,
+                "unweighted": 8754.017711450271,
+                "bound": 31725.149153267783
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 3535,
+                "terminal": 2983.310939984625,
+                "loss": 1660.7240497405833
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 4643.635171167521,
+                "loss": 0.39981855768746755
+              }
+            ]
+          },
+          {
+            "D": 338,
+            "terminal": 3989.706958587794,
+            "physGain": 3069.2348517792434,
+            "virtGain": 920.472106808544,
+            "physProxy": 4683.720281447583,
+            "virtProxy": 2026.1223540147696,
+            "projClockVariance": 5816.823529413361,
+            "internalClockVariance": 4896.351422604815,
+            "terminalClockVariance": 920.472106808544,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.06133232660368016,
+                "virt": 0.00005396817287392938,
+                "unweighted": 1172.3043327561688,
+                "bound": 8334
+              },
+              {
+                "d": 46,
+                "phys": 26.02787222060518,
+                "virt": 0.572214419436178,
+                "unweighted": 5720.792436575674,
+                "bound": 24539.114338698793
+              },
+              {
+                "d": 48,
+                "phys": 28.337814305674648,
+                "virt": 0.6513515125586752,
+                "unweighted": 5805.803854945343,
+                "bound": 24773.077104656237
+              },
+              {
+                "d": 338,
+                "phys": 1279.0030439986872,
+                "virt": 184.506772137124,
+                "unweighted": 10903.140544597258,
+                "bound": 35568.06811168209
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 3535,
+                "terminal": 2475.798253778776,
+                "loss": 1513.9087048090178
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 3989.37646844654,
+                "loss": 0.33049014125390386
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 148,
+        "S": 34194,
+        "R": 78434077,
+        "twin": 96878,
+        "bad": 0,
+        "stopKeys": 192,
+        "physicalNodes": 23693,
+        "virtualClasses": 676,
+        "minority": 9956,
+        "maxClocks": 8,
+        "oneClockStops": 20,
+        "largestPhysical": 243,
+        "branch": 12157,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 37,
+            "terminal": 15565.968109542186,
+            "physGain": 13832.653882328765,
+            "virtGain": 1733.31422721379,
+            "physProxy": 24146.21645014104,
+            "virtProxy": 6466.174871477964,
+            "projClockVariance": 10305.658611281187,
+            "internalClockVariance": 8572.344384067383,
+            "terminalClockVariance": 1733.31422721379,
+            "near": [
+              {
+                "d": 2,
+                "phys": 15.470857375584359,
+                "virt": 0.027961389520611193,
+                "unweighted": 3634.5447542079423,
+                "bound": 25645.5
+              },
+              {
+                "d": 5,
+                "phys": 46.18845422218694,
+                "virt": 0.18831230829366064,
+                "unweighted": 5496.521763921725,
+                "bound": 39038.15
+              },
+              {
+                "d": 11,
+                "phys": 278.87983203784216,
+                "virt": 2.5514885498451014,
+                "unweighted": 9285.159916061171,
+                "bound": 51630.84296536796
+              },
+              {
+                "d": 37,
+                "phys": 2869.1591544570624,
+                "virt": 87.278174267467,
+                "unweighted": 16386.405456101624,
+                "bound": 71834.51966867902
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 4994,
+                "terminal": 13092.638601321925,
+                "loss": 2473.3295082202603
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 15565.407247981228,
+                "loss": 0.5608615609580738
+              }
+            ]
+          },
+          {
+            "D": 74,
+            "terminal": 14463.72321788241,
+            "physGain": 12178.044693590828,
+            "virtGain": 2285.6785242919645,
+            "physProxy": 19894.620819142696,
+            "virtProxy": 6241.273830146707,
+            "projClockVariance": 11595.102639740333,
+            "internalClockVariance": 9309.424115448359,
+            "terminalClockVariance": 2285.6785242919645,
+            "near": [
+              {
+                "d": 2,
+                "phys": 3.9214325986725913,
+                "virt": 0.007087435538210469,
+                "unweighted": 3634.5447542079423,
+                "bound": 25645.5
+              },
+              {
+                "d": 10,
+                "phys": 73.76251023550009,
+                "virt": 0.6785723861998921,
+                "unweighted": 9285.159916061171,
+                "bound": 50076.570238095235
+              },
+              {
+                "d": 17,
+                "phys": 184.18367499907384,
+                "virt": 2.7188394795131874,
+                "unweighted": 11619.717843374048,
+                "bound": 58806.029479589044
+              },
+              {
+                "d": 74,
+                "phys": 3216.075448279925,
+                "virt": 194.81284220517463,
+                "unweighted": 21283.583597502045,
+                "bound": 83570.51721556543
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 4994,
+                "terminal": 12020.299777802249,
+                "loss": 2443.4234400801615
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 14463.116769978637,
+                "loss": 0.6064479037740966
+              }
+            ]
+          },
+          {
+            "D": 148,
+            "terminal": 12671.29083593047,
+            "physGain": 9930.536121637306,
+            "virtGain": 2740.7547142934127,
+            "physProxy": 15252.470314748249,
+            "virtProxy": 5760.90464347801,
+            "projClockVariance": 11797.020723170726,
+            "internalClockVariance": 9056.266008877323,
+            "terminalClockVariance": 2740.7547142934127,
+            "near": [
+              {
+                "d": 2,
+                "phys": 0.9870729315152355,
+                "virt": 0.0017839949043098287,
+                "unweighted": 3634.5447542079423,
+                "bound": 25645.5
+              },
+              {
+                "d": 20,
+                "phys": 76.11545928645806,
+                "virt": 1.3789930406097988,
+                "unweighted": 12864.446119018974,
+                "bound": 61510.55491818553
+              },
+              {
+                "d": 27,
+                "phys": 128.79631786323898,
+                "virt": 3.0283641713880094,
+                "unweighted": 14369.254511934536,
+                "bound": 66532.23611035084
+              },
+              {
+                "d": 148,
+                "phys": 3482.905568875606,
+                "virt": 409.50192431767994,
+                "unweighted": 26829.07116695899,
+                "bound": 95363.68955760148
+              }
+            ],
+            "pruned": [
+              {
+                "A": 1355,
+                "deleted": 4994,
+                "terminal": 10295.637984838719,
+                "loss": 2375.6528510917506
+              },
+              {
+                "A": 5041,
+                "deleted": 1,
+                "terminal": 12670.614821323825,
+                "loss": 0.6760146066444577
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
