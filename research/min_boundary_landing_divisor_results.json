@@ -1,0 +1,4336 @@
+{
+  "rows": [
+    {
+      "X": 256,
+      "B": 43,
+      "N": 128,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 7,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 22,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 790,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 7,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 10,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 43,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 430,
+          "T": 53,
+          "S": 53,
+          "SCell": 0,
+          "SPrime": 53,
+          "twin": 70,
+          "bad": 5,
+          "R": 6952,
+          "Rlo": 3224,
+          "Rhi": 3728,
+          "events": 1076,
+          "literal": 1204,
+          "cellCount": 4,
+          "maxAdmit": 63,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 1542,
+          "primeKeys": 2,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.09610983981693363,
+          "primeH": 3496,
+          "primeU": 19,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 143,
+          "primeStops": [
+            {
+              "p": 19,
+              "C": 816,
+              "m": 23,
+              "U": 8
+            },
+            {
+              "p": 23,
+              "C": 990,
+              "m": 30,
+              "U": 11
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 7,
+              "m": 10,
+              "keys": 2,
+              "I": 0.08585055643879173,
+              "maxLandingFactors": 1,
+              "landingBound": 115.50692172898123,
+              "capacity": 49667.97634346192
+            },
+            {
+              "Q": 11,
+              "m": 10,
+              "keys": 2,
+              "I": 0.08585055643879173,
+              "maxLandingFactors": 1,
+              "landingBound": 59.64938035444134,
+              "capacity": 25649.233552409776
+            },
+            {
+              "Q": 22,
+              "m": 5,
+              "keys": 1,
+              "I": 0.02702702702702703,
+              "maxLandingFactors": 1,
+              "landingBound": 23.136687595776344,
+              "capacity": 9948.775666183828
+            },
+            {
+              "Q": 31,
+              "m": 5,
+              "keys": 1,
+              "I": 0.02702702702702703,
+              "maxLandingFactors": 1,
+              "landingBound": 14.77979692184773,
+              "capacity": 6355.312676394524
+            },
+            {
+              "Q": 790,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0.29849946686889284,
+              "capacity": 128.3547707536239
+            }
+          ],
+          "heights": [
+            {
+              "A0": 7,
+              "small": 10,
+              "large": 0,
+              "highSmall": 10,
+              "lowSmall": 0,
+              "bound": 17.201907790143085,
+              "keys": 2
+            },
+            {
+              "A0": 10,
+              "small": 10,
+              "large": 0,
+              "highSmall": 10,
+              "lowSmall": 0,
+              "bound": 17.717011128775834,
+              "keys": 2
+            },
+            {
+              "A0": 43,
+              "small": 10,
+              "large": 0,
+              "highSmall": 5,
+              "lowSmall": 5,
+              "bound": 23.38314785373609,
+              "keys": 2
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 430,
+          "T": 53,
+          "S": 93,
+          "SCell": 63,
+          "SPrime": 30,
+          "twin": 35,
+          "bad": 0,
+          "R": 3113,
+          "Rlo": 1664,
+          "Rhi": 1449,
+          "events": 515,
+          "literal": 580,
+          "cellCount": 4,
+          "maxAdmit": 63,
+          "stoppedCells": 1,
+          "rootsCell": 53,
+          "maxCellLow": 1253,
+          "primeKeys": 1,
+          "cellKeys": 2,
+          "cellI": 0.08585055643879173,
+          "cellH": 540,
+          "cellU": 10,
+          "primeI": 0.043478260869565216,
+          "primeH": 2484,
+          "primeU": 11,
+          "topMass": 5,
+          "topKeys": 1,
+          "topI": 0.02702702702702703,
+          "topH": 370,
+          "topU": 5,
+          "topPhysical": 0,
+          "entryChecks": 10,
+          "executedCellAdmits": 77,
+          "primeStops": [
+            {
+              "p": 23,
+              "C": 990,
+              "m": 30,
+              "U": 11
+            }
+          ],
+          "cellStops": [
+            {
+              "b": 3,
+              "J": 630,
+              "m": 63,
+              "roots": 53,
+              "gates": 2
+            }
+          ]
+        },
+        {
+          "bands": [
+            {
+              "Q": 7,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 22,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 8689,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 5,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 10,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 43,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 430,
+          "T": 578,
+          "S": 53,
+          "SCell": 0,
+          "SPrime": 53,
+          "twin": 70,
+          "bad": 5,
+          "R": 6952,
+          "Rlo": 3976,
+          "Rhi": 2976,
+          "events": 1076,
+          "literal": 1204,
+          "cellCount": 1,
+          "maxAdmit": 128,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 3976,
+          "primeKeys": 2,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.09610983981693363,
+          "primeH": 3496,
+          "primeU": 19,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 128,
+          "primeStops": [
+            {
+              "p": 19,
+              "C": 816,
+              "m": 23,
+              "U": 8
+            },
+            {
+              "p": 23,
+              "C": 990,
+              "m": 30,
+              "U": 11
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 7,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 22,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 8689,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 5,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 10,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 43,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 430,
+          "T": 578,
+          "S": 53,
+          "SCell": 0,
+          "SPrime": 53,
+          "twin": 70,
+          "bad": 5,
+          "R": 6952,
+          "Rlo": 3976,
+          "Rhi": 2976,
+          "events": 1076,
+          "literal": 1204,
+          "cellCount": 1,
+          "maxAdmit": 128,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 3976,
+          "primeKeys": 2,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.09610983981693363,
+          "primeH": 3496,
+          "primeU": 19,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 128,
+          "primeStops": [
+            {
+              "p": 19,
+              "C": 816,
+              "m": 23,
+              "U": 8
+            },
+            {
+              "p": 23,
+              "C": 990,
+              "m": 30,
+              "U": 11
+            }
+          ],
+          "cellStops": []
+        }
+      ]
+    },
+    {
+      "X": 1024,
+      "B": 85,
+      "N": 512,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 10,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 43,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 933,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 21,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 30,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 85,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 1785,
+          "T": 53,
+          "S": 46,
+          "SCell": 0,
+          "SPrime": 46,
+          "twin": 466,
+          "bad": 0,
+          "R": 31466,
+          "Rlo": 11518,
+          "Rhi": 19948,
+          "events": 4008,
+          "literal": 4520,
+          "cellCount": 11,
+          "maxAdmit": 88,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 1745,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.014925373134328358,
+          "primeH": 276,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 658,
+          "primeStops": [
+            {
+              "p": 67,
+              "C": 2478,
+              "m": 46,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 10,
+              "m": 22,
+              "keys": 5,
+              "I": 0.20792600671265987,
+              "maxLandingFactors": 1,
+              "landingBound": 404.829511345119,
+              "capacity": 722620.6777510374
+            },
+            {
+              "Q": 11,
+              "m": 22,
+              "keys": 5,
+              "I": 0.20792600671265987,
+              "maxLandingFactors": 1,
+              "landingBound": 353.398707078153,
+              "capacity": 630816.692134503
+            },
+            {
+              "Q": 31,
+              "m": 10,
+              "keys": 3,
+              "I": 0.07353865493400377,
+              "maxLandingFactors": 1,
+              "landingBound": 87.56438192689038,
+              "capacity": 156302.42173949932
+            },
+            {
+              "Q": 43,
+              "m": 7,
+              "keys": 2,
+              "I": 0.046511627906976744,
+              "maxLandingFactors": 1,
+              "landingBound": 57.63588373295646,
+              "capacity": 102880.05246332727
+            },
+            {
+              "Q": 933,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 1.4610039107873378,
+              "capacity": 2607.8919807553984
+            }
+          ],
+          "heights": [
+            {
+              "A0": 21,
+              "small": 13,
+              "large": 9,
+              "highSmall": 3,
+              "lowSmall": 10,
+              "bound": 48.73289228193172,
+              "keys": 5
+            },
+            {
+              "A0": 30,
+              "small": 13,
+              "large": 9,
+              "highSmall": 0,
+              "lowSmall": 13,
+              "bound": 52.4755604027596,
+              "keys": 5
+            },
+            {
+              "A0": 85,
+              "small": 13,
+              "large": 9,
+              "highSmall": 0,
+              "lowSmall": 13,
+              "bound": 75.34742114115218,
+              "keys": 5
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 1785,
+          "T": 53,
+          "S": 286,
+          "SCell": 286,
+          "SPrime": 0,
+          "twin": 226,
+          "bad": 0,
+          "R": 10250,
+          "Rlo": 4171,
+          "Rhi": 6079,
+          "events": 1414,
+          "literal": 1640,
+          "cellCount": 11,
+          "maxAdmit": 63,
+          "stoppedCells": 5,
+          "rootsCell": 264,
+          "maxCellLow": 1039,
+          "primeKeys": 0,
+          "cellKeys": 5,
+          "cellI": 0.20792600671265987,
+          "cellH": 162,
+          "cellU": 21,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 7,
+          "topKeys": 2,
+          "topI": 0.046511627906976744,
+          "topH": 6,
+          "topU": 7,
+          "topPhysical": 0,
+          "entryChecks": 22,
+          "executedCellAdmits": 263,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 10,
+              "J": 2100,
+              "m": 55,
+              "roots": 52,
+              "gates": 1
+            },
+            {
+              "b": 11,
+              "J": 2310,
+              "m": 53,
+              "roots": 53,
+              "gates": 0
+            },
+            {
+              "b": 13,
+              "J": 2730,
+              "m": 56,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 15,
+              "J": 3150,
+              "m": 63,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 17,
+              "J": 3570,
+              "m": 59,
+              "roots": 53,
+              "gates": 1
+            }
+          ]
+        },
+        {
+          "bands": [
+            {
+              "Q": 10,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 43,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 10263,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 21,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 23,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 85,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 1785,
+          "T": 578,
+          "S": 46,
+          "SCell": 0,
+          "SPrime": 46,
+          "twin": 466,
+          "bad": 0,
+          "R": 31466,
+          "Rlo": 13883,
+          "Rhi": 17583,
+          "events": 4008,
+          "literal": 4520,
+          "cellCount": 2,
+          "maxAdmit": 462,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 12761,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.014925373134328358,
+          "primeH": 276,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 528,
+          "primeStops": [
+            {
+              "p": 67,
+              "C": 2478,
+              "m": 46,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 10,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 43,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 10263,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 21,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 23,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 85,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 1785,
+          "T": 578,
+          "S": 46,
+          "SCell": 0,
+          "SPrime": 46,
+          "twin": 466,
+          "bad": 0,
+          "R": 31466,
+          "Rlo": 13883,
+          "Rhi": 17583,
+          "events": 4008,
+          "literal": 4520,
+          "cellCount": 2,
+          "maxAdmit": 462,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 12761,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.014925373134328358,
+          "primeH": 276,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 528,
+          "primeStops": [
+            {
+              "p": 67,
+              "C": 2478,
+              "m": 46,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        }
+      ]
+    },
+    {
+      "X": 4096,
+      "B": 170,
+      "N": 2048,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 14,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 85,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 1079,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 42,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 123,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 170,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 7140,
+          "T": 53,
+          "S": 0,
+          "SCell": 0,
+          "SPrime": 0,
+          "twin": 2048,
+          "bad": 0,
+          "R": 331583,
+          "Rlo": 83890,
+          "Rhi": 247693,
+          "events": 30191,
+          "literal": 0,
+          "cellCount": 41,
+          "maxAdmit": 181,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 8755,
+          "primeKeys": 0,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 3729,
+          "primeStops": [],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 547,
+              "keys": 58,
+              "I": 2.0038977699628373,
+              "maxLandingFactors": 2,
+              "landingBound": 1634.3019258217644,
+              "capacity": 11668915.750367394
+            },
+            {
+              "Q": 14,
+              "m": 507,
+              "keys": 48,
+              "I": 1.1787229447880125,
+              "maxLandingFactors": 2,
+              "landingBound": 1166.7513948212566,
+              "capacity": 8330604.959023776
+            },
+            {
+              "Q": 31,
+              "m": 451,
+              "keys": 37,
+              "I": 0.6358040017827349,
+              "maxLandingFactors": 2,
+              "landingBound": 404.94386411227543,
+              "capacity": 2891299.189761645
+            },
+            {
+              "Q": 85,
+              "m": 118,
+              "keys": 12,
+              "I": 0.10745450457474538,
+              "maxLandingFactors": 1,
+              "landingBound": 114.15476399649093,
+              "capacity": 815065.0149349449
+            },
+            {
+              "Q": 1079,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 5.720613080520549,
+              "capacity": 40845.17739491674
+            }
+          ],
+          "heights": [
+            {
+              "A0": 42,
+              "small": 144,
+              "large": 403,
+              "highSmall": 57,
+              "lowSmall": 87,
+              "bound": 632.3274126768785,
+              "keys": 58
+            },
+            {
+              "A0": 123,
+              "small": 144,
+              "large": 403,
+              "highSmall": 45,
+              "lowSmall": 99,
+              "bound": 956.9588514108581,
+              "keys": 58
+            },
+            {
+              "A0": 170,
+              "small": 144,
+              "large": 403,
+              "highSmall": 22,
+              "lowSmall": 122,
+              "bound": 1145.3252417873648,
+              "keys": 58
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 7140,
+          "T": 53,
+          "S": 1607,
+          "SCell": 1607,
+          "SPrime": 0,
+          "twin": 441,
+          "bad": 0,
+          "R": 86273,
+          "Rlo": 21585,
+          "Rhi": 64688,
+          "events": 7777,
+          "literal": 0,
+          "cellCount": 39,
+          "maxAdmit": 105,
+          "stoppedCells": 20,
+          "rootsCell": 1060,
+          "maxCellLow": 1979,
+          "primeKeys": 0,
+          "cellKeys": 58,
+          "cellI": 2.0038977699628373,
+          "cellH": 46252,
+          "cellU": 328,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 118,
+          "topKeys": 12,
+          "topI": 0.10745450457474538,
+          "topH": 15458,
+          "topU": 75,
+          "topPhysical": 83,
+          "entryChecks": 547,
+          "executedCellAdmits": 988,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 39,
+              "J": 8190,
+              "m": 53,
+              "roots": 53,
+              "gates": 0
+            },
+            {
+              "b": 41,
+              "J": 8610,
+              "m": 94,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 43,
+              "J": 9030,
+              "m": 65,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 45,
+              "J": 9450,
+              "m": 66,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 47,
+              "J": 9870,
+              "m": 68,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 49,
+              "J": 10290,
+              "m": 85,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 51,
+              "J": 10710,
+              "m": 83,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 53,
+              "J": 11130,
+              "m": 77,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 55,
+              "J": 11550,
+              "m": 75,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 57,
+              "J": 11970,
+              "m": 72,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 59,
+              "J": 12390,
+              "m": 91,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 61,
+              "J": 12810,
+              "m": 102,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 63,
+              "J": 13230,
+              "m": 104,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 65,
+              "J": 13650,
+              "m": 105,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 67,
+              "J": 14070,
+              "m": 71,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 69,
+              "J": 14490,
+              "m": 89,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 71,
+              "J": 14910,
+              "m": 101,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 73,
+              "J": 15330,
+              "m": 75,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 75,
+              "J": 15750,
+              "m": 56,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 77,
+              "J": 16170,
+              "m": 75,
+              "roots": 53,
+              "gates": 5
+            }
+          ]
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 14,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 85,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 11864,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 42,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 94,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 170,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 7140,
+          "T": 578,
+          "S": 0,
+          "SCell": 0,
+          "SPrime": 0,
+          "twin": 2048,
+          "bad": 0,
+          "R": 331583,
+          "Rlo": 102414,
+          "Rhi": 229169,
+          "events": 30191,
+          "literal": 0,
+          "cellCount": 5,
+          "maxAdmit": 622,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 36943,
+          "primeKeys": 0,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 2165,
+          "primeStops": [],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 45,
+              "keys": 5,
+              "I": 0.08356137568935745,
+              "maxLandingFactors": 1,
+              "landingBound": 1422.0855620800955,
+              "capacity": 10153690.913251882
+            },
+            {
+              "Q": 14,
+              "m": 45,
+              "keys": 5,
+              "I": 0.08356137568935745,
+              "maxLandingFactors": 1,
+              "landingBound": 1283.4265343033826,
+              "capacity": 9163665.454926152
+            },
+            {
+              "Q": 31,
+              "m": 27,
+              "keys": 4,
+              "I": 0.04008311481979222,
+              "maxLandingFactors": 1,
+              "landingBound": 445.438250523503,
+              "capacity": 3180429.1087378114
+            },
+            {
+              "Q": 85,
+              "m": 21,
+              "keys": 3,
+              "I": 0.025157741685463864,
+              "maxLandingFactors": 1,
+              "landingBound": 125.57024039614,
+              "capacity": 896571.5164284395
+            },
+            {
+              "Q": 11864,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0.4260449127972964,
+              "capacity": 3041.9606773726964
+            }
+          ],
+          "heights": [
+            {
+              "A0": 42,
+              "small": 23,
+              "large": 22,
+              "highSmall": 13,
+              "lowSmall": 10,
+              "bound": 47.019155557906025,
+              "keys": 5
+            },
+            {
+              "A0": 94,
+              "small": 23,
+              "large": 22,
+              "highSmall": 13,
+              "lowSmall": 10,
+              "bound": 55.7095386295992,
+              "keys": 5
+            },
+            {
+              "A0": 170,
+              "small": 23,
+              "large": 22,
+              "highSmall": 5,
+              "lowSmall": 18,
+              "bound": 68.41086773438153,
+              "keys": 5
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 7140,
+          "T": 578,
+          "S": 1200,
+          "SCell": 1200,
+          "SPrime": 0,
+          "twin": 848,
+          "bad": 0,
+          "R": 172134,
+          "Rlo": 51882,
+          "Rhi": 120252,
+          "events": 15308,
+          "literal": 0,
+          "cellCount": 5,
+          "maxAdmit": 622,
+          "stoppedCells": 2,
+          "rootsCell": 1155,
+          "maxCellLow": 36213,
+          "primeKeys": 0,
+          "cellKeys": 5,
+          "cellI": 0.08356137568935745,
+          "cellH": 2512,
+          "cellU": 39,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 21,
+          "topKeys": 3,
+          "topI": 0.025157741685463864,
+          "topH": 36,
+          "topU": 18,
+          "topPhysical": 11,
+          "entryChecks": 45,
+          "executedCellAdmits": 919,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 4,
+              "J": 9240,
+              "m": 622,
+              "roots": 577,
+              "gates": 5
+            },
+            {
+              "b": 5,
+              "J": 11550,
+              "m": 578,
+              "roots": 578,
+              "gates": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "X": 16384,
+      "B": 339,
+      "N": 8192,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 19,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 170,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 1224,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 84,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 339,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 495,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 28476,
+          "T": 64,
+          "S": 229,
+          "SCell": 0,
+          "SPrime": 229,
+          "twin": 7963,
+          "bad": 0,
+          "R": 2086247,
+          "Rlo": 442475,
+          "Rhi": 1643772,
+          "events": 158701,
+          "literal": 0,
+          "cellCount": 162,
+          "maxAdmit": 296,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 14683,
+          "primeKeys": 2,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.006657395950814108,
+          "primeH": 0,
+          "primeU": 16,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 18767,
+          "primeStops": [
+            {
+              "p": 271,
+              "C": 48510,
+              "m": 115,
+              "U": 8
+            },
+            {
+              "p": 337,
+              "C": 64368,
+              "m": 114,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 2409,
+              "keys": 286,
+              "I": 8.480712194648609,
+              "maxLandingFactors": 3,
+              "landingBound": 7049.129233167287,
+              "capacity": 200731004.04367128
+            },
+            {
+              "Q": 19,
+              "m": 2025,
+              "keys": 233,
+              "I": 4.38568957021423,
+              "maxLandingFactors": 2,
+              "landingBound": 3323.549948272849,
+              "capacity": 94641408.32701789
+            },
+            {
+              "Q": 31,
+              "m": 1754,
+              "keys": 192,
+              "I": 2.628331407190474,
+              "maxLandingFactors": 2,
+              "landingBound": 1746.6182871137748,
+              "capacity": 49736702.343852006
+            },
+            {
+              "Q": 170,
+              "m": 354,
+              "keys": 38,
+              "I": 0.17514397578943397,
+              "maxLandingFactors": 1,
+              "landingBound": 212.96168636921558,
+              "capacity": 6064296.981049776
+            },
+            {
+              "Q": 1224,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 21.365581310861547,
+              "capacity": 608406.2934080927
+            }
+          ],
+          "heights": [
+            {
+              "A0": 84,
+              "small": 809,
+              "large": 1600,
+              "highSmall": 262,
+              "lowSmall": 547,
+              "bound": 3712.7596487009673,
+              "keys": 286
+            },
+            {
+              "A0": 339,
+              "small": 809,
+              "large": 1600,
+              "highSmall": 23,
+              "lowSmall": 786,
+              "bound": 8037.922867971759,
+              "keys": 286
+            },
+            {
+              "A0": 495,
+              "small": 809,
+              "large": 1600,
+              "highSmall": 0,
+              "lowSmall": 809,
+              "bound": 10683.905072702126,
+              "keys": 286
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 28476,
+          "T": 64,
+          "S": 6402,
+          "SCell": 6402,
+          "SPrime": 0,
+          "twin": 1790,
+          "bad": 0,
+          "R": 416674,
+          "Rlo": 87402,
+          "Rhi": 329272,
+          "events": 31386,
+          "literal": 0,
+          "cellCount": 162,
+          "maxAdmit": 110,
+          "stoppedCells": 76,
+          "rootsCell": 3993,
+          "maxCellLow": 2056,
+          "primeKeys": 0,
+          "cellKeys": 286,
+          "cellI": 8.480712194648609,
+          "cellH": 216234,
+          "cellU": 1593,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 354,
+          "topKeys": 38,
+          "topI": 0.17514397578943397,
+          "topH": 51480,
+          "topU": 200,
+          "topPhysical": 290,
+          "entryChecks": 2409,
+          "executedCellAdmits": 4286,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 157,
+              "J": 32970,
+              "m": 64,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 159,
+              "J": 33390,
+              "m": 83,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 162,
+              "J": 34020,
+              "m": 110,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 164,
+              "J": 34440,
+              "m": 79,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 166,
+              "J": 34860,
+              "m": 93,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 168,
+              "J": 35280,
+              "m": 97,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 170,
+              "J": 35700,
+              "m": 89,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 172,
+              "J": 36120,
+              "m": 82,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 174,
+              "J": 36540,
+              "m": 66,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 176,
+              "J": 36960,
+              "m": 68,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 178,
+              "J": 37380,
+              "m": 65,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 180,
+              "J": 37800,
+              "m": 75,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 182,
+              "J": 38220,
+              "m": 105,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 184,
+              "J": 38640,
+              "m": 72,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 186,
+              "J": 39060,
+              "m": 66,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 188,
+              "J": 39480,
+              "m": 93,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 190,
+              "J": 39900,
+              "m": 74,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 192,
+              "J": 40320,
+              "m": 97,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 195,
+              "J": 40950,
+              "m": 102,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 197,
+              "J": 41370,
+              "m": 100,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 199,
+              "J": 41790,
+              "m": 70,
+              "roots": 53,
+              "gates": 6
+            },
+            {
+              "b": 201,
+              "J": 42210,
+              "m": 86,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 203,
+              "J": 42630,
+              "m": 71,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 205,
+              "J": 43050,
+              "m": 80,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 207,
+              "J": 43470,
+              "m": 74,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 209,
+              "J": 43890,
+              "m": 65,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 211,
+              "J": 44310,
+              "m": 72,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 213,
+              "J": 44730,
+              "m": 69,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 214,
+              "J": 44940,
+              "m": 72,
+              "roots": 52,
+              "gates": 1
+            },
+            {
+              "b": 216,
+              "J": 45360,
+              "m": 77,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 218,
+              "J": 45780,
+              "m": 103,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 220,
+              "J": 46200,
+              "m": 73,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 222,
+              "J": 46620,
+              "m": 93,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 224,
+              "J": 47040,
+              "m": 105,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 226,
+              "J": 47460,
+              "m": 68,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 228,
+              "J": 47880,
+              "m": 70,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 230,
+              "J": 48300,
+              "m": 101,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 232,
+              "J": 48720,
+              "m": 77,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 234,
+              "J": 49140,
+              "m": 86,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 236,
+              "J": 49560,
+              "m": 85,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 238,
+              "J": 49980,
+              "m": 75,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 240,
+              "J": 50400,
+              "m": 101,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 242,
+              "J": 50820,
+              "m": 105,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 245,
+              "J": 51450,
+              "m": 72,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 247,
+              "J": 51870,
+              "m": 75,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 249,
+              "J": 52290,
+              "m": 70,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 251,
+              "J": 52710,
+              "m": 99,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 253,
+              "J": 53130,
+              "m": 79,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 255,
+              "J": 53550,
+              "m": 86,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 257,
+              "J": 53970,
+              "m": 99,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 259,
+              "J": 54390,
+              "m": 105,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 261,
+              "J": 54810,
+              "m": 99,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 263,
+              "J": 55230,
+              "m": 71,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 265,
+              "J": 55650,
+              "m": 68,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 267,
+              "J": 56070,
+              "m": 84,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 269,
+              "J": 56490,
+              "m": 104,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 271,
+              "J": 56910,
+              "m": 76,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 273,
+              "J": 57330,
+              "m": 81,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 275,
+              "J": 57750,
+              "m": 104,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 278,
+              "J": 58380,
+              "m": 66,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 279,
+              "J": 58590,
+              "m": 77,
+              "roots": 53,
+              "gates": 1
+            },
+            {
+              "b": 281,
+              "J": 59010,
+              "m": 70,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 283,
+              "J": 59430,
+              "m": 77,
+              "roots": 53,
+              "gates": 2
+            },
+            {
+              "b": 285,
+              "J": 59850,
+              "m": 98,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 287,
+              "J": 60270,
+              "m": 94,
+              "roots": 53,
+              "gates": 6
+            },
+            {
+              "b": 290,
+              "J": 60900,
+              "m": 82,
+              "roots": 52,
+              "gates": 2
+            },
+            {
+              "b": 292,
+              "J": 61320,
+              "m": 87,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 294,
+              "J": 61740,
+              "m": 102,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 297,
+              "J": 62370,
+              "m": 86,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 299,
+              "J": 62790,
+              "m": 105,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 301,
+              "J": 63210,
+              "m": 98,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 303,
+              "J": 63630,
+              "m": 90,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 305,
+              "J": 64050,
+              "m": 105,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 307,
+              "J": 64470,
+              "m": 76,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 309,
+              "J": 64890,
+              "m": 76,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 311,
+              "J": 65310,
+              "m": 83,
+              "roots": 53,
+              "gates": 6
+            }
+          ]
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 19,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 170,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 13459,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 84,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 339,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 378,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 28476,
+          "T": 578,
+          "S": 229,
+          "SCell": 0,
+          "SPrime": 229,
+          "twin": 7963,
+          "bad": 0,
+          "R": 2086247,
+          "Rlo": 531120,
+          "Rhi": 1555127,
+          "events": 158701,
+          "literal": 0,
+          "cellCount": 15,
+          "maxAdmit": 739,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 66125,
+          "primeKeys": 2,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.006657395950814108,
+          "primeH": 0,
+          "primeU": 16,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 9181,
+          "primeStops": [
+            {
+              "p": 271,
+              "C": 48510,
+              "m": 115,
+              "U": 8
+            },
+            {
+              "p": 337,
+              "C": 64368,
+              "m": 114,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 494,
+              "keys": 24,
+              "I": 0.4326174784293921,
+              "maxLandingFactors": 2,
+              "landingBound": 5649.543476360607,
+              "capacity": 160876400.03284463
+            },
+            {
+              "Q": 19,
+              "m": 353,
+              "keys": 22,
+              "I": 0.2787713245832382,
+              "maxLandingFactors": 1,
+              "landingBound": 3367.280868644865,
+              "capacity": 95886690.01553117
+            },
+            {
+              "Q": 31,
+              "m": 340,
+              "keys": 21,
+              "I": 0.23529306371367306,
+              "maxLandingFactors": 1,
+              "landingBound": 1769.6001066810636,
+              "capacity": 50391132.63784998
+            },
+            {
+              "Q": 170,
+              "m": 134,
+              "keys": 7,
+              "I": 0.03282812272666915,
+              "maxLandingFactors": 1,
+              "landingBound": 215.7638138214419,
+              "capacity": 6144090.362379379
+            },
+            {
+              "Q": 13459,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 1.4721795881749753,
+              "capacity": 41921.78595287059
+            }
+          ],
+          "heights": [
+            {
+              "A0": 84,
+              "small": 54,
+              "large": 440,
+              "highSmall": 18,
+              "lowSmall": 36,
+              "bound": 264.67973637613784,
+              "keys": 24
+            },
+            {
+              "A0": 339,
+              "small": 54,
+              "large": 440,
+              "highSmall": 0,
+              "lowSmall": 54,
+              "bound": 485.3146503751279,
+              "keys": 24
+            },
+            {
+              "A0": 378,
+              "small": 54,
+              "large": 440,
+              "highSmall": 0,
+              "lowSmall": 54,
+              "bound": 519.0588136926204,
+              "keys": 24
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 28476,
+          "T": 578,
+          "S": 4655,
+          "SCell": 4540,
+          "SPrime": 115,
+          "twin": 3537,
+          "bad": 0,
+          "R": 913657,
+          "Rlo": 227512,
+          "Rhi": 686145,
+          "events": 68159,
+          "literal": 0,
+          "cellCount": 15,
+          "maxAdmit": 739,
+          "stoppedCells": 7,
+          "rootsCell": 4046,
+          "maxCellLow": 57223,
+          "primeKeys": 1,
+          "cellKeys": 24,
+          "cellI": 0.4326174784293921,
+          "cellH": 128400,
+          "cellU": 182,
+          "primeI": 0.0036900369003690036,
+          "primeH": 0,
+          "primeU": 8,
+          "topMass": 134,
+          "topKeys": 7,
+          "topI": 0.03282812272666915,
+          "topH": 33722,
+          "topU": 44,
+          "topPhysical": 122,
+          "entryChecks": 494,
+          "executedCellAdmits": 4146,
+          "primeStops": [
+            {
+              "p": 271,
+              "C": 48510,
+              "m": 115,
+              "U": 8
+            }
+          ],
+          "cellStops": [
+            {
+              "b": 15,
+              "J": 34650,
+              "m": 652,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 17,
+              "J": 39270,
+              "m": 609,
+              "roots": 578,
+              "gates": 3
+            },
+            {
+              "b": 19,
+              "J": 43890,
+              "m": 590,
+              "roots": 578,
+              "gates": 1
+            },
+            {
+              "b": 21,
+              "J": 48510,
+              "m": 608,
+              "roots": 578,
+              "gates": 2
+            },
+            {
+              "b": 23,
+              "J": 53130,
+              "m": 739,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 25,
+              "J": 57750,
+              "m": 699,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 27,
+              "J": 62370,
+              "m": 643,
+              "roots": 578,
+              "gates": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "X": 65536,
+      "B": 678,
+      "N": 32768,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 27,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 339,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 1370,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 169,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 678,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 1982,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 114582,
+          "T": 256,
+          "S": 0,
+          "SCell": 0,
+          "SPrime": 0,
+          "twin": 32768,
+          "bad": 0,
+          "R": 15481975,
+          "Rlo": 2151744,
+          "Rhi": 13330231,
+          "events": 796161,
+          "literal": 0,
+          "cellCount": 634,
+          "maxAdmit": 473,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 18369,
+          "primeKeys": 0,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 102939,
+          "primeStops": [],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 7688,
+              "keys": 206,
+              "I": 4.735746748848373,
+              "maxLandingFactors": 2,
+              "landingBound": 3425.0243593585506,
+              "capacity": 392446141.1440219
+            },
+            {
+              "Q": 27,
+              "m": 6889,
+              "keys": 161,
+              "I": 1.7325218138695,
+              "maxLandingFactors": 2,
+              "landingBound": 1015.2128118289583,
+              "capacity": 116325114.40498579
+            },
+            {
+              "Q": 31,
+              "m": 6606,
+              "keys": 154,
+              "I": 1.4911425035246721,
+              "maxLandingFactors": 2,
+              "landingBound": 848.6452697899975,
+              "capacity": 97239472.3030775
+            },
+            {
+              "Q": 339,
+              "m": 1596,
+              "keys": 35,
+              "I": 0.07456097473080632,
+              "maxLandingFactors": 1,
+              "landingBound": 45.742129048539844,
+              "capacity": 5241224.630639793
+            },
+            {
+              "Q": 1370,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 9.130077707156888,
+              "capacity": 1046142.5638414511
+            }
+          ],
+          "heights": [
+            {
+              "A0": 169,
+              "small": 417,
+              "large": 7271,
+              "highSmall": 128,
+              "lowSmall": 289,
+              "bound": 3248.68240111075,
+              "keys": 206
+            },
+            {
+              "A0": 678,
+              "small": 417,
+              "large": 7271,
+              "highSmall": 56,
+              "lowSmall": 361,
+              "bound": 8069.6725914383915,
+              "keys": 206
+            },
+            {
+              "A0": 1982,
+              "small": 417,
+              "large": 7271,
+              "highSmall": 7,
+              "lowSmall": 410,
+              "bound": 20420.500112434947,
+              "keys": 206
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 114582,
+          "T": 256,
+          "S": 9416,
+          "SCell": 9416,
+          "SPrime": 0,
+          "twin": 23352,
+          "bad": 0,
+          "R": 11835046,
+          "Rlo": 1632403,
+          "Rhi": 10202643,
+          "events": 605868,
+          "literal": 0,
+          "cellCount": 634,
+          "maxAdmit": 361,
+          "stoppedCells": 33,
+          "rootsCell": 1728,
+          "maxCellLow": 13051,
+          "primeKeys": 0,
+          "cellKeys": 206,
+          "cellI": 4.735746748848373,
+          "cellH": 3159398,
+          "cellU": 1641,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 1596,
+          "topKeys": 35,
+          "topI": 0.07456097473080632,
+          "topH": 420062,
+          "topU": 243,
+          "topPhysical": 1561,
+          "entryChecks": 7688,
+          "executedCellAdmits": 77740,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 632,
+              "J": 132720,
+              "m": 305,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 658,
+              "J": 138180,
+              "m": 285,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 692,
+              "J": 145320,
+              "m": 325,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 728,
+              "J": 152880,
+              "m": 279,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 760,
+              "J": 159600,
+              "m": 283,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 768,
+              "J": 161280,
+              "m": 270,
+              "roots": 52,
+              "gates": 5
+            },
+            {
+              "b": 776,
+              "J": 162960,
+              "m": 280,
+              "roots": 52,
+              "gates": 9
+            },
+            {
+              "b": 788,
+              "J": 165480,
+              "m": 285,
+              "roots": 52,
+              "gates": 3
+            },
+            {
+              "b": 809,
+              "J": 169890,
+              "m": 284,
+              "roots": 53,
+              "gates": 4
+            },
+            {
+              "b": 898,
+              "J": 188580,
+              "m": 306,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 908,
+              "J": 190680,
+              "m": 267,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 932,
+              "J": 195720,
+              "m": 290,
+              "roots": 52,
+              "gates": 8
+            },
+            {
+              "b": 950,
+              "J": 199500,
+              "m": 283,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 957,
+              "J": 200970,
+              "m": 306,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 965,
+              "J": 202650,
+              "m": 288,
+              "roots": 53,
+              "gates": 5
+            },
+            {
+              "b": 979,
+              "J": 205590,
+              "m": 260,
+              "roots": 53,
+              "gates": 6
+            },
+            {
+              "b": 1006,
+              "J": 211260,
+              "m": 324,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 1014,
+              "J": 212940,
+              "m": 271,
+              "roots": 52,
+              "gates": 8
+            },
+            {
+              "b": 1051,
+              "J": 220710,
+              "m": 264,
+              "roots": 53,
+              "gates": 7
+            },
+            {
+              "b": 1072,
+              "J": 225120,
+              "m": 277,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 1081,
+              "J": 227010,
+              "m": 313,
+              "roots": 53,
+              "gates": 9
+            },
+            {
+              "b": 1090,
+              "J": 228900,
+              "m": 305,
+              "roots": 52,
+              "gates": 7
+            },
+            {
+              "b": 1118,
+              "J": 234780,
+              "m": 309,
+              "roots": 52,
+              "gates": 9
+            },
+            {
+              "b": 1141,
+              "J": 239610,
+              "m": 258,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 1147,
+              "J": 240870,
+              "m": 256,
+              "roots": 53,
+              "gates": 6
+            },
+            {
+              "b": 1158,
+              "J": 243180,
+              "m": 264,
+              "roots": 52,
+              "gates": 8
+            },
+            {
+              "b": 1165,
+              "J": 244650,
+              "m": 284,
+              "roots": 53,
+              "gates": 3
+            },
+            {
+              "b": 1187,
+              "J": 249270,
+              "m": 361,
+              "roots": 53,
+              "gates": 9
+            },
+            {
+              "b": 1194,
+              "J": 250740,
+              "m": 261,
+              "roots": 52,
+              "gates": 4
+            },
+            {
+              "b": 1204,
+              "J": 252840,
+              "m": 288,
+              "roots": 52,
+              "gates": 6
+            },
+            {
+              "b": 1215,
+              "J": 255150,
+              "m": 262,
+              "roots": 53,
+              "gates": 6
+            },
+            {
+              "b": 1230,
+              "J": 258300,
+              "m": 267,
+              "roots": 52,
+              "gates": 8
+            },
+            {
+              "b": 1243,
+              "J": 261030,
+              "m": 256,
+              "roots": 53,
+              "gates": 6
+            }
+          ]
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 27,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 339,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 15060,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 169,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 678,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 1514,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 114582,
+          "T": 578,
+          "S": 0,
+          "SCell": 0,
+          "SPrime": 0,
+          "twin": 32768,
+          "bad": 0,
+          "R": 15481975,
+          "Rlo": 2591384,
+          "Rhi": 12890591,
+          "events": 796161,
+          "literal": 0,
+          "cellCount": 59,
+          "maxAdmit": 976,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 84899,
+          "primeKeys": 0,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 41009,
+          "primeStops": [],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 3550,
+              "keys": 156,
+              "I": 2.772772122392872,
+              "maxLandingFactors": 2,
+              "landingBound": 25287.226047734664,
+              "capacity": 2897460935.0015306
+            },
+            {
+              "Q": 27,
+              "m": 3102,
+              "keys": 133,
+              "I": 1.343083894346858,
+              "maxLandingFactors": 2,
+              "landingBound": 9475.319577070279,
+              "capacity": 1085701067.7798665
+            },
+            {
+              "Q": 31,
+              "m": 3092,
+              "keys": 130,
+              "I": 1.2396356184847892,
+              "maxLandingFactors": 2,
+              "landingBound": 7920.689184706638,
+              "capacity": 907568408.1620567
+            },
+            {
+              "Q": 339,
+              "m": 1083,
+              "keys": 35,
+              "I": 0.07521499064552366,
+              "maxLandingFactors": 1,
+              "landingBound": 426.9265377863717,
+              "capacity": 48918096.55263805
+            },
+            {
+              "Q": 15060,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 5.820126658101995,
+              "capacity": 666881.7527386424
+            }
+          ],
+          "heights": [
+            {
+              "A0": 169,
+              "small": 353,
+              "large": 3197,
+              "highSmall": 105,
+              "lowSmall": 248,
+              "bound": 2185.1969773687906,
+              "keys": 156
+            },
+            {
+              "A0": 678,
+              "small": 353,
+              "large": 3197,
+              "highSmall": 36,
+              "lowSmall": 317,
+              "bound": 5007.878997964736,
+              "keys": 156
+            },
+            {
+              "A0": 1514,
+              "small": 353,
+              "large": 3197,
+              "highSmall": 0,
+              "lowSmall": 353,
+              "bound": 9643.953986605617,
+              "keys": 156
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 114582,
+          "T": 578,
+          "S": 19734,
+          "SCell": 19734,
+          "SPrime": 0,
+          "twin": 13034,
+          "bad": 0,
+          "R": 5868382,
+          "Rlo": 989690,
+          "Rhi": 4878692,
+          "events": 304168,
+          "literal": 0,
+          "cellCount": 59,
+          "maxAdmit": 868,
+          "stoppedCells": 28,
+          "rootsCell": 16184,
+          "maxCellLow": 56255,
+          "primeKeys": 0,
+          "cellKeys": 156,
+          "cellI": 2.772772122392872,
+          "cellH": 1331660,
+          "cellU": 1033,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 1083,
+          "topKeys": 35,
+          "topI": 0.07521499064552366,
+          "topH": 460884,
+          "topU": 200,
+          "topPhysical": 1019,
+          "entryChecks": 3550,
+          "executedCellAdmits": 16802,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 57,
+              "J": 131670,
+              "m": 676,
+              "roots": 578,
+              "gates": 3
+            },
+            {
+              "b": 59,
+              "J": 136290,
+              "m": 779,
+              "roots": 578,
+              "gates": 10
+            },
+            {
+              "b": 61,
+              "J": 140910,
+              "m": 609,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 63,
+              "J": 145530,
+              "m": 868,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 65,
+              "J": 150150,
+              "m": 656,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 67,
+              "J": 154770,
+              "m": 628,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 69,
+              "J": 159390,
+              "m": 795,
+              "roots": 578,
+              "gates": 8
+            },
+            {
+              "b": 71,
+              "J": 164010,
+              "m": 787,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 73,
+              "J": 168630,
+              "m": 694,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 75,
+              "J": 173250,
+              "m": 720,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 77,
+              "J": 177870,
+              "m": 665,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 79,
+              "J": 182490,
+              "m": 620,
+              "roots": 578,
+              "gates": 1
+            },
+            {
+              "b": 81,
+              "J": 187110,
+              "m": 627,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 83,
+              "J": 191730,
+              "m": 603,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 85,
+              "J": 196350,
+              "m": 829,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 87,
+              "J": 200970,
+              "m": 856,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 89,
+              "J": 205590,
+              "m": 790,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 91,
+              "J": 210210,
+              "m": 661,
+              "roots": 578,
+              "gates": 4
+            },
+            {
+              "b": 93,
+              "J": 214830,
+              "m": 615,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 95,
+              "J": 219450,
+              "m": 733,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 97,
+              "J": 224070,
+              "m": 636,
+              "roots": 578,
+              "gates": 2
+            },
+            {
+              "b": 99,
+              "J": 228690,
+              "m": 856,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 101,
+              "J": 233310,
+              "m": 639,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 103,
+              "J": 237930,
+              "m": 721,
+              "roots": 578,
+              "gates": 8
+            },
+            {
+              "b": 105,
+              "J": 242550,
+              "m": 677,
+              "roots": 578,
+              "gates": 6
+            },
+            {
+              "b": 107,
+              "J": 247170,
+              "m": 715,
+              "roots": 578,
+              "gates": 9
+            },
+            {
+              "b": 109,
+              "J": 251790,
+              "m": 582,
+              "roots": 578,
+              "gates": 2
+            },
+            {
+              "b": 111,
+              "J": 256410,
+              "m": 697,
+              "roots": 578,
+              "gates": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "X": 262144,
+      "B": 1355,
+      "N": 131072,
+      "runs": [
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 37,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 678,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 1515,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 338,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 1355,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 7929,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "fullInverse",
+          "A": 457990,
+          "T": 1024,
+          "S": 629,
+          "SCell": 0,
+          "SPrime": 629,
+          "twin": 130443,
+          "bad": 0,
+          "R": 107069391,
+          "Rlo": 10503384,
+          "Rhi": 96566007,
+          "events": 3942185,
+          "literal": 0,
+          "cellCount": 2503,
+          "maxAdmit": 715,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 29590,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.0013458950201884253,
+          "primeH": 3774,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 511067,
+          "primeStops": [
+            {
+              "p": 743,
+              "C": 788322,
+              "m": 629,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 11,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 37,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 678,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 1515,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 338,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 1355,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 7929,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 11,
+          "L": 210,
+          "mode": "cellInverse",
+          "A": 457990,
+          "T": 1024,
+          "S": 629,
+          "SCell": 0,
+          "SPrime": 629,
+          "twin": 130443,
+          "bad": 0,
+          "R": 107069391,
+          "Rlo": 10503384,
+          "Rhi": 96566007,
+          "events": 3942185,
+          "literal": 0,
+          "cellCount": 2503,
+          "maxAdmit": 715,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 29590,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.0013458950201884253,
+          "primeH": 3774,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 511067,
+          "primeStops": [
+            {
+              "p": 743,
+              "C": 788322,
+              "m": 629,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 31,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 37,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 678,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            },
+            {
+              "Q": 16659,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 0,
+              "capacity": 0
+            }
+          ],
+          "heights": [
+            {
+              "A0": 338,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 1355,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            },
+            {
+              "A0": 6056,
+              "small": 0,
+              "large": 0,
+              "highSmall": 0,
+              "lowSmall": 0,
+              "bound": 0,
+              "keys": 0
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "fullInverse",
+          "A": 457990,
+          "T": 1024,
+          "S": 629,
+          "SCell": 0,
+          "SPrime": 629,
+          "twin": 130443,
+          "bad": 0,
+          "R": 107069391,
+          "Rlo": 12572668,
+          "Rhi": 94496723,
+          "events": 3942185,
+          "literal": 0,
+          "cellCount": 229,
+          "maxAdmit": 1274,
+          "stoppedCells": 0,
+          "rootsCell": 0,
+          "maxCellLow": 131749,
+          "primeKeys": 1,
+          "cellKeys": 0,
+          "cellI": 0,
+          "cellH": 0,
+          "cellU": 0,
+          "primeI": 0.0013458950201884253,
+          "primeH": 3774,
+          "primeU": 8,
+          "topMass": 0,
+          "topKeys": 0,
+          "topI": 0,
+          "topH": 0,
+          "topU": 0,
+          "topPhysical": 0,
+          "entryChecks": 0,
+          "executedCellAdmits": 183770,
+          "primeStops": [
+            {
+              "p": 743,
+              "C": 788322,
+              "m": 629,
+              "U": 8
+            }
+          ],
+          "cellStops": []
+        },
+        {
+          "bands": [
+            {
+              "Q": 13,
+              "m": 8258,
+              "keys": 132,
+              "I": 1.5256901481162852,
+              "maxLandingFactors": 2,
+              "landingBound": 14987.302080694972,
+              "capacity": 6864034479.93749
+            },
+            {
+              "Q": 31,
+              "m": 6858,
+              "keys": 115,
+              "I": 0.5999214297129245,
+              "maxLandingFactors": 2,
+              "landingBound": 4694.455662096105,
+              "capacity": 2150013748.683394
+            },
+            {
+              "Q": 37,
+              "m": 6856,
+              "keys": 114,
+              "I": 0.5676633651967955,
+              "maxLandingFactors": 2,
+              "landingBound": 3740.4707958691934,
+              "capacity": 1713098219.8001323
+            },
+            {
+              "Q": 678,
+              "m": 2149,
+              "keys": 34,
+              "I": 0.03614086723753344,
+              "maxLandingFactors": 1,
+              "landingBound": 113.06420176284229,
+              "capacity": 51782273.76536415
+            },
+            {
+              "Q": 16659,
+              "m": 0,
+              "keys": 0,
+              "I": 0,
+              "maxLandingFactors": 0,
+              "landingBound": 3.0860209963771172,
+              "capacity": 1413366.7561307568
+            }
+          ],
+          "heights": [
+            {
+              "A0": 338,
+              "small": 300,
+              "large": 7958,
+              "highSmall": 105,
+              "lowSmall": 195,
+              "bound": 2087.3665401266085,
+              "keys": 132
+            },
+            {
+              "A0": 1355,
+              "small": 300,
+              "large": 7958,
+              "highSmall": 51,
+              "lowSmall": 249,
+              "bound": 5190.620301395133,
+              "keys": 132
+            },
+            {
+              "A0": 6056,
+              "small": 300,
+              "large": 7958,
+              "highSmall": 0,
+              "lowSmall": 300,
+              "bound": 19535.159073984447,
+              "keys": 132
+            }
+          ],
+          "Y": 13,
+          "L": 2310,
+          "mode": "cellInverse",
+          "A": 457990,
+          "T": 1024,
+          "S": 16921,
+          "SCell": 16921,
+          "SPrime": 0,
+          "twin": 114151,
+          "bad": 0,
+          "R": 95205719,
+          "Rlo": 11031812,
+          "Rhi": 84173907,
+          "events": 3463887,
+          "literal": 0,
+          "cellCount": 229,
+          "maxAdmit": 1274,
+          "stoppedCells": 15,
+          "rootsCell": 8663,
+          "maxCellLow": 121263,
+          "primeKeys": 0,
+          "cellKeys": 132,
+          "cellI": 1.5256901481162852,
+          "cellH": 6441232,
+          "cellU": 1060,
+          "primeI": 0,
+          "primeH": 0,
+          "primeU": 0,
+          "topMass": 2149,
+          "topKeys": 34,
+          "topI": 0.03614086723753344,
+          "topH": 927052,
+          "topU": 225,
+          "topPhysical": 2100,
+          "entryChecks": 8258,
+          "executedCellAdmits": 162467,
+          "primeStops": [],
+          "cellStops": [
+            {
+              "b": 233,
+              "J": 538230,
+              "m": 1051,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 275,
+              "J": 635250,
+              "m": 1060,
+              "roots": 578,
+              "gates": 8
+            },
+            {
+              "b": 306,
+              "J": 706860,
+              "m": 1137,
+              "roots": 577,
+              "gates": 9
+            },
+            {
+              "b": 332,
+              "J": 766920,
+              "m": 1274,
+              "roots": 577,
+              "gates": 9
+            },
+            {
+              "b": 336,
+              "J": 776160,
+              "m": 1086,
+              "roots": 577,
+              "gates": 8
+            },
+            {
+              "b": 341,
+              "J": 787710,
+              "m": 1231,
+              "roots": 578,
+              "gates": 9
+            },
+            {
+              "b": 359,
+              "J": 829290,
+              "m": 1094,
+              "roots": 578,
+              "gates": 11
+            },
+            {
+              "b": 369,
+              "J": 852390,
+              "m": 1043,
+              "roots": 578,
+              "gates": 5
+            },
+            {
+              "b": 372,
+              "J": 859320,
+              "m": 1159,
+              "roots": 577,
+              "gates": 8
+            },
+            {
+              "b": 378,
+              "J": 873180,
+              "m": 1089,
+              "roots": 577,
+              "gates": 11
+            },
+            {
+              "b": 383,
+              "J": 884730,
+              "m": 1109,
+              "roots": 578,
+              "gates": 12
+            },
+            {
+              "b": 413,
+              "J": 954030,
+              "m": 1069,
+              "roots": 578,
+              "gates": 12
+            },
+            {
+              "b": 417,
+              "J": 963270,
+              "m": 1121,
+              "roots": 578,
+              "gates": 7
+            },
+            {
+              "b": 430,
+              "J": 993300,
+              "m": 1199,
+              "roots": 577,
+              "gates": 9
+            },
+            {
+              "b": 452,
+              "J": 1044120,
+              "m": 1199,
+              "roots": 577,
+              "gates": 9
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "lows": [
+    {
+      "Y": 5,
+      "L": 6,
+      "meanCost": 3,
+      "maxCost": 6,
+      "ratio": 0.3728009607357671,
+      "clockMaxMean": 3,
+      "clockMax": 6,
+      "clockRatio": 0.3728009607357671,
+      "clockPhaseMean": 3
+    },
+    {
+      "Y": 7,
+      "L": 30,
+      "meanCost": 8.066666666666666,
+      "maxCost": 20,
+      "ratio": 0.592206661207046,
+      "clockMaxMean": 7.133333333333334,
+      "clockMax": 17,
+      "clockRatio": 0.5236868822244126,
+      "clockPhaseMean": 6.246666666666667
+    },
+    {
+      "Y": 11,
+      "L": 210,
+      "meanCost": 16.01904761904762,
+      "maxCost": 48,
+      "ratio": 0.6073147033554825,
+      "clockMaxMean": 13.438095238095238,
+      "clockMax": 39,
+      "clockRatio": 0.5094655448481485,
+      "clockPhaseMean": 10.45641723356009
+    },
+    {
+      "Y": 13,
+      "L": 2310,
+      "meanCost": 36.07272727272727,
+      "maxCost": 144,
+      "ratio": 1.0818245462636917,
+      "clockMaxMean": 25.217316017316016,
+      "clockMax": 115,
+      "clockRatio": 0.7562697228896957,
+      "clockPhaseMean": 14.770231817244804
+    },
+    {
+      "Y": 17,
+      "L": 30030,
+      "meanCost": 68.32940392940392,
+      "maxCost": 403,
+      "ratio": 1.418663620994823
+    },
+    {
+      "Y": 19,
+      "L": 510510,
+      "meanCost": 151.15876280582162,
+      "maxCost": 1103,
+      "ratio": 2.7019491368278836
+    },
+    {
+      "Y": 23,
+      "L": 9699690,
+      "meanCost": 283.92439510953443,
+      "maxCost": 2343,
+      "ratio": 3.93703131553944
+    }
+  ]
+}
