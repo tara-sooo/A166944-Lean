@@ -1,0 +1,692 @@
+[
+  {
+    "Z": 5,
+    "W": 2,
+    "D": 30,
+    "DW": 2,
+    "N": 15,
+    "terminalPhases": 1,
+    "lowerPhases": 1,
+    "predicted": 3,
+    "noExit": 3,
+    "terminalOnly": 3,
+    "roughHorizons": 6,
+    "forbidChecks": 8,
+    "earlyExclusions": 0,
+    "fullEvents": 12,
+    "repChecks": 12,
+    "maxLocalHeight": 20,
+    "packets": 12,
+    "maxPacket": 1,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 12,
+        "large": 0,
+        "small": 12
+      },
+      {
+        "k": 2,
+        "cap": 12,
+        "large": 0,
+        "small": 12
+      },
+      {
+        "k": 4,
+        "cap": 12,
+        "large": 0,
+        "small": 12
+      },
+      {
+        "k": 8,
+        "cap": 12,
+        "large": 0,
+        "small": 12
+      }
+    ]
+  },
+  {
+    "Z": 5,
+    "W": 6,
+    "D": 30,
+    "DW": 30,
+    "N": 15,
+    "terminalPhases": 9,
+    "lowerPhases": 15,
+    "predicted": 9,
+    "noExit": 9,
+    "terminalOnly": 9,
+    "roughHorizons": 6,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 20,
+    "repChecks": 20,
+    "maxLocalHeight": 26,
+    "packets": 5,
+    "maxPacket": 2,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 5,
+        "large": 2,
+        "small": 4
+      },
+      {
+        "k": 2,
+        "cap": 6,
+        "large": 0,
+        "small": 6
+      },
+      {
+        "k": 4,
+        "cap": 6,
+        "large": 0,
+        "small": 6
+      },
+      {
+        "k": 8,
+        "cap": 6,
+        "large": 0,
+        "small": 6
+      }
+    ]
+  },
+  {
+    "Z": 5,
+    "W": 30,
+    "D": 30,
+    "DW": 30,
+    "N": 15,
+    "terminalPhases": 15,
+    "lowerPhases": 15,
+    "predicted": 15,
+    "noExit": 15,
+    "terminalOnly": 15,
+    "roughHorizons": 6,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 26,
+    "repChecks": 26,
+    "maxLocalHeight": 30,
+    "packets": 0,
+    "maxPacket": 0,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 0,
+        "large": 0,
+        "small": 0
+      },
+      {
+        "k": 2,
+        "cap": 0,
+        "large": 0,
+        "small": 0
+      },
+      {
+        "k": 4,
+        "cap": 0,
+        "large": 0,
+        "small": 0
+      },
+      {
+        "k": 8,
+        "cap": 0,
+        "large": 0,
+        "small": 0
+      }
+    ]
+  },
+  {
+    "Z": 7,
+    "W": 2,
+    "D": 210,
+    "DW": 2,
+    "N": 105,
+    "terminalPhases": 1,
+    "lowerPhases": 1,
+    "predicted": 15,
+    "noExit": 15,
+    "terminalOnly": 15,
+    "roughHorizons": 30,
+    "forbidChecks": 15,
+    "earlyExclusions": 0,
+    "fullEvents": 90,
+    "repChecks": 90,
+    "maxLocalHeight": 20,
+    "packets": 90,
+    "maxPacket": 1,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 90,
+        "large": 0,
+        "small": 90
+      },
+      {
+        "k": 2,
+        "cap": 90,
+        "large": 0,
+        "small": 90
+      },
+      {
+        "k": 4,
+        "cap": 90,
+        "large": 0,
+        "small": 90
+      },
+      {
+        "k": 8,
+        "cap": 90,
+        "large": 0,
+        "small": 90
+      }
+    ]
+  },
+  {
+    "Z": 7,
+    "W": 6,
+    "D": 210,
+    "DW": 30,
+    "N": 105,
+    "terminalPhases": 9,
+    "lowerPhases": 15,
+    "predicted": 45,
+    "noExit": 45,
+    "terminalOnly": 45,
+    "roughHorizons": 30,
+    "forbidChecks": 63,
+    "earlyExclusions": 0,
+    "fullEvents": 158,
+    "repChecks": 158,
+    "maxLocalHeight": 28,
+    "packets": 47,
+    "maxPacket": 2,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 47,
+        "large": 26,
+        "small": 34
+      },
+      {
+        "k": 2,
+        "cap": 60,
+        "large": 0,
+        "small": 60
+      },
+      {
+        "k": 4,
+        "cap": 60,
+        "large": 0,
+        "small": 60
+      },
+      {
+        "k": 8,
+        "cap": 60,
+        "large": 0,
+        "small": 60
+      }
+    ]
+  },
+  {
+    "Z": 7,
+    "W": 30,
+    "D": 210,
+    "DW": 210,
+    "N": 105,
+    "terminalPhases": 90,
+    "lowerPhases": 105,
+    "predicted": 90,
+    "noExit": 90,
+    "terminalOnly": 90,
+    "roughHorizons": 30,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 221,
+    "repChecks": 221,
+    "maxLocalHeight": 42,
+    "packets": 6,
+    "maxPacket": 5,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 6,
+        "large": 14,
+        "small": 1
+      },
+      {
+        "k": 2,
+        "cap": 11,
+        "large": 8,
+        "small": 7
+      },
+      {
+        "k": 4,
+        "cap": 14,
+        "large": 5,
+        "small": 10
+      },
+      {
+        "k": 8,
+        "cap": 15,
+        "large": 0,
+        "small": 15
+      }
+    ]
+  },
+  {
+    "Z": 11,
+    "W": 2,
+    "D": 2310,
+    "DW": 2,
+    "N": 1155,
+    "terminalPhases": 1,
+    "lowerPhases": 1,
+    "predicted": 135,
+    "noExit": 135,
+    "terminalOnly": 135,
+    "roughHorizons": 270,
+    "forbidChecks": 26,
+    "earlyExclusions": 0,
+    "fullEvents": 1020,
+    "repChecks": 1020,
+    "maxLocalHeight": 28,
+    "packets": 1020,
+    "maxPacket": 1,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 1020,
+        "large": 0,
+        "small": 1020
+      },
+      {
+        "k": 2,
+        "cap": 1020,
+        "large": 0,
+        "small": 1020
+      },
+      {
+        "k": 4,
+        "cap": 1020,
+        "large": 0,
+        "small": 1020
+      },
+      {
+        "k": 8,
+        "cap": 1020,
+        "large": 0,
+        "small": 1020
+      }
+    ]
+  },
+  {
+    "Z": 11,
+    "W": 6,
+    "D": 2310,
+    "DW": 30,
+    "N": 1155,
+    "terminalPhases": 9,
+    "lowerPhases": 15,
+    "predicted": 405,
+    "noExit": 405,
+    "terminalOnly": 405,
+    "roughHorizons": 270,
+    "forbidChecks": 162,
+    "earlyExclusions": 0,
+    "fullEvents": 1828,
+    "repChecks": 1828,
+    "maxLocalHeight": 28,
+    "packets": 577,
+    "maxPacket": 2,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 577,
+        "large": 346,
+        "small": 404
+      },
+      {
+        "k": 2,
+        "cap": 750,
+        "large": 0,
+        "small": 750
+      },
+      {
+        "k": 4,
+        "cap": 750,
+        "large": 0,
+        "small": 750
+      },
+      {
+        "k": 8,
+        "cap": 750,
+        "large": 0,
+        "small": 750
+      }
+    ]
+  },
+  {
+    "Z": 11,
+    "W": 30,
+    "D": 2310,
+    "DW": 2310,
+    "N": 1155,
+    "terminalPhases": 875,
+    "lowerPhases": 1155,
+    "predicted": 875,
+    "noExit": 875,
+    "terminalOnly": 875,
+    "roughHorizons": 270,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 2873,
+    "repChecks": 2873,
+    "maxLocalHeight": 76,
+    "packets": 117,
+    "maxPacket": 6,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 117,
+        "large": 250,
+        "small": 30
+      },
+      {
+        "k": 2,
+        "cap": 204,
+        "large": 162,
+        "small": 118
+      },
+      {
+        "k": 4,
+        "cap": 264,
+        "large": 68,
+        "small": 212
+      },
+      {
+        "k": 8,
+        "cap": 280,
+        "large": 0,
+        "small": 280
+      }
+    ]
+  },
+  {
+    "Z": 13,
+    "W": 2,
+    "D": 30030,
+    "DW": 2,
+    "N": 15015,
+    "terminalPhases": 1,
+    "lowerPhases": 1,
+    "predicted": 1485,
+    "noExit": 1485,
+    "terminalOnly": 1485,
+    "roughHorizons": 2970,
+    "forbidChecks": 39,
+    "earlyExclusions": 0,
+    "fullEvents": 13530,
+    "repChecks": 13530,
+    "maxLocalHeight": 28,
+    "packets": 13530,
+    "maxPacket": 1,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 13530,
+        "large": 0,
+        "small": 13530
+      },
+      {
+        "k": 2,
+        "cap": 13530,
+        "large": 0,
+        "small": 13530
+      },
+      {
+        "k": 4,
+        "cap": 13530,
+        "large": 0,
+        "small": 13530
+      },
+      {
+        "k": 8,
+        "cap": 13530,
+        "large": 0,
+        "small": 13530
+      }
+    ]
+  },
+  {
+    "Z": 13,
+    "W": 6,
+    "D": 30030,
+    "DW": 30,
+    "N": 15015,
+    "terminalPhases": 9,
+    "lowerPhases": 15,
+    "predicted": 4365,
+    "noExit": 4365,
+    "terminalOnly": 4455,
+    "roughHorizons": 2970,
+    "forbidChecks": 279,
+    "earlyExclusions": 2,
+    "fullEvents": 24048,
+    "repChecks": 24048,
+    "maxLocalHeight": 52,
+    "packets": 8503,
+    "maxPacket": 2,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 8503,
+        "large": 4294,
+        "small": 6356
+      },
+      {
+        "k": 2,
+        "cap": 10650,
+        "large": 0,
+        "small": 10650
+      },
+      {
+        "k": 4,
+        "cap": 10650,
+        "large": 0,
+        "small": 10650
+      },
+      {
+        "k": 8,
+        "cap": 10650,
+        "large": 0,
+        "small": 10650
+      }
+    ]
+  },
+  {
+    "Z": 13,
+    "W": 30,
+    "D": 30030,
+    "DW": 30030,
+    "N": 15015,
+    "terminalPhases": 9966,
+    "lowerPhases": 15015,
+    "predicted": 9966,
+    "noExit": 9966,
+    "terminalOnly": 9966,
+    "roughHorizons": 2970,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 40006,
+    "repChecks": 40006,
+    "maxLocalHeight": 110,
+    "packets": 2108,
+    "maxPacket": 8,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 2108,
+        "large": 4305,
+        "small": 744
+      },
+      {
+        "k": 2,
+        "cap": 3472,
+        "large": 3143,
+        "small": 1906
+      },
+      {
+        "k": 4,
+        "cap": 4687,
+        "large": 1322,
+        "small": 3727
+      },
+      {
+        "k": 8,
+        "cap": 5049,
+        "large": 0,
+        "small": 5049
+      }
+    ]
+  },
+  {
+    "Z": 17,
+    "W": 2,
+    "D": 510510,
+    "DW": 2,
+    "N": 255255,
+    "terminalPhases": 1,
+    "lowerPhases": 1,
+    "predicted": 22275,
+    "noExit": 22275,
+    "terminalOnly": 22275,
+    "roughHorizons": 44550,
+    "forbidChecks": 56,
+    "earlyExclusions": 0,
+    "fullEvents": 232980,
+    "repChecks": 232980,
+    "maxLocalHeight": 28,
+    "packets": 232980,
+    "maxPacket": 1,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 232980,
+        "large": 0,
+        "small": 232980
+      },
+      {
+        "k": 2,
+        "cap": 232980,
+        "large": 0,
+        "small": 232980
+      },
+      {
+        "k": 4,
+        "cap": 232980,
+        "large": 0,
+        "small": 232980
+      },
+      {
+        "k": 8,
+        "cap": 232980,
+        "large": 0,
+        "small": 232980
+      }
+    ]
+  },
+  {
+    "Z": 17,
+    "W": 6,
+    "D": 510510,
+    "DW": 30,
+    "N": 255255,
+    "terminalPhases": 9,
+    "lowerPhases": 15,
+    "predicted": 65475,
+    "noExit": 65475,
+    "terminalOnly": 66825,
+    "roughHorizons": 44550,
+    "forbidChecks": 432,
+    "earlyExclusions": 2,
+    "fullEvents": 417546,
+    "repChecks": 417546,
+    "maxLocalHeight": 52,
+    "packets": 150491,
+    "maxPacket": 2,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 150491,
+        "large": 78578,
+        "small": 111202
+      },
+      {
+        "k": 2,
+        "cap": 189780,
+        "large": 0,
+        "small": 189780
+      },
+      {
+        "k": 4,
+        "cap": 189780,
+        "large": 0,
+        "small": 189780
+      },
+      {
+        "k": 8,
+        "cap": 189780,
+        "large": 0,
+        "small": 189780
+      }
+    ]
+  },
+  {
+    "Z": 17,
+    "W": 30,
+    "D": 510510,
+    "DW": 510510,
+    "N": 255255,
+    "terminalPhases": 148117,
+    "lowerPhases": 255255,
+    "predicted": 148117,
+    "noExit": 148117,
+    "terminalOnly": 148117,
+    "roughHorizons": 44550,
+    "forbidChecks": 0,
+    "earlyExclusions": 0,
+    "fullEvents": 705149,
+    "repChecks": 705149,
+    "maxLocalHeight": 110,
+    "packets": 43587,
+    "maxPacket": 8,
+    "caps": [
+      {
+        "k": 1,
+        "cap": 43587,
+        "large": 91889,
+        "small": 15249
+      },
+      {
+        "k": 2,
+        "cap": 71925,
+        "large": 68627,
+        "small": 38511
+      },
+      {
+        "k": 4,
+        "cap": 98128,
+        "large": 30670,
+        "small": 76468
+      },
+      {
+        "k": 8,
+        "cap": 107138,
+        "large": 0,
+        "small": 107138
+      }
+    ]
+  }
+]
