@@ -1,0 +1,2903 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "S0": 2992,
+    "Skey": 3308,
+    "Sblock": 96746,
+    "keyCount": 596,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 5,
+        "R": 2665,
+        "elapsed": 2566,
+        "highR": 905,
+        "lowR": 1760,
+        "events": 501,
+        "stopped": 85,
+        "sinks": 11,
+        "maxMass": 18,
+        "maxPassed": 4,
+        "twin": 43,
+        "bad": 0,
+        "stopGain": 1884,
+        "stopElapsed": 1919,
+        "stopCost": 1887,
+        "stopPairs": 708,
+        "stopMaxGain": 86,
+        "stopMaxHigh": 3,
+        "shortDepth": [
+          44,
+          80,
+          84,
+          85,
+          85,
+          85,
+          85,
+          85,
+          85,
+          85,
+          85
+        ],
+        "shortTime": [
+          73,
+          85,
+          85,
+          85
+        ],
+        "overshoot": 30,
+        "distinctIncomingOne": 0,
+        "literal": 629,
+        "sampleSinks": [
+          {
+            "p": 13,
+            "C": 558,
+            "m": 8,
+            "minHigh": 0,
+            "maxHigh": 1,
+            "minRoot": 524,
+            "maxRoot": 556,
+            "short": [
+              6,
+              8,
+              8,
+              8,
+              8
+            ]
+          },
+          {
+            "p": 13,
+            "C": 768,
+            "m": 9,
+            "minHigh": 0,
+            "maxHigh": 1,
+            "minRoot": 736,
+            "maxRoot": 768,
+            "short": [
+              8,
+              9,
+              9,
+              9,
+              9
+            ]
+          },
+          {
+            "p": 11,
+            "C": 648,
+            "m": 8,
+            "minHigh": 0,
+            "maxHigh": 2,
+            "minRoot": 604,
+            "maxRoot": 648,
+            "short": [
+              2,
+              7,
+              8,
+              8,
+              8
+            ]
+          },
+          {
+            "p": 11,
+            "C": 978,
+            "m": 18,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 892,
+            "maxRoot": 976,
+            "short": [
+              7,
+              14,
+              17,
+              18,
+              18
+            ]
+          },
+          {
+            "p": 17,
+            "C": 900,
+            "m": 8,
+            "minHigh": 0,
+            "maxHigh": 1,
+            "minRoot": 844,
+            "maxRoot": 900,
+            "short": [
+              4,
+              8,
+              8,
+              8,
+              8
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 10,
+        "R": 3868,
+        "elapsed": 3669,
+        "highR": 1654,
+        "lowR": 2214,
+        "events": 670,
+        "stopped": 65,
+        "sinks": 5,
+        "maxMass": 17,
+        "maxPassed": 9,
+        "twin": 63,
+        "bad": 0,
+        "stopGain": 2588,
+        "stopElapsed": 2600,
+        "stopCost": 2525,
+        "stopPairs": 806,
+        "stopMaxGain": 118,
+        "stopMaxHigh": 4,
+        "shortDepth": [
+          20,
+          41,
+          58,
+          61,
+          65,
+          65,
+          65,
+          65,
+          65,
+          65,
+          65
+        ],
+        "shortTime": [
+          43,
+          57,
+          65,
+          65
+        ],
+        "overshoot": 15,
+        "distinctIncomingOne": 0,
+        "literal": 798,
+        "sampleSinks": [
+          {
+            "p": 13,
+            "C": 690,
+            "m": 12,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 572,
+            "maxRoot": 688,
+            "short": [
+              4,
+              7,
+              7,
+              8,
+              12
+            ]
+          },
+          {
+            "p": 17,
+            "C": 732,
+            "m": 11,
+            "minHigh": 0,
+            "maxHigh": 2,
+            "minRoot": 692,
+            "maxRoot": 732,
+            "short": [
+              4,
+              9,
+              11,
+              11,
+              11
+            ]
+          },
+          {
+            "p": 17,
+            "C": 798,
+            "m": 14,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 736,
+            "maxRoot": 796,
+            "short": [
+              2,
+              5,
+              13,
+              14,
+              14
+            ]
+          },
+          {
+            "p": 23,
+            "C": 942,
+            "m": 11,
+            "minHigh": 0,
+            "maxHigh": 2,
+            "minRoot": 844,
+            "maxRoot": 940,
+            "short": [
+              3,
+              7,
+              11,
+              11,
+              11
+            ]
+          },
+          {
+            "p": 11,
+            "C": 978,
+            "m": 17,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 892,
+            "maxRoot": 976,
+            "short": [
+              7,
+              13,
+              16,
+              17,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 21,
+        "R": 6241,
+        "elapsed": 6310,
+        "highR": 3059,
+        "lowR": 3182,
+        "events": 1015,
+        "stopped": 51,
+        "sinks": 2,
+        "maxMass": 30,
+        "maxPassed": 18,
+        "twin": 73,
+        "bad": 4,
+        "stopGain": 2912,
+        "stopElapsed": 3094,
+        "stopCost": 2930,
+        "stopPairs": 1290,
+        "stopMaxGain": 160,
+        "stopMaxHigh": 6,
+        "shortDepth": [
+          10,
+          22,
+          36,
+          45,
+          50,
+          50,
+          51,
+          51,
+          51,
+          51,
+          51
+        ],
+        "shortTime": [
+          16,
+          41,
+          50,
+          51
+        ],
+        "overshoot": 9,
+        "distinctIncomingOne": 0,
+        "literal": 1143,
+        "sampleSinks": [
+          {
+            "p": 13,
+            "C": 768,
+            "m": 21,
+            "minHigh": 0,
+            "maxHigh": 6,
+            "minRoot": 608,
+            "maxRoot": 768,
+            "short": [
+              8,
+              13,
+              18,
+              20,
+              20
+            ]
+          },
+          {
+            "p": 23,
+            "C": 990,
+            "m": 30,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 844,
+            "maxRoot": 988,
+            "short": [
+              2,
+              9,
+              18,
+              25,
+              30
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 43,
+        "R": 9044,
+        "elapsed": 8582,
+        "highR": 5177,
+        "lowR": 3867,
+        "events": 1354,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 30,
+        "twin": 123,
+        "bad": 5,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 1482,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 609,
+        "R": 9044,
+        "elapsed": 8582,
+        "highR": 5177,
+        "lowR": 3867,
+        "events": 1354,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 30,
+        "twin": 123,
+        "bad": 5,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 1482,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "S0": 14259,
+    "Skey": 19609,
+    "Sblock": 509341,
+    "keyCount": 3101,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 10,
+        "R": 16643,
+        "elapsed": 14229,
+        "highR": 8966,
+        "lowR": 7677,
+        "events": 2517,
+        "stopped": 232,
+        "sinks": 20,
+        "maxMass": 16,
+        "maxPassed": 9,
+        "twin": 280,
+        "bad": 0,
+        "stopGain": 9630,
+        "stopElapsed": 6833,
+        "stopCost": 8555,
+        "stopPairs": 2524,
+        "stopMaxGain": 194,
+        "stopMaxHigh": 4,
+        "shortDepth": [
+          57,
+          142,
+          201,
+          228,
+          232,
+          232,
+          232,
+          232,
+          232,
+          232,
+          232
+        ],
+        "shortTime": [
+          226,
+          232,
+          232,
+          232
+        ],
+        "overshoot": 32,
+        "distinctIncomingOne": 0,
+        "literal": 3029,
+        "sampleSinks": [
+          {
+            "p": 11,
+            "C": 2322,
+            "m": 14,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 2164,
+            "maxRoot": 2320,
+            "short": [
+              3,
+              6,
+              7,
+              12,
+              14
+            ]
+          },
+          {
+            "p": 23,
+            "C": 3612,
+            "m": 14,
+            "minHigh": 0,
+            "maxHigh": 2,
+            "minRoot": 3544,
+            "maxRoot": 3612,
+            "short": [
+              3,
+              10,
+              14,
+              14,
+              14
+            ]
+          },
+          {
+            "p": 31,
+            "C": 2448,
+            "m": 16,
+            "minHigh": 0,
+            "maxHigh": 2,
+            "minRoot": 2384,
+            "maxRoot": 2448,
+            "short": [
+              5,
+              8,
+              16,
+              16,
+              16
+            ]
+          },
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 15,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 3044,
+            "maxRoot": 3108,
+            "short": [
+              3,
+              11,
+              13,
+              15,
+              15
+            ]
+          },
+          {
+            "p": 17,
+            "C": 2772,
+            "m": 12,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 2692,
+            "maxRoot": 2772,
+            "short": [
+              3,
+              6,
+              9,
+              12,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 21,
+        "R": 23525,
+        "elapsed": 21407,
+        "highR": 13579,
+        "lowR": 9946,
+        "events": 3353,
+        "stopped": 136,
+        "sinks": 6,
+        "maxMass": 25,
+        "maxPassed": 19,
+        "twin": 376,
+        "bad": 0,
+        "stopGain": 8474,
+        "stopElapsed": 5897,
+        "stopCost": 7167,
+        "stopPairs": 2958,
+        "stopMaxGain": 206,
+        "stopMaxHigh": 6,
+        "shortDepth": [
+          22,
+          62,
+          90,
+          123,
+          127,
+          134,
+          136,
+          136,
+          136,
+          136,
+          136
+        ],
+        "shortTime": [
+          127,
+          136,
+          136,
+          136
+        ],
+        "overshoot": 10,
+        "distinctIncomingOne": 0,
+        "literal": 3865,
+        "sampleSinks": [
+          {
+            "p": 23,
+            "C": 2370,
+            "m": 24,
+            "minHigh": 0,
+            "maxHigh": 6,
+            "minRoot": 2164,
+            "maxRoot": 2368,
+            "short": [
+              3,
+              7,
+              10,
+              16,
+              17
+            ]
+          },
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 22,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 2384,
+            "maxRoot": 2476,
+            "short": [
+              4,
+              11,
+              14,
+              22,
+              22
+            ]
+          },
+          {
+            "p": 61,
+            "C": 3720,
+            "m": 22,
+            "minHigh": 0,
+            "maxHigh": 3,
+            "minRoot": 3592,
+            "maxRoot": 3720,
+            "short": [
+              3,
+              10,
+              17,
+              22,
+              22
+            ]
+          },
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 25,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 3004,
+            "maxRoot": 3108,
+            "short": [
+              3,
+              11,
+              13,
+              23,
+              25
+            ]
+          },
+          {
+            "p": 11,
+            "C": 3510,
+            "m": 22,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 3380,
+            "maxRoot": 3508,
+            "short": [
+              3,
+              11,
+              18,
+              21,
+              22
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 42,
+        "R": 31466,
+        "elapsed": 27692,
+        "highR": 19948,
+        "lowR": 11518,
+        "events": 4008,
+        "stopped": 46,
+        "sinks": 1,
+        "maxMass": 46,
+        "maxPassed": 40,
+        "twin": 466,
+        "bad": 0,
+        "stopGain": 6004,
+        "stopElapsed": 4250,
+        "stopCost": 5388,
+        "stopPairs": 2070,
+        "stopMaxGain": 314,
+        "stopMaxHigh": 10,
+        "shortDepth": [
+          4,
+          11,
+          14,
+          22,
+          25,
+          29,
+          32,
+          38,
+          39,
+          44,
+          46
+        ],
+        "shortTime": [
+          22,
+          42,
+          46,
+          46
+        ],
+        "overshoot": 4,
+        "distinctIncomingOne": 0,
+        "literal": 4520,
+        "sampleSinks": [
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 46,
+            "minHigh": 0,
+            "maxHigh": 10,
+            "minRoot": 2164,
+            "maxRoot": 2476,
+            "short": [
+              4,
+              11,
+              14,
+              22,
+              25
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 85,
+        "R": 33536,
+        "elapsed": 28100,
+        "highR": 21650,
+        "lowR": 11886,
+        "events": 4146,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 46,
+        "twin": 512,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 4658,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 1678,
+        "R": 33536,
+        "elapsed": 28100,
+        "highR": 21650,
+        "lowR": 11886,
+        "events": 4146,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 46,
+        "twin": 512,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 4658,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "S0": 69836,
+    "Skey": 107057,
+    "Sblock": 2459831,
+    "keyCount": 15061,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 21,
+        "R": 161441,
+        "elapsed": 140705,
+        "highR": 111738,
+        "lowR": 49703,
+        "events": 16909,
+        "stopped": 915,
+        "sinks": 37,
+        "maxMass": 41,
+        "maxPassed": 20,
+        "twin": 1133,
+        "bad": 0,
+        "stopGain": 87604,
+        "stopElapsed": 68305,
+        "stopCost": 81721,
+        "stopPairs": 22438,
+        "stopMaxGain": 406,
+        "stopMaxHigh": 11,
+        "shortDepth": [
+          136,
+          351,
+          532,
+          686,
+          780,
+          843,
+          869,
+          888,
+          896,
+          906,
+          913
+        ],
+        "shortTime": [
+          845,
+          915,
+          915,
+          915
+        ],
+        "overshoot": 138,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 59,
+            "C": 13158,
+            "m": 31,
+            "minHigh": 0,
+            "maxHigh": 6,
+            "minRoot": 12980,
+            "maxRoot": 13156,
+            "short": [
+              6,
+              11,
+              17,
+              24,
+              27
+            ]
+          },
+          {
+            "p": 31,
+            "C": 11130,
+            "m": 31,
+            "minHigh": 0,
+            "maxHigh": 11,
+            "minRoot": 10724,
+            "maxRoot": 11128,
+            "short": [
+              3,
+              9,
+              15,
+              18,
+              18
+            ]
+          },
+          {
+            "p": 11,
+            "C": 10242,
+            "m": 31,
+            "minHigh": 0,
+            "maxHigh": 10,
+            "minRoot": 9844,
+            "maxRoot": 10240,
+            "short": [
+              1,
+              6,
+              13,
+              17,
+              17
+            ]
+          },
+          {
+            "p": 59,
+            "C": 14220,
+            "m": 35,
+            "minHigh": 0,
+            "maxHigh": 4,
+            "minRoot": 14084,
+            "maxRoot": 14220,
+            "short": [
+              3,
+              13,
+              23,
+              33,
+              35
+            ]
+          },
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 41,
+            "minHigh": 0,
+            "maxHigh": 6,
+            "minRoot": 15292,
+            "maxRoot": 15508,
+            "short": [
+              3,
+              12,
+              17,
+              26,
+              32
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 42,
+        "R": 252920,
+        "elapsed": 216019,
+        "highR": 184867,
+        "lowR": 68053,
+        "events": 23700,
+        "stopped": 505,
+        "sinks": 9,
+        "maxMass": 79,
+        "maxPassed": 41,
+        "twin": 1543,
+        "bad": 0,
+        "stopGain": 94126,
+        "stopElapsed": 76068,
+        "stopCost": 88928,
+        "stopPairs": 29590,
+        "stopMaxGain": 830,
+        "stopMaxHigh": 24,
+        "shortDepth": [
+          41,
+          94,
+          162,
+          231,
+          277,
+          326,
+          384,
+          417,
+          450,
+          465,
+          480
+        ],
+        "shortTime": [
+          344,
+          481,
+          490,
+          505
+        ],
+        "overshoot": 127,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 13,
+            "C": 8748,
+            "m": 75,
+            "minHigh": 0,
+            "maxHigh": 9,
+            "minRoot": 8372,
+            "maxRoot": 8748,
+            "short": [
+              8,
+              15,
+              23,
+              32,
+              39
+            ]
+          },
+          {
+            "p": 31,
+            "C": 11130,
+            "m": 51,
+            "minHigh": 0,
+            "maxHigh": 15,
+            "minRoot": 10508,
+            "maxRoot": 11128,
+            "short": [
+              3,
+              9,
+              15,
+              18,
+              18
+            ]
+          },
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 79,
+            "minHigh": 0,
+            "maxHigh": 24,
+            "minRoot": 14680,
+            "maxRoot": 15508,
+            "short": [
+              3,
+              12,
+              17,
+              31,
+              39
+            ]
+          },
+          {
+            "p": 13,
+            "C": 12492,
+            "m": 71,
+            "minHigh": 0,
+            "maxHigh": 8,
+            "minRoot": 12076,
+            "maxRoot": 12492,
+            "short": [
+              5,
+              13,
+              25,
+              38,
+              46
+            ]
+          },
+          {
+            "p": 31,
+            "C": 14478,
+            "m": 54,
+            "minHigh": 0,
+            "maxHigh": 9,
+            "minRoot": 14084,
+            "maxRoot": 14476,
+            "short": [
+              1,
+              4,
+              5,
+              6,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 85,
+        "R": 322521,
+        "elapsed": 280119,
+        "highR": 240012,
+        "lowR": 82509,
+        "events": 29385,
+        "stopped": 121,
+        "sinks": 1,
+        "maxMass": 121,
+        "maxPassed": 82,
+        "twin": 1927,
+        "bad": 0,
+        "stopGain": 52470,
+        "stopElapsed": 52060,
+        "stopCost": 51996,
+        "stopPairs": 14520,
+        "stopMaxGain": 878,
+        "stopMaxHigh": 27,
+        "shortDepth": [
+          3,
+          12,
+          17,
+          31,
+          39,
+          46,
+          49,
+          49,
+          54,
+          56,
+          63
+        ],
+        "shortTime": [
+          43,
+          64,
+          64,
+          121
+        ],
+        "overshoot": 36,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 121,
+            "minHigh": 0,
+            "maxHigh": 27,
+            "minRoot": 14632,
+            "maxRoot": 15508,
+            "short": [
+              3,
+              12,
+              17,
+              31,
+              39
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 170,
+        "R": 331583,
+        "elapsed": 287798,
+        "highR": 247693,
+        "lowR": 83890,
+        "events": 30191,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 121,
+        "twin": 2048,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 4484,
+        "R": 331583,
+        "elapsed": 287798,
+        "highR": 247693,
+        "lowR": 83890,
+        "events": 30191,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 121,
+        "twin": 2048,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "S0": 351638,
+    "Skey": 578630,
+    "Sblock": 11507867,
+    "keyCount": 70082,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 42,
+        "R": 1207940,
+        "elapsed": 1061538,
+        "highR": 942209,
+        "lowR": 265731,
+        "events": 93116,
+        "stopped": 3445,
+        "sinks": 70,
+        "maxMass": 103,
+        "maxPassed": 41,
+        "twin": 4747,
+        "bad": 0,
+        "stopGain": 719448,
+        "stopElapsed": 541826,
+        "stopCost": 649781,
+        "stopPairs": 173274,
+        "stopMaxGain": 1454,
+        "stopMaxHigh": 21,
+        "shortDepth": [
+          233,
+          637,
+          1135,
+          1714,
+          2224,
+          2611,
+          2889,
+          3101,
+          3217,
+          3298,
+          3352
+        ],
+        "shortTime": [
+          3114,
+          3403,
+          3445,
+          3445
+        ],
+        "overshoot": 505,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 179,
+            "C": 46002,
+            "m": 63,
+            "minHigh": 0,
+            "maxHigh": 11,
+            "minRoot": 45332,
+            "maxRoot": 46000,
+            "short": [
+              3,
+              14,
+              26,
+              31,
+              31
+            ]
+          },
+          {
+            "p": 17,
+            "C": 58938,
+            "m": 103,
+            "minHigh": 0,
+            "maxHigh": 14,
+            "minRoot": 58016,
+            "maxRoot": 58936,
+            "short": [
+              4,
+              14,
+              21,
+              40,
+              60
+            ]
+          },
+          {
+            "p": 11,
+            "C": 38400,
+            "m": 72,
+            "minHigh": 0,
+            "maxHigh": 11,
+            "minRoot": 37764,
+            "maxRoot": 38400,
+            "short": [
+              3,
+              9,
+              20,
+              39,
+              49
+            ]
+          },
+          {
+            "p": 23,
+            "C": 50760,
+            "m": 89,
+            "minHigh": 0,
+            "maxHigh": 11,
+            "minRoot": 50296,
+            "maxRoot": 50760,
+            "short": [
+              3,
+              6,
+              13,
+              26,
+              34
+            ]
+          },
+          {
+            "p": 11,
+            "C": 53580,
+            "m": 63,
+            "minHigh": 0,
+            "maxHigh": 11,
+            "minRoot": 52892,
+            "maxRoot": 53580,
+            "short": [
+              3,
+              11,
+              20,
+              25,
+              38
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 84,
+        "R": 1659308,
+        "elapsed": 1477103,
+        "highR": 1308458,
+        "lowR": 350850,
+        "events": 124992,
+        "stopped": 1808,
+        "sinks": 18,
+        "maxMass": 130,
+        "maxPassed": 83,
+        "twin": 6384,
+        "bad": 0,
+        "stopGain": 613194,
+        "stopElapsed": 481800,
+        "stopCost": 545450,
+        "stopPairs": 182172,
+        "stopMaxGain": 1486,
+        "stopMaxHigh": 29,
+        "shortDepth": [
+          44,
+          150,
+          291,
+          470,
+          673,
+          861,
+          1005,
+          1125,
+          1268,
+          1401,
+          1500
+        ],
+        "shortTime": [
+          1284,
+          1743,
+          1808,
+          1808
+        ],
+        "overshoot": 296,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 137,
+            "C": 61512,
+            "m": 107,
+            "minHigh": 0,
+            "maxHigh": 10,
+            "minRoot": 60844,
+            "maxRoot": 61512,
+            "short": [
+              3,
+              6,
+              14,
+              22,
+              32
+            ]
+          },
+          {
+            "p": 11,
+            "C": 38400,
+            "m": 115,
+            "minHigh": 0,
+            "maxHigh": 14,
+            "minRoot": 37764,
+            "maxRoot": 38400,
+            "short": [
+              3,
+              9,
+              20,
+              39,
+              52
+            ]
+          },
+          {
+            "p": 19,
+            "C": 46758,
+            "m": 109,
+            "minHigh": 0,
+            "maxHigh": 16,
+            "minRoot": 45692,
+            "maxRoot": 46756,
+            "short": [
+              5,
+              15,
+              22,
+              35,
+              61
+            ]
+          },
+          {
+            "p": 271,
+            "C": 48510,
+            "m": 115,
+            "minHigh": 2,
+            "maxHigh": 15,
+            "minRoot": 47812,
+            "maxRoot": 48400,
+            "short": [
+              0,
+              0,
+              3,
+              10,
+              17
+            ]
+          },
+          {
+            "p": 11,
+            "C": 60510,
+            "m": 130,
+            "minHigh": 0,
+            "maxHigh": 25,
+            "minRoot": 59024,
+            "maxRoot": 60508,
+            "short": [
+              2,
+              8,
+              20,
+              34,
+              44
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 169,
+        "R": 2091193,
+        "elapsed": 1843824,
+        "highR": 1652685,
+        "lowR": 438508,
+        "events": 156881,
+        "stopped": 353,
+        "sinks": 2,
+        "maxMass": 182,
+        "maxPassed": 165,
+        "twin": 7839,
+        "bad": 0,
+        "stopGain": 214130,
+        "stopElapsed": 180853,
+        "stopCost": 188509,
+        "stopPairs": 62012,
+        "stopMaxGain": 1562,
+        "stopMaxHigh": 28,
+        "shortDepth": [
+          10,
+          21,
+          28,
+          41,
+          72,
+          108,
+          133,
+          155,
+          163,
+          170,
+          181
+        ],
+        "shortTime": [
+          146,
+          242,
+          353,
+          353
+        ],
+        "overshoot": 15,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 19,
+            "C": 46758,
+            "m": 171,
+            "minHigh": 0,
+            "maxHigh": 26,
+            "minRoot": 45196,
+            "maxRoot": 46756,
+            "short": [
+              5,
+              15,
+              22,
+              35,
+              61
+            ]
+          },
+          {
+            "p": 47,
+            "C": 60582,
+            "m": 182,
+            "minHigh": 0,
+            "maxHigh": 28,
+            "minRoot": 59024,
+            "maxRoot": 60580,
+            "short": [
+              5,
+              6,
+              6,
+              6,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 339,
+        "R": 2144640,
+        "elapsed": 1900790,
+        "highR": 1695553,
+        "lowR": 449087,
+        "events": 161096,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 217,
+        "twin": 8192,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 11507,
+        "R": 2144640,
+        "elapsed": 1900790,
+        "highR": 1695553,
+        "lowR": 449087,
+        "events": 161096,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 217,
+        "twin": 8192,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "S0": 1808544,
+    "Skey": 3117177,
+    "Sblock": 52611372,
+    "keyCount": 317145,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 84,
+        "R": 9568887,
+        "elapsed": 8350128,
+        "highR": 8148980,
+        "lowR": 1419907,
+        "events": 514301,
+        "stopped": 10978,
+        "sinks": 112,
+        "maxMass": 140,
+        "maxPassed": 83,
+        "twin": 21790,
+        "bad": 0,
+        "stopGain": 4863254,
+        "stopElapsed": 3554887,
+        "stopCost": 4274332,
+        "stopPairs": 1083816,
+        "stopMaxGain": 2746,
+        "stopMaxHigh": 40,
+        "shortDepth": [
+          404,
+          1165,
+          2131,
+          3156,
+          4255,
+          5354,
+          6316,
+          7246,
+          8037,
+          8767,
+          9306
+        ],
+        "shortTime": [
+          9986,
+          10881,
+          10978,
+          10978
+        ],
+        "overshoot": 1570,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 11,
+            "C": 244608,
+            "m": 140,
+            "minHigh": 0,
+            "maxHigh": 18,
+            "minRoot": 242480,
+            "maxRoot": 244608,
+            "short": [
+              3,
+              4,
+              5,
+              9,
+              12
+            ]
+          },
+          {
+            "p": 17,
+            "C": 233868,
+            "m": 139,
+            "minHigh": 0,
+            "maxHigh": 23,
+            "minRoot": 232884,
+            "maxRoot": 233868,
+            "short": [
+              4,
+              8,
+              18,
+              28,
+              45
+            ]
+          },
+          {
+            "p": 43,
+            "C": 152952,
+            "m": 125,
+            "minHigh": 0,
+            "maxHigh": 26,
+            "minRoot": 151516,
+            "maxRoot": 152952,
+            "short": [
+              3,
+              5,
+              9,
+              14,
+              29
+            ]
+          },
+          {
+            "p": 23,
+            "C": 175698,
+            "m": 121,
+            "minHigh": 0,
+            "maxHigh": 14,
+            "minRoot": 174024,
+            "maxRoot": 175696,
+            "short": [
+              6,
+              16,
+              21,
+              22,
+              27
+            ]
+          },
+          {
+            "p": 107,
+            "C": 243210,
+            "m": 129,
+            "minHigh": 0,
+            "maxHigh": 12,
+            "minRoot": 241944,
+            "maxRoot": 243208,
+            "short": [
+              3,
+              14,
+              26,
+              47,
+              57
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 169,
+        "R": 12808293,
+        "elapsed": 11383282,
+        "highR": 10975671,
+        "lowR": 1832622,
+        "events": 673175,
+        "stopped": 6093,
+        "sinks": 32,
+        "maxMass": 250,
+        "maxPassed": 168,
+        "twin": 26675,
+        "bad": 0,
+        "stopGain": 4722196,
+        "stopElapsed": 3708094,
+        "stopCost": 4097770,
+        "stopPairs": 1169816,
+        "stopMaxGain": 3496,
+        "stopMaxHigh": 49,
+        "shortDepth": [
+          110,
+          313,
+          590,
+          916,
+          1259,
+          1623,
+          2006,
+          2408,
+          2749,
+          3077,
+          3361
+        ],
+        "shortTime": [
+          3929,
+          5602,
+          6093,
+          6093
+        ],
+        "overshoot": 685,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 421,
+            "C": 234498,
+            "m": 213,
+            "minHigh": 0,
+            "maxHigh": 28,
+            "minRoot": 232884,
+            "maxRoot": 234496,
+            "short": [
+              4,
+              12,
+              19,
+              35,
+              46
+            ]
+          },
+          {
+            "p": 13,
+            "C": 228162,
+            "m": 243,
+            "minHigh": 0,
+            "maxHigh": 34,
+            "minRoot": 225932,
+            "maxRoot": 228160,
+            "short": [
+              1,
+              5,
+              15,
+              24,
+              36
+            ]
+          },
+          {
+            "p": 11,
+            "C": 170070,
+            "m": 250,
+            "minHigh": 0,
+            "maxHigh": 21,
+            "minRoot": 167896,
+            "maxRoot": 170068,
+            "short": [
+              3,
+              8,
+              23,
+              41,
+              60
+            ]
+          },
+          {
+            "p": 19,
+            "C": 205902,
+            "m": 227,
+            "minHigh": 0,
+            "maxHigh": 23,
+            "minRoot": 203840,
+            "maxRoot": 205900,
+            "short": [
+              7,
+              14,
+              21,
+              28,
+              47
+            ]
+          },
+          {
+            "p": 43,
+            "C": 152952,
+            "m": 234,
+            "minHigh": 0,
+            "maxHigh": 44,
+            "minRoot": 151040,
+            "maxRoot": 152952,
+            "short": [
+              3,
+              5,
+              9,
+              14,
+              29
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 339,
+        "R": 15342788,
+        "elapsed": 13671017,
+        "highR": 13207219,
+        "lowR": 2135569,
+        "events": 789290,
+        "stopped": 725,
+        "sinks": 2,
+        "maxMass": 376,
+        "maxPassed": 318,
+        "twin": 32043,
+        "bad": 0,
+        "stopGain": 911478,
+        "stopElapsed": 715620,
+        "stopCost": 784530,
+        "stopPairs": 262452,
+        "stopMaxGain": 4576,
+        "stopMaxHigh": 58,
+        "shortDepth": [
+          4,
+          19,
+          41,
+          59,
+          80,
+          89,
+          97,
+          115,
+          141,
+          162,
+          191
+        ],
+        "shortTime": [
+          312,
+          452,
+          707,
+          725
+        ],
+        "overshoot": 47,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 11,
+            "C": 213960,
+            "m": 376,
+            "minHigh": 0,
+            "maxHigh": 58,
+            "minRoot": 209384,
+            "maxRoot": 213960,
+            "short": [
+              3,
+              6,
+              12,
+              16,
+              21
+            ]
+          },
+          {
+            "p": 47,
+            "C": 235422,
+            "m": 349,
+            "minHigh": 0,
+            "maxHigh": 35,
+            "minRoot": 232884,
+            "maxRoot": 235420,
+            "short": [
+              1,
+              13,
+              29,
+              43,
+              59
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 678,
+        "R": 15481975,
+        "elapsed": 13809350,
+        "highR": 13330231,
+        "lowR": 2151744,
+        "events": 796161,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 376,
+        "twin": 32768,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 28815,
+        "R": 15481975,
+        "elapsed": 13809350,
+        "highR": 13330231,
+        "lowR": 2151744,
+        "events": 796161,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 376,
+        "twin": 32768,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "S0": 9566471,
+    "Skey": 16466545,
+    "Sblock": 234052537,
+    "keyCount": 1394787,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 169,
+        "R": 76954150,
+        "elapsed": 66400243,
+        "highR": 68925760,
+        "lowR": 8028390,
+        "events": 2969802,
+        "stopped": 32914,
+        "sinks": 167,
+        "maxMass": 318,
+        "maxPassed": 168,
+        "twin": 98158,
+        "bad": 0,
+        "stopGain": 35043864,
+        "stopElapsed": 25564797,
+        "stopCost": 30427810,
+        "stopPairs": 6592490,
+        "stopMaxGain": 5344,
+        "stopMaxHigh": 45,
+        "shortDepth": [
+          587,
+          1730,
+          3234,
+          4908,
+          6636,
+          8575,
+          10713,
+          12810,
+          14871,
+          16787,
+          18579
+        ],
+        "shortTime": [
+          27477,
+          32534,
+          32914,
+          32914
+        ],
+        "overshoot": 4691,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 59,
+            "C": 868068,
+            "m": 275,
+            "minHigh": 0,
+            "maxHigh": 35,
+            "minRoot": 865204,
+            "maxRoot": 868068,
+            "short": [
+              5,
+              14,
+              28,
+              43,
+              64
+            ]
+          },
+          {
+            "p": 19,
+            "C": 858630,
+            "m": 292,
+            "minHigh": 0,
+            "maxHigh": 31,
+            "minRoot": 855624,
+            "maxRoot": 858628,
+            "short": [
+              3,
+              10,
+              20,
+              42,
+              82
+            ]
+          },
+          {
+            "p": 11,
+            "C": 705660,
+            "m": 299,
+            "minHigh": 0,
+            "maxHigh": 20,
+            "minRoot": 703000,
+            "maxRoot": 705660,
+            "short": [
+              3,
+              9,
+              18,
+              28,
+              43
+            ]
+          },
+          {
+            "p": 743,
+            "C": 788322,
+            "m": 276,
+            "minHigh": 0,
+            "maxHigh": 39,
+            "minRoot": 786200,
+            "maxRoot": 788320,
+            "short": [
+              3,
+              8,
+              20,
+              23,
+              26
+            ]
+          },
+          {
+            "p": 191,
+            "C": 688938,
+            "m": 318,
+            "minHigh": 0,
+            "maxHigh": 36,
+            "minRoot": 686116,
+            "maxRoot": 688936,
+            "short": [
+              6,
+              15,
+              40,
+              61,
+              72
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 338,
+        "R": 98554147,
+        "elapsed": 84529149,
+        "highR": 88873802,
+        "lowR": 9680345,
+        "events": 3620133,
+        "stopped": 11112,
+        "sinks": 30,
+        "maxMass": 504,
+        "maxPassed": 337,
+        "twin": 119960,
+        "bad": 0,
+        "stopGain": 21561808,
+        "stopElapsed": 14947042,
+        "stopCost": 18666435,
+        "stopPairs": 4144946,
+        "stopMaxGain": 6700,
+        "stopMaxHigh": 55,
+        "shortDepth": [
+          115,
+          303,
+          579,
+          936,
+          1315,
+          1697,
+          2140,
+          2571,
+          2971,
+          3330,
+          3694
+        ],
+        "shortTime": [
+          6068,
+          10152,
+          11112,
+          11112
+        ],
+        "overshoot": 972,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 19,
+            "C": 768570,
+            "m": 504,
+            "minHigh": 0,
+            "maxHigh": 39,
+            "minRoot": 763816,
+            "maxRoot": 768568,
+            "short": [
+              3,
+              10,
+              24,
+              49,
+              70
+            ]
+          },
+          {
+            "p": 59,
+            "C": 689178,
+            "m": 431,
+            "minHigh": 0,
+            "maxHigh": 39,
+            "minRoot": 685664,
+            "maxRoot": 689176,
+            "short": [
+              4,
+              12,
+              18,
+              31,
+              48
+            ]
+          },
+          {
+            "p": 167,
+            "C": 904638,
+            "m": 452,
+            "minHigh": 0,
+            "maxHigh": 41,
+            "minRoot": 900796,
+            "maxRoot": 904636,
+            "short": [
+              3,
+              8,
+              21,
+              30,
+              38
+            ]
+          },
+          {
+            "p": 19,
+            "C": 858630,
+            "m": 406,
+            "minHigh": 0,
+            "maxHigh": 42,
+            "minRoot": 854752,
+            "maxRoot": 858628,
+            "short": [
+              3,
+              10,
+              20,
+              42,
+              82
+            ]
+          },
+          {
+            "p": 43,
+            "C": 852390,
+            "m": 413,
+            "minHigh": 0,
+            "maxHigh": 40,
+            "minRoot": 848224,
+            "maxRoot": 852388,
+            "short": [
+              3,
+              12,
+              24,
+              34,
+              43
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 677,
+        "R": 107745566,
+        "elapsed": 92575566,
+        "highR": 97230231,
+        "lowR": 10515335,
+        "events": 3946588,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 646,
+        "twin": 131072,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B",
+        "t": 1355,
+        "R": 107745566,
+        "elapsed": 92575566,
+        "highR": 97230231,
+        "lowR": 10515335,
+        "events": 3946588,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 646,
+        "twin": 131072,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 70469,
+        "R": 107745566,
+        "elapsed": 92575566,
+        "highR": 97230231,
+        "lowR": 10515335,
+        "events": 3946588,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 646,
+        "twin": 131072,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      }
+    ]
+  },
+  {
+    "X": 1048576,
+    "B": 2710,
+    "N": 524288,
+    "S0": 53288322,
+    "Skey": 90332564,
+    "Sblock": 1035120053,
+    "keyCount": 6056478,
+    "runs": [
+      {
+        "name": "B/8",
+        "t": 338,
+        "R": 602888890,
+        "elapsed": 523795704,
+        "highR": 559560124,
+        "lowR": 43328766,
+        "events": 16202056,
+        "stopped": 77221,
+        "sinks": 202,
+        "maxMass": 598,
+        "maxPassed": 337,
+        "twin": 447067,
+        "bad": 0,
+        "stopGain": 176658034,
+        "stopElapsed": 125380005,
+        "stopCost": 153516123,
+        "stopPairs": 29916560,
+        "stopMaxGain": 15700,
+        "stopMaxHigh": 108,
+        "shortDepth": [
+          688,
+          2154,
+          4072,
+          6333,
+          8918,
+          11793,
+          14825,
+          17908,
+          20971,
+          24164,
+          27317
+        ],
+        "shortTime": [
+          63435,
+          75815,
+          77198,
+          77221
+        ],
+        "overshoot": 8945,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 19,
+            "C": 4099422,
+            "m": 548,
+            "minHigh": 0,
+            "maxHigh": 41,
+            "minRoot": 4091572,
+            "maxRoot": 4099420,
+            "short": [
+              3,
+              12,
+              25,
+              43,
+              62
+            ]
+          },
+          {
+            "p": 19,
+            "C": 2474808,
+            "m": 548,
+            "minHigh": 0,
+            "maxHigh": 30,
+            "minRoot": 2470016,
+            "maxRoot": 2474800,
+            "short": [
+              1,
+              15,
+              25,
+              46,
+              60
+            ]
+          },
+          {
+            "p": 53,
+            "C": 4041408,
+            "m": 574,
+            "minHigh": 0,
+            "maxHigh": 35,
+            "minRoot": 4036020,
+            "maxRoot": 4041408,
+            "short": [
+              5,
+              11,
+              20,
+              36,
+              53
+            ]
+          },
+          {
+            "p": 13,
+            "C": 3726828,
+            "m": 598,
+            "minHigh": 0,
+            "maxHigh": 108,
+            "minRoot": 3711128,
+            "maxRoot": 3726828,
+            "short": [
+              5,
+              11,
+              34,
+              62,
+              96
+            ]
+          },
+          {
+            "p": 13,
+            "C": 2670498,
+            "m": 562,
+            "minHigh": 0,
+            "maxHigh": 51,
+            "minRoot": 2664232,
+            "maxRoot": 2670496,
+            "short": [
+              4,
+              15,
+              26,
+              44,
+              74
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/4",
+        "t": 677,
+        "R": 709702687,
+        "elapsed": 620102870,
+        "highR": 659967725,
+        "lowR": 49734962,
+        "events": 18718091,
+        "stopped": 14372,
+        "sinks": 20,
+        "maxMass": 926,
+        "maxPassed": 674,
+        "twin": 509916,
+        "bad": 0,
+        "stopGain": 59288136,
+        "stopElapsed": 41367016,
+        "stopCost": 50535723,
+        "stopPairs": 10371578,
+        "stopMaxGain": 13012,
+        "stopMaxHigh": 107,
+        "shortDepth": [
+          66,
+          191,
+          358,
+          524,
+          739,
+          941,
+          1161,
+          1424,
+          1734,
+          2061,
+          2350
+        ],
+        "shortTime": [
+          7926,
+          12433,
+          14372,
+          14372
+        ],
+        "overshoot": 832,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 827,
+            "C": 3082230,
+            "m": 742,
+            "minHigh": 0,
+            "maxHigh": 58,
+            "minRoot": 3075176,
+            "maxRoot": 3082228,
+            "short": [
+              4,
+              13,
+              25,
+              34,
+              49
+            ]
+          },
+          {
+            "p": 19,
+            "C": 2860128,
+            "m": 926,
+            "minHigh": 0,
+            "maxHigh": 42,
+            "minRoot": 2851484,
+            "maxRoot": 2860128,
+            "short": [
+              2,
+              6,
+              7,
+              16,
+              27
+            ]
+          },
+          {
+            "p": 11,
+            "C": 2596122,
+            "m": 738,
+            "minHigh": 0,
+            "maxHigh": 107,
+            "minRoot": 2584292,
+            "maxRoot": 2596120,
+            "short": [
+              1,
+              9,
+              18,
+              32,
+              50
+            ]
+          },
+          {
+            "p": 701,
+            "C": 4122582,
+            "m": 766,
+            "minHigh": 0,
+            "maxHigh": 68,
+            "minRoot": 4116104,
+            "maxRoot": 4122580,
+            "short": [
+              3,
+              10,
+              20,
+              24,
+              37
+            ]
+          },
+          {
+            "p": 197,
+            "C": 3835788,
+            "m": 751,
+            "minHigh": 0,
+            "maxHigh": 49,
+            "minRoot": 3826052,
+            "maxRoot": 3835788,
+            "short": [
+              5,
+              13,
+              27,
+              45,
+              69
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B/2",
+        "t": 1355,
+        "R": 729003929,
+        "elapsed": 635883541,
+        "highR": 678127584,
+        "lowR": 50876345,
+        "events": 19155719,
+        "stopped": 1432,
+        "sinks": 1,
+        "maxMass": 1432,
+        "maxPassed": 1195,
+        "twin": 522856,
+        "bad": 0,
+        "stopGain": 10460868,
+        "stopElapsed": 6515948,
+        "stopCost": 8648948,
+        "stopPairs": 2049192,
+        "stopMaxGain": 15632,
+        "stopMaxHigh": 82,
+        "shortDepth": [
+          5,
+          13,
+          27,
+          45,
+          69,
+          83,
+          102,
+          121,
+          151,
+          192,
+          218
+        ],
+        "shortTime": [
+          343,
+          790,
+          1432,
+          1432
+        ],
+        "overshoot": 77,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": [
+          {
+            "p": 197,
+            "C": 3835788,
+            "m": 1432,
+            "minHigh": 0,
+            "maxHigh": 82,
+            "minRoot": 3820156,
+            "maxRoot": 3835788,
+            "short": [
+              5,
+              13,
+              27,
+              45,
+              69
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "t": 2710,
+        "R": 730547400,
+        "elapsed": 637213579,
+        "highR": 679498328,
+        "lowR": 51049072,
+        "events": 19219036,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 1595,
+        "twin": 524288,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      },
+      {
+        "name": "B log^2 B",
+        "t": 169333,
+        "R": 730547400,
+        "elapsed": 637213579,
+        "highR": 679498328,
+        "lowR": 51049072,
+        "events": 19219036,
+        "stopped": 0,
+        "sinks": 0,
+        "maxMass": 0,
+        "maxPassed": 1595,
+        "twin": 524288,
+        "bad": 0,
+        "stopGain": 0,
+        "stopElapsed": 0,
+        "stopCost": 0,
+        "stopPairs": 0,
+        "stopMaxGain": 0,
+        "stopMaxHigh": 0,
+        "shortDepth": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "shortTime": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "overshoot": 0,
+        "distinctIncomingOne": 0,
+        "literal": 0,
+        "sampleSinks": []
+      }
+    ]
+  }
+]
