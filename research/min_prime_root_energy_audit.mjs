@@ -20,13 +20,18 @@ function audit(X){
     }
     return [T,P];
   }
+  const Q=Math.ceil(B/Math.pow(Math.log(B),1/8)), y=Math.ceil(Math.sqrt(B));
+  const verts=new Map(), totalCost=new Map();
+  const key=(t,C)=>t*(7*X+4)+C;
+  const vertex=(t,C)=>{const k=key(t,C);if(!verts.has(k))verts.set(k,{t,C,edges:new Map(),root:0,r:0,p:0});return verts.get(k)};
   const len=7*X/2+1, W=new Int32Array(len), WP=new Int32Array(len),
         WL=new Int32Array(len), WB=new Int32Array(len);
   let roots=0,all=0,primeEvents=0,bad=0,primeBad=0,travel=0,primeElapsed=0,
       literal=0,rootChecks=0,largestGain=0;
   for(let M=X+1;M<2*X;M+=2){
     let prime=spf[M]===M,t=M+2,C=2*M-2,K=Math.floor((7*M-1)/4);
-    if(prime){roots++;travel+=K-t;check(M>B,'prime root above B');}
+    let cost=0;
+    if(prime){roots++;travel+=K-t;check(M>B,'prime root above B');vertex(t,C).root=M;}
     for(;;){
       const [u,p]=hit(t,C,K);
       if(X<=1024){
@@ -42,7 +47,7 @@ function audit(X){
           bad++;if(prime)primeBad++;
           check(K-t<2*B,'terminal quiet bound');
         }
-        if(prime)largestGain=Math.max(largestGain,C-(2*M-2));
+        if(prime){largestGain=Math.max(largestGain,C-(2*M-2));totalCost.set(M,cost);}
         break;
       }
       const r=Math.min(spf[C-1],spf[C+1]);
@@ -51,6 +56,8 @@ function audit(X){
       if(prime){WP[C/2]++;primeEvents++;primeElapsed+=u-t;
         if(C-(2*M-2)>T)WL[C/2]++;
         if(C-(2*M-2)>B)WB[C/2]++;
+        cost+=r;const v=vertex(t,C);v.r=r;v.p=p;
+        vertex(u,C+p-1).edges.set(key(t,C),{M,p,cost});
       }
       t=u;C+=p-1;
       check(C<=2*t,'horizon invariant');
@@ -76,6 +83,36 @@ function audit(X){
     if(r>B){check(n===0,'eligible');continue}
     S0+=r;R+=r*n;E+=r*n*n;RP+=r*p;EP+=r*p*p;EL+=r*l*l;EB+=r*b*b;mass=Math.max(mass,p);
   }
+  let same=0,big=0,mixed=0,sameCost=0,bigCost=0,mixedCost=0,rootLineCost=0,rootLineDemotions=0,rep=0,repHigh=0;
+  const demoted=new Set();
+  function demote(v,e,kind){
+    check(!demoted.has(e.M),'single demotion');demoted.add(e.M);
+    const c=totalCost.get(e.M)-e.cost;check(c>=0,'suffix cost');
+    if(kind==='same'){same++;sameCost+=c}
+    else if(kind==='big'){big++;bigCost+=c}
+    else{mixed++;mixedCost+=c}
+    if(v.t%2===1&&v.C===2*v.t-6&&v.t-2>=X&&v.t-2<2*X){rootLineDemotions++;rootLineCost+=c}
+  }
+  for(const v of verts.values()){
+    if(v.r){rep+=v.r;if(v.p>=y)repHigh+=v.r}
+    check(!v.root||v.edges.size===0,'prime injected root no predecessors');
+    const groups=new Map();
+    for(const e of v.edges.values()){
+      if(!groups.has(e.p))groups.set(e.p,[]);
+      groups.get(e.p).push(e);
+    }
+    let winners=[];
+    for(const a of groups.values()){
+      a.sort((b,c)=>c.M-b.M);winners.push(a[0]);
+      for(const e of a.slice(1))demote(v,e,'same');
+    }
+    const large=winners.filter(e=>e.p>=Q).sort((a,b)=>b.M-a.M);
+    for(const e of large.slice(1))demote(v,e,'big');
+    winners=winners.filter(e=>e.p<Q||e===large[0]).sort((a,b)=>b.M-a.M);
+    for(const e of winners.slice(1))demote(v,e,'mixed');
+  }
+  check(rep+sameCost+bigCost+mixedCost===RP,'exact prime representative ledger');
+  for(const n of [R,E,RP,EP,EL,EB,S0,travel,primeElapsed])check(Number.isSafeInteger(n),'integer overflow');
   const nearT=maxNear(T),nearB=maxNear(B);
   check(EP-EL<=2*nearT*RP,'prime late split T');
   check(EP-EB<=2*nearB*RP,'prime late split B');
@@ -83,7 +120,7 @@ function audit(X){
   check(primeElapsed<=2*RP,'elapsed');
   const H2=travel-2*B*roots;
   if(H2>0&&4n*BigInt(S0)*BigInt(EP)<BigInt(H2)**2n)check(primeBad<roots,'finite energy cert');
-  return {X,B,T,roots,all,primeEvents,rootChecks,literal,bad,primeBad,travel,RP,EP,EL,EB,nearT,nearB,S0,largestGain,mass,R,E,energyRatio:EP/(X*X*B),cert:H2>0&&4n*BigInt(S0)*BigInt(EP)<BigInt(H2)**2n};
+  return {X,B,T,Q,y,roots,same,big,mixed,rep,repHigh,sameCost,bigCost,mixedCost,rootLineDemotions,rootLineCost,all,primeEvents,rootChecks,literal,bad,primeBad,travel,RP,EP,EL,EB,nearT,nearB,S0,largestGain,mass,R,E,energyRatio:EP/(X*X*B),cert:H2>0&&4n*BigInt(S0)*BigInt(EP)<BigInt(H2)**2n};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[256,1024,4096,16384,65536,262144])console.log(JSON.stringify(audit(X)));
