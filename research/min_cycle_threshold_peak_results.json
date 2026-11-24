@@ -1,0 +1,1290 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "R": 9044,
+    "E": 8582,
+    "events": 1354,
+    "literal": 1482,
+    "data": [
+      {
+        "mode": 0,
+        "total": 9044,
+        "initial": 1019,
+        "forest": 4166,
+        "last": 2598,
+        "cycle": 1261,
+        "originSurplus": 888,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 6633,
+            "near": 1392,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 8,
+            "peak": 6633,
+            "near": 1392,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 32,
+            "peak": 6633,
+            "near": 1392,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 22.17201864767395,
+            "peak": 6633,
+            "near": 1392,
+            "peakCount": 284,
+            "nearCount": 107
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 107,
+            "D": 85,
+            "sinkless": 22,
+            "tailBeta": 1261,
+            "tailD": 888
+          },
+          {
+            "u": 8,
+            "beta": 74,
+            "D": 60,
+            "sinkless": 22,
+            "tailBeta": 559,
+            "tailD": 325
+          },
+          {
+            "u": 16,
+            "beta": 14,
+            "D": 13,
+            "sinkless": 10,
+            "tailBeta": 163,
+            "tailD": 93
+          },
+          {
+            "u": 32,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 64,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 8582,
+        "initial": 986,
+        "forest": 4347,
+        "last": 2397,
+        "cycle": 852,
+        "originSurplus": 628,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 6584,
+            "near": 1012,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 8,
+            "peak": 6584,
+            "near": 1012,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 32,
+            "peak": 6584,
+            "near": 1012,
+            "peakCount": 284,
+            "nearCount": 107
+          },
+          {
+            "factor": 22.17201864767395,
+            "peak": 6584,
+            "near": 1012,
+            "peakCount": 284,
+            "nearCount": 107
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 107,
+            "D": 85,
+            "sinkless": 22,
+            "tailBeta": 852,
+            "tailD": 628
+          },
+          {
+            "u": 8,
+            "beta": 33,
+            "D": 26,
+            "sinkless": 16,
+            "tailBeta": 309,
+            "tailD": 221
+          },
+          {
+            "u": 16,
+            "beta": 17,
+            "D": 7,
+            "sinkless": 14,
+            "tailBeta": 116,
+            "tailD": 87
+          },
+          {
+            "u": 32,
+            "beta": 2,
+            "D": 2,
+            "sinkless": 2,
+            "tailBeta": 13,
+            "tailD": 16
+          },
+          {
+            "u": 64,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "R": 33536,
+    "E": 28100,
+    "events": 4146,
+    "literal": 4658,
+    "data": [
+      {
+        "mode": 0,
+        "total": 33536,
+        "initial": 3893,
+        "forest": 18880,
+        "last": 9165,
+        "cycle": 1598,
+        "originSurplus": 1110,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 27943,
+            "near": 1700,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 8,
+            "peak": 27943,
+            "near": 1700,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 32,
+            "peak": 27943,
+            "near": 1700,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 40.327176336167526,
+            "peak": 27943,
+            "near": 1700,
+            "peakCount": 1039,
+            "nearCount": 109
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 109,
+            "D": 64,
+            "sinkless": 45,
+            "tailBeta": 1598,
+            "tailD": 1110
+          },
+          {
+            "u": 8,
+            "beta": 82,
+            "D": 54,
+            "sinkless": 41,
+            "tailBeta": 865,
+            "tailD": 690
+          },
+          {
+            "u": 16,
+            "beta": 43,
+            "D": 45,
+            "sinkless": 8,
+            "tailBeta": 290,
+            "tailD": 278
+          },
+          {
+            "u": 32,
+            "beta": 6,
+            "D": 5,
+            "sinkless": 1,
+            "tailBeta": 60,
+            "tailD": 30
+          },
+          {
+            "u": 64,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 28100,
+        "initial": 3604,
+        "forest": 15933,
+        "last": 7211,
+        "cycle": 1352,
+        "originSurplus": 880,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 23079,
+            "near": 1417,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 8,
+            "peak": 23079,
+            "near": 1417,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 32,
+            "peak": 23079,
+            "near": 1417,
+            "peakCount": 1039,
+            "nearCount": 109
+          },
+          {
+            "factor": 40.327176336167526,
+            "peak": 23079,
+            "near": 1417,
+            "peakCount": 1039,
+            "nearCount": 109
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 109,
+            "D": 64,
+            "sinkless": 45,
+            "tailBeta": 1352,
+            "tailD": 880
+          },
+          {
+            "u": 8,
+            "beta": 75,
+            "D": 49,
+            "sinkless": 33,
+            "tailBeta": 698,
+            "tailD": 494
+          },
+          {
+            "u": 16,
+            "beta": 25,
+            "D": 20,
+            "sinkless": 15,
+            "tailBeta": 272,
+            "tailD": 207
+          },
+          {
+            "u": 32,
+            "beta": 4,
+            "D": 3,
+            "sinkless": 1,
+            "tailBeta": 62,
+            "tailD": 48
+          },
+          {
+            "u": 64,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "R": 331583,
+    "E": 287798,
+    "events": 30191,
+    "literal": 0,
+    "data": [
+      {
+        "mode": 0,
+        "total": 331583,
+        "initial": 15600,
+        "forest": 219883,
+        "last": 58317,
+        "cycle": 37783,
+        "originSurplus": 31645,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 278356,
+            "near": 37627,
+            "peakCount": 7261,
+            "nearCount": 2138
+          },
+          {
+            "factor": 8,
+            "peak": 277819,
+            "near": 38164,
+            "peakCount": 7225,
+            "nearCount": 2174
+          },
+          {
+            "factor": 32,
+            "peak": 277819,
+            "near": 38164,
+            "peakCount": 7225,
+            "nearCount": 2174
+          },
+          {
+            "factor": 75.01445113704312,
+            "peak": 277819,
+            "near": 38164,
+            "peakCount": 7225,
+            "nearCount": 2174
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 2174,
+            "D": 1800,
+            "sinkless": 374,
+            "tailBeta": 37783,
+            "tailD": 31645
+          },
+          {
+            "u": 8,
+            "beta": 2042,
+            "D": 1696,
+            "sinkless": 353,
+            "tailBeta": 22730,
+            "tailD": 19146
+          },
+          {
+            "u": 16,
+            "beta": 892,
+            "D": 717,
+            "sinkless": 219,
+            "tailBeta": 8861,
+            "tailD": 7718
+          },
+          {
+            "u": 32,
+            "beta": 222,
+            "D": 215,
+            "sinkless": 65,
+            "tailBeta": 1513,
+            "tailD": 1923
+          },
+          {
+            "u": 64,
+            "beta": 2,
+            "D": 11,
+            "sinkless": 2,
+            "tailBeta": 2,
+            "tailD": 77
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 287798,
+        "initial": 14461,
+        "forest": 196662,
+        "last": 48835,
+        "cycle": 27840,
+        "originSurplus": 25635,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 244229,
+            "near": 29108,
+            "peakCount": 7264,
+            "nearCount": 2135
+          },
+          {
+            "factor": 8,
+            "peak": 243957,
+            "near": 29380,
+            "peakCount": 7225,
+            "nearCount": 2174
+          },
+          {
+            "factor": 32,
+            "peak": 243957,
+            "near": 29380,
+            "peakCount": 7225,
+            "nearCount": 2174
+          },
+          {
+            "factor": 75.01445113704312,
+            "peak": 243957,
+            "near": 29380,
+            "peakCount": 7225,
+            "nearCount": 2174
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 2174,
+            "D": 1800,
+            "sinkless": 374,
+            "tailBeta": 27840,
+            "tailD": 25635
+          },
+          {
+            "u": 8,
+            "beta": 1322,
+            "D": 1229,
+            "sinkless": 207,
+            "tailBeta": 14416,
+            "tailD": 14266
+          },
+          {
+            "u": 16,
+            "beta": 653,
+            "D": 640,
+            "sinkless": 166,
+            "tailBeta": 6290,
+            "tailD": 6469
+          },
+          {
+            "u": 32,
+            "beta": 111,
+            "D": 110,
+            "sinkless": 28,
+            "tailBeta": 1330,
+            "tailD": 1334
+          },
+          {
+            "u": 64,
+            "beta": 0,
+            "D": 2,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 58
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "R": 2144640,
+    "E": 1900790,
+    "events": 161096,
+    "literal": 0,
+    "data": [
+      {
+        "mode": 0,
+        "total": 2144640,
+        "initial": 62679,
+        "forest": 1605346,
+        "last": 257789,
+        "cycle": 218826,
+        "originSurplus": 202566,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 1862806,
+            "near": 219155,
+            "peakCount": 38106,
+            "nearCount": 11991
+          },
+          {
+            "factor": 8,
+            "peak": 1842725,
+            "near": 239236,
+            "peakCount": 37257,
+            "nearCount": 12840
+          },
+          {
+            "factor": 32,
+            "peak": 1842725,
+            "near": 239236,
+            "peakCount": 37257,
+            "nearCount": 12840
+          },
+          {
+            "factor": 140.447642615123,
+            "peak": 1842725,
+            "near": 239236,
+            "peakCount": 37257,
+            "nearCount": 12840
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 12840,
+            "D": 10753,
+            "sinkless": 2087,
+            "tailBeta": 218826,
+            "tailD": 202566
+          },
+          {
+            "u": 8,
+            "beta": 11615,
+            "D": 9900,
+            "sinkless": 1869,
+            "tailBeta": 130526,
+            "tailD": 128386
+          },
+          {
+            "u": 16,
+            "beta": 5527,
+            "D": 5152,
+            "sinkless": 1158,
+            "tailBeta": 53486,
+            "tailD": 60498
+          },
+          {
+            "u": 32,
+            "beta": 1223,
+            "D": 1415,
+            "sinkless": 408,
+            "tailBeta": 6447,
+            "tailD": 15253
+          },
+          {
+            "u": 64,
+            "beta": 4,
+            "D": 121,
+            "sinkless": 0,
+            "tailBeta": 416,
+            "tailD": 2465
+          },
+          {
+            "u": 128,
+            "beta": 4,
+            "D": 26,
+            "sinkless": 0,
+            "tailBeta": 160,
+            "tailD": 424
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 512,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 1900790,
+        "initial": 58080,
+        "forest": 1459218,
+        "last": 212780,
+        "cycle": 170712,
+        "originSurplus": 161629,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 1663661,
+            "near": 179049,
+            "peakCount": 38016,
+            "nearCount": 12081
+          },
+          {
+            "factor": 8,
+            "peak": 1648522,
+            "near": 194188,
+            "peakCount": 37257,
+            "nearCount": 12840
+          },
+          {
+            "factor": 32,
+            "peak": 1648522,
+            "near": 194188,
+            "peakCount": 37257,
+            "nearCount": 12840
+          },
+          {
+            "factor": 140.447642615123,
+            "peak": 1648522,
+            "near": 194188,
+            "peakCount": 37257,
+            "nearCount": 12840
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 12840,
+            "D": 10753,
+            "sinkless": 2087,
+            "tailBeta": 170712,
+            "tailD": 161629
+          },
+          {
+            "u": 8,
+            "beta": 8050,
+            "D": 7167,
+            "sinkless": 1237,
+            "tailBeta": 92274,
+            "tailD": 94078
+          },
+          {
+            "u": 16,
+            "beta": 4125,
+            "D": 3648,
+            "sinkless": 1086,
+            "tailBeta": 41767,
+            "tailD": 48893
+          },
+          {
+            "u": 32,
+            "beta": 794,
+            "D": 933,
+            "sinkless": 353,
+            "tailBeta": 9935,
+            "tailD": 16395
+          },
+          {
+            "u": 64,
+            "beta": 74,
+            "D": 144,
+            "sinkless": 68,
+            "tailBeta": 498,
+            "tailD": 4711
+          },
+          {
+            "u": 128,
+            "beta": 0,
+            "D": 22,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 1839
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          },
+          {
+            "u": 512,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "R": 15481975,
+    "E": 13809350,
+    "events": 796161,
+    "literal": 0,
+    "data": [
+      {
+        "mode": 0,
+        "total": 15481975,
+        "initial": 250282,
+        "forest": 11906095,
+        "last": 2116667,
+        "cycle": 1208931,
+        "originSurplus": 1209726,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 14149715,
+            "near": 1081978,
+            "peakCount": 201217,
+            "nearCount": 61338
+          },
+          {
+            "factor": 8,
+            "peak": 13879136,
+            "near": 1352557,
+            "peakCount": 188609,
+            "nearCount": 73946
+          },
+          {
+            "factor": 32,
+            "peak": 13875685,
+            "near": 1356008,
+            "peakCount": 188533,
+            "nearCount": 74022
+          },
+          {
+            "factor": 265.542657486889,
+            "peak": 13875685,
+            "near": 1356008,
+            "peakCount": 188533,
+            "nearCount": 74022
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 74022,
+            "D": 66604,
+            "sinkless": 7418,
+            "tailBeta": 1208931,
+            "tailD": 1209726
+          },
+          {
+            "u": 8,
+            "beta": 64543,
+            "D": 59610,
+            "sinkless": 6287,
+            "tailBeta": 704570,
+            "tailD": 754661
+          },
+          {
+            "u": 16,
+            "beta": 29467,
+            "D": 28023,
+            "sinkless": 4982,
+            "tailBeta": 275531,
+            "tailD": 353511
+          },
+          {
+            "u": 32,
+            "beta": 5762,
+            "D": 7114,
+            "sinkless": 1463,
+            "tailBeta": 37565,
+            "tailD": 103592
+          },
+          {
+            "u": 64,
+            "beta": 28,
+            "D": 707,
+            "sinkless": 9,
+            "tailBeta": 907,
+            "tailD": 35927
+          },
+          {
+            "u": 128,
+            "beta": 6,
+            "D": 164,
+            "sinkless": 0,
+            "tailBeta": 111,
+            "tailD": 9217
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 2,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 62
+          },
+          {
+            "u": 512,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 13809350,
+        "initial": 231794,
+        "forest": 10693956,
+        "last": 1937801,
+        "cycle": 945799,
+        "originSurplus": 962806,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 12728936,
+            "near": 848620,
+            "peakCount": 201312,
+            "nearCount": 61243
+          },
+          {
+            "factor": 8,
+            "peak": 12504314,
+            "near": 1073242,
+            "peakCount": 188612,
+            "nearCount": 73943
+          },
+          {
+            "factor": 32,
+            "peak": 12502929,
+            "near": 1074627,
+            "peakCount": 188533,
+            "nearCount": 74022
+          },
+          {
+            "factor": 265.542657486889,
+            "peak": 12502929,
+            "near": 1074627,
+            "peakCount": 188533,
+            "nearCount": 74022
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 74022,
+            "D": 66604,
+            "sinkless": 7418,
+            "tailBeta": 945799,
+            "tailD": 962806
+          },
+          {
+            "u": 8,
+            "beta": 45955,
+            "D": 43600,
+            "sinkless": 6035,
+            "tailBeta": 496632,
+            "tailD": 551063
+          },
+          {
+            "u": 16,
+            "beta": 23070,
+            "D": 24229,
+            "sinkless": 3902,
+            "tailBeta": 216754,
+            "tailD": 276155
+          },
+          {
+            "u": 32,
+            "beta": 3954,
+            "D": 4686,
+            "sinkless": 1394,
+            "tailBeta": 36123,
+            "tailD": 77433
+          },
+          {
+            "u": 64,
+            "beta": 9,
+            "D": 493,
+            "sinkless": 1,
+            "tailBeta": 377,
+            "tailD": 25173
+          },
+          {
+            "u": 128,
+            "beta": 2,
+            "D": 103,
+            "sinkless": 0,
+            "tailBeta": 4,
+            "tailD": 9500
+          },
+          {
+            "u": 256,
+            "beta": 0,
+            "D": 39,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 2520
+          },
+          {
+            "u": 512,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "R": 107745566,
+    "E": 92575566,
+    "events": 3946588,
+    "literal": 0,
+    "data": [
+      {
+        "mode": 0,
+        "total": 107745566,
+        "initial": 1000920,
+        "forest": 89576048,
+        "last": 9801763,
+        "cycle": 7366835,
+        "originSurplus": 7692588,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 101550674,
+            "near": 5193972,
+            "peakCount": 1052592,
+            "nearCount": 284969
+          },
+          {
+            "factor": 8,
+            "peak": 98719589,
+            "near": 8025057,
+            "peakCount": 925021,
+            "nearCount": 412540
+          },
+          {
+            "factor": 32,
+            "peak": 98391181,
+            "near": 8353465,
+            "peakCount": 912432,
+            "nearCount": 425129
+          },
+          {
+            "factor": 504.57390103262924,
+            "peak": 98391181,
+            "near": 8353465,
+            "peakCount": 912432,
+            "nearCount": 425129
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 425129,
+            "D": 388797,
+            "sinkless": 36332,
+            "tailBeta": 7366835,
+            "tailD": 7692588
+          },
+          {
+            "u": 8,
+            "beta": 380467,
+            "D": 353178,
+            "sinkless": 32468,
+            "tailBeta": 4446642,
+            "tailD": 5016211
+          },
+          {
+            "u": 16,
+            "beta": 184814,
+            "D": 178805,
+            "sinkless": 21561,
+            "tailBeta": 1892808,
+            "tailD": 2619180
+          },
+          {
+            "u": 32,
+            "beta": 33603,
+            "D": 42929,
+            "sinkless": 7578,
+            "tailBeta": 384528,
+            "tailD": 1050974
+          },
+          {
+            "u": 64,
+            "beta": 1590,
+            "D": 8222,
+            "sinkless": 43,
+            "tailBeta": 147312,
+            "tailD": 509856
+          },
+          {
+            "u": 128,
+            "beta": 614,
+            "D": 1992,
+            "sinkless": 0,
+            "tailBeta": 89679,
+            "tailD": 244017
+          },
+          {
+            "u": 256,
+            "beta": 177,
+            "D": 510,
+            "sinkless": 0,
+            "tailBeta": 53288,
+            "tailD": 120415
+          },
+          {
+            "u": 512,
+            "beta": 139,
+            "D": 235,
+            "sinkless": 0,
+            "tailBeta": 12510,
+            "tailD": 34638
+          },
+          {
+            "u": 1024,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      },
+      {
+        "mode": 1,
+        "total": 92575566,
+        "initial": 927032,
+        "forest": 77662114,
+        "last": 8280299,
+        "cycle": 5706121,
+        "originSurplus": 6012257,
+        "near": [
+          {
+            "factor": 2,
+            "peak": 87681980,
+            "near": 3966554,
+            "peakCount": 1052941,
+            "nearCount": 284620
+          },
+          {
+            "factor": 8,
+            "peak": 85423861,
+            "near": 6224673,
+            "peakCount": 925054,
+            "nearCount": 412507
+          },
+          {
+            "factor": 32,
+            "peak": 85139508,
+            "near": 6509026,
+            "peakCount": 912432,
+            "nearCount": 425129
+          },
+          {
+            "factor": 504.57390103262924,
+            "peak": 85139508,
+            "near": 6509026,
+            "peakCount": 912432,
+            "nearCount": 425129
+          }
+        ],
+        "layers": [
+          {
+            "u": 1,
+            "beta": 425129,
+            "D": 388797,
+            "sinkless": 36332,
+            "tailBeta": 5706121,
+            "tailD": 6012257
+          },
+          {
+            "u": 8,
+            "beta": 271379,
+            "D": 261675,
+            "sinkless": 25004,
+            "tailBeta": 3088256,
+            "tailD": 3580775
+          },
+          {
+            "u": 16,
+            "beta": 143855,
+            "D": 149051,
+            "sinkless": 17778,
+            "tailBeta": 1385079,
+            "tailD": 1895051
+          },
+          {
+            "u": 32,
+            "beta": 22653,
+            "D": 31243,
+            "sinkless": 6291,
+            "tailBeta": 266105,
+            "tailD": 634445
+          },
+          {
+            "u": 64,
+            "beta": 1208,
+            "D": 4770,
+            "sinkless": 229,
+            "tailBeta": 40983,
+            "tailD": 228591
+          },
+          {
+            "u": 128,
+            "beta": 41,
+            "D": 910,
+            "sinkless": 0,
+            "tailBeta": 14846,
+            "tailD": 79470
+          },
+          {
+            "u": 256,
+            "beta": 36,
+            "D": 344,
+            "sinkless": 0,
+            "tailBeta": 10228,
+            "tailD": 24335
+          },
+          {
+            "u": 512,
+            "beta": 23,
+            "D": 23,
+            "sinkless": 0,
+            "tailBeta": 1903,
+            "tailD": 1903
+          },
+          {
+            "u": 1024,
+            "beta": 0,
+            "D": 0,
+            "sinkless": 0,
+            "tailBeta": 0,
+            "tailD": 0
+          }
+        ]
+      }
+    ]
+  }
+]
