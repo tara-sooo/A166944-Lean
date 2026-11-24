@@ -1,9 +1,11 @@
 // MIN wheel: source-preserving SAME/ROOT demotions with recent large labels.
 // Run: node research/min_recent_large_merge_audit.mjs 256 1024 4096 16384 65536
-function audit(X,y,qOverride,zOverride) {
+function audit(X,y,qOverride,zOverride,aOverride) {
   const B=Math.ceil(Math.sqrt(7*X)), L=y===3?6:210;
   const Q=qOverride??Math.ceil(B/Math.cbrt(Math.log(B))), z=zOverride??Math.max(1,Math.floor(Math.sqrt(Math.log(B))));
   const gate=Q>2*z+3*L+2;
+  const A=aOverride??Math.max(1,Math.floor(Math.cbrt(Math.log(B))));
+  const gainGate=Q>2*z+3*A+2;
   const spf=new Int32Array(7*X+4);
   for(let p=2;p<spf.length;p++) if(!spf[p]) {
     spf[p]=p;
@@ -26,7 +28,7 @@ function audit(X,y,qOverride,zOverride) {
   const V=new Map(), costs=new Float64Array(X/2);
   let events=0, literal=0;
   for(let M=X+1;M<2*X;M+=2){
-    let t=M+2,C=2*M-2,K=Math.floor((7*M-1)/4),h=null;
+    let t=M+2,C=2*M-2,K=Math.floor((7*M-1)/4),h=null,big=null;
     let k=key(t,C),v=V.get(k);
     if(!v)V.set(k,v={t,C,root:0,edges:new Map()});
     v.root=M;
@@ -42,17 +44,18 @@ function audit(X,y,qOverride,zOverride) {
       if(!p)break;
       let r=Math.min(spf[C-1],spf[C+1]);check(T-t<=2*r,'clock bound');
       costs[(M-X-1)/2]+=r;events++;
-      let D=C+p-1, nh=p>y?{p,t:T,C:D}:h;
+      let D=C+p-1, nh=p>y?{p,t:T,C:D}:h, nb=p>=Q?{p,t:T,C:D}:big;
       if(h){check(C-h.C<L&&t-h.t<=3*(C-h.C),'LOW block');}
       let nk=key(T,D), w=V.get(nk);
       if(!w)V.set(nk,w={t:T,C:D,root:0,edges:new Map()});
       // M increasing: last writer is the maximal original cutoff.
-      w.edges.set(k,{M,p,t,C,h,nh});
-      t=T;C=D;h=nh;k=nk;
+      w.edges.set(k,{M,p,t,C,h,nh,big,nb});
+      t=T;C=D;h=nh;big=nb;k=nk;
     }
   }
   let same=0,root=0,rareSame=0,rareRoot=0,near=0,rareSameCost=0,rareRootCost=0;
-  const demoted=new Set(), candidates=new Set();
+  const demoted=new Set(), candidates=new Set(), gainCandidates=new Set();
+  let gainSame=0,gainRoot=0,gainSameCost=0,gainRootCost=0;
   function demote(M){check(!demoted.has(M),'double demotion');demoted.add(M);}
   for(const v of V.values()){
     const groups=new Map();
@@ -68,6 +71,13 @@ function audit(X,y,qOverride,zOverride) {
         same++;demote(b.M);
         check(a.C===b.C&&a.t!==b.t,'same predecessor horizon');
         if(Math.abs(a.t-b.t)<2*z){near++;
+          if(a.big&&b.big&&a.C-a.big.C<=A&&b.C-b.big.C<=A){
+            gainSame++;gainSameCost+=costs[(b.M-X-1)/2];
+            check(Math.abs(a.big.t-b.big.t)<2*z+3*A,'gain radius time');
+            if(gainGate)check(a.big.p!==b.big.p,'gain radius distinct primes');
+            let gk=[a.C,a.big.p,b.big.p,a.C-a.big.C,b.C-b.big.C,a.big.t,b.big.t].join(',');
+            check(!gainCandidates.has(gk),'gain radius injection');gainCandidates.add(gk);
+          }
           if(a.h&&b.h&&a.h.p>=Q&&b.h.p>=Q){
             rareSame++;rareSameCost+=costs[(b.M-X-1)/2];
             const e1=a.C-a.h.C,e2=b.C-b.h.C;
@@ -84,6 +94,7 @@ function audit(X,y,qOverride,zOverride) {
     for(const e of winners.slice(1))demote(e.M);
     if(v.root&&winners.length){
       let a=winners[0];root++;check(a.M<v.root,'root cutoff order');demote(a.M);
+      if(a.nb&&v.C-a.nb.C<=A){gainRoot++;gainRootCost+=costs[(a.M-X-1)/2];}
       if(a.nh&&a.nh.p>=Q){rareRoot++;rareRootCost+=costs[(a.M-X-1)/2];
         const e=v.C-a.nh.C;
         check(e>=0&&e<L,'root low offset');
@@ -91,10 +102,10 @@ function audit(X,y,qOverride,zOverride) {
       }
     }
   }
-  return {X,y,B,L,Q,z,gate,events,literal,same,root,near,rareSame,rareRoot,rareSameCost,rareRootCost};
+  return {X,y,B,L,Q,z,gate,A,gainGate,events,literal,same,root,near,rareSame,rareRoot,rareSameCost,rareRootCost,gainSame,gainRoot,gainSameCost,gainRootCost};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[256,1024,4096,16384,65536]) {
   for(const y of [3,7])console.log(JSON.stringify(audit(X,y)));
-  if(X>=4096)console.log(JSON.stringify(audit(X,3,29,3)));
+  if(X>=4096)console.log(JSON.stringify(audit(X,3,29,3,6)));
 }
