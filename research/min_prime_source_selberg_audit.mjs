@@ -32,7 +32,8 @@ function audit(X){
  }
  const ws=ds.map(weights), len=7*X/2+1;
  const W=new Int32Array(len), P=new Int32Array(len), L=new Int32Array(len), LP=new Int32Array(len), F=new Int32Array(len), FP=new Int32Array(len);
- for(const w of ws){w.S=new Float64Array(len);w.SL=new Float64Array(len);w.SF=new Float64Array(len);}
+ const win=new Int32Array(len);let nearRaw=0;
+ for(const w of ws){w.S=new Float64Array(len);w.SL=new Float64Array(len);w.SF=new Float64Array(len);w.win=new Float64Array(len);w.winAbs=new Float64Array(len);w.near=0;w.nearAbs=0;w.absCost=0;}
  let events=0,primeEvents=0,roots=0,primeBad=0,travel=0,literal=0;
  function hit(t,C,K){
    let T=K+1,P=0;
@@ -44,7 +45,18 @@ function audit(X){
      }
    }return [T,P];
  }
+ function expire(M){
+   const i=(M-X-1)/2,rootC=2*M-2,K=Math.floor((7*M-1)/4);
+   let t=M+2,C=rootC;
+   for(;;){const [u,p]=hit(t,C,K);if(!p)break;
+     if(C-rootC>B){const j=C/2;win[j]--;check(win[j]>=0,'window count');
+       for(const w of ws){const d=w.s[i]-1/w.G;w.win[j]-=d;w.winAbs[j]-=Math.abs(d);}
+     }t=u;C+=p-1;
+   }
+ }
+ const gap=2*Math.floor(B/2);
  for(let M=X+1;M<2*X;M+=2){
+   const old=M-gap-2;if(old>=X+1)expire(old);
    const i=(M-X-1)/2,prime=spf[M]===M,rootC=2*M-2,K=Math.floor((7*M-1)/4);
    let t=M+2,C=rootC;
    if(prime){roots++;travel+=K-t;for(const w of ws)check(Math.abs(w.s[i]-1)<1e-10,'prime majorant');}
@@ -57,7 +69,14 @@ function audit(X){
      if(!p){if(prime&&(spf[C-1]!==C-1||spf[C+1]!==C+1)){primeBad++;check(K-t<2*B,'terminal quiet');}break;}
      const j=C/2,late=C-rootC>B,far=C-rootC>T;
      W[j]++;events++;if(prime){P[j]++;primeEvents++;}
-     if(late){L[j]++;if(prime)LP[j]++;}
+     if(late){L[j]++;if(prime)LP[j]++;
+       const r=Math.min(spf[C-1],spf[C+1]);
+       nearRaw+=r*(1+2*win[j]);win[j]++;
+       for(const w of ws){const d=w.s[i]-1/w.G,a=Math.abs(d);
+         w.near+=r*(d*d+2*d*w.win[j]);w.nearAbs+=r*(a*a+2*a*w.winAbs[j]);
+         w.absCost+=r*a;w.win[j]+=d;w.winAbs[j]+=a;
+       }
+     }
      if(far){F[j]++;if(prime)FP[j]++;}
      for(const w of ws){w.S[j]+=w.s[i];if(late)w.SL[j]+=w.s[i];if(far)w.SF[j]+=w.s[i];}
      t=u;C+=p-1;
@@ -81,8 +100,22 @@ function audit(X){
      check(Math.abs(o.ES-o.main-o.err-o.cross)<=1e-7*Math.max(1,o.ES),'exact energy expansion');
      check(EP<=o.ES+1e-7*Math.max(1,o.ES)&&o.ES<=o.bound+1e-7*Math.max(1,o.bound),'energy sandwich');
      o.errScale=o.err/(X*X*B);o.mainScale=o.main/(X*X*B);
+     if(label==='lateB'){
+       const w=ws.find(w=>w.D===o.D);
+       let maxLocal=0,local=0;
+       for(let i=0;i<w.s.length;i++){
+         local+=Math.abs(w.s[i]-1/w.G);
+         const old=i-2*Math.floor(gap/2)-1;
+         if(old>=0)local-=Math.abs(w.s[old]-1/w.G);
+         maxLocal=Math.max(maxLocal,local);
+       }
+       check(w.nearAbs<=maxLocal*w.absCost+1e-6*Math.max(1,w.nearAbs),'absolute near-pair bound');
+       check(Math.abs(w.near)<=w.nearAbs+1e-6*Math.max(1,w.nearAbs),'signed near bound');
+       o.nearSigned=w.near;o.nearAbs=w.nearAbs;o.farSigned=o.err-w.near;
+       o.maxLocal=maxLocal;
+     }
    }
-   out.push({label,E,EP,R,RP,rows});
+   out.push({label,E,EP,R,RP,nearRaw:label==='lateB'?nearRaw:null,farRaw:label==='lateB'?E-nearRaw:null,rows});
  }
  return {X,B,T,roots,events,primeEvents,literal,primeBad,travel,S0,out};
 }
