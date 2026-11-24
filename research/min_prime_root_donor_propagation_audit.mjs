@@ -33,10 +33,10 @@ function audit(X,mode="analytic"){
    for(let u=0;u<ids.length;u++){let mn=Infinity;const cnt=new Map();for(let v=u;v<ids.length&&v-u<=2*Kd;v++){const e=a[ids[v]];mn=Math.min(mn,e.p);if(v>u&&e.C-a[ids[v-1]].C-(a[ids[v-1]].p-1)>Jd)break;if(e.C-a[ids[u]].C>Kd*mn)break;cnt.set(e.p,(cnt.get(e.p)||0)+1);if(cnt.size>=2&&[...cnt.values()].every(x=>x>=2)){dense++;for(let j=ids[u];j<=ids[v];j++)mark[j]=1;}}}
    for(let j=0;j<n;j++){ok(topDeg[j]<=topOverlap&&compDeg[j]<=compOverlap&&compW[j]<=Lambda*a[j].p,"all-child overlap");maxTopOverlap=Math.max(maxTopOverlap,topDeg[j]);maxCompOverlap=Math.max(maxCompOverlap,compDeg[j]);}
    fastSeed+=weight(mark);
-   for(let h=0;h<tf;h++){const old=weight(mark),prefix=[0],fresh=[];for(let i=0;i<n;i++)prefix.push(prefix[i]+(mark[i]?a[i].p-1:0));for(const i of short){const e=a[i];if(!mark[i]&&e.p>=Q&&K*(prefix[i]-prefix[e.j+1])>=e.p)fresh.push(i);}
+   let prevFastPrefix=null;for(let h=0;h<tf;h++){const old=weight(mark),prefix=[0],fresh=[];for(let i=0;i<n;i++)prefix.push(prefix[i]+(mark[i]?a[i].p-1:0));prevFastPrefix=prefix;for(const i of short){const e=a[i];if(!mark[i]&&e.p>=Q&&K*(prefix[i]-prefix[e.j+1])>=e.p)fresh.push(i);}
      let inc=0;for(const i of fresh){mark[i]=1;inc+=a[i].p;fastClock+=a[i].r;}ok(inc<=Gamma*old,"fast growth");fastNew[h]+=inc;fastCounts[h]+=fresh.length;
    }
-   fastAfter+=weight(mark);
+   if(prevFastPrefix)for(const i of short)if(!mark[i]&&a[i].p>=Q)ok(K*(prevFastPrefix[i]-prevFastPrefix[a[i].j+1])<a[i].p,"fast residual marked donor gain");fastAfter+=weight(mark);
    for(let i=0;i<n;i++){const e=a[i];if(local[i]&&!mark[i])localLongNew+=e.p;if(local[i]||e.n<=k+Math.floor(A/(e.p*e.p)))mark[i]=1;}
    slowSeed+=weight(mark);
    const depth=new Int32Array(n);for(let i=0;i<n;i++)if(mark[i])depth[i]=1;
