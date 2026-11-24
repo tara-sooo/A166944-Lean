@@ -1,0 +1,2265 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 10,
+        "S": 65,
+        "stopKeys": 5,
+        "R": 3868,
+        "twin": 63,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 10,
+            "nodes": 26,
+            "edges": 22,
+            "rootCount": 65,
+            "terminal": 30,
+            "merge": 30.5,
+            "split": 0.5,
+            "proxy": 41.536701044053984,
+            "minority": 69,
+            "mergeKeys": 17,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 41.536701044053984
+              },
+              {
+                "d": 2,
+                "proxy": 7.163640607758255,
+                "far": 34.37306043629573
+              }
+            ],
+            "maxMass": 17
+          },
+          {
+            "D": 2,
+            "T0": 10,
+            "nodes": 26,
+            "edges": 22,
+            "rootCount": 65,
+            "terminal": 29.08696205755029,
+            "merge": 29.73973983532807,
+            "split": 0.6527777777777777,
+            "proxy": 39.74579089211442,
+            "minority": 69,
+            "mergeKeys": 17,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 5.372730455818691,
+                "far": 34.37306043629573
+              }
+            ],
+            "maxMass": 17
+          },
+          {
+            "D": 5,
+            "T0": 10,
+            "nodes": 26,
+            "edges": 22,
+            "rootCount": 65,
+            "terminal": 25.388510313216194,
+            "merge": 26.451621424327307,
+            "split": 1.0631111111111111,
+            "proxy": 33.069333723792546,
+            "minority": 69,
+            "mergeKeys": 17,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 1.3754189966895851,
+                "far": 31.69391472710296
+              },
+              {
+                "d": 5,
+                "proxy": 4.116337560478737,
+                "far": 28.952996163313806
+              }
+            ],
+            "maxMass": 17
+          },
+          {
+            "D": 10,
+            "T0": 10,
+            "nodes": 26,
+            "edges": 22,
+            "rootCount": 65,
+            "terminal": 20.23190960020372,
+            "merge": 21.16579848909261,
+            "split": 0.9338888888888889,
+            "proxy": 25.003841702741706,
+            "minority": 69,
+            "mergeKeys": 17,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.38683659281894583,
+                "far": 24.617005109922758
+              },
+              {
+                "d": 4,
+                "proxy": 1.3004761140819963,
+                "far": 23.703365588659704
+              },
+              {
+                "d": 10,
+                "proxy": 7.920920066208301,
+                "far": 17.082921636533403
+              }
+            ],
+            "maxMass": 17
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 28,
+        "S": 0,
+        "stopKeys": 0,
+        "R": 9044,
+        "twin": 123,
+        "bad": 5,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 28,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 7,
+            "T0": 28,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 3,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 7,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 14,
+            "T0": 28,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 3,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 5,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 14,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 28,
+            "T0": 28,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 7,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 9,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 28,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 21,
+        "S": 136,
+        "stopKeys": 6,
+        "R": 23525,
+        "twin": 376,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 21,
+            "nodes": 64,
+            "edges": 59,
+            "rootCount": 136,
+            "terminal": 65,
+            "merge": 65.5,
+            "split": 0.5,
+            "proxy": 107.46236367433735,
+            "minority": 169,
+            "mergeKeys": 45,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 107.46236367433735
+              },
+              {
+                "d": 2,
+                "proxy": 16.630807321333634,
+                "far": 90.83155635300375
+              }
+            ],
+            "maxMass": 25
+          },
+          {
+            "D": 5,
+            "T0": 21,
+            "nodes": 64,
+            "edges": 59,
+            "rootCount": 136,
+            "terminal": 58.72709385281385,
+            "merge": 59.81692242424241,
+            "split": 1.0898285714285714,
+            "proxy": 88.89384952988532,
+            "minority": 169,
+            "mergeKeys": 45,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 3.1931150056960584,
+                "far": 85.70073452418924
+              },
+              {
+                "d": 5,
+                "proxy": 8.711273419913423,
+                "far": 80.1825761099719
+              }
+            ],
+            "maxMass": 25
+          },
+          {
+            "D": 10,
+            "T0": 21,
+            "nodes": 64,
+            "edges": 59,
+            "rootCount": 136,
+            "terminal": 51.42429995670996,
+            "merge": 52.45575709956711,
+            "split": 1.0314571428571429,
+            "proxy": 73.79319889686337,
+            "minority": 169,
+            "mergeKeys": 45,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.8980635953520166,
+                "far": 72.89513530151135
+              },
+              {
+                "d": 4,
+                "proxy": 2.7374497334244703,
+                "far": 71.0557491634389
+              },
+              {
+                "d": 10,
+                "proxy": 14.358680735930733,
+                "far": 59.434518160932626
+              }
+            ],
+            "maxMass": 25
+          },
+          {
+            "D": 21,
+            "T0": 21,
+            "nodes": 64,
+            "edges": 59,
+            "rootCount": 136,
+            "terminal": 38.66674305879845,
+            "merge": 39.1397805277543,
+            "split": 0.47303746895583626,
+            "proxy": 52.373459080212406,
+            "minority": 169,
+            "mergeKeys": 45,
+            "splitKeys": 1,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.21549474987150807,
+                "far": 52.15796433034088
+              },
+              {
+                "d": 5,
+                "proxy": 0.6872086120809971,
+                "far": 51.6862504681314
+              },
+              {
+                "d": 7,
+                "proxy": 1.4760657868227813,
+                "far": 50.89739329338963
+              },
+              {
+                "d": 21,
+                "proxy": 15.557596068289126,
+                "far": 36.81586301192328
+              }
+            ],
+            "maxMass": 25
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 40,
+        "S": 0,
+        "stopKeys": 0,
+        "R": 33536,
+        "twin": 512,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 40,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 2,
+            "T0": 40,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 10,
+            "T0": 40,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 4,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 10,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 20,
+            "T0": 40,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 5,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 7,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 20,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          },
+          {
+            "D": 40,
+            "T0": 40,
+            "nodes": 0,
+            "edges": 0,
+            "rootCount": 0,
+            "terminal": 0,
+            "merge": 0,
+            "split": 0,
+            "proxy": 0,
+            "minority": 0,
+            "mergeKeys": 0,
+            "splitKeys": 0,
+            "qualProxy": 0,
+            "qualKeys": 0,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 10,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 11,
+                "proxy": 0,
+                "far": 0
+              },
+              {
+                "d": 40,
+                "proxy": 0,
+                "far": 0
+              }
+            ],
+            "maxMass": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 42,
+        "S": 505,
+        "stopKeys": 9,
+        "R": 252920,
+        "twin": 1543,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 42,
+            "nodes": 274,
+            "edges": 280,
+            "rootCount": 505,
+            "terminal": 248,
+            "merge": 255.5,
+            "split": 7.5,
+            "proxy": 560.2336959725316,
+            "minority": 863,
+            "mergeKeys": 177,
+            "splitKeys": 14,
+            "qualProxy": 5.9488017429193905,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 560.2336959725316
+              },
+              {
+                "d": 2,
+                "proxy": 53.052077172695434,
+                "far": 507.181618799836
+              }
+            ],
+            "maxMass": 79
+          },
+          {
+            "D": 2,
+            "T0": 42,
+            "nodes": 274,
+            "edges": 280,
+            "rootCount": 505,
+            "terminal": 246.06776687800337,
+            "merge": 254.84475994631342,
+            "split": 8.776993068309991,
+            "proxy": 546.9706766793574,
+            "minority": 863,
+            "mergeKeys": 177,
+            "splitKeys": 14,
+            "qualProxy": 5.9071350762527235,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 39.78905787952158,
+                "far": 507.181618799836
+              }
+            ],
+            "maxMass": 79
+          },
+          {
+            "D": 10,
+            "T0": 42,
+            "nodes": 274,
+            "edges": 280,
+            "rootCount": 505,
+            "terminal": 225.51648353295354,
+            "merge": 244.1140513029712,
+            "split": 18.597567770017843,
+            "proxy": 453.474104540226,
+            "minority": 863,
+            "mergeKeys": 177,
+            "splitKeys": 14,
+            "qualProxy": 5.02780174291939,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 2.864812167325555,
+                "far": 450.6092923729005
+              },
+              {
+                "d": 4,
+                "proxy": 8.599271963791445,
+                "far": 444.8748325764346
+              },
+              {
+                "d": 10,
+                "proxy": 45.32727972840969,
+                "far": 408.1468248118164
+              }
+            ],
+            "maxMass": 79
+          },
+          {
+            "D": 21,
+            "T0": 42,
+            "nodes": 274,
+            "edges": 280,
+            "rootCount": 505,
+            "terminal": 201.23434465454636,
+            "merge": 225.60101745679134,
+            "split": 24.36667280224483,
+            "proxy": 382.5789036826541,
+            "minority": 863,
+            "mergeKeys": 177,
+            "splitKeys": 14,
+            "qualProxy": 4.620845398712101,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.687425684129517,
+                "far": 381.89147799852486
+              },
+              {
+                "d": 5,
+                "proxy": 2.158038146780039,
+                "far": 380.4208655358745
+              },
+              {
+                "d": 7,
+                "proxy": 4.658807818409242,
+                "far": 377.92009586424507
+              },
+              {
+                "d": 21,
+                "proxy": 52.74755009962632,
+                "far": 329.83135358302815
+              }
+            ],
+            "maxMass": 79
+          },
+          {
+            "D": 42,
+            "T0": 42,
+            "nodes": 274,
+            "edges": 280,
+            "rootCount": 505,
+            "terminal": 163.2375630626117,
+            "merge": 190.43664666254264,
+            "split": 27.199083599930905,
+            "proxy": 295.1701451162604,
+            "minority": 863,
+            "mergeKeys": 177,
+            "splitKeys": 14,
+            "qualProxy": 4.317041249186329,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.17615283155818856,
+                "far": 294.99399228470213
+              },
+              {
+                "d": 10,
+                "proxy": 3.828512302882781,
+                "far": 291.3416328133776
+              },
+              {
+                "d": 12,
+                "proxy": 5.674737898458101,
+                "far": 289.4954072178023
+              },
+              {
+                "d": 42,
+                "proxy": 71.08364270185032,
+                "far": 224.08650241441
+              }
+            ],
+            "maxMass": 79
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 56,
+        "S": 384,
+        "stopKeys": 6,
+        "R": 284089,
+        "twin": 1664,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 56,
+            "nodes": 209,
+            "edges": 214,
+            "rootCount": 384,
+            "terminal": 189,
+            "merge": 194.5,
+            "split": 5.5,
+            "proxy": 436.7679692376172,
+            "minority": 663,
+            "mergeKeys": 133,
+            "splitKeys": 10,
+            "qualProxy": 6.516203703703704,
+            "qualKeys": 3,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 436.7679692376172
+              },
+              {
+                "d": 2,
+                "proxy": 40.30330401724034,
+                "far": 396.4646652203769
+              }
+            ],
+            "maxMass": 75
+          },
+          {
+            "D": 3,
+            "T0": 56,
+            "nodes": 209,
+            "edges": 214,
+            "rootCount": 384,
+            "terminal": 185.78606560527643,
+            "merge": 193.61089854550818,
+            "split": 7.824832940231623,
+            "proxy": 412.66665612153525,
+            "minority": 663,
+            "mergeKeys": 133,
+            "splitKeys": 10,
+            "qualProxy": 6.358024691358025,
+            "qualKeys": 3,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 17.912579563217907,
+                "far": 394.7540765583174
+              },
+              {
+                "d": 3,
+                "proxy": 17.912579563217907,
+                "far": 394.7540765583174
+              }
+            ],
+            "maxMass": 75
+          },
+          {
+            "D": 14,
+            "T0": 56,
+            "nodes": 209,
+            "edges": 214,
+            "rootCount": 384,
+            "terminal": 167.5859797509798,
+            "merge": 182.307651235459,
+            "split": 14.721671484479208,
+            "proxy": 331.46186143428906,
+            "minority": 663,
+            "mergeKeys": 133,
+            "splitKeys": 10,
+            "qualProxy": 4.941085263470468,
+            "qualKeys": 3,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 1.1456478547174733,
+                "far": 330.3162135795716
+              },
+              {
+                "d": 3,
+                "proxy": 1.1456478547174733,
+                "far": 330.3162135795716
+              },
+              {
+                "d": 5,
+                "proxy": 3.569397387548098,
+                "far": 327.8924640467409
+              },
+              {
+                "d": 14,
+                "proxy": 38.35053692429747,
+                "far": 293.11132450999173
+              }
+            ],
+            "maxMass": 75
+          },
+          {
+            "D": 28,
+            "T0": 56,
+            "nodes": 209,
+            "edges": 214,
+            "rootCount": 384,
+            "terminal": 147.62379093269521,
+            "merge": 165.46508481964545,
+            "split": 17.841293886950254,
+            "proxy": 272.290673890482,
+            "minority": 663,
+            "mergeKeys": 133,
+            "splitKeys": 10,
+            "qualProxy": 4.080378021744412,
+            "qualKeys": 3,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.297427808436267,
+                "far": 271.9932460820457
+              },
+              {
+                "d": 7,
+                "proxy": 2.142102403151921,
+                "far": 270.1485714873302
+              },
+              {
+                "d": 9,
+                "proxy": 3.9478633189674004,
+                "far": 268.3428105715146
+              },
+              {
+                "d": 28,
+                "proxy": 49.02812749748019,
+                "far": 223.2625463930018
+              }
+            ],
+            "maxMass": 75
+          },
+          {
+            "D": 56,
+            "T0": 56,
+            "nodes": 209,
+            "edges": 214,
+            "rootCount": 384,
+            "terminal": 115.46436278231435,
+            "merge": 132.27519762267292,
+            "split": 16.81083484035858,
+            "proxy": 195.83655475244194,
+            "minority": 663,
+            "mergeKeys": 133,
+            "splitKeys": 10,
+            "qualProxy": 2.6803878390393856,
+            "qualKeys": 3,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.07573393270367912,
+                "far": 195.76082081973814
+              },
+              {
+                "d": 14,
+                "proxy": 3.484478866516082,
+                "far": 192.35207588592579
+              },
+              {
+                "d": 56,
+                "proxy": 62.53564356452412,
+                "far": 133.30091118791773
+              }
+            ],
+            "maxMass": 75
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 84,
+        "S": 1808,
+        "stopKeys": 18,
+        "R": 1659308,
+        "twin": 6384,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 84,
+            "nodes": 1011,
+            "edges": 1087,
+            "rootCount": 1808,
+            "terminal": 895,
+            "merge": 942,
+            "split": 47,
+            "proxy": 2370.638639173012,
+            "minority": 3471,
+            "mergeKeys": 612,
+            "splitKeys": 84,
+            "qualProxy": 6.8625770548262945,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 2370.638639173012
+              },
+              {
+                "d": 2,
+                "proxy": 171.34773348764847,
+                "far": 2199.290905685362
+              }
+            ],
+            "maxMass": 130
+          },
+          {
+            "D": 5,
+            "T0": 84,
+            "nodes": 1011,
+            "edges": 1087,
+            "rootCount": 1808,
+            "terminal": 875.112276970022,
+            "merge": 959.8946532519518,
+            "split": 84.78237628192758,
+            "proxy": 2182.2673901819503,
+            "minority": 3471,
+            "mergeKeys": 612,
+            "splitKeys": 84,
+            "qualProxy": 6.646385999680833,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 32.89876482962846,
+                "far": 2149.368625352325
+              },
+              {
+                "d": 5,
+                "proxy": 86.01205513907921,
+                "far": 2096.2553350428716
+              }
+            ],
+            "maxMass": 130
+          },
+          {
+            "D": 21,
+            "T0": 84,
+            "nodes": 1011,
+            "edges": 1087,
+            "rootCount": 1808,
+            "terminal": 801.6204901593502,
+            "merge": 935.4398588601786,
+            "split": 133.81936870082856,
+            "proxy": 1827.2694273426484,
+            "minority": 3471,
+            "mergeKeys": 612,
+            "splitKeys": 84,
+            "qualProxy": 5.584928703432814,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 2.22024921914672,
+                "far": 1825.0491781235012
+              },
+              {
+                "d": 5,
+                "proxy": 6.760581958049871,
+                "far": 1820.5088453845976
+              },
+              {
+                "d": 7,
+                "proxy": 14.770760661436633,
+                "far": 1812.4986666812115
+              },
+              {
+                "d": 21,
+                "proxy": 150.2504251177927,
+                "far": 1677.0190022248569
+              }
+            ],
+            "maxMass": 130
+          },
+          {
+            "D": 42,
+            "T0": 84,
+            "nodes": 1011,
+            "edges": 1087,
+            "rootCount": 1808,
+            "terminal": 719.3808639103058,
+            "merge": 855.8554482809841,
+            "split": 136.47458437067715,
+            "proxy": 1563.4180894149629,
+            "minority": 3471,
+            "mergeKeys": 612,
+            "splitKeys": 84,
+            "qualProxy": 4.65448191635794,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.5689388624063493,
+                "far": 1562.8491505525567
+              },
+              {
+                "d": 10,
+                "proxy": 11.594135021065666,
+                "far": 1551.8239543938932
+              },
+              {
+                "d": 12,
+                "proxy": 16.687487111234113,
+                "far": 1546.7306023037252
+              },
+              {
+                "d": 42,
+                "proxy": 216.9418736052821,
+                "far": 1346.4762158096778
+              }
+            ],
+            "maxMass": 130
+          },
+          {
+            "D": 84,
+            "T0": 84,
+            "nodes": 1011,
+            "edges": 1087,
+            "rootCount": 1808,
+            "terminal": 579.6653450680654,
+            "merge": 697.7735367996695,
+            "split": 118.10819173160235,
+            "proxy": 1187.2814480412935,
+            "minority": 3471,
+            "mergeKeys": 612,
+            "splitKeys": 84,
+            "qualProxy": 3.2964104494561894,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.1439692853040449,
+                "far": 1187.1374787559876
+              },
+              {
+                "d": 19,
+                "proxy": 10.526121655643099,
+                "far": 1176.7553263856473
+              },
+              {
+                "d": 21,
+                "proxy": 13.188526689322433,
+                "far": 1174.092921351968
+              },
+              {
+                "d": 84,
+                "proxy": 305.38457650611144,
+                "far": 881.8968715351783
+              }
+            ],
+            "maxMass": 130
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 76,
+        "S": 1767,
+        "stopKeys": 19,
+        "R": 1694572,
+        "twin": 6425,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 76,
+            "nodes": 965,
+            "edges": 1023,
+            "rootCount": 1767,
+            "terminal": 874,
+            "merge": 912.5,
+            "split": 38.5,
+            "proxy": 2224.591823002853,
+            "minority": 3274,
+            "mergeKeys": 602,
+            "splitKeys": 72,
+            "qualProxy": 6.850354832604072,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 2224.591823002853
+              },
+              {
+                "d": 2,
+                "proxy": 170.31269128423466,
+                "far": 2054.279131718618
+              }
+            ],
+            "maxMass": 144
+          },
+          {
+            "D": 4,
+            "T0": 76,
+            "nodes": 965,
+            "edges": 1023,
+            "rootCount": 1767,
+            "terminal": 859.1370960305245,
+            "merge": 918.6979754950422,
+            "split": 59.560879464517924,
+            "proxy": 2076.339702943349,
+            "minority": 3274,
+            "mergeKeys": 602,
+            "splitKeys": 72,
+            "qualProxy": 6.694294802208936,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 47.90044442369091,
+                "far": 2028.4392585196563
+              },
+              {
+                "d": 4,
+                "proxy": 118.18225993078637,
+                "far": 1958.1574430125631
+              }
+            ],
+            "maxMass": 144
+          },
+          {
+            "D": 19,
+            "T0": 76,
+            "nodes": 965,
+            "edges": 1023,
+            "rootCount": 1767,
+            "terminal": 790.8177099580429,
+            "merge": 886.4532521961416,
+            "split": 95.63554223809989,
+            "proxy": 1713.861816096175,
+            "minority": 3274,
+            "mergeKeys": 602,
+            "splitKeys": 72,
+            "qualProxy": 5.693022679022925,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 2.6816985943573903,
+                "far": 1711.18011750182
+              },
+              {
+                "d": 4,
+                "proxy": 8.255879617226624,
+                "far": 1705.6059364789517
+              },
+              {
+                "d": 7,
+                "proxy": 17.980854466550596,
+                "far": 1695.8809616296278
+              },
+              {
+                "d": 19,
+                "proxy": 142.3580612517889,
+                "far": 1571.5037548443865
+              }
+            ],
+            "maxMass": 144
+          },
+          {
+            "D": 38,
+            "T0": 76,
+            "nodes": 965,
+            "edges": 1023,
+            "rootCount": 1767,
+            "terminal": 718.5914222878976,
+            "merge": 819.6787359756038,
+            "split": 101.08731368770358,
+            "proxy": 1475.3732657445105,
+            "minority": 3274,
+            "mergeKeys": 602,
+            "splitKeys": 72,
+            "qualProxy": 4.8732756134035045,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.6890475554946046,
+                "far": 1474.6842181890174
+              },
+              {
+                "d": 9,
+                "proxy": 8.815567162487422,
+                "far": 1466.5576985820267
+              },
+              {
+                "d": 11,
+                "proxy": 14.122664120773178,
+                "far": 1461.2506016237392
+              },
+              {
+                "d": 38,
+                "proxy": 193.04697490825555,
+                "far": 1282.3262908362572
+              }
+            ],
+            "maxMass": 144
+          },
+          {
+            "D": 76,
+            "T0": 76,
+            "nodes": 965,
+            "edges": 1023,
+            "rootCount": 1767,
+            "terminal": 594.2627648746244,
+            "merge": 691.4305140584711,
+            "split": 97.16774918384887,
+            "proxy": 1147.5194857538504,
+            "minority": 3274,
+            "mergeKeys": 602,
+            "splitKeys": 72,
+            "qualProxy": 3.737865380941199,
+            "qualKeys": 4,
+            "qualOvershoot": 0,
+            "qualUncovered": 0,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.17458975223680906,
+                "far": 1147.3448960016146
+              },
+              {
+                "d": 17,
+                "proxy": 9.736595607920831,
+                "far": 1137.7828901459302
+              },
+              {
+                "d": 19,
+                "proxy": 12.464104942662894,
+                "far": 1135.0553808111893
+              },
+              {
+                "d": 76,
+                "proxy": 263.1858843705669,
+                "far": 884.3336013832854
+              }
+            ],
+            "maxMass": 144
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 169,
+        "S": 6093,
+        "stopKeys": 32,
+        "R": 12808293,
+        "twin": 26675,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 169,
+            "nodes": 3309,
+            "edges": 3542,
+            "rootCount": 6093,
+            "terminal": 3030.5,
+            "merge": 3163,
+            "split": 132.5,
+            "proxy": 9156.284227222204,
+            "minority": 13030,
+            "mergeKeys": 2061,
+            "splitKeys": 240,
+            "qualProxy": 18.229823211068133,
+            "qualKeys": 13,
+            "qualOvershoot": 0,
+            "qualUncovered": 15.503791982665222,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 9156.284227222204
+              },
+              {
+                "d": 2,
+                "proxy": 546.1718169202279,
+                "far": 8610.112410301981
+              }
+            ],
+            "maxMass": 250
+          },
+          {
+            "D": 10,
+            "T0": 169,
+            "nodes": 3309,
+            "edges": 3542,
+            "rootCount": 6093,
+            "terminal": 2954.530421195358,
+            "merge": 3318.249650251001,
+            "split": 363.71922905563576,
+            "proxy": 8103.745056695099,
+            "minority": 13030,
+            "mergeKeys": 2061,
+            "splitKeys": 240,
+            "qualProxy": 16.484582374127292,
+            "qualKeys": 13,
+            "qualOvershoot": 0,
+            "qualUncovered": 15.390936183065762,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 29.493278113692654,
+                "far": 8074.251778581379
+              },
+              {
+                "d": 4,
+                "proxy": 85.05198603263105,
+                "far": 8018.693070662469
+              },
+              {
+                "d": 10,
+                "proxy": 425.4024502052694,
+                "far": 7678.342606489793
+              }
+            ],
+            "maxMass": 250
+          },
+          {
+            "D": 42,
+            "T0": 169,
+            "nodes": 3309,
+            "edges": 3542,
+            "rootCount": 6093,
+            "terminal": 2729.3553779280887,
+            "merge": 3289.081399870066,
+            "split": 559.7260219419737,
+            "proxy": 6728.0808505569985,
+            "minority": 13030,
+            "mergeKeys": 2061,
+            "splitKeys": 240,
+            "qualProxy": 14.022870988244124,
+            "qualKeys": 13,
+            "qualOvershoot": 0,
+            "qualUncovered": 15.158314667670805,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 1.813495666806717,
+                "far": 6726.267354890241
+              },
+              {
+                "d": 10,
+                "proxy": 35.7440083860053,
+                "far": 6692.336842171059
+              },
+              {
+                "d": 12,
+                "proxy": 51.230639261450094,
+                "far": 6676.8502112956185
+              },
+              {
+                "d": 42,
+                "proxy": 603.236481109035,
+                "far": 6124.844369448039
+              }
+            ],
+            "maxMass": 250
+          },
+          {
+            "D": 84,
+            "T0": 169,
+            "nodes": 3309,
+            "edges": 3542,
+            "rootCount": 6093,
+            "terminal": 2479.2794273674454,
+            "merge": 3073.138514117259,
+            "split": 593.8590867498287,
+            "proxy": 5727.792037372554,
+            "minority": 13030,
+            "mergeKeys": 2061,
+            "splitKeys": 240,
+            "qualProxy": 11.412158018202172,
+            "qualKeys": 13,
+            "qualOvershoot": 0,
+            "qualUncovered": 14.888732167503006,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.4589028669053619,
+                "far": 5727.333134505661
+              },
+              {
+                "d": 19,
+                "proxy": 31.54766056666626,
+                "far": 5696.244376805906
+              },
+              {
+                "d": 21,
+                "proxy": 39.306572768293286,
+                "far": 5688.485464604284
+              },
+              {
+                "d": 84,
+                "proxy": 800.8702443038117,
+                "far": 4926.921793068775
+              }
+            ],
+            "maxMass": 250
+          },
+          {
+            "D": 169,
+            "T0": 169,
+            "nodes": 3309,
+            "edges": 3542,
+            "rootCount": 6093,
+            "terminal": 2056.083641805137,
+            "merge": 2598.455063113961,
+            "split": 542.3714213088149,
+            "proxy": 4412.006291250626,
+            "minority": 13030,
+            "mergeKeys": 2061,
+            "splitKeys": 240,
+            "qualProxy": 8.132953950097031,
+            "qualKeys": 13,
+            "qualOvershoot": 0,
+            "qualUncovered": 14.449471241904872,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.11405903806336402,
+                "far": 4411.892232212561
+              },
+              {
+                "d": 30,
+                "proxy": 24.77406797994716,
+                "far": 4387.232223270687
+              },
+              {
+                "d": 42,
+                "proxy": 53.06208449862555,
+                "far": 4358.944206752008
+              },
+              {
+                "d": 169,
+                "proxy": 1016.4239024214259,
+                "far": 3395.582388829202
+              }
+            ],
+            "maxMass": 250
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 108,
+        "S": 9065,
+        "stopKeys": 71,
+        "R": 11680803,
+        "twin": 23703,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 108,
+            "nodes": 4780,
+            "edges": 5075,
+            "rootCount": 9065,
+            "terminal": 4497,
+            "merge": 4680,
+            "split": 183,
+            "proxy": 12151.69403897985,
+            "minority": 17451,
+            "mergeKeys": 3038,
+            "splitKeys": 337,
+            "qualProxy": 49.50285894075641,
+            "qualKeys": 17,
+            "qualOvershoot": 1.0422535211267605,
+            "qualUncovered": 1.0422535211267605,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 12151.69403897985
+              },
+              {
+                "d": 2,
+                "proxy": 829.547420766034,
+                "far": 11322.146618213857
+              }
+            ],
+            "maxMass": 195
+          },
+          {
+            "D": 6,
+            "T0": 108,
+            "nodes": 4780,
+            "edges": 5075,
+            "rootCount": 9065,
+            "terminal": 4403.584207214413,
+            "merge": 4785.794366160792,
+            "split": 382.21015894640345,
+            "proxy": 11072.013077108013,
+            "minority": 17451,
+            "mergeKeys": 3038,
+            "splitKeys": 337,
+            "qualProxy": 46.56155546274733,
+            "qualKeys": 17,
+            "qualOvershoot": 1.003716744913928,
+            "qualUncovered": 1.003716744913928,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 115.21491955083762,
+                "far": 10956.798157557023
+              },
+              {
+                "d": 3,
+                "proxy": 115.21491955083762,
+                "far": 10956.798157557023
+              },
+              {
+                "d": 6,
+                "proxy": 582.553168460109,
+                "far": 10489.459908647812
+              }
+            ],
+            "maxMass": 195
+          },
+          {
+            "D": 27,
+            "T0": 108,
+            "nodes": 4780,
+            "edges": 5075,
+            "rootCount": 9065,
+            "terminal": 4071.8524843585355,
+            "merge": 4720.25282106925,
+            "split": 648.4003367107108,
+            "proxy": 9169.558429428076,
+            "minority": 17451,
+            "mergeKeys": 3038,
+            "splitKeys": 337,
+            "qualProxy": 41.11737194697552,
+            "qualKeys": 17,
+            "qualOvershoot": 0.8819600527516059,
+            "qualUncovered": 0.8819600527516059,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 6.574678536783149,
+                "far": 9162.983750891344
+              },
+              {
+                "d": 6,
+                "proxy": 43.753776279670866,
+                "far": 9125.80465314843
+              },
+              {
+                "d": 8,
+                "proxy": 78.87897254959881,
+                "far": 9090.679456878519
+              },
+              {
+                "d": 27,
+                "proxy": 761.7552218520068,
+                "far": 8407.803207576097
+              }
+            ],
+            "maxMass": 195
+          },
+          {
+            "D": 54,
+            "T0": 108,
+            "nodes": 4780,
+            "edges": 5075,
+            "rootCount": 9065,
+            "terminal": 3722.512335555967,
+            "merge": 4444.552172524845,
+            "split": 722.039836968898,
+            "proxy": 7880.565829829549,
+            "minority": 17451,
+            "mergeKeys": 3038,
+            "splitKeys": 337,
+            "qualProxy": 36.318664701198635,
+            "qualKeys": 17,
+            "qualOvershoot": 0.7635725187890029,
+            "qualUncovered": 0.7635725187890029,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 1.6752786656226162,
+                "far": 7878.890551163841
+              },
+              {
+                "d": 13,
+                "proxy": 49.69790196894628,
+                "far": 7830.867927860535
+              },
+              {
+                "d": 14,
+                "proxy": 67.71811278707867,
+                "far": 7812.847717042401
+              },
+              {
+                "d": 54,
+                "proxy": 1033.5554331295195,
+                "far": 6847.010396699946
+              }
+            ],
+            "maxMass": 195
+          },
+          {
+            "D": 108,
+            "T0": 108,
+            "nodes": 4780,
+            "edges": 5075,
+            "rootCount": 9065,
+            "terminal": 3146.3106129056628,
+            "merge": 3834.77592128156,
+            "split": 688.4653083759321,
+            "proxy": 6214.32532541484,
+            "minority": 17451,
+            "mergeKeys": 3038,
+            "splitKeys": 337,
+            "qualProxy": 27.90811681735167,
+            "qualKeys": 17,
+            "qualOvershoot": 0.5039862118271791,
+            "qualUncovered": 0.5039862118271791,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.422770795334006,
+                "far": 6213.902554619538
+              },
+              {
+                "d": 22,
+                "proxy": 46.57674860261791,
+                "far": 6167.74857681229
+              },
+              {
+                "d": 27,
+                "proxy": 66.77417447907146,
+                "far": 6147.551150935821
+              },
+              {
+                "d": 108,
+                "proxy": 1306.314910443676,
+                "far": 4908.010414971223
+              }
+            ],
+            "maxMass": 195
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "runs": [
+      {
+        "mode": "uniform",
+        "T0": 338,
+        "S": 11112,
+        "stopKeys": 30,
+        "R": 98554147,
+        "twin": 119960,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 338,
+            "nodes": 6332,
+            "edges": 6831,
+            "rootCount": 11112,
+            "terminal": 5541,
+            "merge": 5805.5,
+            "split": 264.5,
+            "proxy": 19512.332029720943,
+            "minority": 27396,
+            "mergeKeys": 3856,
+            "splitKeys": 481,
+            "qualProxy": 50.04796196799954,
+            "qualKeys": 27,
+            "qualOvershoot": 33.84873949579832,
+            "qualUncovered": 45.67645304809261,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 19512.332029720943
+              },
+              {
+                "d": 2,
+                "proxy": 985.7828248272504,
+                "far": 18526.54920489375
+              }
+            ],
+            "maxMass": 504
+          },
+          {
+            "D": 21,
+            "T0": 338,
+            "nodes": 6332,
+            "edges": 6831,
+            "rootCount": 11112,
+            "terminal": 5392.990780945844,
+            "merge": 6388.675324343048,
+            "split": 995.684543397136,
+            "proxy": 16532.424253479126,
+            "minority": 27396,
+            "mergeKeys": 3856,
+            "splitKeys": 481,
+            "qualProxy": 41.35798836537597,
+            "qualKeys": 27,
+            "qualOvershoot": 33.70867893642718,
+            "qualUncovered": 45.12895669801576,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 12.773344021085403,
+                "far": 16519.650909458232
+              },
+              {
+                "d": 5,
+                "proxy": 38.37779648607953,
+                "far": 16494.046456993263
+              },
+              {
+                "d": 7,
+                "proxy": 80.99377074989197,
+                "far": 16451.430482729356
+              },
+              {
+                "d": 21,
+                "proxy": 789.3963797466621,
+                "far": 15743.027873732646
+              }
+            ],
+            "maxMass": 504
+          },
+          {
+            "D": 84,
+            "T0": 338,
+            "nodes": 6332,
+            "edges": 6831,
+            "rootCount": 11112,
+            "terminal": 5037.424294107934,
+            "merge": 6459.520653709114,
+            "split": 1422.0963596012648,
+            "proxy": 13782.680573961234,
+            "minority": 27396,
+            "mergeKeys": 3856,
+            "splitKeys": 481,
+            "qualProxy": 31.628517454979026,
+            "qualKeys": 27,
+            "qualOvershoot": 33.01815647838878,
+            "qualUncovered": 43.45587542031133,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.8282715263672435,
+                "far": 13781.852302434854
+              },
+              {
+                "d": 19,
+                "proxy": 55.35765219890169,
+                "far": 13727.322921762412
+              },
+              {
+                "d": 21,
+                "proxy": 69.07182259411165,
+                "far": 13713.608751367228
+              },
+              {
+                "d": 84,
+                "proxy": 1175.9350594521109,
+                "far": 12606.745514509226
+              }
+            ],
+            "maxMass": 504
+          },
+          {
+            "D": 169,
+            "T0": 338,
+            "nodes": 6332,
+            "edges": 6831,
+            "rootCount": 11112,
+            "terminal": 4644.034989725208,
+            "merge": 6177.251112401475,
+            "split": 1533.2161226763014,
+            "proxy": 11877.101595291146,
+            "minority": 27396,
+            "mergeKeys": 3856,
+            "splitKeys": 481,
+            "qualProxy": 25.198203635774803,
+            "qualKeys": 27,
+            "qualOvershoot": 31.592774209784622,
+            "qualUncovered": 40.894556163187325,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.20586459655351202,
+                "far": 11876.895730694334
+              },
+              {
+                "d": 30,
+                "proxy": 41.95989104477405,
+                "far": 11835.141704246198
+              },
+              {
+                "d": 42,
+                "proxy": 85.22713808900716,
+                "far": 11791.874457201975
+              },
+              {
+                "d": 169,
+                "proxy": 1452.5793950683753,
+                "far": 10424.5222002226
+              }
+            ],
+            "maxMass": 504
+          },
+          {
+            "D": 338,
+            "T0": 338,
+            "nodes": 6332,
+            "edges": 6831,
+            "rootCount": 11112,
+            "terminal": 3989.706958587794,
+            "merge": 5528.168842644049,
+            "split": 1538.4618840562136,
+            "proxy": 9497.854254635147,
+            "minority": 27396,
+            "mergeKeys": 3856,
+            "splitKeys": 481,
+            "qualProxy": 18.776598460237924,
+            "qualKeys": 27,
+            "qualOvershoot": 26.883385380756213,
+            "qualUncovered": 34.15181333560585,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.05161932220129044,
+                "far": 9497.802635312903
+              },
+              {
+                "d": 48,
+                "proxy": 29.6621128218316,
+                "far": 9468.192141813272
+              },
+              {
+                "d": 84,
+                "proxy": 102.44053910133772,
+                "far": 9395.413715533783
+              },
+              {
+                "d": 338,
+                "proxy": 1851.9785186042625,
+                "far": 7645.875736030843
+              }
+            ],
+            "maxMass": 504
+          }
+        ]
+      },
+      {
+        "mode": "hybrid",
+        "T0": 148,
+        "S": 34194,
+        "stopKeys": 192,
+        "R": 78434077,
+        "twin": 96878,
+        "bad": 0,
+        "kernelTests": 80,
+        "runs": [
+          {
+            "D": 1,
+            "T0": 148,
+            "nodes": 18729,
+            "edges": 19954,
+            "rootCount": 34194,
+            "terminal": 17001,
+            "merge": 17709.5,
+            "split": 708.5,
+            "proxy": 49567.75495015268,
+            "minority": 70495,
+            "mergeKeys": 11742,
+            "splitKeys": 1280,
+            "qualProxy": 138.46469207120168,
+            "qualKeys": 53,
+            "qualOvershoot": 17.256111123551058,
+            "qualUncovered": 20.480922307867306,
+            "near": [
+              {
+                "d": 1,
+                "proxy": 0,
+                "far": 49567.75495015268
+              },
+              {
+                "d": 2,
+                "proxy": 3096.5199332940383,
+                "far": 46471.23501685821
+              }
+            ],
+            "maxMass": 332
+          },
+          {
+            "D": 9,
+            "T0": 148,
+            "nodes": 18729,
+            "edges": 19954,
+            "rootCount": 34194,
+            "terminal": 16616.392037916172,
+            "merge": 18404.92900206383,
+            "split": 1788.5369641472923,
+            "proxy": 44073.98642552506,
+            "minority": 70495,
+            "mergeKeys": 11742,
+            "splitKeys": 1280,
+            "qualProxy": 130.24838872629297,
+            "qualKeys": 53,
+            "qualOvershoot": 17.212966126702355,
+            "qualUncovered": 20.401775564911176,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 203.88608614281554,
+                "far": 43870.10033938199
+              },
+              {
+                "d": 4,
+                "proxy": 580.8780341900261,
+                "far": 43493.10839133401
+              },
+              {
+                "d": 9,
+                "proxy": 1880.9636145626664,
+                "far": 42193.02281096167
+              }
+            ],
+            "maxMass": 332
+          },
+          {
+            "D": 37,
+            "T0": 148,
+            "nodes": 18729,
+            "edges": 19954,
+            "rootCount": 34194,
+            "terminal": 15565.968109542186,
+            "merge": 18319.68238598845,
+            "split": 2753.7142764461914,
+            "proxy": 36954.314277872814,
+            "minority": 70495,
+            "mergeKeys": 11742,
+            "splitKeys": 1280,
+            "qualProxy": 108.37944486287536,
+            "qualKeys": 53,
+            "qualOvershoot": 16.886825385344064,
+            "qualUncovered": 19.9411851104125,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 13.204515144048253,
+                "far": 36941.10976272959
+              },
+              {
+                "d": 9,
+                "proxy": 156.27122721624133,
+                "far": 36798.043050657725
+              },
+              {
+                "d": 11,
+                "proxy": 252.61177826503538,
+                "far": 36701.70249960877
+              },
+              {
+                "d": 37,
+                "proxy": 2964.9084974122534,
+                "far": 33989.40578046159
+              }
+            ],
+            "maxMass": 332
+          },
+          {
+            "D": 74,
+            "T0": 148,
+            "nodes": 18729,
+            "edges": 19954,
+            "rootCount": 34194,
+            "terminal": 14463.72321788241,
+            "merge": 17439.670080283853,
+            "split": 2975.94686240108,
+            "proxy": 32168.854271302993,
+            "minority": 70495,
+            "mergeKeys": 11742,
+            "splitKeys": 1280,
+            "qualProxy": 93.26992868160451,
+            "qualKeys": 53,
+            "qualOvershoot": 16.419277890796064,
+            "qualUncovered": 19.239122542717652,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 3.346977796929027,
+                "far": 32165.50729350649
+              },
+              {
+                "d": 17,
+                "proxy": 173.73447008381308,
+                "far": 31995.119801219604
+              },
+              {
+                "d": 18,
+                "proxy": 222.79899856737012,
+                "far": 31946.05527273599
+              },
+              {
+                "d": 74,
+                "proxy": 3748.033019652194,
+                "far": 28420.821251651178
+              }
+            ],
+            "maxMass": 332
+          },
+          {
+            "D": 148,
+            "T0": 148,
+            "nodes": 18729,
+            "edges": 19954,
+            "rootCount": 34194,
+            "terminal": 12671.29083593047,
+            "merge": 15534.289305944732,
+            "split": 2862.998470014365,
+            "proxy": 26280.108189461193,
+            "minority": 70495,
+            "mergeKeys": 11742,
+            "splitKeys": 1280,
+            "qualProxy": 72.40632940488052,
+            "qualKeys": 53,
+            "qualOvershoot": 15.531956459545478,
+            "qualUncovered": 17.909841665327942,
+            "near": [
+              {
+                "d": 2,
+                "proxy": 0.8424755755968866,
+                "far": 26279.265713884975
+              },
+              {
+                "d": 27,
+                "proxy": 128.61703880664638,
+                "far": 26151.491150653525
+              },
+              {
+                "d": 37,
+                "proxy": 259.72553201114323,
+                "far": 26020.382657449092
+              },
+              {
+                "d": 148,
+                "proxy": 4556.837599719463,
+                "far": 21723.270589740834
+              }
+            ],
+            "maxMass": 332
+          }
+        ]
+      }
+    ]
+  }
+]
