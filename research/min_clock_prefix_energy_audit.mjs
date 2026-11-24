@@ -15,7 +15,7 @@ function audit(X){
  const hs=[...new Set([Math.min(B,minK),Math.min(2*B,minK),Math.min(4*B,minK),Math.min(8*B,minK),Math.min(Math.floor(B*Math.log(B)),minK)])].sort((a,b)=>a-b);
  const configs=hs.flatMap(H=>[{a:0,H},{a:Math.floor(H/2),H}]).map(({a,H})=>{
    const d=Math.max(1,Math.floor(H*Math.log(B)/B));
-   return {a,H,h:H-a,d,W:new Float64Array(len),win:new Float64Array(len),near:0,total:0,live:0,finished:0,largestGain:0};
+   return {a,H,h:H-a,d,W:new Float64Array(len),win:new Float64Array(len),near:0,total:0,live:0,finished:0,twins:new Set(),largestGain:0};
  });
  let events=0, literal=0, noTwin=0;
  function hit(t,C,K){
@@ -39,7 +39,7 @@ function audit(X){
      }check(a===u&&b===p,'literal MIN');literal++;}
      const q=r[C/2];
      check(C<=2*t&&C>=C0,'horizon invariant');
-     if(!q){check(!p&&spf[C-1]===C-1&&spf[C+1]===C+1,'twin at r=0');return {elapsed:t-s,twin:true};}
+     if(!q){check(!p&&spf[C-1]===C-1&&spf[C+1]===C+1,'twin at r=0');return {elapsed:t-s,twin:true,C};}
      const end=p?u:K;
      check(end-t<=2*q,'wait including clipped terminal tail');
      cb(C,t-s,end-s,C0);
@@ -72,7 +72,7 @@ function audit(X){
    for(let j=0;j<configs.length;j++){
      const c=configs[j],expected=Math.max(0,Math.min(result.elapsed,c.H)-c.a);
      check(totals[j]===expected,'exact slab live time');
-     if(result.elapsed>=c.H)c.live++;else c.finished++;
+     if(result.elapsed>=c.H)c.live++;else{c.finished++;check(result.twin,'early finish twin');c.twins.add(result.C);}
    }
  }
  const results=[];
@@ -85,8 +85,11 @@ function audit(X){
    check(E<=(2*Math.floor((c.H+3)/2)+1)*R+1e-7*Math.max(1,E),'support pair bound');
    check(R*R<=S0*E+1e-7*Math.max(1,S0*E),'Cauchy');
    const ratio=4*S0*E/(N*c.h)**2,far=Math.max(0,E-c.near);
+   const rootCap=Math.floor((c.H+3)/2)+1;
+   const certifiedDistinct=Math.max(0,Math.ceil((N*(1-Math.sqrt(ratio)))/rootCap-1e-7));
+   check(c.twins.size>=certifiedDistinct,'distinct twin lower bound');
    if(ratio<1-1e-9)check(c.finished>0,'finite twin certificate');
-   results.push({a:c.a,H:c.H,h:c.h,d:c.d,R,E,near:c.near,far,ratio,maxW,live:c.live,finished:c.finished,largestGain:c.largestGain,midScale:far/(X*c.H*c.h*Math.log(B)**2/B)});
+   results.push({a:c.a,H:c.H,h:c.h,d:c.d,R,E,near:c.near,far,ratio,maxW,live:c.live,finished:c.finished,distinct:c.twins.size,certifiedDistinct,largestGain:c.largestGain,midScale:far/(X*c.H*c.h*Math.log(B)**2/B)});
  }
  return {X,B,N,S0,events,literal,noTwin,results};
 }
