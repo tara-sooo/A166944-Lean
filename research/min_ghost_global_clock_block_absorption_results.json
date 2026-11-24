@@ -1,0 +1,847 @@
+[
+  {
+    "Y": 53,
+    "T": 105,
+    "U": 211,
+    "V": 424,
+    "N": 512,
+    "rows": [
+      {
+        "z": 29,
+        "highFresh": 661,
+        "repeat": 17,
+        "termRepeat": 15,
+        "lowActive": 28648,
+        "lowGain": 26692,
+        "highGain": 53290,
+        "negativeActive": 570,
+        "positiveActive": 31174,
+        "blocks": 1190,
+        "clockPairs": 459,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 14,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 343,
+            "repeatGood": 15,
+            "largeBlocks": 760,
+            "slow": 927,
+            "drop": 66,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 15,
+            "boundChecks": 343
+          },
+          {
+            "R": 55,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 332,
+            "repeatGood": 4,
+            "largeBlocks": 516,
+            "slow": 806,
+            "drop": 26,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 4,
+            "boundChecks": 332
+          },
+          {
+            "R": 123,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 328,
+            "repeatGood": 0,
+            "largeBlocks": 279,
+            "slow": 669,
+            "drop": 8,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 328
+          }
+        ],
+        "guards": [
+          {
+            "v": 1,
+            "badPaths": 72,
+            "pairBad": 85,
+            "actualHighClose": 7,
+            "actualMediumClose": 5,
+            "mediumBadPaths": 72,
+            "mediumPairBad": 0,
+            "actualChecks": 467,
+            "mediumChecks": 0
+          },
+          {
+            "v": 14,
+            "badPaths": 176,
+            "pairBad": 389,
+            "actualHighClose": 70,
+            "actualMediumClose": 58,
+            "mediumBadPaths": 176,
+            "mediumPairBad": 0,
+            "actualChecks": 196,
+            "mediumChecks": 0
+          }
+        ]
+      },
+      {
+        "z": 42,
+        "highFresh": 439,
+        "repeat": 7,
+        "termRepeat": 7,
+        "lowActive": 34575,
+        "lowGain": 34224,
+        "highGain": 45758,
+        "negativeActive": 938,
+        "positiveActive": 35864,
+        "blocks": 958,
+        "clockPairs": 182,
+        "minClockSeparation": 1,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 14,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 294,
+            "repeatGood": 7,
+            "largeBlocks": 587,
+            "slow": 687,
+            "drop": 53,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 7,
+            "boundChecks": 294
+          },
+          {
+            "R": 55,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 292,
+            "repeatGood": 5,
+            "largeBlocks": 412,
+            "slow": 616,
+            "drop": 25,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 5,
+            "boundChecks": 292
+          },
+          {
+            "R": 123,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 287,
+            "repeatGood": 0,
+            "largeBlocks": 234,
+            "slow": 527,
+            "drop": 13,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 287
+          }
+        ],
+        "guards": [
+          {
+            "v": 1,
+            "badPaths": 15,
+            "pairBad": 17,
+            "actualHighClose": 2,
+            "actualMediumClose": 3,
+            "mediumBadPaths": 33,
+            "mediumPairBad": 19,
+            "actualChecks": 407,
+            "mediumChecks": 0
+          },
+          {
+            "v": 14,
+            "badPaths": 78,
+            "pairBad": 123,
+            "actualHighClose": 29,
+            "actualMediumClose": 38,
+            "mediumBadPaths": 122,
+            "mediumPairBad": 89,
+            "actualChecks": 255,
+            "mediumChecks": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 199,
+    "T": 457,
+    "U": 855,
+    "V": 1592,
+    "N": 512,
+    "rows": [
+      {
+        "z": 87,
+        "highFresh": 615,
+        "repeat": 7,
+        "termRepeat": 4,
+        "lowActive": 74633,
+        "lowGain": 82988,
+        "highGain": 177522,
+        "negativeActive": 2296,
+        "positiveActive": 68574,
+        "blocks": 1134,
+        "clockPairs": 492,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 29,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 319,
+            "repeatGood": 6,
+            "largeBlocks": 730,
+            "slow": 869,
+            "drop": 82,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 6,
+            "boundChecks": 319
+          },
+          {
+            "R": 158,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 315,
+            "repeatGood": 2,
+            "largeBlocks": 493,
+            "slow": 718,
+            "drop": 32,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 2,
+            "boundChecks": 315
+          },
+          {
+            "R": 435,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 313,
+            "repeatGood": 0,
+            "largeBlocks": 245,
+            "slow": 539,
+            "drop": 6,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 313
+          }
+        ],
+        "guards": [
+          {
+            "v": 2,
+            "badPaths": 45,
+            "pairBad": 67,
+            "actualHighClose": 2,
+            "actualMediumClose": 2,
+            "mediumBadPaths": 50,
+            "mediumPairBad": 7,
+            "actualChecks": 465,
+            "mediumChecks": 0
+          },
+          {
+            "v": 29,
+            "badPaths": 135,
+            "pairBad": 359,
+            "actualHighClose": 29,
+            "actualMediumClose": 30,
+            "mediumBadPaths": 147,
+            "mediumPairBad": 50,
+            "actualChecks": 221,
+            "mediumChecks": 0
+          }
+        ]
+      },
+      {
+        "z": 135,
+        "highFresh": 427,
+        "repeat": 2,
+        "termRepeat": 0,
+        "lowActive": 89878,
+        "lowGain": 103314,
+        "highGain": 157196,
+        "negativeActive": 3370,
+        "positiveActive": 79812,
+        "blocks": 941,
+        "clockPairs": 214,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 29,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 269,
+            "repeatGood": 2,
+            "largeBlocks": 552,
+            "slow": 652,
+            "drop": 70,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 2,
+            "boundChecks": 269
+          },
+          {
+            "R": 158,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 268,
+            "repeatGood": 1,
+            "largeBlocks": 398,
+            "slow": 547,
+            "drop": 34,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 1,
+            "boundChecks": 268
+          },
+          {
+            "R": 435,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 267,
+            "repeatGood": 0,
+            "largeBlocks": 215,
+            "slow": 423,
+            "drop": 10,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 267
+          }
+        ],
+        "guards": [
+          {
+            "v": 2,
+            "badPaths": 12,
+            "pairBad": 13,
+            "actualHighClose": 1,
+            "actualMediumClose": 2,
+            "mediumBadPaths": 36,
+            "mediumPairBad": 38,
+            "actualChecks": 388,
+            "mediumChecks": 0
+          },
+          {
+            "v": 29,
+            "badPaths": 60,
+            "pairBad": 113,
+            "actualHighClose": 11,
+            "actualMediumClose": 19,
+            "mediumBadPaths": 136,
+            "mediumPairBad": 232,
+            "actualChecks": 267,
+            "mediumChecks": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 797,
+    "T": 2060,
+    "U": 3654,
+    "V": 6376,
+    "N": 512,
+    "rows": [
+      {
+        "z": 293,
+        "highFresh": 538,
+        "repeat": 3,
+        "termRepeat": 2,
+        "lowActive": 197480,
+        "lowGain": 238556,
+        "highGain": 619404,
+        "negativeActive": 7578,
+        "positiveActive": 163982,
+        "blocks": 1053,
+        "clockPairs": 399,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 60,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 292,
+            "repeatGood": 3,
+            "largeBlocks": 689,
+            "slow": 776,
+            "drop": 86,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 3,
+            "boundChecks": 292
+          },
+          {
+            "R": 469,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 292,
+            "repeatGood": 3,
+            "largeBlocks": 425,
+            "slow": 613,
+            "drop": 40,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 3,
+            "boundChecks": 292
+          },
+          {
+            "R": 1608,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 289,
+            "repeatGood": 0,
+            "largeBlocks": 173,
+            "slow": 407,
+            "drop": 12,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 289
+          }
+        ],
+        "guards": [
+          {
+            "v": 6,
+            "badPaths": 42,
+            "pairBad": 55,
+            "actualHighClose": 1,
+            "actualMediumClose": 1,
+            "mediumBadPaths": 69,
+            "mediumPairBad": 52,
+            "actualChecks": 397,
+            "mediumChecks": 0
+          },
+          {
+            "v": 60,
+            "badPaths": 107,
+            "pairBad": 240,
+            "actualHighClose": 8,
+            "actualMediumClose": 10,
+            "mediumBadPaths": 149,
+            "mediumPairBad": 164,
+            "actualChecks": 227,
+            "mediumChecks": 0
+          }
+        ]
+      },
+      {
+        "z": 448,
+        "highFresh": 397,
+        "repeat": 0,
+        "termRepeat": 0,
+        "lowActive": 240183,
+        "lowGain": 289890,
+        "highGain": 568070,
+        "negativeActive": 10890,
+        "positiveActive": 201366,
+        "blocks": 909,
+        "clockPairs": 195,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 60,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 255,
+            "repeatGood": 0,
+            "largeBlocks": 537,
+            "slow": 610,
+            "drop": 72,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 255
+          },
+          {
+            "R": 469,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 255,
+            "repeatGood": 0,
+            "largeBlocks": 342,
+            "slow": 479,
+            "drop": 33,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 255
+          },
+          {
+            "R": 1608,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 255,
+            "repeatGood": 0,
+            "largeBlocks": 141,
+            "slow": 335,
+            "drop": 9,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 255
+          }
+        ],
+        "guards": [
+          {
+            "v": 6,
+            "badPaths": 16,
+            "pairBad": 17,
+            "actualHighClose": 1,
+            "actualMediumClose": 1,
+            "mediumBadPaths": 51,
+            "mediumPairBad": 53,
+            "actualChecks": 351,
+            "mediumChecks": 0
+          },
+          {
+            "v": 60,
+            "badPaths": 56,
+            "pairBad": 80,
+            "actualHighClose": 4,
+            "actualMediumClose": 8,
+            "mediumBadPaths": 135,
+            "mediumPairBad": 242,
+            "actualChecks": 250,
+            "mediumChecks": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 1597,
+    "T": 4337,
+    "U": 7531,
+    "V": 12776,
+    "N": 512,
+    "rows": [
+      {
+        "z": 545,
+        "highFresh": 450,
+        "repeat": 4,
+        "termRepeat": 4,
+        "lowActive": 292507,
+        "lowGain": 362342,
+        "highGain": 1013150,
+        "negativeActive": 18738,
+        "positiveActive": 241410,
+        "blocks": 966,
+        "clockPairs": 313,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 86,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 258,
+            "repeatGood": 4,
+            "largeBlocks": 584,
+            "slow": 651,
+            "drop": 86,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 4,
+            "boundChecks": 258
+          },
+          {
+            "R": 808,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 258,
+            "repeatGood": 4,
+            "largeBlocks": 334,
+            "slow": 503,
+            "drop": 40,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 4,
+            "boundChecks": 258
+          },
+          {
+            "R": 3084,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 254,
+            "repeatGood": 0,
+            "largeBlocks": 101,
+            "slow": 312,
+            "drop": 8,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 254
+          }
+        ],
+        "guards": [
+          {
+            "v": 10,
+            "badPaths": 26,
+            "pairBad": 38,
+            "actualHighClose": 0,
+            "actualMediumClose": 1,
+            "mediumBadPaths": 60,
+            "mediumPairBad": 84,
+            "actualChecks": 358,
+            "mediumChecks": 0
+          },
+          {
+            "v": 86,
+            "badPaths": 72,
+            "pairBad": 168,
+            "actualHighClose": 8,
+            "actualMediumClose": 14,
+            "mediumBadPaths": 123,
+            "mediumPairBad": 235,
+            "actualChecks": 228,
+            "mediumChecks": 0
+          }
+        ]
+      },
+      {
+        "z": 813,
+        "highFresh": 337,
+        "repeat": 0,
+        "termRepeat": 0,
+        "lowActive": 359255,
+        "lowGain": 438774,
+        "highGain": 936718,
+        "negativeActive": 23588,
+        "positiveActive": 303324,
+        "blocks": 849,
+        "clockPairs": 153,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 86,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 228,
+            "repeatGood": 0,
+            "largeBlocks": 469,
+            "slow": 517,
+            "drop": 77,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 228
+          },
+          {
+            "R": 808,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 228,
+            "repeatGood": 0,
+            "largeBlocks": 276,
+            "slow": 405,
+            "drop": 37,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 228
+          },
+          {
+            "R": 3084,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 228,
+            "repeatGood": 0,
+            "largeBlocks": 91,
+            "slow": 258,
+            "drop": 5,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 228
+          }
+        ],
+        "guards": [
+          {
+            "v": 10,
+            "badPaths": 9,
+            "pairBad": 9,
+            "actualHighClose": 0,
+            "actualMediumClose": 1,
+            "mediumBadPaths": 42,
+            "mediumPairBad": 57,
+            "actualChecks": 313,
+            "mediumChecks": 0
+          },
+          {
+            "v": 86,
+            "badPaths": 36,
+            "pairBad": 56,
+            "actualHighClose": 3,
+            "actualMediumClose": 10,
+            "mediumBadPaths": 107,
+            "mediumPairBad": 234,
+            "actualChecks": 236,
+            "mediumChecks": 0
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 3203,
+    "T": 9100,
+    "U": 15506,
+    "V": 25624,
+    "N": 512,
+    "rows": [
+      {
+        "z": 1022,
+        "highFresh": 473,
+        "repeat": 0,
+        "termRepeat": 0,
+        "lowActive": 552190,
+        "lowGain": 670702,
+        "highGain": 2043608,
+        "negativeActive": 31280,
+        "positiveActive": 464958,
+        "blocks": 985,
+        "clockPairs": 357,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 124,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 258,
+            "repeatGood": 0,
+            "largeBlocks": 594,
+            "slow": 666,
+            "drop": 95,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 258
+          },
+          {
+            "R": 1389,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 258,
+            "repeatGood": 0,
+            "largeBlocks": 362,
+            "slow": 524,
+            "drop": 42,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 258
+          },
+          {
+            "R": 5908,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 258,
+            "repeatGood": 0,
+            "largeBlocks": 109,
+            "slow": 305,
+            "drop": 8,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 258
+          }
+        ],
+        "guards": [
+          {
+            "v": 17,
+            "badPaths": 26,
+            "pairBad": 31,
+            "actualHighClose": 2,
+            "actualMediumClose": 5,
+            "mediumBadPaths": 75,
+            "mediumPairBad": 129,
+            "actualChecks": 382,
+            "mediumChecks": 0
+          },
+          {
+            "v": 124,
+            "badPaths": 82,
+            "pairBad": 174,
+            "actualHighClose": 11,
+            "actualMediumClose": 24,
+            "mediumBadPaths": 142,
+            "mediumPairBad": 351,
+            "actualChecks": 222,
+            "mediumChecks": 0
+          }
+        ]
+      },
+      {
+        "z": 1470,
+        "highFresh": 373,
+        "repeat": 0,
+        "termRepeat": 0,
+        "lowActive": 654782,
+        "lowGain": 791816,
+        "highGain": 1922494,
+        "negativeActive": 37378,
+        "positiveActive": 555126,
+        "blocks": 885,
+        "clockPairs": 198,
+        "minClockSeparation": 0,
+        "checks": 512,
+        "rows": [
+          {
+            "R": 124,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 237,
+            "repeatGood": 0,
+            "largeBlocks": 500,
+            "slow": 558,
+            "drop": 85,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 237
+          },
+          {
+            "R": 1389,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 237,
+            "repeatGood": 0,
+            "largeBlocks": 321,
+            "slow": 443,
+            "drop": 41,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 237
+          },
+          {
+            "R": 5908,
+            "certified": 0,
+            "repeatCertified": 0,
+            "relationGood": 237,
+            "repeatGood": 0,
+            "largeBlocks": 119,
+            "slow": 272,
+            "drop": 12,
+            "noLargeRepeats": 0,
+            "largeTouchedRepeats": 0,
+            "boundChecks": 237
+          }
+        ],
+        "guards": [
+          {
+            "v": 17,
+            "badPaths": 11,
+            "pairBad": 13,
+            "actualHighClose": 2,
+            "actualMediumClose": 3,
+            "mediumBadPaths": 58,
+            "mediumPairBad": 93,
+            "actualChecks": 341,
+            "mediumChecks": 0
+          },
+          {
+            "v": 124,
+            "badPaths": 43,
+            "pairBad": 65,
+            "actualHighClose": 6,
+            "actualMediumClose": 17,
+            "mediumBadPaths": 131,
+            "mediumPairBad": 355,
+            "actualChecks": 249,
+            "mediumChecks": 0
+          }
+        ]
+      }
+    ]
+  }
+]
