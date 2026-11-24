@@ -1,0 +1,8352 @@
+[
+  {
+    "X": 256,
+    "B": 43,
+    "N": 128,
+    "runs": [
+      {
+        "T": 10,
+        "d": 5,
+        "Z": 7,
+        "A": 4,
+        "a0": 2,
+        "R": 3868,
+        "events": 670,
+        "stopped": 65,
+        "sinks": 5,
+        "twin": 63,
+        "bad": 0,
+        "literal": 798,
+        "maxMass": 17,
+        "maxRootDist": 58,
+        "stopMax": 17,
+        "P": 738,
+        "J": 768,
+        "stopFar": 632,
+        "firstAtStop": 474,
+        "firstEarlierThanStop": 264,
+        "ratio": 0.5765625,
+        "rootJ": 608,
+        "firstRoot": 608,
+        "sameQ": 1,
+        "sameQFar": 12,
+        "sameQFirst": 12,
+        "distinctNearQ": 118,
+        "roughCounts": [
+          320,
+          394,
+          24
+        ],
+        "roughJ": [
+          320,
+          394,
+          54
+        ],
+        "largeLarge": 56,
+        "largeLargeJ": 86,
+        "largeLargeRough": 24,
+        "largeLargeBothRough": 24,
+        "largeLargeBothCheap": 32,
+        "largeLargeNearQ": 56,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 56,
+        "largeLargeLargest": 56,
+        "llprod": [
+          0,
+          0,
+          32,
+          24
+        ],
+        "productSmall": 368,
+        "productMedium": 682,
+        "productRough": 418,
+        "witnessFar": 328,
+        "witnessVeryFar": 0,
+        "witnessPairs": 450,
+        "largeExamples": [
+          {
+            "p": 17,
+            "C": 798,
+            "stop": true,
+            "q": 11,
+            "q2": 19,
+            "D": 780,
+            "D2": 780,
+            "m": 5,
+            "m2": 6,
+            "sub": 5,
+            "sub2": 6,
+            "r": 11,
+            "r2": 11,
+            "far": 54,
+            "fresh": 24
+          },
+          {
+            "p": 11,
+            "C": 978,
+            "stop": true,
+            "q": 17,
+            "q2": 37,
+            "D": 936,
+            "D2": 924,
+            "m": 4,
+            "m2": 4,
+            "sub": 4,
+            "sub2": 4,
+            "r": 5,
+            "r2": 5,
+            "far": 32,
+            "fresh": 32
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 116,
+            "P": 116,
+            "groups": 58
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 22,
+            "P": 22,
+            "groups": 11
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 16,
+            "P": 16,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 86,
+            "P": 86,
+            "groups": 19
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 156,
+            "P": 156,
+            "groups": 19
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 126,
+            "P": 126,
+            "groups": 16
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 116,
+            "P": 116,
+            "groups": 9
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 44,
+            "P": 44,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 32,
+            "P": 32,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 54,
+            "P": 24,
+            "groups": 1
+          }
+        ],
+        "stops": [
+          {
+            "p": 13,
+            "C": 690,
+            "m": 12,
+            "far": 104,
+            "span": 58,
+            "parents": 5
+          },
+          {
+            "p": 17,
+            "C": 732,
+            "m": 11,
+            "far": 72,
+            "span": 20,
+            "parents": 7
+          },
+          {
+            "p": 17,
+            "C": 798,
+            "m": 14,
+            "far": 136,
+            "span": 30,
+            "parents": 5
+          },
+          {
+            "p": 23,
+            "C": 942,
+            "m": 11,
+            "far": 96,
+            "span": 48,
+            "parents": 4
+          },
+          {
+            "p": 11,
+            "C": 978,
+            "m": 17,
+            "far": 224,
+            "span": 42,
+            "parents": 10
+          }
+        ]
+      },
+      {
+        "T": 21,
+        "d": 10,
+        "Z": 7,
+        "A": 5,
+        "a0": 2,
+        "R": 6241,
+        "events": 1015,
+        "stopped": 51,
+        "sinks": 2,
+        "twin": 73,
+        "bad": 4,
+        "literal": 1143,
+        "maxMass": 30,
+        "maxRootDist": 80,
+        "stopMax": 30,
+        "P": 1164,
+        "J": 1182,
+        "stopFar": 880,
+        "firstAtStop": 580,
+        "firstEarlierThanStop": 584,
+        "ratio": 0.4330357142857143,
+        "rootJ": 748,
+        "firstRoot": 748,
+        "sameQ": 0,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 416,
+        "roughCounts": [
+          208,
+          942,
+          14
+        ],
+        "roughJ": [
+          208,
+          960,
+          14
+        ],
+        "largeLarge": 334,
+        "largeLargeJ": 352,
+        "largeLargeRough": 334,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 334,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 284,
+        "largeLargeLargest": 284,
+        "llprod": [
+          0,
+          0,
+          50,
+          284
+        ],
+        "productSmall": 430,
+        "productMedium": 822,
+        "productRough": 672,
+        "witnessFar": 516,
+        "witnessVeryFar": 0,
+        "witnessPairs": 840,
+        "largeExamples": [
+          {
+            "p": 17,
+            "C": 732,
+            "stop": false,
+            "q": 11,
+            "q2": 19,
+            "D": 714,
+            "D2": 702,
+            "m": 5,
+            "m2": 13,
+            "sub": 5,
+            "sub2": 6,
+            "r": 5,
+            "r2": 19,
+            "far": 50,
+            "fresh": 50
+          },
+          {
+            "p": 23,
+            "C": 990,
+            "stop": true,
+            "q": 11,
+            "q2": 17,
+            "D": 978,
+            "D2": 970,
+            "m": 18,
+            "m2": 10,
+            "sub": 18,
+            "sub2": 10,
+            "r": 11,
+            "r2": 3,
+            "far": 302,
+            "fresh": 284
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 18,
+            "P": 18,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 6,
+            "P": 6,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 60,
+            "P": 60,
+            "groups": 13
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 130,
+            "P": 130,
+            "groups": 19
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 86,
+            "P": 86,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 40,
+            "P": 40,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 194,
+            "P": 194,
+            "groups": 19
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 230,
+            "P": 230,
+            "groups": 10
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 14,
+            "P": 14,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 24,
+            "P": 24,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 20,
+            "P": 20,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 58,
+            "P": 58,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 302,
+            "P": 284,
+            "groups": 1
+          }
+        ],
+        "stops": [
+          {
+            "p": 13,
+            "C": 768,
+            "m": 21,
+            "far": 250,
+            "span": 80,
+            "parents": 10
+          },
+          {
+            "p": 23,
+            "C": 990,
+            "m": 30,
+            "far": 630,
+            "span": 72,
+            "parents": 4
+          }
+        ]
+      },
+      {
+        "T": 609,
+        "d": 304,
+        "Z": 7,
+        "A": 25,
+        "a0": 2,
+        "R": 9044,
+        "events": 1354,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 123,
+        "bad": 5,
+        "literal": 1482,
+        "maxMass": 30,
+        "maxRootDist": 80,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 1,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  },
+  {
+    "X": 1024,
+    "B": 85,
+    "N": 512,
+    "runs": [
+      {
+        "T": 21,
+        "d": 10,
+        "Z": 10,
+        "A": 5,
+        "a0": 2,
+        "R": 23525,
+        "events": 3353,
+        "stopped": 136,
+        "sinks": 6,
+        "twin": 376,
+        "bad": 0,
+        "literal": 3865,
+        "maxMass": 25,
+        "maxRootDist": 102,
+        "stopMax": 25,
+        "P": 3354,
+        "J": 3372,
+        "stopFar": 2038,
+        "firstAtStop": 1300,
+        "firstEarlierThanStop": 2054,
+        "ratio": 0.3119419642857143,
+        "rootJ": 2178,
+        "firstRoot": 2178,
+        "sameQ": 3,
+        "sameQFar": 20,
+        "sameQFirst": 20,
+        "distinctNearQ": 1156,
+        "roughCounts": [
+          828,
+          1978,
+          548
+        ],
+        "roughJ": [
+          828,
+          1996,
+          548
+        ],
+        "largeLarge": 486,
+        "largeLargeJ": 504,
+        "largeLargeRough": 486,
+        "largeLargeBothRough": 274,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 486,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 280,
+        "largeLargeLargest": 280,
+        "llprod": [
+          0,
+          16,
+          470,
+          0
+        ],
+        "productSmall": 810,
+        "productMedium": 2522,
+        "productRough": 2526,
+        "witnessFar": 1676,
+        "witnessVeryFar": 0,
+        "witnessPairs": 2520,
+        "largeExamples": [
+          {
+            "p": 61,
+            "C": 3720,
+            "stop": true,
+            "q": 11,
+            "q2": 31,
+            "D": 3708,
+            "D2": 3690,
+            "m": 7,
+            "m2": 12,
+            "sub": 7,
+            "sub2": 12,
+            "r": 11,
+            "r2": 7,
+            "far": 136,
+            "fresh": 136
+          },
+          {
+            "p": 11,
+            "C": 2322,
+            "stop": false,
+            "q": 43,
+            "q2": 29,
+            "D": 2278,
+            "D2": 2292,
+            "m": 5,
+            "m2": 6,
+            "sub": 5,
+            "sub2": 6,
+            "r": 3,
+            "r2": 29,
+            "far": 60,
+            "fresh": 60
+          },
+          {
+            "p": 19,
+            "C": 2338,
+            "stop": false,
+            "q": 11,
+            "q2": 53,
+            "D": 2322,
+            "D2": 2280,
+            "m": 14,
+            "m2": 5,
+            "sub": 12,
+            "sub2": 5,
+            "r": 11,
+            "r2": 43,
+            "far": 86,
+            "fresh": 86
+          },
+          {
+            "p": 13,
+            "C": 2952,
+            "stop": false,
+            "q": 41,
+            "q2": 23,
+            "D": 2910,
+            "D2": 2922,
+            "m": 11,
+            "m2": 5,
+            "sub": 11,
+            "sub2": 2,
+            "r": 41,
+            "r2": 23,
+            "far": 44,
+            "fresh": 44
+          },
+          {
+            "p": 11,
+            "C": 3510,
+            "stop": true,
+            "q": 73,
+            "q2": 13,
+            "D": 3432,
+            "D2": 3498,
+            "m": 12,
+            "m2": 6,
+            "sub": 12,
+            "sub2": 6,
+            "r": 47,
+            "r2": 13,
+            "far": 144,
+            "fresh": 144
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 54,
+            "P": 54,
+            "groups": 27
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 28,
+            "P": 28,
+            "groups": 14
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 152,
+            "P": 152,
+            "groups": 40
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 162,
+            "P": 162,
+            "groups": 39
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 216,
+            "P": 216,
+            "groups": 22
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 366,
+            "P": 366,
+            "groups": 55
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 224,
+            "P": 224,
+            "groups": 14
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 722,
+            "P": 722,
+            "groups": 47
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 108,
+            "P": 108,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 290,
+            "P": 290,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 38,
+            "P": 38,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 52,
+            "P": 52,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 14,
+            "P": 14,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 62,
+            "P": 62,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 22,
+            "P": 22,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 82,
+            "P": 82,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 42,
+            "P": 42,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 102,
+            "P": 102,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 90,
+            "P": 90,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 76,
+            "P": 76,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 38,
+            "P": 38,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 154,
+            "P": 136,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 274,
+            "P": 274,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          }
+        ],
+        "stops": [
+          {
+            "p": 23,
+            "C": 2370,
+            "m": 24,
+            "far": 450,
+            "span": 102,
+            "parents": 5
+          },
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 22,
+            "far": 288,
+            "span": 46,
+            "parents": 7
+          },
+          {
+            "p": 43,
+            "C": 2622,
+            "m": 21,
+            "far": 282,
+            "span": 82,
+            "parents": 10
+          },
+          {
+            "p": 13,
+            "C": 3108,
+            "m": 25,
+            "far": 392,
+            "span": 52,
+            "parents": 5
+          },
+          {
+            "p": 11,
+            "C": 3510,
+            "m": 22,
+            "far": 306,
+            "span": 64,
+            "parents": 6
+          },
+          {
+            "p": 61,
+            "C": 3720,
+            "m": 22,
+            "far": 320,
+            "span": 64,
+            "parents": 5
+          }
+        ]
+      },
+      {
+        "T": 42,
+        "d": 21,
+        "Z": 10,
+        "A": 7,
+        "a0": 2,
+        "R": 31466,
+        "events": 4008,
+        "stopped": 46,
+        "sinks": 1,
+        "twin": 466,
+        "bad": 0,
+        "literal": 4520,
+        "maxMass": 46,
+        "maxRootDist": 156,
+        "stopMax": 46,
+        "P": 3808,
+        "J": 3808,
+        "stopFar": 1536,
+        "firstAtStop": 394,
+        "firstEarlierThanStop": 3414,
+        "ratio": 0.17708333333333334,
+        "rootJ": 2468,
+        "firstRoot": 2468,
+        "sameQ": 3,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 1340,
+        "roughCounts": [
+          852,
+          2250,
+          706
+        ],
+        "roughJ": [
+          852,
+          2250,
+          706
+        ],
+        "largeLarge": 104,
+        "largeLargeJ": 104,
+        "largeLargeRough": 104,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 104,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          104,
+          0,
+          0
+        ],
+        "productSmall": 1042,
+        "productMedium": 2990,
+        "productRough": 2956,
+        "witnessFar": 1252,
+        "witnessVeryFar": 0,
+        "witnessPairs": 1722,
+        "largeExamples": [
+          {
+            "p": 61,
+            "C": 3720,
+            "stop": false,
+            "q": 11,
+            "q2": 31,
+            "D": 3708,
+            "D2": 3690,
+            "m": 7,
+            "m2": 12,
+            "sub": 7,
+            "sub2": 12,
+            "r": 11,
+            "r2": 7,
+            "far": 104,
+            "fresh": 104
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 16,
+            "P": 16,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 56,
+            "P": 56,
+            "groups": 17
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 48,
+            "P": 48,
+            "groups": 15
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 142,
+            "P": 142,
+            "groups": 21
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 170,
+            "P": 170,
+            "groups": 32
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 110,
+            "P": 110,
+            "groups": 7
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 554,
+            "P": 554,
+            "groups": 44
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 100,
+            "P": 100,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 830,
+            "P": 830,
+            "groups": 21
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 22,
+            "P": 22,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 328,
+            "P": 328,
+            "groups": 6
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 338,
+            "P": 338,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 48,
+            "P": 48,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 18,
+            "P": 18,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 24,
+            "P": 24,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 42,
+            "P": 42,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 42,
+            "P": 42,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 96,
+            "P": 96,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 190,
+            "P": 190,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 98,
+            "P": 98,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 52,
+            "P": 52,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 104,
+            "P": 104,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 250,
+            "P": 250,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 130,
+            "P": 130,
+            "groups": 1
+          }
+        ],
+        "stops": [
+          {
+            "p": 67,
+            "C": 2478,
+            "m": 46,
+            "far": 1536,
+            "span": 156,
+            "parents": 7
+          }
+        ]
+      },
+      {
+        "T": 1678,
+        "d": 839,
+        "Z": 10,
+        "A": 41,
+        "a0": 2,
+        "R": 33536,
+        "events": 4146,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 512,
+        "bad": 0,
+        "literal": 4658,
+        "maxMass": 46,
+        "maxRootDist": 156,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 3,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  },
+  {
+    "X": 4096,
+    "B": 170,
+    "N": 2048,
+    "runs": [
+      {
+        "T": 42,
+        "d": 21,
+        "Z": 14,
+        "A": 7,
+        "a0": 2,
+        "R": 252920,
+        "events": 23700,
+        "stopped": 505,
+        "sinks": 9,
+        "twin": 1543,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 79,
+        "maxRootDist": 414,
+        "stopMax": 79,
+        "P": 41416,
+        "J": 44858,
+        "stopFar": 22584,
+        "firstAtStop": 13272,
+        "firstEarlierThanStop": 28144,
+        "ratio": 0.48149181547619047,
+        "rootJ": 18920,
+        "firstRoot": 18920,
+        "sameQ": 16,
+        "sameQFar": 1498,
+        "sameQFirst": 1300,
+        "distinctNearQ": 21196,
+        "roughCounts": [
+          12248,
+          23274,
+          5894
+        ],
+        "roughJ": [
+          13408,
+          24608,
+          6842
+        ],
+        "largeLarge": 13222,
+        "largeLargeJ": 16250,
+        "largeLargeRough": 10932,
+        "largeLargeBothRough": 3410,
+        "largeLargeBothCheap": 2290,
+        "largeLargeNearQ": 12330,
+        "largeLargeSameQ": 892,
+        "largeLargeStop": 8466,
+        "largeLargeLargest": 11074,
+        "llprod": [
+          0,
+          444,
+          4996,
+          7782
+        ],
+        "productSmall": 4644,
+        "productMedium": 23238,
+        "productRough": 21928,
+        "witnessFar": 10564,
+        "witnessVeryFar": 0,
+        "witnessPairs": 15498,
+        "largeExamples": [
+          {
+            "p": 31,
+            "C": 11130,
+            "stop": true,
+            "q": 17,
+            "q2": 103,
+            "D": 11100,
+            "D2": 11022,
+            "m": 33,
+            "m2": 20,
+            "sub": 28,
+            "sub2": 20,
+            "r": 11,
+            "r2": 73,
+            "far": 1120,
+            "fresh": 840
+          },
+          {
+            "p": 13,
+            "C": 12492,
+            "stop": true,
+            "q": 79,
+            "q2": 11,
+            "D": 12402,
+            "D2": 12462,
+            "m": 34,
+            "m2": 28,
+            "sub": 32,
+            "sub2": 28,
+            "r": 79,
+            "r2": 11,
+            "far": 1506,
+            "fresh": 1494
+          },
+          {
+            "p": 13,
+            "C": 8748,
+            "stop": true,
+            "q": 31,
+            "q2": 23,
+            "D": 8712,
+            "D2": 8718,
+            "m": 27,
+            "m2": 27,
+            "sub": 27,
+            "sub2": 27,
+            "r": 31,
+            "r2": 23,
+            "far": 1392,
+            "fresh": 770
+          },
+          {
+            "p": 31,
+            "C": 14478,
+            "stop": true,
+            "q": 47,
+            "q2": 19,
+            "D": 14430,
+            "D2": 14460,
+            "m": 25,
+            "m2": 39,
+            "sub": 14,
+            "sub2": 39,
+            "r": 47,
+            "r2": 19,
+            "far": 1092,
+            "fresh": 1092
+          },
+          {
+            "p": 13,
+            "C": 15510,
+            "stop": true,
+            "q": 11,
+            "q2": 23,
+            "D": 15498,
+            "D2": 15480,
+            "m": 40,
+            "m2": 34,
+            "sub": 40,
+            "sub2": 34,
+            "r": 11,
+            "r2": 23,
+            "far": 2450,
+            "fresh": 2000
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 50,
+            "P": 50,
+            "groups": 25
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 58,
+            "P": 58,
+            "groups": 29
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 386,
+            "P": 386,
+            "groups": 96
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 448,
+            "P": 448,
+            "groups": 97
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 872,
+            "P": 872,
+            "groups": 126
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1404,
+            "P": 1404,
+            "groups": 169
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 30,
+            "P": 30,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 2402,
+            "P": 2402,
+            "groups": 151
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 2680,
+            "P": 2680,
+            "groups": 162
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 3354,
+            "P": 3324,
+            "groups": 129
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 6330,
+            "P": 6308,
+            "groups": 190
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 208,
+            "P": 208,
+            "groups": 7
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 894,
+            "P": 894,
+            "groups": 16
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 1364,
+            "P": 1346,
+            "groups": 31
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 40,
+            "P": 40,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 40,
+            "P": 40,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 30,
+            "P": 30,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 58,
+            "P": 58,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 140,
+            "P": 140,
+            "groups": 9
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 72,
+            "P": 72,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 224,
+            "P": 224,
+            "groups": 10
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 786,
+            "P": 786,
+            "groups": 24
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 388,
+            "P": 388,
+            "groups": 9
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 416,
+            "P": 416,
+            "groups": 7
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 726,
+            "P": 726,
+            "groups": 13
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 520,
+            "P": 520,
+            "groups": 6
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 486,
+            "P": 486,
+            "groups": 6
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 96,
+            "P": 96,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 94,
+            "P": 94,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 94,
+            "P": 94,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 118,
+            "P": 58,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 350,
+            "P": 332,
+            "groups": 6
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 612,
+            "P": 602,
+            "groups": 11
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 412,
+            "P": 376,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 1284,
+            "P": 994,
+            "groups": 9
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 450,
+            "P": 450,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 836,
+            "P": 836,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 232,
+            "P": 232,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1106,
+            "P": 564,
+            "groups": 5
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 226,
+            "P": 226,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 40,
+            "P": 40,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 1484,
+            "P": 1260,
+            "groups": 9
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 2620,
+            "P": 2462,
+            "groups": 9
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 432,
+            "P": 432,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 394,
+            "P": 338,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 836,
+            "P": 452,
+            "groups": 4
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1806,
+            "P": 1184,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 2626,
+            "P": 2334,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 1854,
+            "P": 1624,
+            "groups": 4
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 2450,
+            "P": 2000,
+            "groups": 1
+          }
+        ],
+        "stops": [
+          {
+            "p": 13,
+            "C": 8748,
+            "m": 75,
+            "far": 4376,
+            "span": 188,
+            "parents": 11
+          },
+          {
+            "p": 31,
+            "C": 11130,
+            "m": 51,
+            "far": 1986,
+            "span": 310,
+            "parents": 5
+          },
+          {
+            "p": 13,
+            "C": 11688,
+            "m": 43,
+            "far": 1366,
+            "span": 158,
+            "parents": 8
+          },
+          {
+            "p": 13,
+            "C": 12492,
+            "m": 71,
+            "far": 4010,
+            "span": 208,
+            "parents": 9
+          },
+          {
+            "p": 37,
+            "C": 12840,
+            "m": 43,
+            "far": 1218,
+            "span": 164,
+            "parents": 5
+          },
+          {
+            "p": 37,
+            "C": 13578,
+            "m": 47,
+            "far": 1374,
+            "span": 110,
+            "parents": 11
+          },
+          {
+            "p": 31,
+            "C": 14478,
+            "m": 54,
+            "far": 2082,
+            "span": 196,
+            "parents": 3
+          },
+          {
+            "p": 19,
+            "C": 14802,
+            "m": 42,
+            "far": 1012,
+            "span": 84,
+            "parents": 9
+          },
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 79,
+            "far": 5160,
+            "span": 414,
+            "parents": 6
+          }
+        ]
+      },
+      {
+        "T": 85,
+        "d": 42,
+        "Z": 14,
+        "A": 10,
+        "a0": 2,
+        "R": 322521,
+        "events": 29385,
+        "stopped": 121,
+        "sinks": 1,
+        "twin": 1927,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 121,
+        "maxRootDist": 438,
+        "stopMax": 121,
+        "P": 48242,
+        "J": 54490,
+        "stopFar": 11120,
+        "firstAtStop": 4674,
+        "firstEarlierThanStop": 43568,
+        "ratio": 0.2771254595588235,
+        "rootJ": 20808,
+        "firstRoot": 20808,
+        "sameQ": 16,
+        "sameQFar": 966,
+        "sameQFirst": 838,
+        "distinctNearQ": 26596,
+        "roughCounts": [
+          14674,
+          27526,
+          6042
+        ],
+        "roughJ": [
+          16632,
+          30730,
+          7128
+        ],
+        "largeLarge": 14660,
+        "largeLargeJ": 20130,
+        "largeLargeRough": 11458,
+        "largeLargeBothRough": 2504,
+        "largeLargeBothCheap": 3202,
+        "largeLargeNearQ": 14312,
+        "largeLargeSameQ": 348,
+        "largeLargeStop": 3732,
+        "largeLargeLargest": 8326,
+        "llprod": [
+          0,
+          2282,
+          7666,
+          4712
+        ],
+        "productSmall": 6484,
+        "productMedium": 26210,
+        "productRough": 29314,
+        "witnessFar": 5066,
+        "witnessVeryFar": 0,
+        "witnessPairs": 7140,
+        "largeExamples": [
+          {
+            "p": 11,
+            "C": 15300,
+            "stop": false,
+            "q": 13,
+            "q2": 11,
+            "D": 15274,
+            "D2": 15280,
+            "m": 15,
+            "m2": 46,
+            "sub": 15,
+            "sub2": 46,
+            "r": 3,
+            "r2": 3,
+            "far": 1380,
+            "fresh": 920
+          },
+          {
+            "p": 13,
+            "C": 12492,
+            "stop": false,
+            "q": 79,
+            "q2": 11,
+            "D": 12402,
+            "D2": 12462,
+            "m": 34,
+            "m2": 28,
+            "sub": 32,
+            "sub2": 28,
+            "r": 79,
+            "r2": 11,
+            "far": 1120,
+            "fresh": 1112
+          },
+          {
+            "p": 11,
+            "C": 14532,
+            "stop": false,
+            "q": 13,
+            "q2": 43,
+            "D": 14520,
+            "D2": 14490,
+            "m": 64,
+            "m2": 15,
+            "sub": 64,
+            "sub2": 15,
+            "r": 13,
+            "r2": 43,
+            "far": 1332,
+            "fresh": 1302
+          },
+          {
+            "p": 13,
+            "C": 15510,
+            "stop": true,
+            "q": 11,
+            "q2": 23,
+            "D": 15498,
+            "D2": 15480,
+            "m": 40,
+            "m2": 76,
+            "sub": 40,
+            "sub2": 76,
+            "r": 11,
+            "r2": 23,
+            "far": 5442,
+            "fresh": 3732
+          },
+          {
+            "p": 31,
+            "C": 14478,
+            "stop": false,
+            "q": 47,
+            "q2": 19,
+            "D": 14430,
+            "D2": 14460,
+            "m": 25,
+            "m2": 39,
+            "sub": 14,
+            "sub2": 39,
+            "r": 47,
+            "r2": 19,
+            "far": 1068,
+            "fresh": 1068
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 14,
+            "P": 14,
+            "groups": 7
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 192,
+            "P": 192,
+            "groups": 41
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 184,
+            "P": 184,
+            "groups": 40
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 426,
+            "P": 426,
+            "groups": 63
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 586,
+            "P": 586,
+            "groups": 104
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 6,
+            "P": 6,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1372,
+            "P": 1372,
+            "groups": 114
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 1430,
+            "P": 1430,
+            "groups": 109
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 2384,
+            "P": 2384,
+            "groups": 92
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 4508,
+            "P": 4508,
+            "groups": 149
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 68,
+            "P": 68,
+            "groups": 4
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 3436,
+            "P": 3436,
+            "groups": 61
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 5202,
+            "P": 5198,
+            "groups": 89
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 200,
+            "P": 200,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 1166,
+            "P": 1166,
+            "groups": 15
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 1866,
+            "P": 1866,
+            "groups": 19
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 128,
+            "P": 128,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 18,
+            "P": 18,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 8,
+            "P": 8,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 8,
+            "P": 8,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 32,
+            "P": 32,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 40,
+            "P": 40,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 20,
+            "P": 20,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 162,
+            "P": 162,
+            "groups": 8
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 364,
+            "P": 364,
+            "groups": 16
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 218,
+            "P": 218,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 298,
+            "P": 298,
+            "groups": 6
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 326,
+            "P": 326,
+            "groups": 10
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 386,
+            "P": 386,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 462,
+            "P": 462,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 1486,
+            "P": 1486,
+            "groups": 13
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 228,
+            "P": 228,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 272,
+            "P": 272,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 244,
+            "P": 244,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 18,
+            "P": 18,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 56,
+            "P": 56,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 32,
+            "P": 14,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 134,
+            "P": 134,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 260,
+            "P": 260,
+            "groups": 8
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 120,
+            "P": 118,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 740,
+            "P": 460,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 258,
+            "P": 258,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 822,
+            "P": 822,
+            "groups": 4
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 312,
+            "P": 312,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 546,
+            "P": 546,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 368,
+            "P": 368,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 846,
+            "P": 846,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 244,
+            "P": 58,
+            "groups": 4
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 40,
+            "P": 40,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 1582,
+            "P": 1138,
+            "groups": 9
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 1628,
+            "P": 1628,
+            "groups": 7
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 166,
+            "P": 166,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 2106,
+            "P": 1394,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 1214,
+            "P": 314,
+            "groups": 4
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 528,
+            "P": 528,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 1332,
+            "P": 1302,
+            "groups": 1
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 316,
+            "P": 88,
+            "groups": 3
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1540,
+            "P": 1162,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 360,
+            "P": 208,
+            "groups": 1
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 2818,
+            "P": 2486,
+            "groups": 4
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 1068,
+            "P": 1068,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 914,
+            "P": 730,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 216,
+            "P": 18,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 5442,
+            "P": 3732,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 722,
+            "P": 232,
+            "groups": 2
+          }
+        ],
+        "stops": [
+          {
+            "p": 13,
+            "C": 15510,
+            "m": 121,
+            "far": 11120,
+            "span": 438,
+            "parents": 6
+          }
+        ]
+      },
+      {
+        "T": 4484,
+        "d": 2242,
+        "Z": 14,
+        "A": 67,
+        "a0": 2,
+        "R": 331583,
+        "events": 30191,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 2048,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 121,
+        "maxRootDist": 454,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 16,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  },
+  {
+    "X": 16384,
+    "B": 339,
+    "N": 8192,
+    "runs": [
+      {
+        "T": 84,
+        "d": 42,
+        "Z": 19,
+        "A": 10,
+        "a0": 2,
+        "R": 1659308,
+        "events": 124992,
+        "stopped": 1808,
+        "sinks": 18,
+        "twin": 6384,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 130,
+        "maxRootDist": 786,
+        "stopMax": 130,
+        "P": 277916,
+        "J": 310672,
+        "stopFar": 134614,
+        "firstAtStop": 62742,
+        "firstEarlierThanStop": 215174,
+        "ratio": 0.4038725353422619,
+        "rootJ": 100180,
+        "firstRoot": 100180,
+        "sameQ": 68,
+        "sameQFar": 5054,
+        "sameQFirst": 2810,
+        "distinctNearQ": 169486,
+        "roughCounts": [
+          93976,
+          154874,
+          29066
+        ],
+        "roughJ": [
+          107378,
+          167572,
+          35722
+        ],
+        "largeLarge": 99454,
+        "largeLargeJ": 124978,
+        "largeLargeRough": 77174,
+        "largeLargeBothRough": 18076,
+        "largeLargeBothCheap": 22280,
+        "largeLargeNearQ": 96070,
+        "largeLargeSameQ": 1112,
+        "largeLargeStop": 47992,
+        "largeLargeLargest": 53554,
+        "llprod": [
+          424,
+          16394,
+          50190,
+          32446
+        ],
+        "productSmall": 23618,
+        "productMedium": 130048,
+        "productRough": 143172,
+        "witnessFar": 87764,
+        "witnessVeryFar": 0,
+        "witnessPairs": 125496,
+        "largeExamples": [
+          {
+            "p": 11,
+            "C": 38400,
+            "stop": true,
+            "q": 13,
+            "q2": 211,
+            "D": 38388,
+            "D2": 38190,
+            "m": 76,
+            "m2": 35,
+            "sub": 76,
+            "sub2": 35,
+            "r": 13,
+            "r2": 181,
+            "far": 3924,
+            "fresh": 3544
+          },
+          {
+            "p": 137,
+            "C": 61512,
+            "stop": true,
+            "q": 11,
+            "q2": 17,
+            "D": 61500,
+            "D2": 61488,
+            "m": 35,
+            "m2": 72,
+            "sub": 32,
+            "sub2": 72,
+            "r": 11,
+            "r2": 17,
+            "far": 4304,
+            "fresh": 4304
+          },
+          {
+            "p": 19,
+            "C": 46758,
+            "stop": true,
+            "q": 29,
+            "q2": 53,
+            "D": 46720,
+            "D2": 46692,
+            "m": 30,
+            "m2": 55,
+            "sub": 30,
+            "sub2": 55,
+            "r": 3,
+            "r2": 53,
+            "far": 2764,
+            "fresh": 2764
+          },
+          {
+            "p": 139,
+            "C": 54348,
+            "stop": true,
+            "q": 29,
+            "q2": 11,
+            "D": 54318,
+            "D2": 54330,
+            "m": 36,
+            "m2": 73,
+            "sub": 25,
+            "sub2": 70,
+            "r": 29,
+            "r2": 11,
+            "far": 3248,
+            "fresh": 3232
+          },
+          {
+            "p": 271,
+            "C": 48510,
+            "stop": true,
+            "q": 11,
+            "q2": 59,
+            "D": 48498,
+            "D2": 48438,
+            "m": 50,
+            "m2": 69,
+            "sub": 47,
+            "sub2": 68,
+            "r": 11,
+            "r2": 59,
+            "far": 5182,
+            "fresh": 4658
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 112,
+            "P": 112,
+            "groups": 56
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 198,
+            "P": 198,
+            "groups": 99
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 2,
+            "J": 4,
+            "P": 4,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 682,
+            "P": 682,
+            "groups": 154
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 1090,
+            "P": 1090,
+            "groups": 236
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 10,
+            "P": 10,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 3476,
+            "P": 3476,
+            "groups": 461
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 2746,
+            "P": 2740,
+            "groups": 345
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 46,
+            "P": 46,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 7038,
+            "P": 7038,
+            "groups": 545
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 6996,
+            "P": 6978,
+            "groups": 480
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 136,
+            "P": 136,
+            "groups": 10
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 16676,
+            "P": 16560,
+            "groups": 547
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 17888,
+            "P": 17888,
+            "groups": 580
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 268,
+            "P": 268,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 21374,
+            "P": 21354,
+            "groups": 366
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 24520,
+            "P": 24510,
+            "groups": 377
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 300,
+            "P": 300,
+            "groups": 6
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 3740,
+            "P": 3738,
+            "groups": 45
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 4148,
+            "P": 4148,
+            "groups": 51
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 96,
+            "P": 96,
+            "groups": 10
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 110,
+            "P": 110,
+            "groups": 14
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 42,
+            "P": 42,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 498,
+            "P": 486,
+            "groups": 33
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 622,
+            "P": 620,
+            "groups": 35
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 96,
+            "P": 96,
+            "groups": 8
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1032,
+            "P": 996,
+            "groups": 41
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 1318,
+            "P": 1316,
+            "groups": 44
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 190,
+            "P": 190,
+            "groups": 6
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 2658,
+            "P": 2444,
+            "groups": 46
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 5232,
+            "P": 5052,
+            "groups": 81
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 778,
+            "P": 778,
+            "groups": 15
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 2216,
+            "P": 1982,
+            "groups": 18
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 4808,
+            "P": 4628,
+            "groups": 38
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 1440,
+            "P": 1440,
+            "groups": 10
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 264,
+            "P": 264,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 992,
+            "P": 788,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 244,
+            "P": 244,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 428,
+            "P": 396,
+            "groups": 13
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 754,
+            "P": 734,
+            "groups": 23
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 88,
+            "P": 88,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1300,
+            "P": 1028,
+            "groups": 25
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 2250,
+            "P": 2032,
+            "groups": 37
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 378,
+            "P": 378,
+            "groups": 9
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 4884,
+            "P": 4086,
+            "groups": 34
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 4942,
+            "P": 4854,
+            "groups": 38
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1904,
+            "P": 1904,
+            "groups": 12
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 5270,
+            "P": 4168,
+            "groups": 19
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 9468,
+            "P": 8656,
+            "groups": 29
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 2228,
+            "P": 2228,
+            "groups": 9
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 456,
+            "P": 456,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 830,
+            "P": 602,
+            "groups": 4
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 1146,
+            "P": 1038,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 714,
+            "P": 526,
+            "groups": 6
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 1450,
+            "P": 1244,
+            "groups": 13
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 336,
+            "P": 336,
+            "groups": 4
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 5094,
+            "P": 3986,
+            "groups": 18
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 8100,
+            "P": 7922,
+            "groups": 36
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 2886,
+            "P": 2530,
+            "groups": 11
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 6250,
+            "P": 4804,
+            "groups": 10
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 12506,
+            "P": 11074,
+            "groups": 23
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 6718,
+            "P": 5936,
+            "groups": 11
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 1192,
+            "P": 0,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 1436,
+            "P": 1150,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 4706,
+            "P": 2056,
+            "groups": 12
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 8868,
+            "P": 6272,
+            "groups": 18
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 938,
+            "P": 898,
+            "groups": 8
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 9590,
+            "P": 8330,
+            "groups": 10
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 15816,
+            "P": 13154,
+            "groups": 15
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 3534,
+            "P": 2948,
+            "groups": 7
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 2604,
+            "P": 608,
+            "groups": 3
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 2394,
+            "P": 2394,
+            "groups": 3
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 2872,
+            "P": 2500,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 724,
+            "P": 0,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 12160,
+            "P": 10302,
+            "groups": 8
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 3050,
+            "P": 2274,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 4304,
+            "P": 4304,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 15550,
+            "P": 14038,
+            "groups": 4
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 6088,
+            "P": 2452,
+            "groups": 2
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 380,
+            "P": 380,
+            "groups": 2
+          }
+        ],
+        "stops": [
+          {
+            "p": 17,
+            "C": 36330,
+            "m": 90,
+            "far": 5808,
+            "span": 366,
+            "parents": 5
+          },
+          {
+            "p": 11,
+            "C": 38400,
+            "m": 115,
+            "far": 9530,
+            "span": 318,
+            "parents": 6
+          },
+          {
+            "p": 11,
+            "C": 41130,
+            "m": 87,
+            "far": 4908,
+            "span": 516,
+            "parents": 5
+          },
+          {
+            "p": 17,
+            "C": 43230,
+            "m": 88,
+            "far": 5390,
+            "span": 282,
+            "parents": 4
+          },
+          {
+            "p": 19,
+            "C": 45810,
+            "m": 102,
+            "far": 7638,
+            "span": 306,
+            "parents": 5
+          },
+          {
+            "p": 19,
+            "C": 46758,
+            "m": 109,
+            "far": 9412,
+            "span": 532,
+            "parents": 11
+          },
+          {
+            "p": 271,
+            "C": 48510,
+            "m": 115,
+            "far": 9668,
+            "span": 294,
+            "parents": 2
+          },
+          {
+            "p": 23,
+            "C": 50760,
+            "m": 89,
+            "far": 5152,
+            "span": 232,
+            "parents": 6
+          },
+          {
+            "p": 227,
+            "C": 52890,
+            "m": 101,
+            "far": 7644,
+            "span": 400,
+            "parents": 7
+          },
+          {
+            "p": 11,
+            "C": 53580,
+            "m": 91,
+            "far": 6616,
+            "span": 680,
+            "parents": 7
+          },
+          {
+            "p": 139,
+            "C": 54348,
+            "m": 95,
+            "far": 6248,
+            "span": 274,
+            "parents": 2
+          },
+          {
+            "p": 23,
+            "C": 54810,
+            "m": 95,
+            "far": 6554,
+            "span": 372,
+            "parents": 7
+          },
+          {
+            "p": 17,
+            "C": 58938,
+            "m": 103,
+            "far": 8010,
+            "span": 460,
+            "parents": 10
+          },
+          {
+            "p": 11,
+            "C": 60510,
+            "m": 130,
+            "far": 13348,
+            "span": 742,
+            "parents": 5
+          },
+          {
+            "p": 19,
+            "C": 60630,
+            "m": 86,
+            "far": 5458,
+            "span": 456,
+            "parents": 7
+          },
+          {
+            "p": 137,
+            "C": 61512,
+            "m": 107,
+            "far": 8502,
+            "span": 334,
+            "parents": 5
+          },
+          {
+            "p": 19,
+            "C": 62718,
+            "m": 105,
+            "far": 7472,
+            "span": 330,
+            "parents": 4
+          },
+          {
+            "p": 107,
+            "C": 64092,
+            "m": 100,
+            "far": 7256,
+            "span": 332,
+            "parents": 6
+          }
+        ]
+      },
+      {
+        "T": 169,
+        "d": 84,
+        "Z": 19,
+        "A": 13,
+        "a0": 2,
+        "R": 2091193,
+        "events": 156881,
+        "stopped": 353,
+        "sinks": 2,
+        "twin": 7839,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 182,
+        "maxRootDist": 1026,
+        "stopMax": 182,
+        "P": 326890,
+        "J": 413950,
+        "stopFar": 44394,
+        "firstAtStop": 26620,
+        "firstEarlierThanStop": 300270,
+        "ratio": 0.23611576599482248,
+        "rootJ": 106356,
+        "firstRoot": 106356,
+        "sameQ": 71,
+        "sameQFar": 11690,
+        "sameQFirst": 2190,
+        "distinctNearQ": 198090,
+        "roughCounts": [
+          109178,
+          173744,
+          43968
+        ],
+        "roughJ": [
+          143602,
+          215738,
+          54610
+        ],
+        "largeLarge": 126562,
+        "largeLargeJ": 205356,
+        "largeLargeRough": 99350,
+        "largeLargeBothRough": 28170,
+        "largeLargeBothCheap": 27212,
+        "largeLargeNearQ": 110142,
+        "largeLargeSameQ": 1062,
+        "largeLargeStop": 21592,
+        "largeLargeLargest": 31810,
+        "llprod": [
+          4400,
+          39000,
+          73310,
+          9852
+        ],
+        "productSmall": 33166,
+        "productMedium": 142152,
+        "productRough": 159014,
+        "witnessFar": 40100,
+        "witnessVeryFar": 0,
+        "witnessPairs": 56784,
+        "largeExamples": [
+          {
+            "p": 47,
+            "C": 60582,
+            "stop": true,
+            "q": 233,
+            "q2": 19,
+            "D": 60348,
+            "D2": 60552,
+            "m": 49,
+            "m2": 149,
+            "sub": 49,
+            "sub2": 127,
+            "r": 7,
+            "r2": 19,
+            "far": 9046,
+            "fresh": 7294
+          },
+          {
+            "p": 19,
+            "C": 46758,
+            "stop": true,
+            "q": 241,
+            "q2": 53,
+            "D": 46512,
+            "D2": 46692,
+            "m": 74,
+            "m2": 55,
+            "sub": 74,
+            "sub2": 55,
+            "r": 193,
+            "r2": 53,
+            "far": 8140,
+            "fresh": 8140
+          },
+          {
+            "p": 29,
+            "C": 54492,
+            "stop": false,
+            "q": 227,
+            "q2": 139,
+            "D": 54252,
+            "D2": 54348,
+            "m": 38,
+            "m2": 95,
+            "sub": 38,
+            "sub2": 95,
+            "r": 227,
+            "r2": 17,
+            "far": 5672,
+            "fresh": 5068
+          },
+          {
+            "p": 11,
+            "C": 63240,
+            "stop": false,
+            "q": 17,
+            "q2": 31,
+            "D": 63222,
+            "D2": 63210,
+            "m": 118,
+            "m2": 41,
+            "sub": 118,
+            "sub2": 41,
+            "r": 17,
+            "r2": 31,
+            "far": 8366,
+            "fresh": 4850
+          },
+          {
+            "p": 19,
+            "C": 46758,
+            "stop": true,
+            "q": 241,
+            "q2": 29,
+            "D": 46512,
+            "D2": 46720,
+            "m": 74,
+            "m2": 30,
+            "sub": 74,
+            "sub2": 30,
+            "r": 193,
+            "r2": 3,
+            "far": 4440,
+            "fresh": 4440
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 54,
+            "P": 54,
+            "groups": 27
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 70,
+            "P": 70,
+            "groups": 35
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 300,
+            "P": 300,
+            "groups": 66
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 386,
+            "P": 386,
+            "groups": 95
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 1500,
+            "P": 1500,
+            "groups": 205
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1074,
+            "P": 1068,
+            "groups": 138
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 14,
+            "P": 14,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 3234,
+            "P": 3234,
+            "groups": 282
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 3516,
+            "P": 3502,
+            "groups": 296
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 60,
+            "P": 60,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 10728,
+            "P": 10632,
+            "groups": 446
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 12082,
+            "P": 12082,
+            "groups": 483
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 154,
+            "P": 154,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 21332,
+            "P": 21322,
+            "groups": 399
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 17964,
+            "P": 17956,
+            "groups": 332
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 174,
+            "P": 174,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 13558,
+            "P": 13556,
+            "groups": 113
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 16844,
+            "P": 16844,
+            "groups": 163
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 238,
+            "P": 238,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 6560,
+            "P": 6560,
+            "groups": 36
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 7956,
+            "P": 7956,
+            "groups": 44
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 14,
+            "P": 14,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 52,
+            "P": 52,
+            "groups": 8
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 202,
+            "P": 190,
+            "groups": 14
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 190,
+            "P": 190,
+            "groups": 11
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 34,
+            "P": 34,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 546,
+            "P": 502,
+            "groups": 20
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 536,
+            "P": 536,
+            "groups": 25
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 118,
+            "P": 118,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 1764,
+            "P": 1668,
+            "groups": 40
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 3380,
+            "P": 3252,
+            "groups": 63
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 628,
+            "P": 628,
+            "groups": 9
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 2054,
+            "P": 1752,
+            "groups": 17
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 3184,
+            "P": 3124,
+            "groups": 32
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 940,
+            "P": 940,
+            "groups": 9
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 2152,
+            "P": 2152,
+            "groups": 6
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 2138,
+            "P": 2016,
+            "groups": 10
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 424,
+            "P": 424,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 1696,
+            "P": 1472,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 2914,
+            "P": 2914,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 1110,
+            "P": 1004,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 196,
+            "P": 196,
+            "groups": 8
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 326,
+            "P": 326,
+            "groups": 11
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 16,
+            "P": 16,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 602,
+            "P": 408,
+            "groups": 11
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 708,
+            "P": 708,
+            "groups": 20
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 108,
+            "P": 108,
+            "groups": 4
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 2688,
+            "P": 2296,
+            "groups": 25
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 3538,
+            "P": 3534,
+            "groups": 34
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 976,
+            "P": 976,
+            "groups": 6
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 4124,
+            "P": 3264,
+            "groups": 17
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 7640,
+            "P": 7096,
+            "groups": 30
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 1256,
+            "P": 1256,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 2002,
+            "P": 1938,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 7602,
+            "P": 6848,
+            "groups": 14
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 4416,
+            "P": 4326,
+            "groups": 7
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 3334,
+            "P": 3234,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 3082,
+            "P": 3082,
+            "groups": 3
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 1862,
+            "P": 1670,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 470,
+            "P": 344,
+            "groups": 3
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 630,
+            "P": 530,
+            "groups": 8
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 208,
+            "P": 208,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 2608,
+            "P": 1742,
+            "groups": 14
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 4262,
+            "P": 4234,
+            "groups": 31
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1496,
+            "P": 1260,
+            "groups": 11
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 6220,
+            "P": 3556,
+            "groups": 11
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 9274,
+            "P": 8298,
+            "groups": 19
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 2524,
+            "P": 1850,
+            "groups": 7
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 2664,
+            "P": 1520,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 1152,
+            "P": 880,
+            "groups": 3
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 624,
+            "P": 624,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 824,
+            "P": 736,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 3192,
+            "P": 3192,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 3586,
+            "P": 2040,
+            "groups": 12
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 6054,
+            "P": 4252,
+            "groups": 17
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 386,
+            "P": 378,
+            "groups": 6
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 13040,
+            "P": 9372,
+            "groups": 14
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 10940,
+            "P": 9018,
+            "groups": 12
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 1906,
+            "P": 1596,
+            "groups": 5
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 9890,
+            "P": 6636,
+            "groups": 5
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 11144,
+            "P": 9400,
+            "groups": 7
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 10774,
+            "P": 8864,
+            "groups": 5
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 2378,
+            "P": 288,
+            "groups": 1
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 516,
+            "P": 516,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 12242,
+            "P": 2746,
+            "groups": 4
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 9144,
+            "P": 7878,
+            "groups": 10
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 5516,
+            "P": 1898,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 10126,
+            "P": 4690,
+            "groups": 5
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 33836,
+            "P": 24114,
+            "groups": 11
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 12862,
+            "P": 10004,
+            "groups": 3
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 1738,
+            "P": 0,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 15396,
+            "P": 8578,
+            "groups": 3
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 1984,
+            "P": 1344,
+            "groups": 1
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 10828,
+            "P": 1344,
+            "groups": 2
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 94,
+            "P": 94,
+            "groups": 1
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 7072,
+            "P": 940,
+            "groups": 3
+          }
+        ],
+        "stops": [
+          {
+            "p": 19,
+            "C": 46758,
+            "m": 171,
+            "far": 22506,
+            "span": 780,
+            "parents": 11
+          },
+          {
+            "p": 47,
+            "C": 60582,
+            "m": 182,
+            "far": 21888,
+            "span": 778,
+            "parents": 8
+          }
+        ]
+      },
+      {
+        "T": 11507,
+        "d": 5753,
+        "Z": 19,
+        "A": 108,
+        "a0": 2,
+        "R": 2144640,
+        "events": 161096,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 8192,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 217,
+        "maxRootDist": 1026,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 72,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "N": 32768,
+    "runs": [
+      {
+        "T": 169,
+        "d": 84,
+        "Z": 27,
+        "A": 13,
+        "a0": 2,
+        "R": 12808293,
+        "events": 673175,
+        "stopped": 6093,
+        "sinks": 32,
+        "twin": 26675,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 250,
+        "maxRootDist": 1748,
+        "stopMax": 250,
+        "P": 2024662,
+        "J": 2386780,
+        "stopFar": 891418,
+        "firstAtStop": 325444,
+        "firstEarlierThanStop": 1699218,
+        "ratio": 0.36560817018768493,
+        "rootJ": 593586,
+        "firstRoot": 593586,
+        "sameQ": 296,
+        "sameQFar": 58226,
+        "sameQFirst": 29334,
+        "distinctNearQ": 1150344,
+        "roughCounts": [
+          803198,
+          992354,
+          229110
+        ],
+        "roughJ": [
+          982602,
+          1150012,
+          254166
+        ],
+        "largeLarge": 893354,
+        "largeLargeJ": 1197832,
+        "largeLargeRough": 626254,
+        "largeLargeBothRough": 162782,
+        "largeLargeBothCheap": 267100,
+        "largeLargeNearQ": 715496,
+        "largeLargeSameQ": 12124,
+        "largeLargeStop": 247950,
+        "largeLargeLargest": 284592,
+        "llprod": [
+          34002,
+          273314,
+          430460,
+          155578
+        ],
+        "productSmall": 124784,
+        "productMedium": 792790,
+        "productRough": 897798,
+        "witnessFar": 665544,
+        "witnessVeryFar": 0,
+        "witnessPairs": 908544,
+        "largeExamples": [
+          {
+            "p": 43,
+            "C": 152952,
+            "stop": true,
+            "q": 11,
+            "q2": 31,
+            "D": 152934,
+            "D2": 152922,
+            "m": 141,
+            "m2": 90,
+            "sub": 141,
+            "sub2": 90,
+            "r": 5,
+            "r2": 31,
+            "far": 21706,
+            "fresh": 13508
+          },
+          {
+            "p": 11,
+            "C": 170070,
+            "stop": true,
+            "q": 23,
+            "q2": 13,
+            "D": 170040,
+            "D2": 170052,
+            "m": 94,
+            "m2": 148,
+            "sub": 94,
+            "sub2": 148,
+            "r": 23,
+            "r2": 7,
+            "far": 26226,
+            "fresh": 24778
+          },
+          {
+            "p": 11,
+            "C": 244608,
+            "stop": true,
+            "q": 19,
+            "q2": 13,
+            "D": 244588,
+            "D2": 244596,
+            "m": 102,
+            "m2": 65,
+            "sub": 102,
+            "sub2": 65,
+            "r": 3,
+            "r2": 5,
+            "far": 12594,
+            "fresh": 12390
+          },
+          {
+            "p": 13,
+            "C": 228162,
+            "stop": true,
+            "q": 11,
+            "q2": 97,
+            "D": 228150,
+            "D2": 228048,
+            "m": 99,
+            "m2": 122,
+            "sub": 99,
+            "sub2": 115,
+            "r": 7,
+            "r2": 97,
+            "far": 22152,
+            "fresh": 14016
+          },
+          {
+            "p": 11,
+            "C": 255168,
+            "stop": true,
+            "q": 19,
+            "q2": 79,
+            "D": 255150,
+            "D2": 255090,
+            "m": 96,
+            "m2": 83,
+            "sub": 96,
+            "sub2": 83,
+            "r": 13,
+            "r2": 53,
+            "far": 12612,
+            "fresh": 12236
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 218,
+            "P": 218,
+            "groups": 109
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 338,
+            "P": 338,
+            "groups": 169
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 2,
+            "J": 4,
+            "P": 4,
+            "groups": 2
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 1970,
+            "P": 1970,
+            "groups": 424
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 2596,
+            "P": 2592,
+            "groups": 547
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 38,
+            "P": 38,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 5178,
+            "P": 5178,
+            "groups": 724
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 6094,
+            "P": 6094,
+            "groups": 713
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 56,
+            "P": 56,
+            "groups": 6
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 19744,
+            "P": 19678,
+            "groups": 1640
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 18164,
+            "P": 18156,
+            "groups": 1230
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 204,
+            "P": 204,
+            "groups": 14
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 58570,
+            "P": 58526,
+            "groups": 2328
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 44030,
+            "P": 44030,
+            "groups": 1527
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 276,
+            "P": 276,
+            "groups": 11
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 109190,
+            "P": 109060,
+            "groups": 1902
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 75884,
+            "P": 75730,
+            "groups": 1205
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 490,
+            "P": 490,
+            "groups": 9
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 147336,
+            "P": 147336,
+            "groups": 1201
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 102416,
+            "P": 102416,
+            "groups": 803
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 1236,
+            "P": 1236,
+            "groups": 11
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 30382,
+            "P": 30162,
+            "groups": 139
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 33092,
+            "P": 33092,
+            "groups": 152
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 590,
+            "P": 590,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 274,
+            "P": 270,
+            "groups": 28
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 466,
+            "P": 458,
+            "groups": 46
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 46,
+            "P": 46,
+            "groups": 4
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 1126,
+            "P": 1092,
+            "groups": 63
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1556,
+            "P": 1556,
+            "groups": 85
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 366,
+            "P": 366,
+            "groups": 17
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 3212,
+            "P": 3014,
+            "groups": 107
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 4040,
+            "P": 3998,
+            "groups": 123
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 680,
+            "P": 664,
+            "groups": 22
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 8844,
+            "P": 8438,
+            "groups": 154
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 10128,
+            "P": 10062,
+            "groups": 173
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 2428,
+            "P": 2366,
+            "groups": 36
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 19958,
+            "P": 18328,
+            "groups": 150
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 16796,
+            "P": 16572,
+            "groups": 125
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 3478,
+            "P": 3470,
+            "groups": 25
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 20400,
+            "P": 17954,
+            "groups": 73
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 23926,
+            "P": 23644,
+            "groups": 84
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 4852,
+            "P": 4852,
+            "groups": 14
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 6520,
+            "P": 5938,
+            "groups": 11
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 7468,
+            "P": 7468,
+            "groups": 14
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 822,
+            "P": 822,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 844,
+            "P": 758,
+            "groups": 26
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1348,
+            "P": 1348,
+            "groups": 37
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 406,
+            "P": 406,
+            "groups": 10
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 3870,
+            "P": 3276,
+            "groups": 79
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 6138,
+            "P": 5890,
+            "groups": 106
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 1694,
+            "P": 1692,
+            "groups": 19
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 12412,
+            "P": 10826,
+            "groups": 111
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 13160,
+            "P": 12438,
+            "groups": 120
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 3726,
+            "P": 3504,
+            "groups": 31
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 19086,
+            "P": 16920,
+            "groups": 74
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 26318,
+            "P": 25356,
+            "groups": 98
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 6562,
+            "P": 6458,
+            "groups": 24
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 24068,
+            "P": 18540,
+            "groups": 44
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 37070,
+            "P": 32964,
+            "groups": 69
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 12236,
+            "P": 12236,
+            "groups": 24
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 4028,
+            "P": 4028,
+            "groups": 5
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 18132,
+            "P": 16010,
+            "groups": 16
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 2376,
+            "P": 2376,
+            "groups": 5
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 5998,
+            "P": 4812,
+            "groups": 59
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 6382,
+            "P": 6016,
+            "groups": 66
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 928,
+            "P": 928,
+            "groups": 7
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 20016,
+            "P": 16494,
+            "groups": 94
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 24492,
+            "P": 23264,
+            "groups": 110
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 7972,
+            "P": 7294,
+            "groups": 38
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 38502,
+            "P": 25318,
+            "groups": 74
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 38732,
+            "P": 35388,
+            "groups": 90
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 14006,
+            "P": 13444,
+            "groups": 24
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 63832,
+            "P": 41262,
+            "groups": 55
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 52920,
+            "P": 45898,
+            "groups": 49
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 24294,
+            "P": 23068,
+            "groups": 18
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 7324,
+            "P": 1496,
+            "groups": 4
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 12292,
+            "P": 10636,
+            "groups": 7
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 2490,
+            "P": 2490,
+            "groups": 4
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 19562,
+            "P": 14924,
+            "groups": 50
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 23176,
+            "P": 19994,
+            "groups": 46
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 3632,
+            "P": 3128,
+            "groups": 8
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 58026,
+            "P": 33650,
+            "groups": 58
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 74560,
+            "P": 61156,
+            "groups": 79
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 17350,
+            "P": 15700,
+            "groups": 19
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 54374,
+            "P": 33780,
+            "groups": 34
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 80292,
+            "P": 71636,
+            "groups": 32
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 36798,
+            "P": 32142,
+            "groups": 17
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 21736,
+            "P": 13796,
+            "groups": 8
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 18926,
+            "P": 16964,
+            "groups": 9
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 9306,
+            "P": 8670,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 45436,
+            "P": 29218,
+            "groups": 32
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 38288,
+            "P": 31104,
+            "groups": 28
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 5710,
+            "P": 5670,
+            "groups": 3
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 80878,
+            "P": 45636,
+            "groups": 22
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 149142,
+            "P": 107794,
+            "groups": 37
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 38020,
+            "P": 35616,
+            "groups": 10
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 10632,
+            "P": 8830,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 23724,
+            "P": 21036,
+            "groups": 6
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 17616,
+            "P": 14566,
+            "groups": 2
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 31840,
+            "P": 27694,
+            "groups": 11
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 128018,
+            "P": 81474,
+            "groups": 14
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 33478,
+            "P": 24242,
+            "groups": 4
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 27216,
+            "P": 24778,
+            "groups": 2
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 29908,
+            "P": 19782,
+            "groups": 5
+          }
+        ],
+        "stops": [
+          {
+            "p": 13,
+            "C": 132612,
+            "m": 176,
+            "far": 23096,
+            "span": 770,
+            "parents": 12
+          },
+          {
+            "p": 157,
+            "C": 138318,
+            "m": 178,
+            "far": 25006,
+            "span": 938,
+            "parents": 9
+          },
+          {
+            "p": 11,
+            "C": 145782,
+            "m": 171,
+            "far": 23330,
+            "span": 1214,
+            "parents": 3
+          },
+          {
+            "p": 11,
+            "C": 146508,
+            "m": 197,
+            "far": 31212,
+            "span": 1006,
+            "parents": 15
+          },
+          {
+            "p": 43,
+            "C": 152952,
+            "m": 234,
+            "far": 44220,
+            "span": 956,
+            "parents": 5
+          },
+          {
+            "p": 13,
+            "C": 161316,
+            "m": 170,
+            "far": 19862,
+            "span": 584,
+            "parents": 3
+          },
+          {
+            "p": 389,
+            "C": 163770,
+            "m": 177,
+            "far": 22926,
+            "span": 772,
+            "parents": 5
+          },
+          {
+            "p": 11,
+            "C": 165408,
+            "m": 187,
+            "far": 24432,
+            "span": 736,
+            "parents": 14
+          },
+          {
+            "p": 11,
+            "C": 170070,
+            "m": 250,
+            "far": 51022,
+            "span": 1086,
+            "parents": 6
+          },
+          {
+            "p": 23,
+            "C": 172062,
+            "m": 184,
+            "far": 23474,
+            "span": 790,
+            "parents": 3
+          },
+          {
+            "p": 53,
+            "C": 188520,
+            "m": 170,
+            "far": 20438,
+            "span": 514,
+            "parents": 4
+          },
+          {
+            "p": 19,
+            "C": 190740,
+            "m": 188,
+            "far": 25000,
+            "span": 608,
+            "parents": 8
+          },
+          {
+            "p": 97,
+            "C": 196620,
+            "m": 208,
+            "far": 34284,
+            "span": 1072,
+            "parents": 8
+          },
+          {
+            "p": 13,
+            "C": 199458,
+            "m": 174,
+            "far": 23190,
+            "span": 702,
+            "parents": 8
+          },
+          {
+            "p": 199,
+            "C": 200790,
+            "m": 171,
+            "far": 20564,
+            "span": 852,
+            "parents": 4
+          },
+          {
+            "p": 17,
+            "C": 202590,
+            "m": 201,
+            "far": 28714,
+            "span": 550,
+            "parents": 4
+          },
+          {
+            "p": 19,
+            "C": 205902,
+            "m": 227,
+            "far": 39548,
+            "span": 1030,
+            "parents": 11
+          },
+          {
+            "p": 193,
+            "C": 212880,
+            "m": 170,
+            "far": 23554,
+            "span": 1748,
+            "parents": 7
+          },
+          {
+            "p": 11,
+            "C": 213918,
+            "m": 203,
+            "far": 30470,
+            "span": 706,
+            "parents": 9
+          },
+          {
+            "p": 11,
+            "C": 224982,
+            "m": 176,
+            "far": 20522,
+            "span": 552,
+            "parents": 6
+          },
+          {
+            "p": 241,
+            "C": 226782,
+            "m": 173,
+            "far": 24206,
+            "span": 1300,
+            "parents": 8
+          },
+          {
+            "p": 13,
+            "C": 228162,
+            "m": 243,
+            "far": 47908,
+            "span": 1114,
+            "parents": 5
+          },
+          {
+            "p": 61,
+            "C": 229422,
+            "m": 175,
+            "far": 23654,
+            "span": 780,
+            "parents": 6
+          },
+          {
+            "p": 421,
+            "C": 234498,
+            "m": 213,
+            "far": 35364,
+            "span": 806,
+            "parents": 8
+          },
+          {
+            "p": 13,
+            "C": 239628,
+            "m": 201,
+            "far": 30068,
+            "span": 694,
+            "parents": 4
+          },
+          {
+            "p": 107,
+            "C": 243210,
+            "m": 183,
+            "far": 23928,
+            "span": 832,
+            "parents": 8
+          },
+          {
+            "p": 11,
+            "C": 244608,
+            "m": 170,
+            "far": 23474,
+            "span": 1096,
+            "parents": 5
+          },
+          {
+            "p": 13,
+            "C": 248988,
+            "m": 195,
+            "far": 29722,
+            "span": 916,
+            "parents": 11
+          },
+          {
+            "p": 353,
+            "C": 250278,
+            "m": 176,
+            "far": 21442,
+            "span": 616,
+            "parents": 8
+          },
+          {
+            "p": 23,
+            "C": 253530,
+            "m": 201,
+            "far": 30474,
+            "span": 888,
+            "parents": 6
+          },
+          {
+            "p": 11,
+            "C": 255168,
+            "m": 182,
+            "far": 23666,
+            "span": 582,
+            "parents": 5
+          },
+          {
+            "p": 17,
+            "C": 258552,
+            "m": 169,
+            "far": 22648,
+            "span": 958,
+            "parents": 5
+          }
+        ]
+      },
+      {
+        "T": 339,
+        "d": 169,
+        "Z": 27,
+        "A": 19,
+        "a0": 2,
+        "R": 15342788,
+        "events": 789290,
+        "stopped": 725,
+        "sinks": 2,
+        "twin": 32043,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 376,
+        "maxRootDist": 2288,
+        "stopMax": 376,
+        "P": 2044160,
+        "J": 2615178,
+        "stopFar": 197550,
+        "firstAtStop": 47184,
+        "firstEarlierThanStop": 1996976,
+        "ratio": 0.18402009587020648,
+        "rootJ": 557216,
+        "firstRoot": 557216,
+        "sameQ": 305,
+        "sameQFar": 74654,
+        "sameQFirst": 37298,
+        "distinctNearQ": 1189732,
+        "roughCounts": [
+          807404,
+          1025720,
+          211036
+        ],
+        "roughJ": [
+          1072382,
+          1280352,
+          262444
+        ],
+        "largeLarge": 811534,
+        "largeLargeJ": 1264142,
+        "largeLargeRough": 568206,
+        "largeLargeBothRough": 115156,
+        "largeLargeBothCheap": 243328,
+        "largeLargeNearQ": 643746,
+        "largeLargeSameQ": 18494,
+        "largeLargeStop": 26508,
+        "largeLargeLargest": 124768,
+        "llprod": [
+          104230,
+          401786,
+          278864,
+          26654
+        ],
+        "productSmall": 169370,
+        "productMedium": 787286,
+        "productRough": 992430,
+        "witnessFar": 170324,
+        "witnessVeryFar": 0,
+        "witnessPairs": 229164,
+        "largeExamples": [
+          {
+            "p": 11,
+            "C": 170070,
+            "stop": false,
+            "q": 23,
+            "q2": 13,
+            "D": 170040,
+            "D2": 170052,
+            "m": 94,
+            "m2": 148,
+            "sub": 94,
+            "sub2": 148,
+            "r": 23,
+            "r2": 7,
+            "far": 22336,
+            "fresh": 21450
+          },
+          {
+            "p": 11,
+            "C": 235302,
+            "stop": false,
+            "q": 31,
+            "q2": 23,
+            "D": 235260,
+            "D2": 235266,
+            "m": 67,
+            "m2": 213,
+            "sub": 67,
+            "sub2": 213,
+            "r": 13,
+            "r2": 5,
+            "far": 27628,
+            "fresh": 27628
+          },
+          {
+            "p": 11,
+            "C": 213960,
+            "stop": true,
+            "q": 601,
+            "q2": 31,
+            "D": 213354,
+            "D2": 213930,
+            "m": 109,
+            "m2": 268,
+            "sub": 109,
+            "sub2": 257,
+            "r": 5,
+            "r2": 31,
+            "far": 55282,
+            "fresh": 26508
+          },
+          {
+            "p": 13,
+            "C": 244620,
+            "stop": false,
+            "q": 11,
+            "q2": 151,
+            "D": 244608,
+            "D2": 244470,
+            "m": 211,
+            "m2": 53,
+            "sub": 211,
+            "sub2": 53,
+            "r": 11,
+            "r2": 151,
+            "far": 20138,
+            "fresh": 20138
+          },
+          {
+            "p": 11,
+            "C": 213918,
+            "stop": false,
+            "q": 17,
+            "q2": 31,
+            "D": 213876,
+            "D2": 213870,
+            "m": 78,
+            "m2": 165,
+            "sub": 73,
+            "sub2": 165,
+            "r": 5,
+            "r2": 7,
+            "far": 15518,
+            "fresh": 15268
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 96,
+            "P": 96,
+            "groups": 48
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 130,
+            "P": 130,
+            "groups": 65
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 2,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 1024,
+            "P": 1024,
+            "groups": 220
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 816,
+            "P": 816,
+            "groups": 169
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 4,
+            "P": 4,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 2258,
+            "P": 2252,
+            "groups": 311
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 2384,
+            "P": 2384,
+            "groups": 292
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 32,
+            "P": 32,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 9118,
+            "P": 9058,
+            "groups": 711
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 7414,
+            "P": 7408,
+            "groups": 579
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 30,
+            "P": 30,
+            "groups": 3
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 33064,
+            "P": 33026,
+            "groups": 1462
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 21638,
+            "P": 21616,
+            "groups": 984
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 124,
+            "P": 124,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 76932,
+            "P": 76858,
+            "groups": 1656
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 53224,
+            "P": 53186,
+            "groups": 1054
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 388,
+            "P": 388,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 135622,
+            "P": 135486,
+            "groups": 1233
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 88324,
+            "P": 88324,
+            "groups": 786
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 568,
+            "P": 568,
+            "groups": 6
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 86428,
+            "P": 86074,
+            "groups": 366
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 79048,
+            "P": 79048,
+            "groups": 345
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 1042,
+            "P": 1042,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 10054,
+            "P": 10054,
+            "groups": 23
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 6038,
+            "P": 6038,
+            "groups": 16
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 480,
+            "P": 480,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 194,
+            "P": 194,
+            "groups": 18
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 170,
+            "P": 170,
+            "groups": 17
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 8,
+            "P": 8,
+            "groups": 1
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 490,
+            "P": 474,
+            "groups": 29
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 686,
+            "P": 656,
+            "groups": 39
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 94,
+            "P": 94,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1600,
+            "P": 1404,
+            "groups": 48
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 1762,
+            "P": 1696,
+            "groups": 56
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 184,
+            "P": 168,
+            "groups": 8
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 4594,
+            "P": 4358,
+            "groups": 92
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 4980,
+            "P": 4924,
+            "groups": 110
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1202,
+            "P": 1202,
+            "groups": 24
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 13954,
+            "P": 13040,
+            "groups": 124
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 10574,
+            "P": 10440,
+            "groups": 111
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 2006,
+            "P": 2006,
+            "groups": 16
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 15890,
+            "P": 14118,
+            "groups": 69
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 21502,
+            "P": 21406,
+            "groups": 86
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 4790,
+            "P": 4790,
+            "groups": 16
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 15770,
+            "P": 13828,
+            "groups": 31
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 11590,
+            "P": 11578,
+            "groups": 22
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 2574,
+            "P": 2574,
+            "groups": 5
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 2806,
+            "P": 1516,
+            "groups": 3
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 1034,
+            "P": 1034,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 466,
+            "P": 394,
+            "groups": 12
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 508,
+            "P": 496,
+            "groups": 17
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 40,
+            "P": 40,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 1988,
+            "P": 1696,
+            "groups": 34
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 2402,
+            "P": 2228,
+            "groups": 46
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 682,
+            "P": 682,
+            "groups": 11
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 7228,
+            "P": 6448,
+            "groups": 77
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 6170,
+            "P": 6018,
+            "groups": 66
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1564,
+            "P": 1564,
+            "groups": 15
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 14150,
+            "P": 12920,
+            "groups": 70
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 17758,
+            "P": 16750,
+            "groups": 75
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 4328,
+            "P": 4308,
+            "groups": 23
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 27028,
+            "P": 22528,
+            "groups": 51
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 29628,
+            "P": 27052,
+            "groups": 65
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 10808,
+            "P": 10808,
+            "groups": 23
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 20456,
+            "P": 13538,
+            "groups": 14
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 32038,
+            "P": 26928,
+            "groups": 31
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 10658,
+            "P": 10268,
+            "groups": 10
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 3160,
+            "P": 2730,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 2590,
+            "P": 2590,
+            "groups": 2
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 2280,
+            "P": 1806,
+            "groups": 32
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 1944,
+            "P": 1924,
+            "groups": 32
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 342,
+            "P": 342,
+            "groups": 4
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 10318,
+            "P": 8046,
+            "groups": 54
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 11088,
+            "P": 10464,
+            "groups": 74
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 3196,
+            "P": 2834,
+            "groups": 22
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 25554,
+            "P": 17490,
+            "groups": 63
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 23396,
+            "P": 20732,
+            "groups": 71
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 8712,
+            "P": 8426,
+            "groups": 21
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 53308,
+            "P": 32106,
+            "groups": 56
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 38704,
+            "P": 31932,
+            "groups": 44
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 21216,
+            "P": 19812,
+            "groups": 19
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 29084,
+            "P": 15250,
+            "groups": 12
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 45792,
+            "P": 42878,
+            "groups": 24
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 11352,
+            "P": 11352,
+            "groups": 8
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 11904,
+            "P": 11904,
+            "groups": 2
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 9450,
+            "P": 6660,
+            "groups": 35
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 10430,
+            "P": 9260,
+            "groups": 31
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 2268,
+            "P": 1986,
+            "groups": 6
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 40828,
+            "P": 24900,
+            "groups": 51
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 61070,
+            "P": 50434,
+            "groups": 75
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 10760,
+            "P": 9412,
+            "groups": 16
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 41856,
+            "P": 22108,
+            "groups": 31
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 74688,
+            "P": 63432,
+            "groups": 36
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 27596,
+            "P": 24242,
+            "groups": 18
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 40744,
+            "P": 32028,
+            "groups": 12
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 54354,
+            "P": 44344,
+            "groups": 18
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 11060,
+            "P": 10636,
+            "groups": 3
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 23680,
+            "P": 10018,
+            "groups": 3
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 8996,
+            "P": 7718,
+            "groups": 1
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 23838,
+            "P": 14278,
+            "groups": 31
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 23286,
+            "P": 17882,
+            "groups": 24
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 3416,
+            "P": 3386,
+            "groups": 3
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 90090,
+            "P": 43926,
+            "groups": 26
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 128200,
+            "P": 97378,
+            "groups": 40
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 43498,
+            "P": 32668,
+            "groups": 11
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 58262,
+            "P": 30470,
+            "groups": 10
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 113366,
+            "P": 82502,
+            "groups": 18
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 19194,
+            "P": 11388,
+            "groups": 3
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 3462,
+            "P": 2772,
+            "groups": 1
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 13202,
+            "P": 3424,
+            "groups": 10
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 121650,
+            "P": 69016,
+            "groups": 16
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 46396,
+            "P": 23854,
+            "groups": 5
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 110870,
+            "P": 78862,
+            "groups": 7
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 93794,
+            "P": 44496,
+            "groups": 9
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 11830,
+            "P": 9516,
+            "groups": 2
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 55282,
+            "P": 26508,
+            "groups": 1
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 11186,
+            "P": 146,
+            "groups": 2
+          }
+        ],
+        "stops": [
+          {
+            "p": 11,
+            "C": 213960,
+            "m": 376,
+            "far": 107434,
+            "span": 2288,
+            "parents": 6
+          },
+          {
+            "p": 47,
+            "C": 235422,
+            "m": 349,
+            "far": 90116,
+            "span": 1268,
+            "parents": 6
+          }
+        ]
+      },
+      {
+        "T": 28815,
+        "d": 14407,
+        "Z": 27,
+        "A": 170,
+        "a0": 2,
+        "R": 15481975,
+        "events": 796161,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 32768,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 376,
+        "maxRootDist": 2408,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 305,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  },
+  {
+    "X": 262144,
+    "B": 1355,
+    "N": 131072,
+    "runs": [
+      {
+        "T": 677,
+        "d": 338,
+        "Z": 37,
+        "A": 27,
+        "a0": 2,
+        "R": 107745566,
+        "events": 3946588,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 131072,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 646,
+        "maxRootDist": 4822,
+        "stopMax": 0,
+        "P": 11922336,
+        "J": 16333126,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 11922336,
+        "ratio": 0.13435776230151403,
+        "rootJ": 2725752,
+        "firstRoot": 2725752,
+        "sameQ": 1330,
+        "sameQFar": 656608,
+        "sameQFirst": 275144,
+        "distinctNearQ": 6577298,
+        "roughCounts": [
+          5276850,
+          5679670,
+          965816
+        ],
+        "roughJ": [
+          8095536,
+          7078468,
+          1159122
+        ],
+        "largeLarge": 4900998,
+        "largeLargeJ": 8583474,
+        "largeLargeRough": 3058550,
+        "largeLargeBothRough": 534136,
+        "largeLargeBothCheap": 1842448,
+        "largeLargeNearQ": 3426524,
+        "largeLargeSameQ": 191314,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 380682,
+        "llprod": [
+          1439734,
+          2660782,
+          800270,
+          212
+        ],
+        "productSmall": 903364,
+        "productMedium": 4186430,
+        "productRough": 5484734,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [
+          {
+            "p": 59,
+            "C": 868068,
+            "stop": false,
+            "q": 31,
+            "q2": 31,
+            "D": 868032,
+            "D2": 868030,
+            "m": 405,
+            "m2": 149,
+            "sub": 405,
+            "sub2": 149,
+            "r": 31,
+            "r2": 3,
+            "far": 93796,
+            "fresh": 75382
+          },
+          {
+            "p": 743,
+            "C": 788322,
+            "stop": false,
+            "q": 613,
+            "q2": 67,
+            "D": 787704,
+            "D2": 788256,
+            "m": 432,
+            "m2": 136,
+            "sub": 432,
+            "sub2": 136,
+            "r": 5,
+            "r2": 5,
+            "far": 94468,
+            "fresh": 49946
+          },
+          {
+            "p": 83,
+            "C": 708738,
+            "stop": false,
+            "q": 43,
+            "q2": 19,
+            "D": 708682,
+            "D2": 708720,
+            "m": 173,
+            "m2": 391,
+            "sub": 173,
+            "sub2": 391,
+            "r": 3,
+            "r2": 11,
+            "far": 109014,
+            "fresh": 87446
+          },
+          {
+            "p": 43,
+            "C": 777312,
+            "stop": false,
+            "q": 139,
+            "q2": 71,
+            "D": 777150,
+            "D2": 777238,
+            "m": 120,
+            "m2": 293,
+            "sub": 120,
+            "sub2": 293,
+            "r": 139,
+            "r2": 3,
+            "far": 60424,
+            "fresh": 59776
+          },
+          {
+            "p": 19,
+            "C": 768570,
+            "stop": false,
+            "q": 11,
+            "q2": 37,
+            "D": 768558,
+            "D2": 768528,
+            "m": 265,
+            "m2": 221,
+            "sub": 265,
+            "sub2": 221,
+            "r": 11,
+            "r2": 29,
+            "far": 91176,
+            "fresh": 73690
+          }
+        ],
+        "bins": [
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 0,
+            "J": 380,
+            "P": 380,
+            "groups": 190
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 1,
+            "J": 360,
+            "P": 360,
+            "groups": 180
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 0,
+            "rough": 2,
+            "J": 2,
+            "P": 2,
+            "groups": 1
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 2610,
+            "P": 2608,
+            "groups": 572
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 2342,
+            "P": 2342,
+            "groups": 471
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 28,
+            "P": 28,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 8772,
+            "P": 8744,
+            "groups": 1130
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 6508,
+            "P": 6494,
+            "groups": 780
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 40,
+            "P": 36,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 25866,
+            "P": 25786,
+            "groups": 1939
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 22110,
+            "P": 22108,
+            "groups": 1621
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 156,
+            "P": 156,
+            "groups": 10
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 79104,
+            "P": 78972,
+            "groups": 3677
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 53666,
+            "P": 53652,
+            "groups": 2249
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 162,
+            "P": 162,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 230654,
+            "P": 230334,
+            "groups": 5709
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 136038,
+            "P": 135986,
+            "groups": 3152
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 590,
+            "P": 504,
+            "groups": 21
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 434408,
+            "P": 433714,
+            "groups": 4784
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 278454,
+            "P": 278040,
+            "groups": 2824
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 1254,
+            "P": 1242,
+            "groups": 18
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 649764,
+            "P": 648602,
+            "groups": 2903
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 389484,
+            "P": 389330,
+            "groups": 1702
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 1422,
+            "P": 1422,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 441376,
+            "P": 439200,
+            "groups": 947
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 221604,
+            "P": 221306,
+            "groups": 540
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 2200,
+            "P": 2200,
+            "groups": 5
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 9,
+            "rough": 0,
+            "J": 5200,
+            "P": 5200,
+            "groups": 8
+          },
+          {
+            "smallBand": 0,
+            "largeBand": 9,
+            "rough": 1,
+            "J": 14554,
+            "P": 14554,
+            "groups": 17
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 0,
+            "J": 348,
+            "P": 316,
+            "groups": 37
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 1,
+            "J": 436,
+            "P": 412,
+            "groups": 40
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 1,
+            "rough": 2,
+            "J": 24,
+            "P": 24,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 2158,
+            "P": 1954,
+            "groups": 110
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1824,
+            "P": 1788,
+            "groups": 89
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 282,
+            "P": 282,
+            "groups": 12
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 5848,
+            "P": 5254,
+            "groups": 176
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 5814,
+            "P": 5690,
+            "groups": 163
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 504,
+            "P": 504,
+            "groups": 16
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 15744,
+            "P": 13902,
+            "groups": 284
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 13100,
+            "P": 12848,
+            "groups": 248
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 1866,
+            "P": 1866,
+            "groups": 34
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 44646,
+            "P": 41066,
+            "groups": 426
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 30482,
+            "P": 29494,
+            "groups": 326
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 5236,
+            "P": 5236,
+            "groups": 46
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 73494,
+            "P": 66528,
+            "groups": 356
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 74466,
+            "P": 73556,
+            "groups": 343
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 8920,
+            "P": 8878,
+            "groups": 39
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 92722,
+            "P": 87458,
+            "groups": 183
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 101406,
+            "P": 99952,
+            "groups": 196
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 19348,
+            "P": 19348,
+            "groups": 36
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 72344,
+            "P": 65318,
+            "groups": 75
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 48528,
+            "P": 46800,
+            "groups": 55
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 11142,
+            "P": 11142,
+            "groups": 11
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 9,
+            "rough": 0,
+            "J": 1756,
+            "P": 932,
+            "groups": 2
+          },
+          {
+            "smallBand": 1,
+            "largeBand": 9,
+            "rough": 1,
+            "J": 2600,
+            "P": 2516,
+            "groups": 2
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 0,
+            "J": 1650,
+            "P": 1304,
+            "groups": 46
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 1,
+            "J": 1896,
+            "P": 1808,
+            "groups": 50
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 2,
+            "rough": 2,
+            "J": 448,
+            "P": 448,
+            "groups": 9
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 9222,
+            "P": 7648,
+            "groups": 144
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 10132,
+            "P": 10106,
+            "groups": 157
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 1132,
+            "P": 1120,
+            "groups": 19
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 20208,
+            "P": 13666,
+            "groups": 182
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 21094,
+            "P": 20348,
+            "groups": 187
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 3536,
+            "P": 3496,
+            "groups": 27
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 49468,
+            "P": 40356,
+            "groups": 259
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 51900,
+            "P": 50914,
+            "groups": 282
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 8454,
+            "P": 8364,
+            "groups": 44
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 92844,
+            "P": 75976,
+            "groups": 218
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 107022,
+            "P": 103260,
+            "groups": 233
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 21318,
+            "P": 21074,
+            "groups": 49
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 146588,
+            "P": 121114,
+            "groups": 148
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 148446,
+            "P": 139930,
+            "groups": 149
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 14694,
+            "P": 14662,
+            "groups": 17
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 118786,
+            "P": 97632,
+            "groups": 58
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 97372,
+            "P": 95214,
+            "groups": 48
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 17712,
+            "P": 17712,
+            "groups": 9
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 9,
+            "rough": 0,
+            "J": 2330,
+            "P": 2330,
+            "groups": 1
+          },
+          {
+            "smallBand": 2,
+            "largeBand": 9,
+            "rough": 1,
+            "J": 7530,
+            "P": 7530,
+            "groups": 1
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 0,
+            "J": 8526,
+            "P": 6336,
+            "groups": 83
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 1,
+            "J": 8908,
+            "P": 8562,
+            "groups": 81
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 3,
+            "rough": 2,
+            "J": 1434,
+            "P": 1374,
+            "groups": 18
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 35572,
+            "P": 25958,
+            "groups": 187
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 36310,
+            "P": 34084,
+            "groups": 201
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 10584,
+            "P": 10274,
+            "groups": 41
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 81920,
+            "P": 56820,
+            "groups": 220
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 82288,
+            "P": 77112,
+            "groups": 233
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 17592,
+            "P": 15946,
+            "groups": 41
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 149638,
+            "P": 112014,
+            "groups": 197
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 155198,
+            "P": 145066,
+            "groups": 215
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 35702,
+            "P": 31926,
+            "groups": 39
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 257876,
+            "P": 188236,
+            "groups": 119
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 233464,
+            "P": 215080,
+            "groups": 124
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 35486,
+            "P": 34042,
+            "groups": 22
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 135334,
+            "P": 84966,
+            "groups": 37
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 179848,
+            "P": 173772,
+            "groups": 40
+          },
+          {
+            "smallBand": 3,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 14840,
+            "P": 14222,
+            "groups": 4
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 0,
+            "J": 28700,
+            "P": 22820,
+            "groups": 91
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 1,
+            "J": 30082,
+            "P": 27512,
+            "groups": 99
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 4,
+            "rough": 2,
+            "J": 10996,
+            "P": 10190,
+            "groups": 27
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 136108,
+            "P": 91782,
+            "groups": 219
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 132714,
+            "P": 114650,
+            "groups": 226
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 44330,
+            "P": 40804,
+            "groups": 67
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 214444,
+            "P": 134730,
+            "groups": 155
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 262754,
+            "P": 237908,
+            "groups": 173
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 69006,
+            "P": 65140,
+            "groups": 42
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 315424,
+            "P": 204770,
+            "groups": 97
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 391134,
+            "P": 346518,
+            "groups": 102
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 72654,
+            "P": 68668,
+            "groups": 21
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 193206,
+            "P": 116700,
+            "groups": 35
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 172384,
+            "P": 123310,
+            "groups": 27
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 63882,
+            "P": 63466,
+            "groups": 12
+          },
+          {
+            "smallBand": 4,
+            "largeBand": 9,
+            "rough": 1,
+            "J": 22452,
+            "P": 8806,
+            "groups": 2
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 0,
+            "J": 125842,
+            "P": 76978,
+            "groups": 105
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 1,
+            "J": 127066,
+            "P": 112552,
+            "groups": 103
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 5,
+            "rough": 2,
+            "J": 27262,
+            "P": 24352,
+            "groups": 31
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 305012,
+            "P": 140460,
+            "groups": 123
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 412380,
+            "P": 337190,
+            "groups": 152
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 98388,
+            "P": 89978,
+            "groups": 26
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 600452,
+            "P": 278310,
+            "groups": 87
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 546858,
+            "P": 456766,
+            "groups": 85
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 84594,
+            "P": 56936,
+            "groups": 20
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 378698,
+            "P": 146870,
+            "groups": 26
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 453124,
+            "P": 359496,
+            "groups": 32
+          },
+          {
+            "smallBand": 5,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 65228,
+            "P": 51716,
+            "groups": 5
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 0,
+            "J": 269270,
+            "P": 121642,
+            "groups": 62
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 1,
+            "J": 243688,
+            "P": 189696,
+            "groups": 50
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 6,
+            "rough": 2,
+            "J": 64382,
+            "P": 46998,
+            "groups": 8
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 693540,
+            "P": 364830,
+            "groups": 55
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 684728,
+            "P": 411416,
+            "groups": 57
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 160276,
+            "P": 124612,
+            "groups": 12
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 247084,
+            "P": 58780,
+            "groups": 13
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 257302,
+            "P": 145758,
+            "groups": 19
+          },
+          {
+            "smallBand": 6,
+            "largeBand": 8,
+            "rough": 2,
+            "J": 74922,
+            "P": 54292,
+            "groups": 3
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 7,
+            "rough": 0,
+            "J": 514962,
+            "P": 147604,
+            "groups": 28
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 7,
+            "rough": 1,
+            "J": 444056,
+            "P": 270390,
+            "groups": 26
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 7,
+            "rough": 2,
+            "J": 87094,
+            "P": 40972,
+            "groups": 4
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 773362,
+            "P": 379950,
+            "groups": 11
+          },
+          {
+            "smallBand": 7,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 171634,
+            "P": 57446,
+            "groups": 5
+          },
+          {
+            "smallBand": 8,
+            "largeBand": 8,
+            "rough": 0,
+            "J": 2276,
+            "P": 0,
+            "groups": 2
+          },
+          {
+            "smallBand": 8,
+            "largeBand": 8,
+            "rough": 1,
+            "J": 180928,
+            "P": 242,
+            "groups": 7
+          }
+        ],
+        "stops": []
+      },
+      {
+        "T": 70469,
+        "d": 35234,
+        "Z": 37,
+        "A": 266,
+        "a0": 2,
+        "R": 107745566,
+        "events": 3946588,
+        "stopped": 0,
+        "sinks": 0,
+        "twin": 131072,
+        "bad": 0,
+        "literal": 0,
+        "maxMass": 646,
+        "maxRootDist": 4822,
+        "stopMax": 0,
+        "P": 0,
+        "J": 0,
+        "stopFar": 0,
+        "firstAtStop": 0,
+        "firstEarlierThanStop": 0,
+        "ratio": 0,
+        "rootJ": 0,
+        "firstRoot": 0,
+        "sameQ": 1330,
+        "sameQFar": 0,
+        "sameQFirst": 0,
+        "distinctNearQ": 0,
+        "roughCounts": [
+          0,
+          0,
+          0
+        ],
+        "roughJ": [
+          0,
+          0,
+          0
+        ],
+        "largeLarge": 0,
+        "largeLargeJ": 0,
+        "largeLargeRough": 0,
+        "largeLargeBothRough": 0,
+        "largeLargeBothCheap": 0,
+        "largeLargeNearQ": 0,
+        "largeLargeSameQ": 0,
+        "largeLargeStop": 0,
+        "largeLargeLargest": 0,
+        "llprod": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "productSmall": 0,
+        "productMedium": 0,
+        "productRough": 0,
+        "witnessFar": 0,
+        "witnessVeryFar": 0,
+        "witnessPairs": 0,
+        "largeExamples": [],
+        "bins": [],
+        "stops": []
+      }
+    ]
+  }
+]
