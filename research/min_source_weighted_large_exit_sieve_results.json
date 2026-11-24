@@ -37,6 +37,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 64,
+    "cutExits": 1967,
+    "cutMismatches": 29,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 1996,
+        "cutCap": 1967,
+        "sharedCap": 1967,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 2,
+        "fullCap": 1996,
+        "cutCap": 1967,
+        "sharedCap": 1967,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 1996,
+        "cutCap": 1967,
+        "sharedCap": 1967,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 1996,
+        "cutCap": 1967,
+        "sharedCap": 1967,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 1996,
+        "cutCap": 1967,
+        "sharedCap": 1967,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 1
   },
   {
@@ -77,6 +122,51 @@
     ],
     "largeExitGainSum": 134,
     "largeExitTimeSum": 97,
+    "Z": 170,
+    "cutExits": 1885,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 1451,
+        "cutCap": 1451,
+        "sharedCap": 1451,
+        "fullLarge": 868,
+        "cutLarge": 868
+      },
+      {
+        "k": 2,
+        "fullCap": 1885,
+        "cutCap": 1885,
+        "sharedCap": 1885,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 1885,
+        "cutCap": 1885,
+        "sharedCap": 1885,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 1885,
+        "cutCap": 1885,
+        "sharedCap": 1885,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 1885,
+        "cutCap": 1885,
+        "sharedCap": 1885,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 15
   },
   {
@@ -117,6 +207,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 170,
+    "cutExits": 1691,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 653,
+        "cutCap": 653,
+        "sharedCap": 653,
+        "fullLarge": 1495,
+        "cutLarge": 1495
+      },
+      {
+        "k": 2,
+        "fullCap": 1110,
+        "cutCap": 1110,
+        "sharedCap": 1110,
+        "fullLarge": 1175,
+        "cutLarge": 1175
+      },
+      {
+        "k": 4,
+        "fullCap": 1549,
+        "cutCap": 1549,
+        "sharedCap": 1549,
+        "fullLarge": 422,
+        "cutLarge": 422
+      },
+      {
+        "k": 8,
+        "fullCap": 1691,
+        "cutCap": 1691,
+        "sharedCap": 1691,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 1691,
+        "cutCap": 1691,
+        "sharedCap": 1691,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 2048
   },
   {
@@ -157,6 +292,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 170,
+    "cutExits": 1128,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 163,
+        "cutCap": 163,
+        "sharedCap": 163,
+        "fullLarge": 1101,
+        "cutLarge": 1101
+      },
+      {
+        "k": 2,
+        "fullCap": 299,
+        "cutCap": 299,
+        "sharedCap": 299,
+        "fullLarge": 1055,
+        "cutLarge": 1055
+      },
+      {
+        "k": 4,
+        "fullCap": 500,
+        "cutCap": 500,
+        "sharedCap": 500,
+        "fullLarge": 892,
+        "cutLarge": 892
+      },
+      {
+        "k": 8,
+        "fullCap": 734,
+        "cutCap": 734,
+        "sharedCap": 734,
+        "fullLarge": 754,
+        "cutLarge": 754
+      },
+      {
+        "k": 16,
+        "fullCap": 991,
+        "cutCap": 991,
+        "sharedCap": 991,
+        "fullLarge": 425,
+        "cutLarge": 425
+      }
+    ],
     "phaseCount": 2048
   },
   {
@@ -197,6 +377,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 64,
+    "cutExits": 7813,
+    "cutMismatches": 192,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 8000,
+        "cutCap": 7813,
+        "sharedCap": 7808,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 2,
+        "fullCap": 8000,
+        "cutCap": 7813,
+        "sharedCap": 7808,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 8000,
+        "cutCap": 7813,
+        "sharedCap": 7808,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 8000,
+        "cutCap": 7813,
+        "sharedCap": 7808,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 8000,
+        "cutCap": 7813,
+        "sharedCap": 7808,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 1
   },
   {
@@ -237,6 +462,51 @@
     ],
     "largeExitGainSum": 920,
     "largeExitTimeSum": 733,
+    "Z": 192,
+    "cutExits": 7602,
+    "cutMismatches": 90,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 5904,
+        "cutCap": 5865,
+        "sharedCap": 5843,
+        "fullLarge": 3510,
+        "cutLarge": 3474
+      },
+      {
+        "k": 2,
+        "fullCap": 7659,
+        "cutCap": 7602,
+        "sharedCap": 7569,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 7659,
+        "cutCap": 7602,
+        "sharedCap": 7569,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 7659,
+        "cutCap": 7602,
+        "sharedCap": 7569,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 7659,
+        "cutCap": 7602,
+        "sharedCap": 7569,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 15
   },
   {
@@ -277,6 +547,51 @@
     ],
     "largeExitGainSum": 16,
     "largeExitTimeSum": 11,
+    "Z": 339,
+    "cutExits": 7010,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 2698,
+        "cutCap": 2698,
+        "sharedCap": 2698,
+        "fullLarge": 6168,
+        "cutLarge": 6168
+      },
+      {
+        "k": 2,
+        "fullCap": 4554,
+        "cutCap": 4554,
+        "sharedCap": 4554,
+        "fullLarge": 4868,
+        "cutLarge": 4868
+      },
+      {
+        "k": 4,
+        "fullCap": 6373,
+        "cutCap": 6373,
+        "sharedCap": 6373,
+        "fullLarge": 2005,
+        "cutLarge": 2005
+      },
+      {
+        "k": 8,
+        "fullCap": 7010,
+        "cutCap": 7010,
+        "sharedCap": 7010,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 7010,
+        "cutCap": 7010,
+        "sharedCap": 7010,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 8192
   },
   {
@@ -317,6 +632,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 339,
+    "cutExits": 5069,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 715,
+        "cutCap": 715,
+        "sharedCap": 715,
+        "fullLarge": 4945,
+        "cutLarge": 4945
+      },
+      {
+        "k": 2,
+        "fullCap": 1306,
+        "cutCap": 1306,
+        "sharedCap": 1306,
+        "fullLarge": 4755,
+        "cutLarge": 4755
+      },
+      {
+        "k": 4,
+        "fullCap": 2201,
+        "cutCap": 2201,
+        "sharedCap": 2201,
+        "fullLarge": 4252,
+        "cutLarge": 4252
+      },
+      {
+        "k": 8,
+        "fullCap": 3347,
+        "cutCap": 3347,
+        "sharedCap": 3347,
+        "fullLarge": 3370,
+        "cutLarge": 3370
+      },
+      {
+        "k": 16,
+        "fullCap": 4518,
+        "cutCap": 4518,
+        "sharedCap": 4518,
+        "fullLarge": 1831,
+        "cutLarge": 1831
+      }
+    ],
     "phaseCount": 8192
   },
   {
@@ -357,6 +717,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 64,
+    "cutExits": 31242,
+    "cutMismatches": 955,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 32177,
+        "cutCap": 31242,
+        "sharedCap": 31222,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 2,
+        "fullCap": 32177,
+        "cutCap": 31242,
+        "sharedCap": 31222,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 32177,
+        "cutCap": 31242,
+        "sharedCap": 31222,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 32177,
+        "cutCap": 31242,
+        "sharedCap": 31222,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 32177,
+        "cutCap": 31242,
+        "sharedCap": 31222,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 1
   },
   {
@@ -397,6 +802,51 @@
     ],
     "largeExitGainSum": 4810,
     "largeExitTimeSum": 3950,
+    "Z": 192,
+    "cutExits": 30052,
+    "cutMismatches": 1063,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 23884,
+        "cutCap": 23201,
+        "sharedCap": 23167,
+        "fullLarge": 14360,
+        "cutLarge": 13702
+      },
+      {
+        "k": 2,
+        "fullCap": 31064,
+        "cutCap": 30052,
+        "sharedCap": 30001,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 31064,
+        "cutCap": 30052,
+        "sharedCap": 30001,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 31064,
+        "cutCap": 30052,
+        "sharedCap": 30001,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 31064,
+        "cutCap": 30052,
+        "sharedCap": 30001,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 15
   },
   {
@@ -437,6 +887,51 @@
     ],
     "largeExitGainSum": 8108,
     "largeExitTimeSum": 7743,
+    "Z": 678,
+    "cutExits": 29062,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 11036,
+        "cutCap": 11036,
+        "sharedCap": 11036,
+        "fullLarge": 25812,
+        "cutLarge": 25812
+      },
+      {
+        "k": 2,
+        "fullCap": 18822,
+        "cutCap": 18822,
+        "sharedCap": 18822,
+        "fullLarge": 20480,
+        "cutLarge": 20480
+      },
+      {
+        "k": 4,
+        "fullCap": 26470,
+        "cutCap": 26470,
+        "sharedCap": 26470,
+        "fullLarge": 8412,
+        "cutLarge": 8412
+      },
+      {
+        "k": 8,
+        "fullCap": 29062,
+        "cutCap": 29062,
+        "sharedCap": 29062,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 29062,
+        "cutCap": 29062,
+        "sharedCap": 29062,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 32768
   },
   {
@@ -477,6 +972,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 678,
+    "cutExits": 23683,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 3295,
+        "cutCap": 3295,
+        "sharedCap": 3295,
+        "fullLarge": 23133,
+        "cutLarge": 23133
+      },
+      {
+        "k": 2,
+        "fullCap": 6040,
+        "cutCap": 6040,
+        "sharedCap": 6040,
+        "fullLarge": 22259,
+        "cutLarge": 22259
+      },
+      {
+        "k": 4,
+        "fullCap": 10252,
+        "cutCap": 10252,
+        "sharedCap": 10252,
+        "fullLarge": 20027,
+        "cutLarge": 20027
+      },
+      {
+        "k": 8,
+        "fullCap": 15727,
+        "cutCap": 15727,
+        "sharedCap": 15727,
+        "fullLarge": 15748,
+        "cutLarge": 15748
+      },
+      {
+        "k": 16,
+        "fullCap": 21028,
+        "cutCap": 21028,
+        "sharedCap": 21028,
+        "fullLarge": 8463,
+        "cutLarge": 8463
+      }
+    ],
     "phaseCount": 32768
   },
   {
@@ -517,6 +1057,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 64,
+    "cutExits": 125061,
+    "cutMismatches": 4292,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 129181,
+        "cutCap": 125061,
+        "sharedCap": 124889,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 2,
+        "fullCap": 129181,
+        "cutCap": 125061,
+        "sharedCap": 124889,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 129181,
+        "cutCap": 125061,
+        "sharedCap": 124889,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 129181,
+        "cutCap": 125061,
+        "sharedCap": 124889,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 129181,
+        "cutCap": 125061,
+        "sharedCap": 124889,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 1
   },
   {
@@ -557,6 +1142,51 @@
     ],
     "largeExitGainSum": 22006,
     "largeExitTimeSum": 17912,
+    "Z": 192,
+    "cutExits": 119556,
+    "cutMismatches": 6101,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 96367,
+        "cutCap": 92315,
+        "sharedCap": 92218,
+        "fullLarge": 58280,
+        "cutLarge": 54482
+      },
+      {
+        "k": 2,
+        "fullCap": 125507,
+        "cutCap": 119556,
+        "sharedCap": 119406,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 4,
+        "fullCap": 125507,
+        "cutCap": 119556,
+        "sharedCap": 119406,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 8,
+        "fullCap": 125507,
+        "cutCap": 119556,
+        "sharedCap": 119406,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 125507,
+        "cutCap": 119556,
+        "sharedCap": 119406,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 15
   },
   {
@@ -597,6 +1227,51 @@
     ],
     "largeExitGainSum": 65102,
     "largeExitTimeSum": 62385,
+    "Z": 960,
+    "cutExits": 118753,
+    "cutMismatches": 689,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 45126,
+        "cutCap": 45105,
+        "sharedCap": 44916,
+        "fullLarge": 105548,
+        "cutLarge": 105495
+      },
+      {
+        "k": 2,
+        "fullCap": 76990,
+        "cutCap": 76952,
+        "sharedCap": 76601,
+        "fullLarge": 83726,
+        "cutLarge": 83683
+      },
+      {
+        "k": 4,
+        "fullCap": 108280,
+        "cutCap": 108227,
+        "sharedCap": 107676,
+        "fullLarge": 33986,
+        "cutLarge": 33974
+      },
+      {
+        "k": 8,
+        "fullCap": 118810,
+        "cutCap": 118753,
+        "sharedCap": 118121,
+        "fullLarge": 0,
+        "cutLarge": 0
+      },
+      {
+        "k": 16,
+        "fullCap": 118810,
+        "cutCap": 118753,
+        "sharedCap": 118121,
+        "fullLarge": 0,
+        "cutLarge": 0
+      }
+    ],
     "phaseCount": 131072
   },
   {
@@ -637,6 +1312,51 @@
     ],
     "largeExitGainSum": 0,
     "largeExitTimeSum": 0,
+    "Z": 1355,
+    "cutExits": 100874,
+    "cutMismatches": 0,
+    "packetComparison": [
+      {
+        "k": 1,
+        "fullCap": 14117,
+        "cutCap": 14117,
+        "sharedCap": 14117,
+        "fullLarge": 98550,
+        "cutLarge": 98550
+      },
+      {
+        "k": 2,
+        "fullCap": 25910,
+        "cutCap": 25910,
+        "sharedCap": 25910,
+        "fullLarge": 94760,
+        "cutLarge": 94760
+      },
+      {
+        "k": 4,
+        "fullCap": 43851,
+        "cutCap": 43851,
+        "sharedCap": 43851,
+        "fullLarge": 84651,
+        "cutLarge": 84651
+      },
+      {
+        "k": 8,
+        "fullCap": 66763,
+        "cutCap": 66763,
+        "sharedCap": 66763,
+        "fullLarge": 66687,
+        "cutLarge": 66687
+      },
+      {
+        "k": 16,
+        "fullCap": 89001,
+        "cutCap": 89001,
+        "sharedCap": 89001,
+        "fullLarge": 37201,
+        "cutLarge": 37201
+      }
+    ],
     "phaseCount": 131072
   }
 ]
