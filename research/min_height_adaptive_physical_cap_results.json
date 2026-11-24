@@ -1,0 +1,791 @@
+{
+  "rows": [
+    {
+      "X": 4096,
+      "mode": 0,
+      "B": 170,
+      "N": 2048,
+      "H0": 24,
+      "T0": 42,
+      "a": 4,
+      "Q": 85,
+      "stops": 290,
+      "lowStops": 149,
+      "highStops": 141,
+      "stopVertices": 6,
+      "minStop": 43,
+      "maxStop": 63,
+      "terminal": 1758,
+      "twin": 1758,
+      "nontwin": 0,
+      "events": 25854,
+      "cost": 290668,
+      "stopEdgeCost": 9099,
+      "lowArrivalCost": 116104,
+      "midArrivalCost": 45699,
+      "highArrivalCost": 119766,
+      "hitTags": 796,
+      "hitViaStop": 9,
+      "highTagCost": 195722,
+      "bandPassageChecks": 486,
+      "nontrivialPassageChecks": 445,
+      "bandPositive": 33662,
+      "passagePositive": 31060,
+      "bandEntryOvershootMax": 39.5,
+      "maxHeight": 840,
+      "clockChecks": 5249,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 135,
+      "anchorArrivals": 5527,
+      "bands": {
+        "4": {
+          "cost": 7461,
+          "clocks": 367,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "5": {
+          "cost": 25155,
+          "clocks": 546,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "6": {
+          "cost": 40135,
+          "clocks": 417,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "7": {
+          "cost": 53594,
+          "clocks": 429,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "8": {
+          "cost": 26272,
+          "clocks": 250,
+          "maxMass": 35,
+          "capMax": 42
+        },
+        "9": {
+          "cost": 12848,
+          "clocks": 91,
+          "maxMass": 26,
+          "capMax": 32
+        },
+        "low": {
+          "cost": 116104,
+          "clocks": 3468,
+          "maxMass": 40,
+          "capMax": 42
+        }
+      }
+    },
+    {
+      "X": 4096,
+      "mode": 1,
+      "B": 170,
+      "N": 2048,
+      "H0": 24,
+      "T0": 42,
+      "a": 8,
+      "Q": 255,
+      "stops": 290,
+      "lowStops": 149,
+      "highStops": 141,
+      "stopVertices": 6,
+      "minStop": 43,
+      "maxStop": 63,
+      "terminal": 1758,
+      "twin": 1758,
+      "nontwin": 0,
+      "events": 25854,
+      "cost": 290668,
+      "stopEdgeCost": 9099,
+      "lowArrivalCost": 116104,
+      "midArrivalCost": 126345,
+      "highArrivalCost": 39120,
+      "hitTags": 227,
+      "hitViaStop": 0,
+      "highTagCost": 88889,
+      "bandPassageChecks": 182,
+      "nontrivialPassageChecks": 182,
+      "bandPositive": 38294,
+      "passagePositive": 28134,
+      "bandEntryOvershootMax": 108.5,
+      "maxHeight": 840,
+      "clockChecks": 5249,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 135,
+      "anchorArrivals": 5527,
+      "bands": {
+        "4": {
+          "cost": 7461,
+          "clocks": 367,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "5": {
+          "cost": 25155,
+          "clocks": 546,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "6": {
+          "cost": 40135,
+          "clocks": 417,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "7": {
+          "cost": 53594,
+          "clocks": 429,
+          "maxMass": 37,
+          "capMax": 42
+        },
+        "8": {
+          "cost": 26272,
+          "clocks": 250,
+          "maxMass": 35,
+          "capMax": 42
+        },
+        "9": {
+          "cost": 12848,
+          "clocks": 91,
+          "maxMass": 26,
+          "capMax": 42
+        },
+        "low": {
+          "cost": 116104,
+          "clocks": 3468,
+          "maxMass": 40,
+          "capMax": 42
+        }
+      }
+    },
+    {
+      "X": 16384,
+      "mode": 0,
+      "B": 339,
+      "N": 8192,
+      "H0": 24,
+      "T0": 84,
+      "a": 4,
+      "Q": 169,
+      "stops": 1011,
+      "lowStops": 424,
+      "highStops": 587,
+      "stopVertices": 11,
+      "minStop": 32,
+      "maxStop": 115,
+      "terminal": 7181,
+      "twin": 7181,
+      "nontwin": 0,
+      "events": 146230,
+      "cost": 1964842,
+      "stopEdgeCost": 100328,
+      "lowArrivalCost": 638156,
+      "midArrivalCost": 489139,
+      "highArrivalCost": 737219,
+      "hitTags": 2866,
+      "hitViaStop": 168,
+      "highTagCost": 1286305,
+      "bandPassageChecks": 1757,
+      "nontrivialPassageChecks": 1693,
+      "bandPositive": 222902,
+      "passagePositive": 190952,
+      "bandEntryOvershootMax": 81.5,
+      "maxHeight": 2114,
+      "clockChecks": 21403,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 734,
+      "anchorArrivals": 27633,
+      "bands": {
+        "4": {
+          "cost": 33899,
+          "clocks": 1462,
+          "maxMass": 82,
+          "capMax": 84
+        },
+        "5": {
+          "cost": 117119,
+          "clocks": 2242,
+          "maxMass": 68,
+          "capMax": 84
+        },
+        "6": {
+          "cost": 215476,
+          "clocks": 1702,
+          "maxMass": 70,
+          "capMax": 84
+        },
+        "7": {
+          "cost": 303884,
+          "clocks": 1544,
+          "maxMass": 75,
+          "capMax": 84
+        },
+        "8": {
+          "cost": 379064,
+          "clocks": 1156,
+          "maxMass": 74,
+          "capMax": 84
+        },
+        "9": {
+          "cost": 132002,
+          "clocks": 562,
+          "maxMass": 60,
+          "capMax": 64
+        },
+        "10": {
+          "cost": 44914,
+          "clocks": 120,
+          "maxMass": 32,
+          "capMax": 46
+        },
+        "11": {
+          "cost": 0,
+          "clocks": 0,
+          "maxMass": 0,
+          "capMax": 0
+        },
+        "low": {
+          "cost": 638156,
+          "clocks": 13950,
+          "maxMass": 82,
+          "capMax": 84
+        }
+      }
+    },
+    {
+      "X": 16384,
+      "mode": 1,
+      "B": 339,
+      "N": 8192,
+      "H0": 24,
+      "T0": 84,
+      "a": 8,
+      "Q": 508,
+      "stops": 845,
+      "lowStops": 424,
+      "highStops": 421,
+      "stopVertices": 8,
+      "minStop": 95,
+      "maxStop": 115,
+      "terminal": 7347,
+      "twin": 7347,
+      "nontwin": 0,
+      "events": 149564,
+      "cost": 2020996,
+      "stopEdgeCost": 95438,
+      "lowArrivalCost": 638156,
+      "midArrivalCost": 1053254,
+      "highArrivalCost": 234148,
+      "hitTags": 704,
+      "hitViaStop": 0,
+      "highTagCost": 583752,
+      "bandPassageChecks": 646,
+      "nontrivialPassageChecks": 646,
+      "bandPositive": 261514,
+      "passagePositive": 187076,
+      "bandEntryOvershootMax": 234,
+      "maxHeight": 2114,
+      "clockChecks": 21446,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 734,
+      "anchorArrivals": 27707,
+      "bands": {
+        "4": {
+          "cost": 33899,
+          "clocks": 1462,
+          "maxMass": 82,
+          "capMax": 84
+        },
+        "5": {
+          "cost": 117119,
+          "clocks": 2242,
+          "maxMass": 68,
+          "capMax": 84
+        },
+        "6": {
+          "cost": 215476,
+          "clocks": 1702,
+          "maxMass": 70,
+          "capMax": 84
+        },
+        "7": {
+          "cost": 303884,
+          "clocks": 1544,
+          "maxMass": 75,
+          "capMax": 84
+        },
+        "8": {
+          "cost": 383874,
+          "clocks": 1161,
+          "maxMass": 74,
+          "capMax": 84
+        },
+        "9": {
+          "cost": 171630,
+          "clocks": 590,
+          "maxMass": 74,
+          "capMax": 84
+        },
+        "10": {
+          "cost": 60528,
+          "clocks": 135,
+          "maxMass": 74,
+          "capMax": 84
+        },
+        "11": {
+          "cost": 992,
+          "clocks": 1,
+          "maxMass": 32,
+          "capMax": 63
+        },
+        "low": {
+          "cost": 638156,
+          "clocks": 13950,
+          "maxMass": 82,
+          "capMax": 84
+        }
+      }
+    },
+    {
+      "X": 65536,
+      "mode": 0,
+      "B": 678,
+      "N": 32768,
+      "H0": 24,
+      "T0": 169,
+      "a": 4,
+      "Q": 339,
+      "stops": 4678,
+      "lowStops": 169,
+      "highStops": 4509,
+      "stopVertices": 31,
+      "minStop": 78,
+      "maxStop": 238,
+      "terminal": 28090,
+      "twin": 28090,
+      "nontwin": 0,
+      "events": 712179,
+      "cost": 13885737,
+      "stopEdgeCost": 998299,
+      "lowArrivalCost": 5289691,
+      "midArrivalCost": 3456592,
+      "highArrivalCost": 4141155,
+      "hitTags": 9109,
+      "hitViaStop": 1714,
+      "highTagCost": 7378295,
+      "bandPassageChecks": 4341,
+      "nontrivialPassageChecks": 4205,
+      "bandPositive": 1532924,
+      "passagePositive": 991818,
+      "bandEntryOvershootMax": 168.5,
+      "maxHeight": 3212,
+      "clockChecks": 86701,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 3930,
+      "anchorArrivals": 143361,
+      "bands": {
+        "4": {
+          "cost": 171607,
+          "clocks": 5827,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "5": {
+          "cost": 577081,
+          "clocks": 9026,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "6": {
+          "cost": 771425,
+          "clocks": 6560,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "7": {
+          "cost": 1208021,
+          "clocks": 5365,
+          "maxMass": 165,
+          "capMax": 169
+        },
+        "8": {
+          "cost": 2069766,
+          "clocks": 4243,
+          "maxMass": 165,
+          "capMax": 169
+        },
+        "9": {
+          "cost": 2027842,
+          "clocks": 3649,
+          "maxMass": 114,
+          "capMax": 128
+        },
+        "10": {
+          "cost": 677321,
+          "clocks": 1171,
+          "maxMass": 78,
+          "capMax": 91
+        },
+        "11": {
+          "cost": 94684,
+          "clocks": 166,
+          "maxMass": 50,
+          "capMax": 64
+        },
+        "low": {
+          "cost": 5289691,
+          "clocks": 55981,
+          "maxMass": 167,
+          "capMax": 169
+        }
+      }
+    },
+    {
+      "X": 65536,
+      "mode": 1,
+      "B": 678,
+      "N": 32768,
+      "H0": 24,
+      "T0": 169,
+      "a": 8,
+      "Q": 1017,
+      "stops": 2590,
+      "lowStops": 169,
+      "highStops": 2421,
+      "stopVertices": 14,
+      "minStop": 116,
+      "maxStop": 238,
+      "terminal": 30178,
+      "twin": 30178,
+      "nontwin": 0,
+      "events": 748363,
+      "cost": 14599477,
+      "stopEdgeCost": 421603,
+      "lowArrivalCost": 5289691,
+      "midArrivalCost": 7557472,
+      "highArrivalCost": 1330711,
+      "hitTags": 2345,
+      "hitViaStop": 235,
+      "highTagCost": 3314214,
+      "bandPassageChecks": 1890,
+      "nontrivialPassageChecks": 1890,
+      "bandPositive": 1437080,
+      "passagePositive": 928908,
+      "bandEntryOvershootMax": 501.5,
+      "maxHeight": 3212,
+      "clockChecks": 86984,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 2055,
+      "anchorArrivals": 143892,
+      "bands": {
+        "4": {
+          "cost": 171607,
+          "clocks": 5827,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "5": {
+          "cost": 577081,
+          "clocks": 9026,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "6": {
+          "cost": 771425,
+          "clocks": 6560,
+          "maxMass": 168,
+          "capMax": 169
+        },
+        "7": {
+          "cost": 1208021,
+          "clocks": 5365,
+          "maxMass": 165,
+          "capMax": 169
+        },
+        "8": {
+          "cost": 2198607,
+          "clocks": 4278,
+          "maxMass": 165,
+          "capMax": 169
+        },
+        "9": {
+          "cost": 2634324,
+          "clocks": 3783,
+          "maxMass": 160,
+          "capMax": 169
+        },
+        "10": {
+          "cost": 1131570,
+          "clocks": 1286,
+          "maxMass": 153,
+          "capMax": 169
+        },
+        "11": {
+          "cost": 195548,
+          "clocks": 180,
+          "maxMass": 116,
+          "capMax": 127
+        },
+        "low": {
+          "cost": 5289691,
+          "clocks": 55981,
+          "maxMass": 167,
+          "capMax": 169
+        }
+      }
+    },
+    {
+      "X": 262144,
+      "mode": 0,
+      "B": 1355,
+      "N": 131072,
+      "H0": 24,
+      "T0": 338,
+      "a": 4,
+      "Q": 677,
+      "stops": 11808,
+      "lowStops": 920,
+      "highStops": 10888,
+      "stopVertices": 55,
+      "minStop": 100,
+      "maxStop": 562,
+      "terminal": 119264,
+      "twin": 119264,
+      "nontwin": 0,
+      "events": 3584916,
+      "cost": 97585966,
+      "stopEdgeCost": 3534820,
+      "lowArrivalCost": 40457700,
+      "midArrivalCost": 25659008,
+      "highArrivalCost": 27934438,
+      "hitTags": 30082,
+      "hitViaStop": 3212,
+      "highTagCost": 47119811,
+      "bandPassageChecks": 11697,
+      "nontrivialPassageChecks": 11289,
+      "bandPositive": 7863762,
+      "passagePositive": 5259964,
+      "bandEntryOvershootMax": 335.5,
+      "maxHeight": 6150,
+      "clockChecks": 357664,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 8872,
+      "anchorArrivals": 687625,
+      "bands": {
+        "4": {
+          "cost": 782030,
+          "clocks": 23451,
+          "maxMass": 330,
+          "capMax": 338
+        },
+        "5": {
+          "cost": 2579250,
+          "clocks": 36027,
+          "maxMass": 334,
+          "capMax": 338
+        },
+        "6": {
+          "cost": 3704720,
+          "clocks": 25750,
+          "maxMass": 328,
+          "capMax": 338
+        },
+        "7": {
+          "cost": 5380799,
+          "clocks": 20361,
+          "maxMass": 322,
+          "capMax": 338
+        },
+        "8": {
+          "cost": 8429497,
+          "clocks": 15949,
+          "maxMass": 280,
+          "capMax": 338
+        },
+        "9": {
+          "cost": 14104732,
+          "clocks": 15524,
+          "maxMass": 250,
+          "capMax": 256
+        },
+        "10": {
+          "cost": 14310056,
+          "clocks": 12132,
+          "maxMass": 175,
+          "capMax": 181
+        },
+        "11": {
+          "cost": 4037320,
+          "clocks": 4729,
+          "maxMass": 122,
+          "capMax": 128
+        },
+        "12": {
+          "cost": 265042,
+          "clocks": 393,
+          "maxMass": 83,
+          "capMax": 91
+        },
+        "low": {
+          "cost": 40457700,
+          "clocks": 224780,
+          "maxMass": 327,
+          "capMax": 338
+        }
+      }
+    },
+    {
+      "X": 262144,
+      "mode": 1,
+      "B": 1355,
+      "N": 131072,
+      "H0": 24,
+      "T0": 338,
+      "a": 8,
+      "Q": 2032,
+      "stops": 4436,
+      "lowStops": 1639,
+      "highStops": 2797,
+      "stopVertices": 13,
+      "minStop": 204,
+      "maxStop": 562,
+      "terminal": 126636,
+      "twin": 126636,
+      "nontwin": 0,
+      "events": 3806392,
+      "cost": 104058378,
+      "stopEdgeCost": 967569,
+      "lowArrivalCost": 40842641,
+      "midArrivalCost": 55738713,
+      "highArrivalCost": 6509455,
+      "hitTags": 6797,
+      "hitViaStop": 0,
+      "highTagCost": 19209129,
+      "bandPassageChecks": 6057,
+      "nontrivialPassageChecks": 6057,
+      "bandPositive": 9902066,
+      "passagePositive": 6156060,
+      "bandEntryOvershootMax": 1002,
+      "maxHeight": 6150,
+      "clockChecks": 358506,
+      "largeHeightSmallGroup": 0,
+      "stopsAtAnchor": 3074,
+      "anchorArrivals": 694778,
+      "bands": {
+        "4": {
+          "cost": 789440,
+          "clocks": 23451,
+          "maxMass": 337,
+          "capMax": 338
+        },
+        "5": {
+          "cost": 2591949,
+          "clocks": 36027,
+          "maxMass": 337,
+          "capMax": 338
+        },
+        "6": {
+          "cost": 3720768,
+          "clocks": 25750,
+          "maxMass": 337,
+          "capMax": 338
+        },
+        "7": {
+          "cost": 5380799,
+          "clocks": 20361,
+          "maxMass": 322,
+          "capMax": 338
+        },
+        "8": {
+          "cost": 8684703,
+          "clocks": 15967,
+          "maxMass": 326,
+          "capMax": 338
+        },
+        "9": {
+          "cost": 15908143,
+          "clocks": 15715,
+          "maxMass": 318,
+          "capMax": 338
+        },
+        "10": {
+          "cost": 18824984,
+          "clocks": 12692,
+          "maxMass": 293,
+          "capMax": 338
+        },
+        "11": {
+          "cost": 5958346,
+          "clocks": 4898,
+          "maxMass": 252,
+          "capMax": 256
+        },
+        "12": {
+          "cost": 389036,
+          "clocks": 399,
+          "maxMass": 140,
+          "capMax": 181
+        },
+        "low": {
+          "cost": 40842641,
+          "clocks": 224779,
+          "maxMass": 337,
+          "capMax": 338
+        }
+      }
+    }
+  ],
+  "bars": [
+    {
+      "Y": 5,
+      "L": 6,
+      "count": 1,
+      "meanGap": 6,
+      "minGap": 6,
+      "maxGap": 6,
+      "localChecks": 3
+    },
+    {
+      "Y": 7,
+      "L": 30,
+      "count": 2,
+      "meanGap": 15,
+      "minGap": 12,
+      "maxGap": 18,
+      "localChecks": 30
+    },
+    {
+      "Y": 11,
+      "L": 210,
+      "count": 6,
+      "meanGap": 35,
+      "minGap": 12,
+      "maxGap": 108,
+      "localChecks": 315
+    },
+    {
+      "Y": 13,
+      "L": 2310,
+      "count": 30,
+      "meanGap": 77,
+      "minGap": 18,
+      "maxGap": 198,
+      "localChecks": 4620
+    },
+    {
+      "Y": 17,
+      "L": 30030,
+      "count": 180,
+      "meanGap": 166.83333333333334,
+      "minGap": 18,
+      "maxGap": 438,
+      "localChecks": 75075
+    }
+  ]
+}
