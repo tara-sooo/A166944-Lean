@@ -1,0 +1,962 @@
+[
+  {
+    "Y": 53,
+    "T": 105,
+    "U": 211,
+    "V": 424,
+    "N": 512,
+    "rows": [
+      {
+        "z": 29,
+        "highFresh": 623,
+        "highRepeat": 18,
+        "repeatPaths": 18,
+        "terminalRepeats": 11,
+        "repeatSameHigh": 7,
+        "maxK": 5,
+        "lowGain": 25584,
+        "repeatLowGain": 922,
+        "minRepeatLowGain": 2,
+        "maxRepeatLowGain": 136,
+        "repeatTime": 1418,
+        "repeatHighGain": 1042,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 7,
+        "firstLastSummand": 11,
+        "relations": 18,
+        "dpPaths": 512,
+        "dpLabels": 623,
+        "dpMin": {
+          "n": 325,
+          "min": 0,
+          "median": 20,
+          "max": 400
+        },
+        "actualMin": {
+          "n": 18,
+          "min": 2,
+          "median": 44,
+          "max": 136
+        },
+        "caps": [
+          {
+            "R": 14,
+            "badRelationPaths": 155,
+            "smallRepeat": 2,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 3,
+            "certificateChecks": 512
+          },
+          {
+            "R": 55,
+            "badRelationPaths": 242,
+            "smallRepeat": 13,
+            "smallTerminalRepeat": 7,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 123,
+            "badRelationPaths": 296,
+            "smallRepeat": 16,
+            "smallTerminalRepeat": 9,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 27353
+      },
+      {
+        "z": 21,
+        "highFresh": 706,
+        "highRepeat": 27,
+        "repeatPaths": 25,
+        "terminalRepeats": 16,
+        "repeatSameHigh": 7,
+        "maxK": 6,
+        "lowGain": 23560,
+        "repeatLowGain": 1084,
+        "minRepeatLowGain": 2,
+        "maxRepeatLowGain": 132,
+        "repeatTime": 2154,
+        "repeatHighGain": 1740,
+        "maxRepeatMultiplicity": 3,
+        "firstLastModulus": 7,
+        "firstLastSummand": 20,
+        "relations": 27,
+        "dpPaths": 512,
+        "dpLabels": 706,
+        "dpMin": {
+          "n": 348,
+          "min": 0,
+          "median": 12,
+          "max": 400
+        },
+        "actualMin": {
+          "n": 25,
+          "min": 2,
+          "median": 30,
+          "max": 132
+        },
+        "caps": [
+          {
+            "R": 14,
+            "badRelationPaths": 177,
+            "smallRepeat": 6,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 55,
+            "badRelationPaths": 273,
+            "smallRepeat": 20,
+            "smallTerminalRepeat": 10,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 123,
+            "badRelationPaths": 321,
+            "smallRepeat": 26,
+            "smallTerminalRepeat": 15,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 25918
+      },
+      {
+        "z": 42,
+        "highFresh": 414,
+        "highRepeat": 5,
+        "repeatPaths": 5,
+        "terminalRepeats": 3,
+        "repeatSameHigh": 2,
+        "maxK": 4,
+        "lowGain": 32788,
+        "repeatLowGain": 290,
+        "minRepeatLowGain": 42,
+        "maxRepeatLowGain": 80,
+        "repeatTime": 455,
+        "repeatHighGain": 182,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 2,
+        "firstLastSummand": 3,
+        "relations": 5,
+        "dpPaths": 512,
+        "dpLabels": 414,
+        "dpMin": {
+          "n": 267,
+          "min": 0,
+          "median": 52,
+          "max": 400
+        },
+        "actualMin": {
+          "n": 5,
+          "min": 42,
+          "median": 50,
+          "max": 80
+        },
+        "caps": [
+          {
+            "R": 14,
+            "badRelationPaths": 76,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 2,
+            "certificateChecks": 512
+          },
+          {
+            "R": 55,
+            "badRelationPaths": 144,
+            "smallRepeat": 3,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 123,
+            "badRelationPaths": 223,
+            "smallRepeat": 5,
+            "smallTerminalRepeat": 3,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 31911
+      }
+    ]
+  },
+  {
+    "Y": 199,
+    "T": 457,
+    "U": 855,
+    "V": 1592,
+    "N": 512,
+    "rows": [
+      {
+        "z": 87,
+        "highFresh": 582,
+        "highRepeat": 6,
+        "repeatPaths": 5,
+        "terminalRepeats": 2,
+        "repeatSameHigh": 3,
+        "maxK": 6,
+        "lowGain": 82878,
+        "repeatLowGain": 1346,
+        "minRepeatLowGain": 82,
+        "maxRepeatLowGain": 446,
+        "repeatTime": 1747,
+        "repeatHighGain": 698,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 3,
+        "firstLastSummand": 3,
+        "relations": 6,
+        "dpPaths": 512,
+        "dpLabels": 582,
+        "dpMin": {
+          "n": 307,
+          "min": 0,
+          "median": 88,
+          "max": 1582
+        },
+        "actualMin": {
+          "n": 5,
+          "min": 82,
+          "median": 126,
+          "max": 410
+        },
+        "caps": [
+          {
+            "R": 29,
+            "badRelationPaths": 131,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 158,
+            "badRelationPaths": 215,
+            "smallRepeat": 3,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 435,
+            "badRelationPaths": 274,
+            "smallRepeat": 5,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 73529
+      },
+      {
+        "z": 59,
+        "highFresh": 813,
+        "highRepeat": 14,
+        "repeatPaths": 13,
+        "terminalRepeats": 9,
+        "repeatSameHigh": 4,
+        "maxK": 8,
+        "lowGain": 66534,
+        "repeatLowGain": 2006,
+        "minRepeatLowGain": 2,
+        "maxRepeatLowGain": 446,
+        "repeatTime": 4120,
+        "repeatHighGain": 2768,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 4,
+        "firstLastSummand": 10,
+        "relations": 14,
+        "dpPaths": 512,
+        "dpLabels": 813,
+        "dpMin": {
+          "n": 343,
+          "min": 0,
+          "median": 6,
+          "max": 1486
+        },
+        "actualMin": {
+          "n": 13,
+          "min": 2,
+          "median": 92,
+          "max": 410
+        },
+        "caps": [
+          {
+            "R": 29,
+            "badRelationPaths": 204,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 158,
+            "badRelationPaths": 284,
+            "smallRepeat": 11,
+            "smallTerminalRepeat": 7,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 435,
+            "badRelationPaths": 320,
+            "smallRepeat": 13,
+            "smallTerminalRepeat": 8,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 63034
+      },
+      {
+        "z": 135,
+        "highFresh": 414,
+        "highRepeat": 2,
+        "repeatPaths": 2,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 1,
+        "maxK": 5,
+        "lowGain": 101158,
+        "repeatLowGain": 262,
+        "minRepeatLowGain": 82,
+        "maxRepeatLowGain": 180,
+        "repeatTime": 432,
+        "repeatHighGain": 172,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 1,
+        "firstLastSummand": 1,
+        "relations": 2,
+        "dpPaths": 512,
+        "dpLabels": 414,
+        "dpMin": {
+          "n": 259,
+          "min": 0,
+          "median": 178,
+          "max": 1582
+        },
+        "actualMin": {
+          "n": 2,
+          "min": 82,
+          "median": 180,
+          "max": 180
+        },
+        "caps": [
+          {
+            "R": 29,
+            "badRelationPaths": 66,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 158,
+            "badRelationPaths": 119,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 435,
+            "badRelationPaths": 210,
+            "smallRepeat": 2,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 86045
+      }
+    ]
+  },
+  {
+    "Y": 797,
+    "T": 2060,
+    "U": 3654,
+    "V": 6376,
+    "N": 512,
+    "rows": [
+      {
+        "z": 293,
+        "highFresh": 515,
+        "highRepeat": 2,
+        "repeatPaths": 2,
+        "terminalRepeats": 2,
+        "repeatSameHigh": 1,
+        "maxK": 7,
+        "lowGain": 233590,
+        "repeatLowGain": 652,
+        "minRepeatLowGain": 10,
+        "maxRepeatLowGain": 642,
+        "repeatTime": 1620,
+        "repeatHighGain": 970,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 1,
+        "firstLastSummand": 1,
+        "relations": 2,
+        "dpPaths": 512,
+        "dpLabels": 515,
+        "dpMin": {
+          "n": 271,
+          "min": 0,
+          "median": 316,
+          "max": 5868
+        },
+        "actualMin": {
+          "n": 2,
+          "min": 10,
+          "median": 642,
+          "max": 642
+        },
+        "caps": [
+          {
+            "R": 60,
+            "badRelationPaths": 111,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 469,
+            "badRelationPaths": 172,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1608,
+            "badRelationPaths": 235,
+            "smallRepeat": 2,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 195086
+      },
+      {
+        "z": 192,
+        "highFresh": 698,
+        "highRepeat": 4,
+        "repeatPaths": 4,
+        "terminalRepeats": 2,
+        "repeatSameHigh": 0,
+        "maxK": 8,
+        "lowGain": 189920,
+        "repeatLowGain": 958,
+        "minRepeatLowGain": 10,
+        "maxRepeatLowGain": 360,
+        "repeatTime": 3252,
+        "repeatHighGain": 4760,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 0,
+        "firstLastSummand": 4,
+        "relations": 4,
+        "dpPaths": 512,
+        "dpLabels": 698,
+        "dpMin": {
+          "n": 309,
+          "min": 0,
+          "median": 56,
+          "max": 5868
+        },
+        "actualMin": {
+          "n": 4,
+          "min": 10,
+          "median": 348,
+          "max": 360
+        },
+        "caps": [
+          {
+            "R": 60,
+            "badRelationPaths": 157,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 469,
+            "badRelationPaths": 237,
+            "smallRepeat": 4,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1608,
+            "badRelationPaths": 284,
+            "smallRepeat": 4,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 160074
+      },
+      {
+        "z": 448,
+        "highFresh": 368,
+        "highRepeat": 2,
+        "repeatPaths": 2,
+        "terminalRepeats": 2,
+        "repeatSameHigh": 1,
+        "maxK": 6,
+        "lowGain": 287898,
+        "repeatLowGain": 652,
+        "minRepeatLowGain": 10,
+        "maxRepeatLowGain": 642,
+        "repeatTime": 1620,
+        "repeatHighGain": 970,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 1,
+        "firstLastSummand": 1,
+        "relations": 2,
+        "dpPaths": 512,
+        "dpLabels": 368,
+        "dpMin": {
+          "n": 232,
+          "min": 0,
+          "median": 568,
+          "max": 5868
+        },
+        "actualMin": {
+          "n": 2,
+          "min": 10,
+          "median": 642,
+          "max": 642
+        },
+        "caps": [
+          {
+            "R": 60,
+            "badRelationPaths": 54,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 1,
+            "certificateChecks": 512
+          },
+          {
+            "R": 469,
+            "badRelationPaths": 100,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1608,
+            "badRelationPaths": 192,
+            "smallRepeat": 2,
+            "smallTerminalRepeat": 2,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 232737
+      }
+    ]
+  },
+  {
+    "Y": 1597,
+    "T": 4337,
+    "U": 7531,
+    "V": 12776,
+    "N": 512,
+    "rows": [
+      {
+        "z": 545,
+        "highFresh": 466,
+        "highRepeat": 0,
+        "repeatPaths": 0,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 0,
+        "maxK": 6,
+        "lowGain": 367020,
+        "repeatLowGain": 0,
+        "minRepeatLowGain": null,
+        "maxRepeatLowGain": 0,
+        "repeatTime": 0,
+        "repeatHighGain": 0,
+        "maxRepeatMultiplicity": 1,
+        "firstLastModulus": 0,
+        "firstLastSummand": 0,
+        "relations": 0,
+        "dpPaths": 512,
+        "dpLabels": 466,
+        "dpMin": {
+          "n": 265,
+          "min": 0,
+          "median": 682,
+          "max": 12400
+        },
+        "actualMin": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "caps": [
+          {
+            "R": 86,
+            "badRelationPaths": 66,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 808,
+            "badRelationPaths": 150,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 3084,
+            "badRelationPaths": 229,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 299832
+      },
+      {
+        "z": 352,
+        "highFresh": 608,
+        "highRepeat": 1,
+        "repeatPaths": 1,
+        "terminalRepeats": 1,
+        "repeatSameHigh": 0,
+        "maxK": 9,
+        "lowGain": 305116,
+        "repeatLowGain": 104,
+        "minRepeatLowGain": 104,
+        "maxRepeatLowGain": 104,
+        "repeatTime": 1525,
+        "repeatHighGain": 408,
+        "maxRepeatMultiplicity": 2,
+        "firstLastModulus": 0,
+        "firstLastSummand": 1,
+        "relations": 1,
+        "dpPaths": 512,
+        "dpLabels": 608,
+        "dpMin": {
+          "n": 299,
+          "min": 0,
+          "median": 366,
+          "max": 12400
+        },
+        "actualMin": {
+          "n": 1,
+          "min": 104,
+          "median": 104,
+          "max": 104
+        },
+        "caps": [
+          {
+            "R": 86,
+            "badRelationPaths": 117,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 808,
+            "badRelationPaths": 218,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 3084,
+            "badRelationPaths": 273,
+            "smallRepeat": 1,
+            "smallTerminalRepeat": 1,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 248951
+      },
+      {
+        "z": 813,
+        "highFresh": 328,
+        "highRepeat": 0,
+        "repeatPaths": 0,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 0,
+        "maxK": 5,
+        "lowGain": 457268,
+        "repeatLowGain": 0,
+        "minRepeatLowGain": null,
+        "maxRepeatLowGain": 0,
+        "repeatTime": 0,
+        "repeatHighGain": 0,
+        "maxRepeatMultiplicity": 1,
+        "firstLastModulus": 0,
+        "firstLastSummand": 0,
+        "relations": 0,
+        "dpPaths": 512,
+        "dpLabels": 328,
+        "dpMin": {
+          "n": 225,
+          "min": 0,
+          "median": 1290,
+          "max": 12538
+        },
+        "actualMin": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "caps": [
+          {
+            "R": 86,
+            "badRelationPaths": 25,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 808,
+            "badRelationPaths": 68,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 3084,
+            "badRelationPaths": 175,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 368203
+      }
+    ]
+  },
+  {
+    "Y": 3203,
+    "T": 9100,
+    "U": 15506,
+    "V": 25624,
+    "N": 512,
+    "rows": [
+      {
+        "z": 1022,
+        "highFresh": 433,
+        "highRepeat": 0,
+        "repeatPaths": 0,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 0,
+        "maxK": 7,
+        "lowGain": 598646,
+        "repeatLowGain": 0,
+        "minRepeatLowGain": null,
+        "maxRepeatLowGain": 0,
+        "repeatTime": 0,
+        "repeatHighGain": 0,
+        "maxRepeatMultiplicity": 1,
+        "firstLastModulus": 0,
+        "firstLastSummand": 0,
+        "relations": 0,
+        "dpPaths": 512,
+        "dpLabels": 433,
+        "dpMin": {
+          "n": 237,
+          "min": 0,
+          "median": 1200,
+          "max": 16900
+        },
+        "actualMin": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "caps": [
+          {
+            "R": 124,
+            "badRelationPaths": 67,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1389,
+            "badRelationPaths": 132,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 5908,
+            "badRelationPaths": 197,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 491297
+      },
+      {
+        "z": 649,
+        "highFresh": 572,
+        "highRepeat": 0,
+        "repeatPaths": 0,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 0,
+        "maxK": 9,
+        "lowGain": 484780,
+        "repeatLowGain": 0,
+        "minRepeatLowGain": null,
+        "maxRepeatLowGain": 0,
+        "repeatTime": 0,
+        "repeatHighGain": 0,
+        "maxRepeatMultiplicity": 1,
+        "firstLastModulus": 0,
+        "firstLastSummand": 0,
+        "relations": 0,
+        "dpPaths": 512,
+        "dpLabels": 572,
+        "dpMin": {
+          "n": 272,
+          "min": 0,
+          "median": 378,
+          "max": 16332
+        },
+        "actualMin": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "caps": [
+          {
+            "R": 124,
+            "badRelationPaths": 114,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1389,
+            "badRelationPaths": 201,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 5908,
+            "badRelationPaths": 244,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 403330
+      },
+      {
+        "z": 1470,
+        "highFresh": 337,
+        "highRepeat": 0,
+        "repeatPaths": 0,
+        "terminalRepeats": 0,
+        "repeatSameHigh": 0,
+        "maxK": 6,
+        "lowGain": 716288,
+        "repeatLowGain": 0,
+        "minRepeatLowGain": null,
+        "maxRepeatLowGain": 0,
+        "repeatTime": 0,
+        "repeatHighGain": 0,
+        "maxRepeatMultiplicity": 1,
+        "firstLastModulus": 0,
+        "firstLastSummand": 0,
+        "relations": 0,
+        "dpPaths": 512,
+        "dpLabels": 337,
+        "dpMin": {
+          "n": 206,
+          "min": 0,
+          "median": 2286,
+          "max": 16900
+        },
+        "actualMin": {
+          "n": 0,
+          "min": null,
+          "median": null,
+          "max": null
+        },
+        "caps": [
+          {
+            "R": 124,
+            "badRelationPaths": 38,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 1389,
+            "badRelationPaths": 72,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          },
+          {
+            "R": 5908,
+            "badRelationPaths": 157,
+            "smallRepeat": 0,
+            "smallTerminalRepeat": 0,
+            "repeatPathsWithCert": 0,
+            "certificateChecks": 512
+          }
+        ],
+        "countBoundChecks": 512,
+        "active": 602516
+      }
+    ]
+  }
+]
