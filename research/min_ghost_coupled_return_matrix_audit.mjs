@@ -5,10 +5,10 @@ function audit(U,N=64,A=5,K=12){
  let rng=(0x98f2ce71^U)>>>0;function rand(){rng^=rng<<13;rng^=rng>>>17;rng^=rng<<5;return rng>>>0;}function uni(p){let a=4294967296-4294967296%p,x;do{x=rand()}while(x>=a);return x%p;}
  function det(a){let n=a.length;if(!n)return 1n;let x=a.map(r=>r.map(BigInt)),sg=1n,d=1n;for(let k=0;k<n-1;k++){let j=k;while(j<n&&x[j][k]===0n)j++;if(j===n)return 0n;if(j!==k){[x[j],x[k]]=[x[k],x[j]];sg=-sg;}let p=x[k][k];for(let i=k+1;i<n;i++){for(let j=k+1;j<n;j++){let v=x[i][j]*p-x[i][k]*x[k][j];ck(v%d===0n,"Bareiss exact");x[i][j]=v/d;}x[i][k]=0n;}d=p;}return sg*x[n-1][n-1];}
  const c=new Int32Array(ps.length),t=new Int32Array(ps.length),first=new Int32Array(ps.length);
- const out={U,N,V,A,L,K,root,base,events:0,windows:0,allRepeated:0,sinkChecks:0,strongBlocks:0,maxSupport:0,maxLength:0,rootBlocks:0,minorChecks:0,invertible:0,singular:0,analyticGate:0,reconstructions:0,marked:0,markedPositive:0,markedWeight:0,edgeDistinctStrong:0,farFirst:0};
+ const out={U,N,V,A,L,K,root,base,events:0,windows:0,allRepeated:0,sinkChecks:0,strongBlocks:0,maxSupport:0,maxLength:0,rootBlocks:0,minorChecks:0,invertible:0,singular:0,analyticGate:0,reconstructions:0,marked:0,markedPositive:0,markedWeight:0,edgeDistinctStrong:0,farFirst:0,denseWeight:0,denseEvents:0,coverageWeight:0};
  for(let a=0;a<N;a++){
   let parity=uni(2);first.fill(-1);for(let j=0;j<ps.length;j++){let p=ps[j];c[j]=uni(p);let x=uni(p);t[j]=x%2===parity?x:x+p;}
-  let s=0,g=0,seq=[],marks=new Set(),sig=new Set();
+  let s=0,g=0,seq=[],marks=new Set(),sig=new Set(),dense=new Set(),covers=new Map();
   for(;;){let w=Infinity,i=-1;for(let j=0;j<ps.length;j++){let p=ps[j],cc=mod(c[j]+g,p);if(cc!==1&&cc!==p-1)continue;let f=2*p-mod(t[j]+s-(cc===1?0:p+2),2*p);if(f<w||(f===w&&p<ps[i])){w=f;i=j;}}
    if(s+w>U)break;let p=ps[i],J=2*(s+w)-g-p+1-6*((parity+s+w)%2);if(first[i]<0)first[i]=s+w;out.events++;if(g+p-1>2*U)break;
    if(p>=A)seq.push({p,i,g,J,s:s+w,w});s+=w;g+=p-1;
@@ -39,17 +39,17 @@ function audit(U,N=64,A=5,K=12){
     for(let k=0;k<h;k++)for(let i=0;i<h;i++)for(let j=0;j<h;j++)reach[i][j]||=reach[i][k]&&reach[k][j];
     let sink=-1;for(let i=0;i<h;i++)if(reach[i].every((v,j)=>!v||reach[j][i])){sink=i;break;}ck(sink>=0,"sink exists");
     let S=labels.filter((_,i)=>reach[sink][i]),sl=Math.min(...S.map(p=>loc.get(p)[0])),sr=Math.max(...S.map(p=>loc.get(p)[1]));
-    ck(S.length>=2&&seq.slice(sl,sr+1).every(x=>S.includes(x.p)),"closed sink subword");out.sinkChecks++;checkBlock(sl,sr,S,loc);
+    ck(S.length>=2&&seq.slice(sl,sr+1).every(x=>S.includes(x.p)),"closed sink subword");out.sinkChecks++;checkBlock(sl,sr,S,loc);let anchor=sl+1;ck(marks.has(anchor),'sink mark');let a=seq[anchor],C=covers.get(anchor)||new Set();for(let i=l;i<=r;i++){let x=seq[i];ck(x.g>=a.g-K*a.p&&x.g+x.p-1<=a.g+2*K*a.p+1,'dense gain cover');dense.add(i);C.add(i);}covers.set(anchor,C);
    }
   }
-  out.marked+=marks.size;for(let j of marks){out.markedWeight+=seq[j].p;out.markedPositive+=Math.max(0,seq[j].J-seq[j-1].J);}
+  let denseW=0,coverW=0;for(let i of dense)denseW+=seq[i].p;for(let [j,idx] of covers){let w=0;for(let i of idx)w+=seq[i].p;ck(w<=6*K*seq[j].p,'per-anchor cover mass');coverW+=w;}ck(denseW<=coverW&&coverW<=6*K*[...marks].reduce((s,i)=>s+seq[i].p,0),'global cover mass');out.denseWeight+=denseW;out.denseEvents+=dense.size;out.coverageWeight+=coverW;out.marked+=marks.size;for(let j of marks){out.markedWeight+=seq[j].p;out.markedPositive+=Math.max(0,seq[j].J-seq[j-1].J);}
  }
  return out;
 }
 function synthetic(){
  function determinant(a){let n=a.length;if(!n)return 1n;let v=0n;for(let j=0;j<n;j++){let m=a.slice(1).map(r=>r.filter((_,k)=>k!==j));v+=(j%2?-1n:1n)*BigInt(a[0][j])*determinant(m);}return v;}
  let checks=0;for(let h=2;h<=6;h++)for(let k=1;k<=12;k++){let P=10n**20n,p=Array.from({length:h},(_,i)=>P+BigInt(2*i+1)),M=Array.from({length:h},(_,i)=>Array.from({length:h},(_,j)=>i===j?k+1:j===(i+1)%h?-1:j===(i+h-1)%h&&h>2?-k:0));if(h===2)M=M.map((r,i)=>r.map((v,j)=>i===j?k+1:-(k+1)));let e=M.map(r=>r.reduce((s,x,j)=>s+BigInt(x)*p[j],0n)),E=e.reduce((m,x)=>m>(x<0n?-x:x)?m:(x<0n?-x:x),0n);if(P<=E*BigInt(2*(k+2)+1)**BigInt(h))throw Error("synthetic gate");for(let r=0;r<h;r++){let a=M.filter((_,i)=>i!==r).map(x=>x.filter((_,j)=>j!==r));if(determinant(a)===0n)throw Error("synthetic minor");checks++;}}
- return {checks}
+ let word=[0,1,2,0,3,1,4,2,3,4],edges=new Set(),reach=Array.from({length:5},(_,i)=>Array.from({length:5},(_,j)=>word.slice(word.indexOf(i),word.lastIndexOf(i)+1).includes(j)));for(let i=1;i<word.length;i++)edges.add([word[i-1],word[i]].sort().join(','));for(let k=0;k<5;k++)for(let i=0;i<5;i++)for(let j=0;j<5;j++)reach[i][j]||=reach[i][k]&&reach[k][j];if(edges.size!==9||!reach.every(r=>r.every(Boolean)))throw Error('edge-distinct coupled word');return {checks,edgeDistinctCombinatorialWord:word}
 }
 for(const U of process.argv.slice(2).map(Number))console.log(JSON.stringify(audit(U,U>=65536?64:128)));
 console.log(JSON.stringify(synthetic()));
