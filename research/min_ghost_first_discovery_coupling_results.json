@@ -1,0 +1,1392 @@
+[
+  {
+    "Y": 7,
+    "Z": 5,
+    "L": 30,
+    "l": 6,
+    "hi": [
+      5
+    ],
+    "states": 450,
+    "baseStates": 18,
+    "W": 0.04,
+    "fullMatchNumer": 249,
+    "fullMatchActual": 249,
+    "fullMatchProb": 0.5533333333333333,
+    "meanBad": 0.4466666666666668,
+    "checks": 450,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 390,
+        "matchActual": 390,
+        "fullTail": 239,
+        "lowTail": 125,
+        "baseShortDiff": 125,
+        "unionBudget": 135,
+        "firsts": [
+          0,
+          60
+        ],
+        "factorialMoments": [
+          0,
+          60
+        ],
+        "bounds": [
+          1,
+          0.16
+        ],
+        "sharpBounds": [
+          1,
+          0.16
+        ],
+        "matchProb": 0.8666666666666667,
+        "fullTailProb": 0.5311111111111111,
+        "lowTailProb": 0.2777777777777778,
+        "firstProb": [
+          0,
+          0.13333333333333333
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 329,
+        "matchActual": 329,
+        "fullTail": 140,
+        "lowTail": 0,
+        "baseShortDiff": 140,
+        "unionBudget": 201,
+        "firsts": [
+          0,
+          121
+        ],
+        "factorialMoments": [
+          0,
+          121
+        ],
+        "bounds": [
+          1,
+          0.32
+        ],
+        "sharpBounds": [
+          1,
+          0.32
+        ],
+        "matchProb": 0.7311111111111112,
+        "fullTailProb": 0.3111111111111111,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.2688888888888889
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 250,
+        "matchActual": 250,
+        "fullTail": 22,
+        "lowTail": 0,
+        "baseShortDiff": 22,
+        "unionBudget": 201,
+        "firsts": [
+          0,
+          200
+        ],
+        "factorialMoments": [
+          0,
+          200
+        ],
+        "bounds": [
+          1,
+          0.64
+        ],
+        "sharpBounds": [
+          1,
+          0.64
+        ],
+        "matchProb": 0.5555555555555556,
+        "fullTailProb": 0.04888888888888889,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.4444444444444444
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 249,
+        "matchActual": 249,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 201,
+        "firsts": [
+          0,
+          201
+        ],
+        "factorialMoments": [
+          0,
+          201
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.5533333333333333,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.44666666666666666
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 249,
+        "matchActual": 249,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 201,
+        "firsts": [
+          0,
+          201
+        ],
+        "factorialMoments": [
+          0,
+          201
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.5533333333333333,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.44666666666666666
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 249,
+        "matchActual": 249,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 201,
+        "firsts": [
+          0,
+          201
+        ],
+        "factorialMoments": [
+          0,
+          201
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.5533333333333333,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.44666666666666666
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 11,
+    "Z": 5,
+    "L": 210,
+    "l": 6,
+    "hi": [
+      5,
+      7
+    ],
+    "states": 22050,
+    "baseStates": 18,
+    "W": 0.060408163265306125,
+    "fullMatchNumer": 8465,
+    "fullMatchActual": 8465,
+    "fullMatchProb": 0.3839002267573696,
+    "meanBad": 0.7561904761904761,
+    "checks": 22050,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 17799,
+        "matchActual": 17799,
+        "fullTail": 14186,
+        "lowTail": 6125,
+        "baseShortDiff": 8446,
+        "unionBudget": 11290,
+        "firsts": [
+          0,
+          4251,
+          156
+        ],
+        "factorialMoments": [
+          0,
+          4407,
+          156
+        ],
+        "bounds": [
+          1,
+          0.2416326530612245,
+          0.021894877134527285
+        ],
+        "sharpBounds": [
+          1,
+          0.2416326530612245,
+          0.009795918367346938
+        ],
+        "matchProb": 0.8072108843537414,
+        "fullTailProb": 0.6433560090702948,
+        "lowTailProb": 0.2777777777777778,
+        "firstProb": [
+          0,
+          0.1927891156462585,
+          0.007074829931972789
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 13944,
+        "matchActual": 13944,
+        "fullTail": 10029,
+        "lowTail": 0,
+        "baseShortDiff": 10029,
+        "unionBudget": 16674,
+        "firsts": [
+          0,
+          8106,
+          705
+        ],
+        "factorialMoments": [
+          0,
+          8811,
+          705
+        ],
+        "bounds": [
+          1,
+          0.483265306122449,
+          0.10217609329446066
+        ],
+        "sharpBounds": [
+          1,
+          0.483265306122449,
+          0.045714285714285714
+        ],
+        "matchProb": 0.6323809523809524,
+        "fullTailProb": 0.4548299319727891,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.3676190476190476,
+          0.03197278911564626
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 8790,
+        "matchActual": 8790,
+        "fullTail": 4879,
+        "lowTail": 0,
+        "baseShortDiff": 4879,
+        "unionBudget": 16674,
+        "firsts": [
+          0,
+          13260,
+          2941
+        ],
+        "factorialMoments": [
+          0,
+          16201,
+          2941
+        ],
+        "bounds": [
+          1,
+          0.966530612244898,
+          0.43789754269054565
+        ],
+        "sharpBounds": [
+          1,
+          0.966530612244898,
+          0.1959183673469388
+        ],
+        "matchProb": 0.3986394557823129,
+        "fullTailProb": 0.22126984126984128,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.601360544217687,
+          0.13337868480725623
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 8465,
+        "matchActual": 8465,
+        "fullTail": 1292,
+        "lowTail": 0,
+        "baseShortDiff": 1292,
+        "unionBudget": 16674,
+        "firsts": [
+          0,
+          13585,
+          5459
+        ],
+        "factorialMoments": [
+          0,
+          19044,
+          5459
+        ],
+        "bounds": [
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          0.809795918367347
+        ],
+        "matchProb": 0.3839002267573696,
+        "fullTailProb": 0.05859410430839002,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6160997732426304,
+          0.24757369614512473
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 8465,
+        "matchActual": 8465,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 16674,
+        "firsts": [
+          0,
+          13585,
+          5463
+        ],
+        "factorialMoments": [
+          0,
+          19048,
+          5463
+        ],
+        "bounds": [
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1
+        ],
+        "matchProb": 0.3839002267573696,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6160997732426304,
+          0.24775510204081633
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 8465,
+        "matchActual": 8465,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 16674,
+        "firsts": [
+          0,
+          13585,
+          5463
+        ],
+        "factorialMoments": [
+          0,
+          19048,
+          5463
+        ],
+        "bounds": [
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1
+        ],
+        "matchProb": 0.3839002267573696,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6160997732426304,
+          0.24775510204081633
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 11,
+    "Z": 7,
+    "L": 210,
+    "l": 30,
+    "hi": [
+      7
+    ],
+    "states": 22050,
+    "baseStates": 450,
+    "W": 0.02040816326530612,
+    "fullMatchNumer": 14243,
+    "fullMatchActual": 14243,
+    "fullMatchProb": 0.6459410430839002,
+    "meanBad": 0.3540589569161007,
+    "checks": 22050,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 20585,
+        "matchActual": 20585,
+        "fullTail": 14186,
+        "lowTail": 11711,
+        "baseShortDiff": 2825,
+        "unionBudget": 3044,
+        "firsts": [
+          0,
+          1465
+        ],
+        "factorialMoments": [
+          0,
+          1465
+        ],
+        "bounds": [
+          1,
+          0.08163265306122448
+        ],
+        "sharpBounds": [
+          1,
+          0.08163265306122448
+        ],
+        "matchProb": 0.9335600907029479,
+        "fullTailProb": 0.6433560090702948,
+        "lowTailProb": 0.5311111111111111,
+        "firstProb": [
+          0,
+          0.06643990929705215
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 19168,
+        "matchActual": 19168,
+        "fullTail": 10029,
+        "lowTail": 6860,
+        "baseShortDiff": 3932,
+        "unionBudget": 4742,
+        "firsts": [
+          0,
+          2882
+        ],
+        "factorialMoments": [
+          0,
+          2882
+        ],
+        "bounds": [
+          1,
+          0.16326530612244897
+        ],
+        "sharpBounds": [
+          1,
+          0.16326530612244897
+        ],
+        "matchProb": 0.8692970521541951,
+        "fullTailProb": 0.4548299319727891,
+        "lowTailProb": 0.3111111111111111,
+        "firstProb": [
+          0,
+          0.130702947845805
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 16143,
+        "matchActual": 16143,
+        "fullTail": 4879,
+        "lowTail": 1078,
+        "baseShortDiff": 4028,
+        "unionBudget": 7243,
+        "firsts": [
+          0,
+          5907
+        ],
+        "factorialMoments": [
+          0,
+          5907
+        ],
+        "bounds": [
+          1,
+          0.32653061224489793
+        ],
+        "sharpBounds": [
+          1,
+          0.32653061224489793
+        ],
+        "matchProb": 0.732108843537415,
+        "fullTailProb": 0.22126984126984128,
+        "lowTailProb": 0.04888888888888889,
+        "firstProb": [
+          0,
+          0.26789115646258504
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 14247,
+        "matchActual": 14247,
+        "fullTail": 1292,
+        "lowTail": 0,
+        "baseShortDiff": 1292,
+        "unionBudget": 7807,
+        "firsts": [
+          0,
+          7803
+        ],
+        "factorialMoments": [
+          0,
+          7803
+        ],
+        "bounds": [
+          1,
+          0.6530612244897959
+        ],
+        "sharpBounds": [
+          1,
+          0.6530612244897959
+        ],
+        "matchProb": 0.6461224489795918,
+        "fullTailProb": 0.05859410430839002,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.3538775510204082
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 14243,
+        "matchActual": 14243,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 7807,
+        "firsts": [
+          0,
+          7807
+        ],
+        "factorialMoments": [
+          0,
+          7807
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.6459410430839002,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.3540589569160998
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 14243,
+        "matchActual": 14243,
+        "fullTail": 0,
+        "lowTail": 0,
+        "baseShortDiff": 0,
+        "unionBudget": 7807,
+        "firsts": [
+          0,
+          7807
+        ],
+        "factorialMoments": [
+          0,
+          7807
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.6459410430839002,
+        "fullTailProb": 0,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.3540589569160998
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 13,
+    "Z": 5,
+    "L": 2310,
+    "l": 6,
+    "hi": [
+      5,
+      7,
+      11
+    ],
+    "states": 2668050,
+    "baseStates": 18,
+    "W": 0.06867262607522348,
+    "fullMatchNumer": 830017,
+    "fullMatchActual": 830017,
+    "fullMatchProb": 0.31109499447161787,
+    "meanBad": 0.947650531286895,
+    "checks": 2668050,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 2094075,
+        "matchActual": 2094075,
+        "fullTail": 1880005,
+        "lowTail": 741125,
+        "baseShortDiff": 1182812,
+        "unionBudget": 1722565,
+        "firsts": [
+          0,
+          573975,
+          29320,
+          269
+        ],
+        "factorialMoments": [
+          0,
+          603564,
+          29858,
+          269
+        ],
+        "bounds": [
+          1,
+          0.2746905043008939,
+          0.02829557743240478,
+          0.0012954210723987104
+        ],
+        "sharpBounds": [
+          1,
+          0.2746905043008939,
+          0.015786810592005394,
+          0.00016191600607185023
+        ],
+        "matchProb": 0.7848709731826615,
+        "fullTailProb": 0.7046363448960852,
+        "lowTailProb": 0.2777777777777778,
+        "firstProb": [
+          0,
+          0.2151290268173385,
+          0.010989299300987613,
+          0.00010082269822529563
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 1590336,
+        "matchActual": 1590336,
+        "fullTail": 1455248,
+        "lowTail": 0,
+        "baseShortDiff": 1455248,
+        "unionBudget": 2528379,
+        "firsts": [
+          0,
+          1077714,
+          128591,
+          3348
+        ],
+        "factorialMoments": [
+          0,
+          1209653,
+          135287,
+          3348
+        ],
+        "bounds": [
+          1,
+          0.5493810086017878,
+          0.13204602801788898,
+          0.018135895013581947
+        ],
+        "sharpBounds": [
+          1,
+          0.5493810086017878,
+          0.07367178276269185,
+          0.002266824085005903
+        ],
+        "matchProb": 0.5960667903525046,
+        "fullTailProb": 0.5454350555649257,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.40393320964749535,
+          0.048196623001817804,
+          0.0012548490470568393
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 935613,
+        "matchActual": 935613,
+        "fullTail": 890054,
+        "lowTail": 0,
+        "baseShortDiff": 890054,
+        "unionBudget": 2528379,
+        "firsts": [
+          0,
+          1732437,
+          491385,
+          30725
+        ],
+        "factorialMoments": [
+          0,
+          2254547,
+          552835,
+          30725
+        ],
+        "bounds": [
+          1,
+          1,
+          0.5659115486480957,
+          0.18135895013581946
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          0.3157362118401079,
+          0.022668240850059033
+        ],
+        "matchProb": 0.3506729634002361,
+        "fullTailProb": 0.33359719645433933,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6493270365997639,
+          0.18417383482318547,
+          0.011515901126290737
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 830017,
+        "matchActual": 830017,
+        "fullTail": 336743,
+        "lowTail": 0,
+        "baseShortDiff": 336743,
+        "unionBudget": 2528379,
+        "firsts": [
+          0,
+          1838033,
+          939947,
+          164011
+        ],
+        "factorialMoments": [
+          0,
+          2941991,
+          1267969,
+          164011
+        ],
+        "bounds": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1,
+          0.20077584752909428
+        ],
+        "matchProb": 0.31109499447161787,
+        "fullTailProb": 0.12621315192743765,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6889050055283822,
+          0.3522973707389292,
+          0.061472236277431085
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 830017,
+        "matchActual": 830017,
+        "fullTail": 49975,
+        "lowTail": 0,
+        "baseShortDiff": 49975,
+        "unionBudget": 2528379,
+        "firsts": [
+          0,
+          1838033,
+          964120,
+          288369
+        ],
+        "factorialMoments": [
+          0,
+          3090522,
+          1540858,
+          288369
+        ],
+        "bounds": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "matchProb": 0.31109499447161787,
+        "fullTailProb": 0.018730908341297953,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6889050055283822,
+          0.3613575457731302,
+          0.10808230730308653
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 830017,
+        "matchActual": 830017,
+        "fullTail": 16,
+        "lowTail": 0,
+        "baseShortDiff": 16,
+        "unionBudget": 2528379,
+        "firsts": [
+          0,
+          1838033,
+          964120,
+          290748
+        ],
+        "factorialMoments": [
+          0,
+          3092901,
+          1545616,
+          290748
+        ],
+        "bounds": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "matchProb": 0.31109499447161787,
+        "fullTailProb": 0.0000059968891137722305,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.6889050055283822,
+          0.3613575457731302,
+          0.10897396975319053
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 13,
+    "Z": 7,
+    "L": 2310,
+    "l": 30,
+    "hi": [
+      7,
+      11
+    ],
+    "states": 2668050,
+    "baseStates": 450,
+    "W": 0.028672626075223476,
+    "fullMatchNumer": 1367181,
+    "fullMatchActual": 1367181,
+    "fullMatchProb": 0.5124270534660145,
+    "meanBad": 0.5641783324900205,
+    "checks": 2668050,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 2424057,
+        "matchActual": 2424057,
+        "fullTail": 1880005,
+        "lowTail": 1417031,
+        "baseShortDiff": 506229,
+        "unionBudget": 600192,
+        "firsts": [
+          0,
+          243993,
+          3589
+        ],
+        "factorialMoments": [
+          0,
+          247582,
+          3589
+        ],
+        "bounds": [
+          1,
+          0.1146905043008939,
+          0.004932716916297511
+        ],
+        "sharpBounds": [
+          1,
+          0.1146905043008939,
+          0.0020239500758981277
+        ],
+        "matchProb": 0.9085500646539607,
+        "fullTailProb": 0.7046363448960852,
+        "lowTailProb": 0.5311111111111111,
+        "firstProb": [
+          0,
+          0.09144993534603925,
+          0.0013451771893330335
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 2191585,
+        "matchActual": 2191585,
+        "fullTail": 1455248,
+        "lowTail": 830060,
+        "baseShortDiff": 710989,
+        "unionBudget": 927709,
+        "firsts": [
+          0,
+          476465,
+          16778
+        ],
+        "factorialMoments": [
+          0,
+          493243,
+          16778
+        ],
+        "bounds": [
+          1,
+          0.2293810086017878,
+          0.023019345609388384
+        ],
+        "sharpBounds": [
+          1,
+          0.2293810086017878,
+          0.009445100354191263
+        ],
+        "matchProb": 0.8214182642754071,
+        "fullTailProb": 0.5454350555649257,
+        "lowTailProb": 0.3111111111111111,
+        "firstProb": [
+          0,
+          0.17858173572459288,
+          0.006288487846929406
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 1731507,
+        "matchActual": 1731507,
+        "fullTail": 890054,
+        "lowTail": 130438,
+        "baseShortDiff": 786353,
+        "unionBudget": 1400556,
+        "firsts": [
+          0,
+          936543,
+          69840
+        ],
+        "factorialMoments": [
+          0,
+          1006383,
+          69840
+        ],
+        "bounds": [
+          1,
+          0.4587620172035756,
+          0.09865433832595022
+        ],
+        "sharpBounds": [
+          1,
+          0.4587620172035756,
+          0.040479001517962555
+        ],
+        "matchProb": 0.6489784674200259,
+        "fullTailProb": 0.33359719645433933,
+        "lowTailProb": 0.04888888888888889,
+        "firstProb": [
+          0,
+          0.35102153257997415,
+          0.026176420981615788
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 1378569,
+        "matchActual": 1378569,
+        "fullTail": 336743,
+        "lowTail": 0,
+        "baseShortDiff": 336743,
+        "unionBudget": 1505256,
+        "firsts": [
+          0,
+          1289481,
+          235481
+        ],
+        "factorialMoments": [
+          0,
+          1524962,
+          235481
+        ],
+        "bounds": [
+          1,
+          0.9175240344071512,
+          0.40777126508059425
+        ],
+        "sharpBounds": [
+          1,
+          0.9175240344071512,
+          0.16731320627424523
+        ],
+        "matchProb": 0.5166953392927419,
+        "fullTailProb": 0.12621315192743765,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.4833046607072581,
+          0.08825959033751242
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 1367181,
+        "matchActual": 1367181,
+        "fullTail": 49975,
+        "lowTail": 0,
+        "baseShortDiff": 49975,
+        "unionBudget": 1505256,
+        "firsts": [
+          0,
+          1300869,
+          358903
+        ],
+        "factorialMoments": [
+          0,
+          1659772,
+          358903
+        ],
+        "bounds": [
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          0.680047225501771
+        ],
+        "matchProb": 0.5124270534660145,
+        "fullTailProb": 0.018730908341297953,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.4875729465339855,
+          0.13451884335001218
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 1367181,
+        "matchActual": 1367181,
+        "fullTail": 16,
+        "lowTail": 0,
+        "baseShortDiff": 16,
+        "unionBudget": 1505256,
+        "firsts": [
+          0,
+          1300869,
+          361282
+        ],
+        "factorialMoments": [
+          0,
+          1662151,
+          361282
+        ],
+        "bounds": [
+          1,
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1,
+          1
+        ],
+        "matchProb": 0.5124270534660145,
+        "fullTailProb": 0.0000059968891137722305,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.4875729465339855,
+          0.13541050580011618
+        ]
+      }
+    ]
+  },
+  {
+    "Y": 13,
+    "Z": 11,
+    "L": 2310,
+    "l": 210,
+    "hi": [
+      11
+    ],
+    "states": 2668050,
+    "baseStates": 22050,
+    "W": 0.008264462809917356,
+    "fullMatchNumer": 2033568,
+    "fullMatchActual": 2033568,
+    "fullMatchProb": 0.7621926125822229,
+    "meanBad": 0.2378073874177603,
+    "checks": 2668050,
+    "out": [
+      {
+        "T": 4,
+        "matchNumer": 2597733,
+        "matchActual": 2597733,
+        "fullTail": 1880005,
+        "lowTail": 1716506,
+        "baseShortDiff": 173358,
+        "unionBudget": 176688,
+        "firsts": [
+          0,
+          70317
+        ],
+        "factorialMoments": [
+          0,
+          70317
+        ],
+        "bounds": [
+          1,
+          0.03305785123966942
+        ],
+        "sharpBounds": [
+          1,
+          0.03305785123966942
+        ],
+        "matchProb": 0.9736447967616799,
+        "fullTailProb": 0.7046363448960852,
+        "lowTailProb": 0.6433560090702948,
+        "firstProb": [
+          0,
+          0.02635520323832012
+        ]
+      },
+      {
+        "T": 8,
+        "matchNumer": 2523540,
+        "matchActual": 2523540,
+        "fullTail": 1455248,
+        "lowTail": 1213509,
+        "baseShortDiff": 258908,
+        "unionBudget": 281820,
+        "firsts": [
+          0,
+          144510
+        ],
+        "factorialMoments": [
+          0,
+          144510
+        ],
+        "bounds": [
+          1,
+          0.06611570247933884
+        ],
+        "sharpBounds": [
+          1,
+          0.06611570247933884
+        ],
+        "matchProb": 0.9458368471355484,
+        "fullTailProb": 0.5454350555649257,
+        "lowTailProb": 0.4548299319727891,
+        "firstProb": [
+          0,
+          0.054163152864451565
+        ]
+      },
+      {
+        "T": 16,
+        "matchNumer": 2369861,
+        "matchActual": 2369861,
+        "fullTail": 890054,
+        "lowTail": 590359,
+        "baseShortDiff": 324760,
+        "unionBudget": 435735,
+        "firsts": [
+          0,
+          298189
+        ],
+        "factorialMoments": [
+          0,
+          298189
+        ],
+        "bounds": [
+          1,
+          0.1322314049586777
+        ],
+        "sharpBounds": [
+          1,
+          0.1322314049586777
+        ],
+        "matchProb": 0.8882371020033357,
+        "fullTailProb": 0.33359719645433933,
+        "lowTailProb": 0.22126984126984128,
+        "firstProb": [
+          0,
+          0.11176289799666424
+        ]
+      },
+      {
+        "T": 32,
+        "matchNumer": 2119728,
+        "matchActual": 2119728,
+        "fullTail": 336743,
+        "lowTail": 156332,
+        "baseShortDiff": 201156,
+        "unionBudget": 570253,
+        "firsts": [
+          0,
+          548322
+        ],
+        "factorialMoments": [
+          0,
+          548322
+        ],
+        "bounds": [
+          1,
+          0.2644628099173554
+        ],
+        "sharpBounds": [
+          1,
+          0.2644628099173554
+        ],
+        "matchProb": 0.7944858604598865,
+        "fullTailProb": 0.12621315192743765,
+        "lowTailProb": 0.05859410430839002,
+        "firstProb": [
+          0,
+          0.20551413954011358
+        ]
+      },
+      {
+        "T": 64,
+        "matchNumer": 2035683,
+        "matchActual": 2035683,
+        "fullTail": 49975,
+        "lowTail": 0,
+        "baseShortDiff": 49975,
+        "unionBudget": 634482,
+        "firsts": [
+          0,
+          632367
+        ],
+        "factorialMoments": [
+          0,
+          632367
+        ],
+        "bounds": [
+          1,
+          0.5289256198347108
+        ],
+        "sharpBounds": [
+          1,
+          0.5289256198347108
+        ],
+        "matchProb": 0.7629853263619497,
+        "fullTailProb": 0.018730908341297953,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.23701467363805026
+        ]
+      },
+      {
+        "T": 128,
+        "matchNumer": 2033568,
+        "matchActual": 2033568,
+        "fullTail": 16,
+        "lowTail": 0,
+        "baseShortDiff": 16,
+        "unionBudget": 634482,
+        "firsts": [
+          0,
+          634482
+        ],
+        "factorialMoments": [
+          0,
+          634482
+        ],
+        "bounds": [
+          1,
+          1
+        ],
+        "sharpBounds": [
+          1,
+          1
+        ],
+        "matchProb": 0.7621926125822229,
+        "fullTailProb": 0.0000059968891137722305,
+        "lowTailProb": 0,
+        "firstProb": [
+          0,
+          0.23780738741777702
+        ]
+      }
+    ]
+  }
+]
