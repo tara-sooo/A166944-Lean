@@ -1,5 +1,5 @@
 // Reproduce: node research/min_prime_root_repeat_energy_audit.mjs
-function audit(X, diagnostic=false) {
+function audit(X, diagnostic=false, adaptive=false) {
   const B=Math.ceil(Math.sqrt(7*X)), Q=diagnostic?Math.max(5,Math.floor(B/8)):Math.ceil(B/Math.log(B)), J=diagnostic?12:Math.floor(Math.pow(Math.log(B),.25)), k=Math.max(1,Math.floor(Math.sqrt(Math.log(B)))), T=B;
   const lim=7*X+5, spf=new Int32Array(lim+1), ps=[];
   for(let n=2;n<=lim;n++) if(!spf[n]) {spf[n]=n;if(n<=B && n%2)ps.push(n);if(n*n<=lim)for(let j=n*n;j<=lim;j+=n)if(!spf[j])spf[j]=n;}
@@ -7,6 +7,8 @@ function audit(X, diagnostic=false) {
   const mod=(a,m)=>((a%m)+m)%m;
   const gcd=(a,b)=>{while(b){let c=a%b;a=b;b=c;}return a;};
   const inv=(a,m)=>{let x=0,y=1,b=m;while(a){let q=Math.floor(b/a);[b,a]=[a,b-q*a];[x,y]=[y,x-q*y];}if(b!==1)throw Error("inverse");return mod(x,m);};
+  const A=Math.floor(B*B/Math.pow(Math.max(1,Math.log(Math.log(B))),2)); 
+  const cap=p=>k+(adaptive?Math.floor(A/(p*p)):0);
   const ok=(b,msg)=>{if(!b)throw Error(msg);};
   const bad=new Set();
   for(const p of ps)if(p>=Q)for(const q of ps)if(q!==p) {
@@ -49,22 +51,22 @@ function audit(X, diagnostic=false) {
           light++;lightCost+=r;
         }
       }
-      if(count<=k)base+=r;
+      if(count<=cap(p))base+=r;
       else if(bad.has(C))deleted+=r;
       else if(p<Q){small+=r;smallCounts.set(p,(smallCounts.get(p)||0)+1);}
-      else {high+=r;add(W,C);if(C-(2*M-2)>T)add(Wlate,C);}
+      else {ok(C-(2*M-2)>=cap(p)*(p-1),"adaptive prior gain");high+=r;add(W,C);if(C-(2*M-2)>T)add(Wlate,C);}
       last.set(p,idx);a.push({C,p,sg});t=tt;C+=p-1;ok(C<=2*t,"post invariant");
     }
     for(const n of smallCounts.values())Z+=n*n;
     for(const n of counts.values())maxCount=Math.max(maxCount,n);
     if(spf[C-1]!==C-1||spf[C+1]!==C+1){nontwin++;ok(K-(M+2)<=2*a.reduce((s,x)=>s+least(x.C),0)+2*B,"no twin clock");}
   }
-  ok(R===base+deleted+small+high,"disjoint R");ok(deleted<=N*Sbad&&lightCost<=N*Sbad,"bad weight");ok(base<=N*k*ps.reduce((s,p)=>s+p,0),"baseline");
+  ok(R===base+deleted+small+high,"disjoint R");ok(deleted<=N*Sbad&&lightCost<=N*Sbad,"bad weight");ok(base<=N*ps.reduce((s,p)=>s+p*cap(p),0),"baseline");
   let P2=ps.filter(p=>p<Q).reduce((s,p)=>s+p*p,0);
   ok(BigInt(small)**2n<=BigInt(N)*BigInt(P2)*BigInt(Z),"small Cauchy");
   const energy=m=>{let e=0n;for(const [C,n] of m)e+=BigInt(least(C))*BigInt(n)**2n;return e;};
   let e=energy(W),el=energy(Wlate),ea=energy(Wall);
   ok(BigInt(high)**2n<=BigInt(S0)*e&&e<=ea&&el<=e,"energy");
-  return {X,B,Q,J,k,N,events,literal,nontwin,R,base,deleted,small,high,Z,P2,light,lightCost,Sbad,badHorizons:bad.size,E:e.toString(),Elate:el.toString(),Eall:ea.toString(),maxCount,H,S0};
+  return {X,B,Q,J,k,A:adaptive?A:0,N,events,literal,nontwin,R,base,deleted,small,high,Z,P2,light,lightCost,Sbad,badHorizons:bad.size,E:e.toString(),Elate:el.toString(),Eall:ea.toString(),maxCount,H,S0};
 }
-const xs=process.argv.slice(2).map(Number); const windows=xs.length?xs:[256,1024,4096,16384,65536,262144]; for(const X of windows) console.log(JSON.stringify({mode:'asymptotic',...audit(X)})); for(const X of windows) console.log(JSON.stringify({mode:'diagnostic',...audit(X,true)}));
+const xs=process.argv.slice(2).map(Number); const windows=xs.length?xs:[256,1024,4096,16384,65536,262144]; for(const X of windows) console.log(JSON.stringify({mode:'asymptotic',...audit(X)})); for(const X of windows) console.log(JSON.stringify({mode:'diagnostic',...audit(X,true)})); for(const X of windows) console.log(JSON.stringify({mode:'adaptive',...audit(X,false,true)}));
