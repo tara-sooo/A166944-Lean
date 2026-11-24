@@ -1,0 +1,80 @@
+# Clock-ticket subset sums and weighted terminal reactivation
+
+2026-11-25 JST. Continues 18e38b007dcb83e3519db42aa1811128eddee5bc on the SAME research/min-cycle-forest-2026-11-24 branch. Original elementary combinatorics/probability deductions and finite shared-CRT diagnostics. No Lean compilation. Neither the clipped-height tail criterion nor the physical far-coalescence upper bound has been proved.
+
+## 1. Exact weighted candidate law; finite cutoff is sufficient
+
+Use the infinite CRT ghost, and reveal all coordinates of p<z, parity, and selected tick labels including zero through each tick. Let U be an integer time horizon, z>=11 and z^2>=4U, as in the previous note. Before tick s<=U, write A_q for the allowed coordinate pairs of an UNUSED q>=z in the exact adaptive history law. We use A_q only in this paragraph; the clock ticket count below has a different notation. Define alpha_q to be zero if the matching pair at this tick is excluded, and 1/|A_q| otherwise. Let b be the least matching already known prime, or infinity if none. The already known labels include the revealed p<z and all previously selected high primes. For any unused q>=z,
+    Pr(q selected at s | history before s)
+       = 1{q<b} alpha_q product_(unused z<=p<q) (1-alpha_p).
+This follows directly from conditional independence of unused prime coordinates and the least-label rule. No high clock match is required at a known but ineligible label. For a history-measurable set B_s of unused candidates, sum this equality over q in B_s. Write B_s^* for the subset with q<b and the current matching pair allowed. Uniformly in the history,
+    (1-O(1/(z log z))) sum_(q in B_s^*) q^-2
+       <= Pr(selected q in B_s | history)
+       <= (1+O(U/z^2)) sum_(q in B_s^*) q^-2.
+Indeed |A_q| is between q^2-U and q^2, and the sum of all alpha_p at this tick is O(1/(z log z)). If B_s^* is empty the probability is exactly zero. These bounds apply to infinite candidate sets by monotone convergence. They do not assert that allowed candidates are uniformly distributed in q, or that the set B_s^* is independent of the past. In particular they justify using a WEIGHTED sum of terminal-bad candidates rather than the unweighted number of all possible offsets.
+
+One may restrict the candidate calculations to z<=q<V, with V>=z, because the single-prime deletion/cutoff coupling implies
+    Pr(any q>=V selected through U) <= U sum_(q>=V prime)q^-2
+                                   = O(U/(V log V)).
+Taking V=ceil(U) makes this o(1) (when z<U). Thus for the asymptotic quiet-gap task there is no need to bound the offset support for all infinitely many q. In a finite candidate calculation it is legitimate to count only q<V and add this rigorous missing-tail error. Actual LOW suffixes use p<z and so do not change when truncating q at V. The entire initial and selected history may be evaluated in the truncated ghost with the same coupling error. This is not a claim that a finite empirical average of weights is a rigorous asymptotic upper bound.
+
+## 2. Available clock tickets and restricted endpoint support
+
+Retain the actual cutoff z for the LOW-only suffix. Introduce a smaller cutoff 5<=P<=z and L_P=2 product_(3<=p<P prime)p. Fix a tick s, the entire prehistory and the known low coordinates. Consider the hypothetical LOW-only continuation from the post-state of each unused high candidate q>=z at s, as in the preceding note. Restrict to candidates whose suffix terminates in elapsed time <=v, and uses at most k events with labels P<=p<z (including repetitions). Call its terminal gain d_q. Define M_s^(k)(v,P) as the number of DISTINCT d_q among these candidates. This definition is valid for any finite or infinite set of unused candidates.
+
+A clock ticket is a pair (p,u) with P<=p<z, s<u<=s+v, such that the clock coordinate of p at u is one of its two possible time classes mod2p, regardless of horizon eligibility. Let A_s(v,P) count all tickets. Each possible suffix selects a subset of these tickets, at most one per tick and at most k in total for the restricted candidates. The sum of the selected ticket gains is the sum of p-1 over its subset, with repeated labels treated as separate tickets. All remaining LOW labels are <P and occur in at most k+1 consecutive blocks; each block has even gain <L_P by the exact barrier. Hence their combined even gain is <(k+1)L_P, and is also <=v(P-1), since there are at most v total events. Let C_s be the sum of p-1 over ALL possible tickets with p<P in (s,s+v]. This is another upper bound for the small-label gain, independent of q. Therefore, deterministically,
+    M_s^(k)(v,P) <= [1+floor(min((k+1)L_P,v(P-1),C_s)/2)]
+                           * sum_(j=0..k) binomial(A_s(v,P),j).
+Interpret the binomial coefficient as zero for j>A_s. The bound counts a possible small even gain and a subset of tickets, which may overcount and may include impossible itineraries. It is NOT necessary to assume independent endpoint offsets or any particular q-distribution. In particular it holds simultaneously for every pre-horizon at the same s. It is valid to take the minimum with 1+floor(v(z-1)/2), the old entire gain range bound. One can improve the subset factor by counting distinct sums of p-1 of the available tickets (respecting the cardinality k) instead of the number of subsets; this is a finite subset-sum computation, not an assumed equidistribution.
+
+The old support M_s(v) includes candidates with arbitrarily many medium events. We do not replace it by the number of events on the realized suffix. Instead restrict the candidate set to the actual condition <=k and bound the full counterfactual support of THAT subset. If an actual selected candidate has <=k medium events and finishes within v, the support bound is applicable to its terminal reactivation. Candidates with more than k events are not claimed to satisfy this bound.
+
+## 3. Uniform concentration of clock tickets
+
+The possible time classes depend only on the time coordinate b_p and common initial parity. Conditional on either parity, these coordinates are independent across p. At a FIXED tick u, exactly one of the two possible clock classes can apply and a uniform b_p mod p meets it with probability 1/p. Thus the expected number of tickets of p in an interval of v ticks is v/p.
+
+For fixed s, the contribution of p<=v is deterministically <=v/p+2<=3v/p. For p>v it is in [0,2], since each of the two classes has period 2p. For a random variable J in [0,2], convexity gives E exp(J)<=1+((exp(2)-1)/2)E J. Independence of these larger-p clock counts conditional on parity gives, including the deterministic smaller-p contributions,
+    E exp(A_s(v,P)) <= exp(C v sum_(P<=p<z prime)1/p)
+                     <= exp(C' v log log(3z)).
+Both constants can be chosen absolute (including an empty interval). The same bound holds after averaging over parity. This calculation is about the ORIGINAL independent time-coordinate law at a fixed s; it does not assert that the adaptive observed history preserves the low-clock independence after conditioning.
+
+Apply exponential Markov and a union bound over all integer s in [1,U]. With probability >=1-O(U^-2), simultaneously for all such s,
+    A_s(v,P) <= A_* = ceil(C' v log log(3z)+3 log U).
+The event is global, but the individual ticket count and its threshold comparison at s are measurable from the low coordinates already revealed. Thus we can use the pointwise threshold in the conditional selection estimates, and pay for failure of the global concentration only once. We do not condition the fresh-high hazard on a future-dependent concentration event.
+
+For k<=A_* and k>=1, sum_(j<=k) binomial(A_*,j) <= (e A_*/k)^k (use generating polynomial at x=k/A_*<=1). For k=0 the sum is 1. In particular
+    M_* = [1+floor((k+1)L_P/2)] * sum_(j<=k) binomial(A_*,j)
+is a deterministic support bound for all restricted candidates at the individual good-clock histories. One may use the minimum with the smaller v(P-1) bound from section2. This yields a uniform support estimate without requiring any terminal-offset distribution theorem. It also works if k grows with U, with the explicit binomial formula; there is no unspecified constant depending on a growing k.
+
+## 4. Unconditional deletion of terminal reactivation for restricted suffixes
+
+Let z^2>=4U, 1<=v<z-2, and use the previous note's terminal congruence and own-label divisor bounds. At a good-clock history the conditional probability of selecting a fresh q whose actual LOW-only suffix terminates within v, has <=k medium events, and reactivates a previously seen high prime (or q itself) at its terminal is
+    O(M_* (1+K_(s-1))/z^2),
+where K_(s-1) counts previously selected distinct high labels. For previous high p, group candidates by distinct d_q and use the fixed residue class q mod p and sum q^-2<=2/z^2. For own q, q divides at least one of d_q-1,d_q+1,d_q-3, nonzero odd integers of absolute value <z^2, so at most O(1) candidate prime factors per d. The constants in these conditional bounds are absolute, independent of k. The proof does not require q to be independent of its own LOW suffix; the union is over the restricted counterfactual support.
+
+Sum over s<=U, using the pointwise good-clock indicator, E K_s=O(s/(z log z)), and add the global concentration failure:
+    Pr(any such restricted terminal reactivation through U)
+       <= O(U^-2 + M_* U/z^2 + M_* U^2/(z^3 log z)).
+Thus if z=ceil(U^theta) with fixed 2/3<theta<1, and M_*=O(U^(3theta-2-delta)) for some fixed delta>0, this probability is o(1). Unlike the previous BadSpread criterion, no separate probability estimate on all-candidate terminal support is needed for this restricted population.
+
+Concrete parameters: choose P growing slowly with L_P<=U^epsilon (e.g. P=c_epsilon log U by the elementary Chebyshev bound; eventually P<z). For fixed integer k>=1 and v=floor(U^rho) with rho>0 and epsilon+k rho<3theta-2, we have M_*<=U^(epsilon+k rho+o(1)). The old interior guard and fresh-interference errors also vanish because rho<3theta-2. For example theta=.9, epsilon=.05, k=4, rho=.14 satisfy the conditions. k=0 is covered independently whenever L_P=O(U^epsilon) with epsilon<3theta-2 and v has the previous clock guard bound. The parameters are examples, not optimized or user-prescribed.
+
+A growing number of medium events is also possible: let v=floor(exp(sqrt(log U))), k=floor(c sqrt(log U)) for fixed c>0, and L_P<=U^epsilon, epsilon+c<3theta-2. Then log A_*=sqrt(log U)+O(log log log U), and the binomial inequality gives log M_*<=(epsilon+c+o(1))log U. The same unconditional deletion follows, and the previous clock and fresh-interference bounds vanish. This example trades a shorter (subpolynomial) time cap for an unbounded medium-event cap. It does not establish that actual LOW suffixes usually meet either cap.
+
+## 5. Updated conditional quiet-gap reduction
+
+Take Y->infinity, T=floor(Y sqrt(log Y)), w=2Y, U=T+w, z=ceil(U^theta), and one of the admissible parameter families above. Let BadSuffix be the event that the initial LOW-only (<z) continuation does not finish within v, OR that some actual fresh high event by T has a LOW-only continuation that fails to finish within v or uses >k medium events (P<=p<z). No medium cap is necessary for the initial continuation, since it has no previous high labels and cannot reactivate its own fresh label. The previous interior guard and fresh-interference deletion still apply, and section4 removes terminal reactivation for the restricted suffixes. The good-event induction of the preceding note now applies with BadSuffix only: at each LOW terminal no low or known high label is eligible, so the next high event is fresh. Each terminal yields a test with conditional probability at least c_theta of w quiet ticks. On sigma_Y>T and the good event at least m=floor((T-v)/(w+v)) tests start by T and fail. Apply the same successive conditional failure bound; do not condition the per-test probability on BadSuffix or its complement. Hence
+    Pr(sigma_Y>T) <= Pr(BadSuffix)+o(1)+(1-c_theta)^m.
+Here m->infinity. This replaces the prior two unresolved restrictions BadTime and BadSpread by a time cap and a restriction solely on the actual selected medium-event count, without requiring a separate full counterfactual support estimate. It is an alternative sufficient condition, not an unconditional improvement on every previous parameter choice. In particular a small fixed k with P=c log U may be restrictive, and the growing-k example has a smaller v. Neither Pr(BadSuffix)->0 nor the corresponding weighted bad-candidate sum has been proved. If that suffix condition were proved along a diverging sequence, the previous coupling and clipped-height theorem would remove the small-class cell-stop residual. A bound on physical far-coalescence is separately necessary. No twin-prime proof.
+
+## 6. Finite checks and results
+
+Saved research/min_ghost_terminal_clock_ticket_support_audit.mjs and research/min_ghost_terminal_clock_ticket_support_results.json, updated with explicit per-core-block barrier assertions and exact remote readback at baa148145e444473b0c1ea9eb5e62348fcb1a029. For Y=53,199,397,797,1597 take 256 fixed-seed pseudorandom CRT initial states each, finite V=8Y,T=floor(Y sqrt(log Y)),z=ceil(T^.8),v=floor(z/4),P=max(5,ceil(sqrt v)). These are finite diagnostics, not the asymptotic choices of section4. Replay actual fresh events through T and all their LOW-only paths to termination or time cap. At first32 fresh-event histories at each Y, enumerate all unused candidate q in [z,V), compute actual restricted support for k=0,1,2,3,4, verify the available-ticket count, every consecutive <P block gain <L_P, aggregate small-label gain bounds and subset-sum support inequality. Sum q^-2 weights of finished candidates and of those with actual known-terminal eligibility or the conservative own-divisibility test. The weights here deliberately omit past-match exclusion and least-known-match filters: these are conservative candidate weights, not the exact B_s^* conditional probabilities from section1. Section1 is a deduction from the earlier exact conditional-history law; no new exhaustive conditional probability test performed in this turn.
+
+An initial generated test script failed because one return path lacked the diagnostic label list. Replaced it with a standalone audit, then added the explicit core barrier checks and reran all windows before remote readback.
+
+At Y1597, T4337,z813,v203,P15,L_P30030, V12776:166 actual fresh high events in256 paths, no repeated high in this sample.72 actual LOW suffixes finish by v. Of those,25 use no medium event,45 use <=1,55 <=2,64 <=3,67 <=4. Among the 67 with <=4,9 have terminal gain>v. In the first32 histories, maximum full finite support167, mean138.6875, maximum available medium clock tickets178, mean166.46875. For restricted k=0,1,2,3,4 the maximum finite supports are25,76,113,138,150; total candidate pairs finishing with <=4 medium events19191. The explicit upper bounds are loose at these parameters: e.g. mean cap422.28125 at k=0 and82419 at k=4 after taking minimum with full gain range, vs observed supports. At Y397 there is nonzero weighted bad-candidate mass even for <=1 medium event; at Y797 there is nonzero mass for <=4. Thus reactivation is not excluded deterministically by the small event-count restriction. At Y1597 the conservative bad weights are zero in the32 enumerated histories only. These are shared-residue finite samples, not uniform infinite support bounds or a proof of rare long suffixes. There was no original canonical source resimulation or Lean compilation.
+
+## 7. Next proof task
+
+Use the exact predictable weighted candidate law or a direct bound on actual suffix durations and medium counts. The new uniform clock-ticket concentration and subset-sum estimate remove the independent counterfactual support condition for a restricted population, but the actual suffix restriction is still unproved. The finite diagnostics show that many suffixes exceed the time cap. No main edit, no new branch.
