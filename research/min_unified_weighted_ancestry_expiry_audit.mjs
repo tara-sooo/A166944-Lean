@@ -31,9 +31,9 @@ function audit(X,focus=false,scale=1){
    ok(found&&eq(slow,z),"weighted score recurrence");scoreChecks++;
   }
  }
- let kraftChecks=0,maxKraft=0;for(let ar of at.values()){let mv=ar.filter(e=>e.moving),leaves=new Map();maxMoving=Math.max(maxMoving,mv.length);ok(mv.length<=2*theta,"moving mass cap");
+ let kraftChecks=0,maxKraft=0;for(let ar of at.values()){let mv=ar.filter(e=>e.moving),leaves=new Map();maxMoving=Math.max(maxMoving,mv.length);ok(mv.length<=theta,"moving mass cap");
   for(let e of mv){let s=e.tag.es[e.start],k=e.word,g=leaves.get(k)||{start:s.C,kappa:e.kappa,root:0,ordinary:0};ok(g.start===s.C&&eq(g.kappa,e.kappa),"same reverse word");if(e.type){g.ordinary++;ordinaryWitnesses++}else{g.root++;rootWitnesses++}leaves.set(k,g)}
-  let sum=0;for(let g of leaves.values()){let w=Math.exp(-g.kappa);sum+=w;ok(g.root<=1&&g.ordinary<=at.get(g.start).length&&g.root+g.ordinary<=2*theta*w+1e-7,"leaf cap");witnessChecks++}
+  let sum=0;for(let g of leaves.values()){let w=Math.exp(-g.kappa);sum+=w;ok(g.root<=1&&g.ordinary<=at.get(g.start).length&&g.root+g.ordinary<=at.get(g.start).length&&g.root+g.ordinary<=theta*w+1e-7,"leaf cap");witnessChecks++}
   ok(sum<=1+1e-7,"Kraft cap");maxKraft=Math.max(maxKraft,sum);kraftChecks++;
  }
  const cache=new Map();function meet(a,b){let k=key(a.tag.id,b.tag.id),q=cache.get(k);if(q)return a.tag.id<b.tag.id?q:[q[1],q[0],q[2]];let x=a.tag.es,y=b.tag.es,i=0,j=0;while(i<x.length&&j<y.length){let u=x[i],v=y[j];if(u.C<v.C){i++;continue}if(v.C<u.C){j++;continue}let t=Math.max(u.t,v.t);if(t<=Math.min(u.end,v.end)){q=[u,v,t];cache.set(k,a.tag.id<b.tag.id?q:[v,u,t]);return q}i++;j++}throw Error("missing birth")}
@@ -42,7 +42,7 @@ function audit(X,focus=false,scale=1){
  let rows=Ps.map(P=>({P,mixed:0,both:0,light:0,old:0,expiryCap:0,oldCap:0,expiryKeys:0,resetKeys:0,sourceMoving:0,sourceMovingCap:0,mixedSmall:0}));
  for(let a of slots.values()){let b=a.length;if(b<bmin)continue;sourceCohorts++;let e=a[0],mv=a.filter(f=>f.moving).length,exp=new Map(),expCount=0;
   for(let f of a){let x=f.finalExp,k=x.C+"|"+x.end,g=exp.get(k)||{C:x.C,t:x.end,n:0};g.n++;exp.set(k,g)}
-  for(let g of exp.values()){let n=a.filter(f=>{let x=occupied(f,g.C,g.t);return x&&x.i>=f.lastLight&&x.i<=f.finalExp.i&&x.moving}).length;ok(n>=g.n&&n<=2*theta,"final run occupancy");expCount+=g.n*(n-g.n)+g.n*(g.n-1)/2;}
+  for(let g of exp.values()){let n=a.filter(f=>{let x=occupied(f,g.C,g.t);return x&&x.i>=f.lastLight&&x.i<=f.finalExp.i&&x.moving}).length;ok(n>=g.n&&n<=theta,"final run occupancy");expCount+=g.n*(n-g.n)+g.n*(g.n-1)/2;}
   let both=0,light=0,mixed=0,old=0,small=0,sm=0,counts=new Map(),byTag=new Map();
   for(let i=0;i<b;i++)for(let j=i+1;j<b;j++){let f=a[i],h=a[j];if(f.moving||h.moving){sm++;sourceMovingPairs++;continue}let [u,v,t]=meet(f,h);
    let fs=f.tag.es[f.lastLight],hs=h.tag.es[h.lastLight];if((fs.C>=u.C&&at.get(fs.C).length<=theta/L)||(hs.C>=u.C&&at.get(hs.C).length<=theta/L)){light++;lightPairs++;continue}
