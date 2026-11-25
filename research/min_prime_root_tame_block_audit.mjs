@@ -1,17 +1,17 @@
 // Reproduce: node research/min_prime_root_tame_block_audit.mjs
 function audit(X,mode="analytic"){
- const B=Math.ceil(Math.sqrt(7*X)), l=Math.max(1,Math.log(Math.log(B))),analytic=mode==="analytic",K=analytic?Math.max(2,Math.floor(Math.pow(Math.max(1,Math.log(l)),.25))):6,D=analytic?K:3,Q=mode==="wide"?7:Math.max(5,Math.ceil(B/Math.log(B))),H=analytic?Math.ceil(B/Math.sqrt(Math.log(B))):16,F=analytic?Math.ceil(l*l):4,k=analytic?Math.max(1,Math.floor(Math.sqrt(Math.log(B)))):1,A=analytic?Math.floor(B*B/(l*l)):0;
+ const B=Math.ceil(Math.sqrt(7*X)), l=Math.max(1,Math.log(Math.log(B))),analytic=mode==="analytic",K=analytic?Math.max(2,Math.floor(Math.pow(Math.max(1,Math.log(l)),.25))):6,D=analytic?K:3,Q=(mode==="wide"||mode==="narrow")?7:Math.max(5,Math.ceil(B/Math.log(B))),H=analytic?Math.ceil(B/Math.sqrt(Math.log(B))):16,F=analytic?Math.ceil(l*l):4,k=analytic?Math.max(1,Math.floor(Math.sqrt(Math.log(B)))):1,A=analytic?Math.floor(B*B/(l*l)):0;
  const z=analytic?Math.ceil(Math.sqrt(B)):7,Kd=analytic?Math.max(2,Math.floor(Math.pow(l,.25))):6,Jd=analytic?Math.floor(Math.pow(l,.25)):2,J=analytic?Math.floor(Math.pow(Math.log(B),.25)):12;
  const topOverlap=(4*K+1)*(3+Math.ceil(Math.log2(B/Q))),compOverlap=(4*K+1)*(3+Math.ceil(Math.log2(K*D))),Gamma=K*topOverlap,Lambda=D*compOverlap;
  const tf=analytic?Math.floor(l/(8*Math.log(1+Gamma))):3,ts=analytic?Math.floor(Math.log(l)/(4*Math.log(1+Lambda))):3;
- const m=Math.ceil(2*K*D)+2, Wblock=Math.min(Number.MAX_SAFE_INTEGER,2**Math.min(52,2*m)), innerRad=analytic?Math.max(1,Math.floor(l**(1/8))):1, outerRad=analytic?Math.max(innerRad,Math.floor(l**(1/4))):4;
+ const m=Math.ceil(2*K*D)+2, Wblock=Math.min(Number.MAX_SAFE_INTEGER,2**Math.min(52,2*m)), innerRad=analytic?Math.max(1,Math.floor(l**(1/8))):1, outerRad=analytic?Math.max(innerRad,Math.floor(l**(1/4))):mode==="narrow"?1:4, labelRad=analytic?Math.max(1,Math.floor(l**(1/8))):2;
  const wideGate=Wblock*(D+1)<=Kd && outerRad>=innerRad*(1+4*Wblock*(D+1)) && z>Jd+1 && Q>=z;
  const lim=7*X+5,spf=new Int32Array(lim+1),ps=[];
  for(let n=2;n<=lim;n++)if(!spf[n]){spf[n]=n;if(n<=B&&n%2)ps.push(n);if(n*n<=lim)for(let j=n*n;j<=lim;j+=n)if(!spf[j])spf[j]=n;}
  const factors=n=>{let a=[];while(n>1){const p=spf[n];if(p<=B&&p%2)a.push(p);while(n%p===0)n/=p;}return a;};
  const mod=(a,m)=>((a%m)+m)%m,gcd=(a,b)=>{while(b){let c=a%b;a=b;b=c;}return a;},ok=(b,msg)=>{if(!b)throw Error(msg);};
  const rc=new Int32Array(lim+1);function least(C){if(rc[C])return rc[C]-1;let r=0;for(let n of [C-1,C+1])for(let p of factors(n))if(!r||p<r)r=p;rc[C]=r+1;return r;}
- const W=new Map(),Wlate=new Map();let oldWeight=0,innerWeight=0,outerWeight=0,haloNewCount=0,haloNewClock=0,haloNewHighClock=0,blockCount=0,windowCount=0,forcedDense=0,actualDense=0,geometryChecks=0,gateChecks=0,fullResidualBlocks=0,fullResidualHigh=0,tailHigh=0,defectWeight=0,blockCharge=0,maxWindow=0,haloEnergy=new Map();let N=0,R=0,G=0,events=0,literal=0,nontwin=0,fastSeed=0,fastLong=0,localLong=0,fastAfter=0,slowSeed=0,slowAfter=0,fastClock=0,slowClock=0,remaining=0,medium=0,high=0,low=0,Zmid=0,shortCount=0,shortRemain=0,shortHighRemain=0,compRemain=0,maxTopOverlap=0,maxCompOverlap=0,maxDepth=0,light=0,dense=0,fastNew=Array(tf).fill(0),slowNew=Array(ts).fill(0),fastCounts=Array(tf).fill(0),slowCounts=Array(ts).fill(0),localLongNew=0;
+ const W=new Map(),Wlate=new Map();let oldWeight=0,innerWeight=0,outerWeight=0,labelWeight=0,labelNewCount=0,labelNewClock=0,labelNewHighClock=0,seedLabelExtra=0,labelResidualCount=0,labelResidualHigh=0,cleanPriorChecks=0,cleanFutureChecks=0,finalEnergy=new Map(),haloNewCount=0,haloNewClock=0,haloNewHighClock=0,blockCount=0,windowCount=0,forcedDense=0,actualDense=0,geometryChecks=0,gateChecks=0,fullResidualBlocks=0,fullResidualHigh=0,tailHigh=0,defectWeight=0,blockCharge=0,maxWindow=0,haloEnergy=new Map();let N=0,R=0,G=0,events=0,literal=0,nontwin=0,fastSeed=0,fastLong=0,localLong=0,fastAfter=0,slowSeed=0,slowAfter=0,fastClock=0,slowClock=0,remaining=0,medium=0,high=0,low=0,Zmid=0,shortCount=0,shortRemain=0,shortHighRemain=0,compRemain=0,maxTopOverlap=0,maxCompOverlap=0,maxDepth=0,light=0,dense=0,fastNew=Array(tf).fill(0),slowNew=Array(ts).fill(0),fastCounts=Array(tf).fill(0),slowCounts=Array(ts).fill(0),localLongNew=0;
  for(let M=X+1;M<2*X;M+=2)if(spf[M]===M){
    N++;let t=M+2,C=2*M-2,cut=Math.floor((7*M-1)/4);const a=[],last=new Map(),counts=new Map();
    while(true){let tt=Infinity,p=Infinity,sg=0;for(const sigma of [-1,1])for(const q of factors(C+sigma)){let n=t+1+mod((sigma===-1?0:q+2)-(t+1),2*q);if(n<tt||(n===tt&&q<p)){tt=n;p=q;sg=sigma;}}
@@ -54,6 +54,15 @@ function audit(X,mode="analytic"){
    const v0=weight(seed),v1=weight(inner),v2=weight(outer);
    ok(v1<=3*innerRad*v0&&v2<=3*outerRad*v0,"halo weight");oldWeight+=v0;innerWeight+=v1;outerWeight+=v2;
    for(let i=0;i<n;i++){ok(!inner[i]||outer[i],"nested halos");if(outer[i]&&!seed[i]){haloNewCount++;haloNewClock+=a[i].r;if(a[i].p>=Q)haloNewHighClock+=a[i].r;}if(!outer[i]&&a[i].p>=Q)haloEnergy.set(a[i].C,(haloEnergy.get(a[i].C)||0)+1);}
+   const byLabel=new Map();for(let i=0;i<n;i++){const p=a[i].p;if(!byLabel.has(p))byLabel.set(p,[]);byLabel.get(p).push(i);}
+   function dilate(s){const d=s.slice();for(const is of byLabel.values())for(let j=0;j<is.length;j++)if(s[is[j]])for(let h=Math.max(0,j-labelRad);h<=Math.min(is.length-1,j+labelRad);h++)d[is[h]]=1;return d;}
+   const seedD=dilate(seed), final=dilate(outer);const v3=weight(final);
+   ok(v3<=(2*labelRad+1)*v2&&weight(seedD)<=(2*labelRad+1)*v0,"same-label dilation weight");labelWeight+=v3;seedLabelExtra+=weight(seedD)-v0;
+   for(const is of byLabel.values())for(let j=0;j<is.length;j++){const i=is[j];if(final[i]){if(!outer[i]){labelNewCount++;labelNewClock+=a[i].r;if(a[i].p>=Q)labelNewHighClock+=a[i].r;}continue;}
+     labelResidualCount++;if(a[i].p>=Q){labelResidualHigh+=a[i].r;finalEnergy.set(a[i].C,(finalEnergy.get(a[i].C)||0)+1);}
+     ok(j>labelRad,"residual first-label distance");for(let h=1;h<=labelRad;h++){ok(!outer[is[j-h]],"clean prior label hit");cleanPriorChecks++;}
+     for(let h=1;h<=Math.min(labelRad,is.length-j-1);h++){ok(!outer[is[j+h]],"clean future label hit");cleanFutureChecks++;}
+   }
    const hids=a.map((e,i)=>e.p>=Math.max(Q,z)?i:-1).filter(i=>i>=0);
    const denseFind=(arr)=>{if(!arr.length)return null;const freq=new Map();for(const p of arr)freq.set(p,(freq.get(p)||0)+1);const j=arr.findIndex(p=>freq.get(p)===1);if(j<0)return arr;return denseFind(arr.slice(0,j))||denseFind(arr.slice(j+1));};
    // All tame subwindows up to eight in finite diagnostics; the full asymptotic W is tested only if it fits.
@@ -64,7 +73,7 @@ function audit(X,mode="analytic"){
      const core=denseFind(arr);if(core){actualDense++;ok([...new Set(core)].every(p=>core.filter(q=>p===q).length>=2),"dense core oracle");}
      if(is.length>=2**kinds){forcedDense++;ok(core!==null,"forced dense core");}
      let allOuter=is.every(i=>outer[i]);
-     for(const i of is)if(inner[i]){const h=witness[i];ok(h>=0,"inner witness");const e=a[h];if(left>=e.C-outerRad*e.p&&right<=e.C+outerRad*e.p){geometryChecks++;ok(allOuter,"halo covers block");}}
+     for(const i of is)if(inner[i]){const h=witness[i];ok(h>=0,"inner witness");const e=a[h];if(left>=e.C-outerRad*e.p&&right<=e.C+outerRad*e.p){geometryChecks++;ok(allOuter,"halo covers block");for(let j=is[0];j<=is[is.length-1];j++)ok(outer[j],"halo covers intervening events");}}
      if(full&&wideGate){gateChecks++;if(!allOuter){ok(is.every(i=>!inner[i]),"outer residual forces all inner unmarked");ok(defects.length>m,"forced intermediate defect count");for(const i of defects)ok(!seed[i]&&a[i].j>=0&&a[i].C-a[a[i].j].C<=Math.min(H*a[i].p,F*a[i].p*a[i].p),"intermediate only");}}
      if(full){blockCount++;if(!allOuter){fullResidualBlocks++;const v=is.filter(i=>!outer[i]).reduce((s,i)=>s+a[i].p,0),d=defects.reduce((s,i)=>s+a[i].p,0);fullResidualHigh+=v;defectWeight+=d;if(wideGate){ok((m+1)*v<=is.length*D*d,"block defect charge");blockCharge+=v;}}}
      windowCount++;maxWindow=Math.max(maxWindow,is.length);
@@ -82,6 +91,17 @@ function audit(X,mode="analytic"){
  }
  const energy=m=>[...m].reduce((s,[C,n])=>s+BigInt(least(C))*BigInt(n)**2n,0n).toString();
  ok(remaining===low+medium+high,"residual partition");
- return {mode,X,B,Q,K,D,H,F,N,R,G,events,m,Wblock,innerRad,outerRad,wideGate,oldWeight,innerWeight,outerWeight,haloNewCount,haloNewClock,haloNewHighClock,haloE:energy(haloEnergy),windowCount,blockCount,forcedDense,actualDense,geometryChecks,gateChecks,fullResidualBlocks,fullResidualHigh,tailHigh,defectWeight,blockCharge,maxWindow,literal,nontwin,tf,ts,fastSeed,fastLong,localLong,localLongNew,fastAfter,slowSeed,slowAfter,fastClock,slowClock,fastNew,fastCounts,slowNew,slowCounts,remaining,low,medium,high,Zmid,E:energy(W),Elate:energy(Wlate),shortCount,shortRemain,shortHighRemain,compRemain,maxTopOverlap,maxCompOverlap,maxDepth,light,dense};
+ return {mode,X,B,Q,K,D,H,F,N,R,G,events,m,Wblock,innerRad,outerRad,wideGate,oldWeight,innerWeight,outerWeight,labelWeight,labelNewCount,labelNewClock,labelNewHighClock,seedLabelExtra,labelResidualCount,labelResidualHigh,cleanPriorChecks,cleanFutureChecks,finalE:energy(finalEnergy),haloNewCount,haloNewClock,haloNewHighClock,haloE:energy(haloEnergy),windowCount,blockCount,forcedDense,actualDense,geometryChecks,gateChecks,fullResidualBlocks,fullResidualHigh,tailHigh,defectWeight,blockCharge,maxWindow,literal,nontwin,tf,ts,fastSeed,fastLong,localLong,localLongNew,fastAfter,slowSeed,slowAfter,fastClock,slowClock,fastNew,fastCounts,slowNew,slowCounts,remaining,low,medium,high,Zmid,E:energy(W),Elate:energy(Wlate),shortCount,shortRemain,shortHighRemain,compRemain,maxTopOverlap,maxCompOverlap,maxDepth,light,dense};
 }
-const xs=process.argv.slice(2).map(Number),windows=xs.length?xs:[256,1024,4096,16384,65536,262144];for(const mode of ['analytic','fixed','wide'])for(const X of windows)console.log(JSON.stringify(audit(X,mode)));
+const xs=process.argv.slice(2).map(Number),windows=xs.length?xs:[256,1024,4096,16384,65536,262144];for(const mode of ['analytic','fixed','wide','narrow'])for(const X of windows)console.log(JSON.stringify(audit(X,mode)));
+
+function combinatorialOracle(){
+ const ok=(b,msg)=>{if(!b)throw Error(msg);};
+ function denseFind(w){if(!w.length)return false;const j=w.findIndex(p=>w.filter(q=>q===p).length===1);return j<0||denseFind(w.slice(0,j))||denseFind(w.slice(j+1));}
+ function brute(w){for(let i=0;i<w.length;i++){const c=new Map();for(let j=i;j<w.length;j++){c.set(w[j],(c.get(w[j])||0)+1);if([...c.values()].every(n=>n>=2))return true;}}return false;}
+ let words=0,forced=0,lagChecks=0,extremal=0;
+ for(let h=1;h<=3;h++)for(let n=1;n<=2**h;n++)for(let t=0;t<h**n;t++){let x=t,w=[];for(let j=0;j<n;j++){w.push(x%h);x=Math.floor(x/h);}const d=denseFind(w),b=brute(w),s=new Set(w).size;words++;ok(d===b,"dense singleton recursion vs brute");if(n>=2**s){forced++;ok(d,"dense threshold");}for(let m=1;m<=3;m++){let defects=0;const last=new Map();for(let i=0;i<n;i++){if(i>=m&&(!last.has(w[i])||i-last.get(w[i])>m))defects++;last.set(w[i],i);}ok(s<=m+defects,"lag alphabet bound");lagChecks++;}}
+ let w=[];for(let h=1;h<=8;h++){w=[...w,h,...w];ok(w.length===2**h-1&&!denseFind(w),"sharp Zimin word");extremal++;}
+ return {words,forced,lagChecks,extremal};
+}
+console.log(JSON.stringify({oracle:combinatorialOracle()}));
