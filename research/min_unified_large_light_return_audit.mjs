@@ -97,7 +97,7 @@ function audit(X,focus=false,scale=1,gainFactor=8){
  }
  let globalAudit=Ps.map((P,j)=>{let actual=0,cap=0,linear=0,checks=0;
   for(let {g,loads} of globalGroups.values()){
-   let a=g.fresh.filter(f=>!resetTags.has(f.tag.id)&&f.tag.lastExpiry===f),b=g.older.filter(f=>!resetTags.has(f.tag.id)&&f.tag.lastExpiry&&f.tag.lastExpiry.i<f.i),z=0;
+   let a=g.fresh.filter(f=>!resetTags.has(f.tag.id)&&!f.tag.es.at(-1).moving&&f.tag.lastExpiry===f),b=g.older.filter(f=>!resetTags.has(f.tag.id)&&!f.tag.es.at(-1).moving&&f.tag.lastExpiry&&f.tag.lastExpiry.i<f.i),z=0;
    for(let K=P*Math.ceil((g.x.J+globalAge)/P);K<g.x.J+H;K+=P){let x=a.filter(f=>K<=f.tag.es.at(-1).C-globalAge).length,y=b.filter(f=>K>=f.tag.lastExpiry.J+globalAge&&K<=f.tag.es.at(-1).C-globalAge).length;z+=2*P*x*y/Math.max(largeCut,x+y)}
    ok(loads[j]<=z+1e-7,"global final-expiry harmonic cap");actual+=loads[j];cap+=z;checks++;
   }
