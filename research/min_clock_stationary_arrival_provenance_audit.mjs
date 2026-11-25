@@ -1,6 +1,6 @@
 function arrivalAudit(trees,sourcePaths,B,ok,close){
  const out={raw:0,reset:0,nonreset:0,lowBoth:0,lateNonreset:0,lateReset:0,lateRoot:0,sameIncoming:0,differentIncoming:0,rootIncoming:0,resetDecrease:0,resetLargeInput:0,shortGap:0,shortGapSame:0,pairs:0,checks:0,slots:0,arrivalKeys:0,rootPairs:0,firstContactOracle:0,keys:[],labels:{},highLabelCount:0};
- const pairs=new Map(),slots=new Map(),cache=new Map(),arrivals=new Set();
+ const pairs=new Map(),slots=new Map(),cache=new Map(),arrivals=new Set(),roughKeys=new Map();const R=Math.ceil(B/16),Amax=32;
  function get(M,J,t){const k=M+'|'+J+','+t;if(cache.has(k))return cache.get(k);const P=sourcePaths.get(M),i=P.records.findIndex(e=>e.C===J&&e.b===t);ok(i>=0,"recorded birth");let z=i?{e:P.records[i-1],prev:i>1?P.records[i-2]:null,P}:null;cache.set(k,z);return z}
  function state(P,t){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].v<=t)a=m+1;else b=m}return a<P.records.length?P.records[a].C:P.endC}
  for(const tree of trees.values())for(const [l,es] of tree.levels)for(const e of es){
@@ -24,6 +24,7 @@ function arrivalAudit(trees,sourcePaths,B,ok,close){
   });
   const [i,j]=incoming;
   if(i.q&&i.q===j.q){
+    ok(j.d>=4*i.q&&j.phase>0,'same incoming label late nonRESET and deficit at least 4q');
     ok(i.s===j.s&&gap%(2*i.q)===0&&gap>=2*i.q,"same incoming label clock separation");
     ok(A.prev.C===D.prev.C&&A.prev.v<=D.prev.b,"disjoint actual predecessor waits");
   }
@@ -47,8 +48,45 @@ function arrivalAudit(trees,sourcePaths,B,ok,close){
    if(reset&&j.q&&j.phase!==0&&p>=5)out.resetDecrease+=w;
    if(reset&&j.q>=p/2+3)out.resetLargeInput+=w;
    if(gap<=8){out.shortGap+=w;if(i.q&&i.q===j.q)out.shortGapSame+=w;}
-   if(r>=B/16)out.highLabelCount++;
+   if(r>=R)out.highLabelCount++;
+   if(reset&&r>=R&&j.d<=Amax){
+    const zero=j.phase===0;ok(zero||j.q>0&&j.phase>0&&j.q<=Amax/2,'low late arrival label bound');
+    const q=zero?0:j.q,C=sl.C,v=sl.v,b=j.b,key=[C,v,p,b,q].join(',');
+    if(!roughKeys.has(key))roughKeys.set(key,{C,v,p,b,q,weight:0,pairs:0,early:new Set(),late:new Set()});
+    const k=roughKeys.get(key);k.weight+=w;k.pairs++;k.early.add(i.b);k.late.add(j.b);
+   }
  }
+ const Q={R,Amax,raw:0,paid:0,residual:0,keys:roughKeys.size,zero:0,nonzero:0,detail:[],supports:[]};
+ const prime=[];for(let p=3;p<R;p+=2){if(!prime.some(q=>q*q<=p&&p%q===0))prime.push(p)}
+ const labelPairs=new Map();
+ for(const k of roughKeys.values()){
+    let cap=8*B*(k.q?k.q/Amax:1),paid=Math.min(cap,k.weight);
+    Q.raw+=k.weight;Q.paid+=paid;Q.residual+=k.weight-paid;if(k.q)Q.nonzero+=k.weight;else Q.zero+=k.weight;
+    const label=k.p+','+k.q;
+    if(!labelPairs.has(label))labelPairs.set(label,[]);labelPairs.get(label).push(k);
+    Q.detail.push({...k,early:[...k.early],late:[...k.late],paid,residual:k.weight-paid});
+ }
+ for(const [label,ks] of labelPairs){
+   const [p,q]=label.split(',').map(Number),lo=Math.min(...ks.map(k=>k.C)),hi=Math.max(...ks.map(k=>k.C));let support=0;
+   // Exact relaxed enumeration over realized horizon span, not full window.
+   for(let C=lo;C<=hi;C+=2){
+     if(prime.some(r=>(C-1)%r===0||(C+1)%r===0))continue;
+     for(let s=0;s<2;s++){
+       if((C+2*s-1)%p!==0)continue;
+       const v=(C+p-1+6*s)/2;
+       if(v%2!==s||(v-2*s)%p!==0)continue;
+       for(let d=0;d<=Amax;d+=2){
+         let b=(C+d)/2,t=b%2;if(b>=v||v-b>2*p)continue;
+         if(q===0){if(d===6*t)support++;}
+         else if(d>6*t&&(d-6*t)%(2*q)===0&&(C+2*t)%q===0&&(b-2*t)%q===0)support++;
+       }
+     }
+   }
+   ok(ks.length<=support,'relaxed actual rough RESET low-arrival support');
+   Q.supports.push({p,q,lo,hi,actual:ks.length,support});
+ }
+ ok(close(Q.raw,Q.zero+Q.nonzero)&&close(Q.raw,Q.paid+Q.residual),'rough low-arrival quota');
+ out.quota=Q;
  out.slots=slots.size;out.arrivalKeys=arrivals.size;
  out.keys=[...slots.values()].map(s=>({...s,arrivals:[...s.arrivals.values()].map(a=>({...a,n:a.src.size,src:undefined})).sort((a,b)=>a.b-b.b)})).sort((a,b)=>b.w-a.w);
  ok(close(out.raw,out.reset+out.nonreset)&&close(out.raw,out.lateRoot+out.lateReset+out.lateNonreset)&&close(out.raw,out.rootIncoming+out.sameIncoming+out.differentIncoming),"arrival partition");
