@@ -33,28 +33,37 @@ function audit(X,focus=false,scale=1,gainFactor=8,coarse=false){
 
 
  const s=coarse?large:Math.max(2,Math.floor(scale*Math.sqrt(B)/4)),h=Math.floor(.02*H)+.5,age=Math.floor(.03*H)+.5;
+ const par=Int32Array.from(tags.map(t=>t.id)),mass=new Int32Array(tags.length).fill(1),growth=new Float64Array(tags.length),selected=new Int32Array(tags.length);
+ function find(i){while(par[i]!==i){par[i]=par[par[i]];i=par[i]}return i}
+ let logBudget=0,selectedBudget=0,historyChecks=0;
+ for(let U of [...all].sort((a,b)=>a.t-b.t||a.C-b.C)){let branches=[...U.groups.entries()],ids=branches.map(([k,a])=>find(a[0].tag.id)),n=ids.reduce((v,x)=>v+mass[x],0);
+  ok(new Set(ids).size===ids.length,"distinct historical branches");U.hist=new Map();U.histMass=n;
+  for(let j=0;j<ids.length;j++){let [k,a]=branches[j],r=ids[j],v=Math.log(n/mass[r]);U.hist.set(k,mass[r]);for(let f of a){ok(find(f.tag.id)===r,"historical incoming");growth[f.tag.id]+=v;logBudget+=v;if(2*mass[r]<=n){selected[f.tag.id]++;selectedBudget+=v;}historyChecks++}}
+  let r=ids[0];for(let x of ids.slice(1))par[x]=r;mass[r]=n;
+ }
+ ok(logBudget<=tags.length*Math.log(tags.length)+1e-6&&growth.every(x=>x<=Math.log(tags.length)+1e-8)&&selected.every(x=>x<=Math.log2(tags.length)+1e-8),"historical growth budgets");
  const cache=new Map(),delta=new Map(),deltaRaw=new Map(),staticPairs=new Set();
  function meet(a,b){let k=key(a.tag.id,b.tag.id),q=cache.get(k);if(q)return a.tag.id<b.tag.id?q:[q[1],q[0],q[2]];let x=a.tag.es,y=b.tag.es,i=0,j=0;while(i<x.length&&j<y.length){let u=x[i],v=y[j];if(u.C<v.C){i++;continue}if(v.C<u.C){j++;continue}let t=Math.max(u.t,v.t);if(t<=Math.min(u.end,v.end)){q=[u,v,t];cache.set(k,a.tag.id<b.tag.id?q:[v,u,t]);return q}i++;j++}throw Error("missing birth")}
  function add(m,x,w){m.set(x,(m.get(x)||0)+w)}
- let pieces=0,pairs=0,slotCount=0,thresholdChecks=0,integral=0,integralRaw=0,insertChecks=0,maxInsert=0,primeAgeChecks=0;
- let rows=Ps.map(P=>({P,grid:0,rawGrid:0,sweep:0,rawSweep:0,err:0,bound:0}));
+ let pieces=0,pairs=0,slotCount=0,thresholdChecks=0,integral=0,integralRaw=0,youngIntegral=0,youngPairChecks=0,insertChecks=0,maxInsert=0,primeAgeChecks=0;
+ let rows=Ps.map(P=>({P,grid:0,rawGrid:0,youngGrid:0,youngCap:0,sweep:0,rawSweep:0,err:0,bound:0}));
  function census(a,b,fullPairs,K){
    let ids=new Set(a.map(f=>f.tag.id)),nodes=new Map();
    for(let f of a)for(let U of f.tag.seq){if(U.t>f.end)break;let g=nodes.get(U)||new Map();nodes.set(U,g);let v=f.tag.byC.get(U.C);let k=branch(v,U.t);g.set(k,(g.get(k)||0)+1)}
-   let val=0,raw=0;for(let q of fullPairs){if(!ids.has(q.i)||!ids.has(q.j))continue;let g=nodes.get(q.U),x=g.get(q.k1),y=g.get(q.k2);if(Math.max(x,y)<s)continue;raw+=2;if(q.allowed&&K>=q.lo)val+=2;}
+   let val=0,raw=0,young=0;for(let q of fullPairs){if(!ids.has(q.i)||!ids.has(q.j))continue;let g=nodes.get(q.U),x=g.get(q.k1),y=g.get(q.k2);if(Math.max(x,y)<s)continue;raw+=2;if(q.allowed&&K>=q.lo)val+=2;if(q.allowed&&K<q.youngLo){young+=2;youngPairChecks++;}}
    let sm=0;for(let g of nodes.values()){let a=[...g.values()].filter(x=>x<s);sm+=a.reduce((v,x)=>v+x,0)**2-a.reduce((v,x)=>v+x*x,0)}
-   ok(raw===a.length*(a.length-1)-sm,"raw induced count");return {val,raw};
+   ok(raw===a.length*(a.length-1)-sm,"raw induced count");return {val,raw,young};
  }
  for(let ar of slots.values()){let b=ar.length;if(b<large)continue;slotCount++;let e=ar[0],cuts=new Set([e.C,e.J]),a=ar.filter(f=>f.tag.firstBig),fullPairs=[];
    for(let f of a){let lo=f.tag.firstBig.C+h,hi=f.tag.es.at(-1).C-h;for(let k of [lo,hi])if(k>e.C&&k<e.J)cuts.add(k)}
-   for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++){let f=a[i],g=a[j],[u,v,t]=meet(f,g),U=verts.get(u.C+"|"+t),k1=branch(u,t),k2=branch(v,t),x=U.groups.get(k1).length,y=U.groups.get(k2).length,allowed=Math.max(x,y)>=large,lo=U.C+age;if(allowed){staticPairs.add(key(f.tag.id,g.tag.id));if(lo>e.C&&lo<e.J)cuts.add(lo)}fullPairs.push({i:f.tag.id,j:g.tag.id,U,k1,k2,allowed,lo});pairs++}
+   for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++){let f=a[i],g=a[j],[u,v,t]=meet(f,g),U=verts.get(u.C+"|"+t),k1=branch(u,t),k2=branch(v,t),x=U.groups.get(k1).length,y=U.groups.get(k2).length,allowed=Math.max(x,y)>=large,small=Math.min(U.hist.get(k1),U.hist.get(k2)),a0=.25*H*Math.log(U.histMass/small)/Math.log(tags.length),youngLo=U.C+Math.floor(a0)+.5,lo=Math.max(U.C+age,youngLo);ok(small*2<=U.histMass,'smaller historical branch');if(allowed){staticPairs.add(key(f.tag.id,g.tag.id));if(lo>e.C&&lo<e.J)cuts.add(lo);if(youngLo>e.C&&youngLo<e.J)cuts.add(youngLo)}fullPairs.push({i:f.tag.id,j:g.tag.id,U,k1,k2,allowed,lo,youngLo});pairs++}
    let times=[...cuts].sort((a,b)=>a-b);
    for(let i=1;i<times.length;i++){let l=times[i-1],r=times[i],K=(l+r)/2,eligible=a.filter(f=>K>=f.tag.firstBig.C+h&&K<f.tag.es.at(-1).C-h);
-    let {val,raw}=census(eligible,b,fullPairs,K);ok(val<=raw,"joint cut");thresholdChecks++;
+    let {val,raw,young}=census(eligible,b,fullPairs,K);ok(val<=raw,"joint cut");thresholdChecks++;
     // Independently check the single-member change bound on the raw induced count.
     if(eligible.length){let other=eligible.slice(0,-1),r0=census(other,b,fullPairs,K).raw,change=Math.abs(raw-r0);ok(change<=2*b+2*degree*s*s,"leaf update bound");maxInsert=Math.max(maxInsert,change);insertChecks++}
-    let w=val/b,v=raw/b;add(delta,l,w);add(delta,r,-w);add(deltaRaw,l,v);add(deltaRaw,r,-v);integral+=(r-l)*w;integralRaw+=(r-l)*v;pieces++;
-    for(let z of rows){let n=Math.ceil(r/z.P)-Math.ceil(l/z.P);z.grid+=z.P*n*w;z.rawGrid+=z.P*n*v}
+    let w=val/b,v=raw/b;add(delta,l,w);add(delta,r,-w);add(deltaRaw,l,v);add(deltaRaw,r,-v);integral+=(r-l)*w;integralRaw+=(r-l)*v;youngIntegral+=(r-l)*young/b;pieces++;
+    for(let z of rows){let n=Math.ceil(r/z.P)-Math.ceil(l/z.P);z.grid+=z.P*n*w;z.rawGrid+=z.P*n*v;z.youngGrid+=z.P*n*young/b}
    }
  }
  function sweep(m,which){let xs=[...m.keys()].sort((a,b)=>a-b),tv=0,area=0,f=0,last=xs[0]||0;
@@ -65,8 +74,8 @@ function audit(X,focus=false,scale=1,gainFactor=8,coarse=false){
  // Loose absolute theorem constant; includes threshold crossing, historical merges and pair activations.
  let theoretical=32*tags.length*(large+Math.log2(2+tags.length)+1+degree*s*s/large)+8*staticPairs.size/large;
  ok(sv.tv<=theoretical+1e-6&&sr.tv<=theoretical+1e-6,"global variation bound");
- for(let z of rows){ok(eq(z.grid,z.sweep)&&eq(z.rawGrid,z.rawSweep),"independent grid sum");z.err=Math.abs(z.grid-integral);z.bound=z.P*sv.tv;ok(z.err<=z.bound+1e-6&&Math.abs(z.rawGrid-integralRaw)<=z.P*sr.tv+1e-6,"quadrature");for(let k of Object.keys(z))z[k]=+z[k].toFixed(6)}
- return {X,focus,scale,gainFactor,coarse,B,T,H,N:tags.length,events,hit,m,large,s,h,age,d:degree,pieces,pairs,slotCount,thresholdChecks,insertChecks,maxInsert,staticPairs:staticPairs.size,integral:+integral.toFixed(6),integralRaw:+integralRaw.toFixed(6),tv:+sv.tv.toFixed(6),rawTV:+sr.tv.toFixed(6),breakpoints:sv.keys,theoretical:+theoretical.toFixed(6),rows}
+ for(let z of rows){ok(eq(z.grid,z.sweep)&&eq(z.rawGrid,z.rawSweep),"independent grid sum");z.youngCap=2*(.25*H*selectedBudget/Math.log(tags.length)+(z.P+1)*selected.reduce((a,b)=>a+b,0));ok(z.youngGrid<=z.youngCap+1e-6,'young growth budget');z.err=Math.abs(z.grid-integral);z.bound=z.P*sv.tv;ok(z.err<=z.bound+1e-6&&Math.abs(z.rawGrid-integralRaw)<=z.P*sr.tv+1e-6,"quadrature");for(let k of Object.keys(z))z[k]=+z[k].toFixed(6)}
+ return {X,focus,scale,gainFactor,coarse,logBudget:+logBudget.toFixed(6),selectedBudget:+selectedBudget.toFixed(6),historyChecks,selectedMemberships:selected.reduce((a,b)=>a+b,0),youngIntegral:+youngIntegral.toFixed(6),youngPairChecks,B,T,H,N:tags.length,events,hit,m,large,s,h,age,d:degree,pieces,pairs,slotCount,thresholdChecks,insertChecks,maxInsert,staticPairs:staticPairs.size,integral:+integral.toFixed(6),integralRaw:+integralRaw.toFixed(6),tv:+sv.tv.toFixed(6),rawTV:+sr.tv.toFixed(6),breakpoints:sv.keys,theoretical:+theoretical.toFixed(6),rows}
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));
 for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
