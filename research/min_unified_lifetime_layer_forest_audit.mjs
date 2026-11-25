@@ -1,5 +1,5 @@
 // Lifetime-layer induced forest: founder, attachment and merge area budget.
-function audit(X,focus=false,scale=1,gainFactor=8){
+function audit(X,focus=false,scale=1,gainFactor=8,coarse=false){
  const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(Math.floor(gainFactor*B),Math.floor(X/2)),H=T+B,Ps=[6,30,210],L=6,y=3,theta=scale*L*Math.max(2,Math.floor(Math.sqrt(B))),logTheta=Math.log(theta),bmin=3,lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(v,m)=>{if(!v)throw Error(`${X}/${focus}: ${m}`)},eq=(a,b)=>Math.abs(a-b)<1e-7*Math.max(1,Math.abs(a),Math.abs(b)),mod=(a,b)=>(a%b+b)%b, key=(a,b)=>Math.min(a,b)+"|"+Math.max(a,b);
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
@@ -31,9 +31,9 @@ function audit(X,focus=false,scale=1,gainFactor=8){
  for(let U of all){ok((U.out?U.out.ids.size:0)===U.n-U.ret,"compressed flow");flowChecks++}
 
 
- const s=Math.max(2,Math.floor(scale*Math.sqrt(B)/4)),h=.02*H;
+ const s=coarse?large:Math.max(2,Math.floor(scale*Math.sqrt(B)/4)),h=.02*H;
  const d=degree;
- let rows=Ps.map(P=>({P,eligible:0,founder:0,attach:0,mergeBudget:0,small:0,oldResidual:0,merge:0,attachment:0,smallShare:0,thinMerge:0,support:0,primeAgeChecks:0,activeLayers:0,pairChecks:0,forestChecks:0,keyChecks:0,newAttachment:0}));
+ let rows=Ps.map(P=>({P,eligible:0,founder:0,attach:0,mergeBudget:0,small:0,oldResidual:0,merge:0,attachment:0,smallShare:0,thinMerge:0,support:0,primeAgeChecks:0,activeLayers:0,pairChecks:0,forestChecks:0,keyChecks:0,newAttachment:0,indCut:0,physCut:0,strictCut:0,cutChecks:0}));
  const cache=new Map();function meet(a,b){let k=key(a.tag.id,b.tag.id),q=cache.get(k);if(q)return a.tag.id<b.tag.id?q:[q[1],q[0],q[2]];let x=a.tag.es,y=b.tag.es,i=0,j=0;while(i<x.length&&j<y.length){let u=x[i],v=y[j];if(u.C<v.C){i++;continue}if(v.C<u.C){j++;continue}let t=Math.max(u.t,v.t);if(t<=Math.min(u.end,v.end)){q=[u,v,t];cache.set(k,a.tag.id<b.tag.id?q:[v,u,t]);return q}i++;j++}throw Error("missing birth")}
  for(let z of rows){let P=z.P,keys=new Map();
   for(let ar of slots.values()){let b=ar.length;if(b<large)continue;let e=ar[0];
@@ -51,6 +51,12 @@ function audit(X,focus=false,scale=1,gainFactor=8){
      z.forestChecks++;
     }
     ok(A+S<=n&&s*J<=S&&A+s*J<=n&&ss<=2*d*s*n&&smallMembership.size===A,"layer founder budget");z.founder+=P*S;z.attach+=P*A;z.mergeBudget+=P*s*J;
+    let cuts=new Map(),phys=new Map(),mapping=new Map();
+    for(let f of a){let k0=f.tag.seq.find(U=>U.t<=f.end&&nodes.has(U)&&[...nodes.get(U).counts.values()].reduce((v,x)=>v+x,0)>=s)?.key||"none",p0=f.tag.firstBig.key;
+     cuts.set(k0,(cuts.get(k0)||0)+1);phys.set(p0,(phys.get(p0)||0)+1);if(coarse){ok(!mapping.has(p0)||mapping.get(p0)===k0,"coarsening");mapping.set(p0,k0)}}
+    let ic=n*n-[...cuts.values()].reduce((v,x)=>v+x*x,0),pc=n*n-[...phys.values()].reduce((v,x)=>v+x*x,0);
+    ok(ic===n*(n-1)-ss,"induced cut identity");if(coarse)ok(ic<=pc,"coarse cut comparison");
+    z.indCut+=P*ic/b;z.physCut+=P*pc/b;if(ic<pc)z.strictCut++;z.cutChecks++;
     let loadSmall=0,loadAtt=0,loadMerge=0,loadThin=0;
     for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){let f=a[i],g=a[j],[u,v,t]=meet(f,g),U=verts.get(u.C+"|"+t),k1=branch(u,t),k2=branch(v,t),x=U.groups.get(k1).length,y=U.groups.get(k2).length;if(Math.max(x,y)<large)continue;
       let v0=nodes.get(U),l=v0.counts.get(k1),r=v0.counts.get(k2),w=2*P/b;z.oldResidual+=w;z.pairChecks++;
@@ -65,9 +71,11 @@ function audit(X,focus=false,scale=1,gainFactor=8){
   for(let g of keys.values()){if(g.load<=eta*s*g.support)z.thinMerge+=g.load;z.keyChecks++}
   ok(z.attach+z.mergeBudget<=z.eligible&&z.attach+z.founder<=z.eligible&&eq(z.mergeBudget,s*z.support)&&eq(z.oldResidual,z.small+z.merge+z.attachment)&&z.smallShare<=2*eta*z.attach+1e-6&&z.thinMerge<=eta*z.mergeBudget+1e-6,"global layer budget");for(let k of Object.keys(z))z[k]=+z[k].toFixed(6)
  }
- return {X,focus,scale,gainFactor,B,T,H,N:tags.length,events,hit,m,large,s,h,d,rows}
+ return {X,focus,scale,gainFactor,coarse,B,T,H,N:tags.length,events,hit,m,large,s,h,d,rows}
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));
 for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
 console.log(JSON.stringify(audit(65536,false,.5,2)));
 console.log(JSON.stringify(audit(65536,false,1,2)));
+console.log(JSON.stringify(audit(65536,false,.5,2,true)));
+console.log(JSON.stringify(audit(65536,false,1,8,true)));
