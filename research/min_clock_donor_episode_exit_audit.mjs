@@ -1,11 +1,11 @@
 // Unified donor ascent/inherited episode exits; bounded per-pair storage.
 function exitAudit(uses,B,expected,ok,close){
- const byPair=new Map(),thin=[new Map(),new Map()],U=27,H=8;
+ const byPair=new Map(),thin=[new Map(),new Map()],sourcePaths=new Map(),U=27,H=8;
  let target={raw:0,rMass:0,natural:0,drop:0,pos:0,nonpos:0,zero:0,short:0,keys:0,maxRatio:0},targets=new Set();
  let matched=0,terminal=0,matchedShared=0,matchedInherited=0,terminalShared=0,terminalInherited=0,raw=0,low=0,near=0,checks=0,literal=0,netCap=0,terminalCap=0,maxPairLevel=0,maxEpisodeWeight=0,matchedEdges=0,terminalPairs=0,episodes=0,repeatEpisodes=0,eligible=0,tokenMemberships=0;
  for(const u of uses){
    const key=Math.min(u.a.P.M,u.b.P.M)+','+Math.max(u.a.P.M,u.b.P.M);
-   if(!byPair.has(key))byPair.set(key,[]);byPair.get(key).push(u);
+   if(!byPair.has(key))byPair.set(key,[]);byPair.get(key).push(u);sourcePaths.set(u.a.P.M,u.a.P);sourcePaths.set(u.b.P.M,u.b.P);
  }
  function stateAt(P,t){let i=0,j=P.records.length;while(i<j){let k=(i+j)>>1;if(P.records[k].v<=t)i=k+1;else j=k;}return i<P.records.length?P.records[i].C:P.endC}
  for(const [pk,us] of byPair){
@@ -23,7 +23,7 @@ function exitAudit(uses,B,expected,ok,close){
      const T=A[j0],T1=Q[j1],r=T.r,wT=T.v-T.b,drop=Math.max(0,T.p-1-2*wT),E=wT*wT/(2*r);
      ok(T.C===T1.C&&T.b===T1.b&&T.v===T1.v&&T.p===T1.p&&r===T1.r&&r===u.r&&T.v<=stop,"shared recorded target wait");
      const key=pk+"|"+T.C+","+T.b+","+T.v;ok(!targets.has(key),"pair target counted once");targets.add(key);
-     const x=u.w*B/r,charge=u.w*(u.d-6);ok(x<=1+1e-9&&charge<=12*r*x+1e-7&&r<=18*(E+drop)+1e-7,"direct target coercivity");
+     const x=u.w*B/r,charge=u.w*(u.d-6);ok(x<=1+1e-9&&charge<=12*r*x+1e-7&&r<=18*E+3*drop+1e-7,"direct target coercivity");
      target.raw+=charge;target.rMass+=r*x;target.natural+=E*x;target.drop+=drop*x;
      const drift=2*wT-(T.p-1);if(drift>0)target.pos+=charge;else{target.nonpos+=charge;if(!drift)target.zero+=charge;}
      if(wT<r/4)target.short+=charge;
@@ -51,7 +51,7 @@ function exitAudit(uses,B,expected,ok,close){
          tail.set(l,(tail.get(l)||0)+w);
        }
        // Per-pair episode aggregation; no global quadratic episode storage.
-       const ep=l+'|'+x.z+','+x.C+'|'+y.z+','+y.C;
+       const [ox,oy]=a.P.M<b.P.M?[x,y]:[y,x];const ep=l+'|'+ox.z+','+ox.C+'|'+oy.z+','+oy.C;
        let c=episode.get(ep);if(!c){c={w:0,exit:code,ty};episode.set(ep,c)}ok(c.exit===code&&c.ty===ty,"episode exit independent of anchor");
        c.w+=w;
        if(l<=6+H)low+=w;
@@ -76,7 +76,8 @@ function exitAudit(uses,B,expected,ok,close){
  }
  const quota=m=>{let pay=[0,0],rem=[0,0];for(let i=0;i<2;i++)for(const w of thin[i].values()){if(w<=m+1e-10)pay[i]+=w;else rem[i]+=w}ok(close(eligible,pay[0]+pay[1]+rem[0]+rem[1]),"token quota ledger");return {m,pay,rem,capacity:m*(thin[0].size+thin[1].size)}};
  tokenMemberships=thin[0].size+thin[1].size;
- ok(close(target.raw,raw)&&raw<=216*(target.natural+target.drop)+1e-7&&close(target.raw,target.pos+target.nonpos),'direct target ledger');
+ const tokenCounts=new Map();for(const t of thin)for(const k of t.keys()){let M=Number(k.split('|')[0]);tokenCounts.set(M,(tokenCounts.get(M)||0)+1)}for(const [M,n] of tokenCounts){let P=sourcePaths.get(M);ok(n<=4*(P.end-P.s),'actual token membership bound')}
+ ok(close(target.raw,raw)&&raw<=216*target.natural+36*target.drop+1e-6&&close(target.raw,target.pos+target.nonpos),'direct target ledger');
  ok(close(raw,expected)&&close(raw,matched+terminal)&&close(matched,matchedShared+matchedInherited)&&close(terminal,terminalShared+terminalInherited)&&close(raw,low+near+eligible)&&matched<=U*netCap+1e-7&&terminal<=U*terminalCap+1e-7,"global exit ledger");
  return {target,raw,matched,terminal,matchedShared,matchedInherited,terminalShared,terminalInherited,low,near,eligible,netCap,terminalCap,maxPairLevel,maxEpisodeWeight,matchedEdges,terminalPairs,episodes,repeatEpisodes,checks,literal,pairs:byPair.size,tokenMemberships,thinCounts:thin.map(x=>x.size),quota:[quota(1),quota(8)]};
 }
