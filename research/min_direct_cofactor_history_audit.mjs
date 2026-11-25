@@ -25,7 +25,11 @@ function audit(N=100000,steps=24){
  // Independent exact conditional prediction for all actual prime pairs in both classes,
  // whether or not the reset is reachable; check only state arithmetic and next clock.
  for(let p=13;p*(p+3)+1<cap;p+=2)if(spf[p]===p&&spf[p+2]===p+2){let Z=p*(p+3)-(p%4===1?0:2),t=Z/2+(p%4===1?0:3),e=next(t,Z);if(e?.p!==3||e?.w!==4)throw Error("conditional phase");res.pairChecks++}
- return res
+ // Separate abstract phase-space controls: exact two-edge histories, NOT canonical roots.
+ let abstract={targets:0,arrivals:0,compositeArrivals:0,primeArrivals:0,oddArrivals:0,oppositePairs:0,samePairs:0,compositeOppositePairs:0,compositeSamePairs:0,oppositeExample:null,oddExample:null};
+ for(let p=11;p<=500&&p*(p+3)+1<cap;p+=2)if(spf[p]===p){let q=p+2,s=p%4===1?-1:1,delta=s===-1?0:6,C=p*q-s,Z=C+p-1,n=(Z+delta)/2,r=spf[q],comp=r!==q;abstract.targets++;for(let w=1;w<=2*p;w++){let t=n-w,d=2*t-C;if(d<0)continue;let win=next(t,C);if(!win||win.p!==p||win.w!==w||win.s!==s)continue;abstract.arrivals++;if(comp){abstract.compositeArrivals++;if(w>r-1||d<p+1+delta-2*r)throw Error('abstract late entry')}else abstract.primeArrivals++;if(s===1){abstract.oddArrivals++;if(!abstract.oddExample)abstract.oddExample={p,q,C,Z,n,t,w,d,delta,comp}}
+ let side=t%2?1:-1;for(let l of new Set(factors(C+(side===1?2:0)))){let Cp=C-l+1;if(Cp<4||2*(t-1)<Cp)continue;let prev=next(t-1,Cp);if(!prev||prev.w!==1||prev.p!==l||prev.s!==side)continue;if(side===s){abstract.samePairs++;if((p+1)%l||w<l-1||w%2)throw Error('abstract same side');if(comp){abstract.compositeSamePairs++;if(!(l<r))throw Error('abstract descent')}}else{abstract.oppositePairs++;let u=s===-1?2*w+8:2*w-4,H=u*u+(s===-1?2:-2);if(H%l||H===0)throw Error('abstract opposite side');if(comp){abstract.compositeOppositePairs++;if(!abstract.oppositeExample)abstract.oppositeExample={p,q,r,s,C,Z,t,n,w,d,delta,l,side,Cp,start:t-1}}}}
+ }}res.abstract=abstract;return res
 }
 
 console.log(JSON.stringify(audit(Number(process.argv[2] || 100000),Number(process.argv[3] || 24)),null,2));
