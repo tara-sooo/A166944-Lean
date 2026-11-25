@@ -957,7 +957,7 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
    for(const k of cutKeys)cutCap+=base*k.factor;
    const usage=new Map();
    for(const e of edges.values()){
-     const f=e.w-e.arc.cap;if(extended&&high&&!trimmed&&!custom)for(const z of e.tags)z.multiUnpaid=e.arc.cap/e.w;ok(f>=-EPS&&f<=e.w+EPS,"joint intersection flow");paidDirect+=f;paidOther+=e.other*f/e.w;
+     const f=e.w-e.arc.cap;if(custom)for(const z of e.tags)z[high?"gridUnpaidHigh":"gridUnpaidMed"]=Math.max(0,Math.min(1,e.arc.cap/e.w));if(extended&&high&&!trimmed&&!custom)for(const z of e.tags)z.multiUnpaid=e.arc.cap/e.w;ok(f>=-EPS&&f<=e.w+EPS,"joint intersection flow");paidDirect+=f;paidOther+=e.other*f/e.w;
      const used=e.arcs.map(a=>a.initial-a.cap);ok(near(used.reduce((s,x)=>s+x,0),f),"joint node conservation");
      for(let i=0;i<used.length;i++){const id=e.keys[i];usage.set(id,(usage.get(id)||0)+used[i]);if(ks.get(id).kind==="anchor-tag"||ks.get(id).kind==="precut-same")tagPaid+=used[i];else if(ks.get(id).kind.startsWith("compressed-"))compressedPaid+=used[i];else if(i===0)projPaid+=used[i];else physPaid+=used[i];}
      if(e.keys.every(k=>cutSet.has(k))){cutWeight+=e.w;internalPairs+=e.pairs;}
@@ -1109,7 +1109,7 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
    const d0=gridDs[j],fee=1/(j+1)**2,hm=analytic?Math.floor(B*u**1.5*d0/H*fee):gridStress?8:3,mm=analytic?Math.floor(mg/u**.25*d0/H*fee):gridStress?6:2;
    const info={d:d0,hm,mm,members:0,cuts:0,pairs:0,high:0,med:0};gridInfo.push(info);
    const queries=new Map([...gridData.values()].filter(g=>g.j===j).map(g=>[g.x,g]));
-   for(const ar of roots.values())for(const e of ar)if(e.next)for(let x=d0*Math.ceil(e.C/d0);x<e.next.C;x+=d0){const g=queries.get(x);if(g){g.es.push(e);info.members++;}}
+   if(queries.size)for(const ar of roots.values())for(const e of ar)if(e.next)for(let x=d0*Math.ceil(e.C/d0);x<e.next.C;x+=d0){const g=queries.get(x);if(g){g.es.push(e);info.members++;}}
    ok(info.members<=N*(1+Math.ceil(H/d0)),"multigrid full membership budget");
    gridMembership+=info.members;info.cuts=queries.size;
    for(const g of queries.values()){
@@ -1131,8 +1131,9 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
  ok(gridAssignedPairs+gridShallow===gridPairs.length,"multigrid assignment partition");
  const gridAfterHigh=jointBirthFlow("high",true,false,true),gridAfterMed=jointBirthFlow("med",true,false,true);delete gridAfterHigh.cutIds;delete gridAfterMed.cutIds;
  ok(gridAfterHigh.residual<=pcFinalHigh.residual+1e-6&&gridAfterMed.residual<=pcFinalMed.residual+1e-6,"multigrid reopt monotonic");
- // Actual residual support cores. Work on PRE-quota remaining pair weights,
- // not arbitrary flow-dependent fractions. Use global root constraints plus
+ // Actual residual support cores. Freeze the unpaid fractions of the feasible
+ // multigrid flow; remove only these amounts from the original pair weights.
+ // Use global root constraints plus
  // per-cut and per-opposite-edge-cohort constraints. A pair is in at most
  // six endpoint constraints, and every constraint is removed at most once.
  function gridCore(metric){
@@ -1140,9 +1141,10 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
    const globalCap=analytic?(hi?B*u**1.5:mg/u**.25)*unit:hi?H/(gridStress?4:16):gridStress?.5:.1;
    let paid=0,paidOther=0,deleted=0,coreBudget=0,full=0,fullOther=0,initialByKind={},paidByKind={},peelsByKind={},pairGroups=new Map();
    function node(id,cap,kind){let n=nodes.get(id);if(!n){n={id,cap,kind,degree:0,edges:[],dead:false};nodes.set(id,n);coreBudget+=cap;initialByKind[kind]=(initialByKind[kind]||0)+cap;}else ok(near(n.cap,cap),"fixed core capacity");return n;}
-   for(const z of gridPairs){const w=z[key];if(w<=1e-12)continue;const e={z,w,other:z[other],nodes:[],dead:false},g=z.gridId!==undefined?gridData.get(z.gridId):null;
+   for(const z of gridPairs){const frac=z[hi?"gridUnpaidHigh":"gridUnpaidMed"]||0,w=z[key]*frac;if(w<=1e-12)continue;const e={z,w,frac,other:z[other]*frac,nodes:[],dead:false},g=z.gridId!==undefined?gridData.get(z.gridId):null;
      full+=w;fullOther+=e.other;
      for(const M of [z.M,z.Mp])e.nodes.push(node("R:"+M,globalCap,"root"));
+     if(!g)e.nodes.push(node("Y:"+z.Mp,globalCap,"root-contact"));
      if(g){
        const d0=gridDs[g.j],fee=1/(g.j+1)**2,scale=analytic?unit*(hi?B*u**1.5:mg/u**.25)*d0/H*fee:hi?H/(gridStress?4:32):gridStress?.5:.08;
        const v=hi?g:g.cells.get(sourceCell(z.M));ok(v.map.has(z.Mp),"core medium cell");
@@ -1161,7 +1163,7 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
      ok(charge<=n.cap+1e-7,"core peel within local capacity");paidByKind[n.kind]=(paidByKind[n.kind]||0)+charge;
    }
    let remaining=0,otherRemaining=0,edges=0,activeNodes=0,minDegree=Infinity;
-   for(const e of edgeList)if(e.dead){e.z[key]=0;e.z[other]=0;if(!hi)e.z.pcLo=e.z.pcHi=0;}else{remaining+=e.w;otherRemaining+=e.other;edges++;for(const n of e.nodes)ok(!n.dead&&n.degree>n.cap-1e-8,"surviving core degree");}
+   for(const e of edgeList)if(e.dead){e.z[key]*=1-e.frac;e.z[other]*=1-e.frac;if(!hi){e.z.pcLo*=1-e.frac;e.z.pcHi*=1-e.frac;}}else{remaining+=e.w;otherRemaining+=e.other;edges++;for(const n of e.nodes)ok(!n.dead&&n.degree>n.cap-1e-8,"surviving core degree");}
    for(const n of nodes.values())if(!n.dead&&n.degree>1e-9){activeNodes++;minDegree=Math.min(minDegree,n.degree/n.cap);}
    let rectangles=0,rectRaw=0,rectAllowed=0,rectWeight=0,rectEnvelope=0,rectWitness=0,rectMinLeft=Infinity,rectMinRight=Infinity,rectMoment1=0,rectMoment2=0,rectDegreeChecks=0,rectMaxDensity=0;
    for(const rec of pairGroups.values()){
@@ -1184,13 +1186,23 @@ function audit(X,mode,crtStress=false,gainStress=false,windowStress=false,revers
      for(const e of live){const z=e.z;const a=z.gridA,b=z.gridB;const an=e.nodes.find(n=>n.kind==="opposite"&&n.id.includes(":"+a.M+":")),bn=e.nodes.find(n=>n.kind==="opposite"&&n.id.includes(":"+b.M+":"));ok(an&&bn&&an.degree>an.cap-1e-8&&bn.degree>bn.cap-1e-8,"both opposite core degrees");rectDegreeChecks++;}
    }
    ok(near(full,paid+remaining)&&near(fullOther,paidOther+otherRemaining)&&paid<=coreBudget+1e-6,"core weight conservation");
+   // Independent simultaneous-round peeling, recomputing weighted degrees
+   // from scratch. The greatest admissible support is order independent.
+   const liveSet=new Set(edgeList);let rounds=0,oracleChecks=0;
+   while(true){const sums=new Map();for(const e of liveSet)for(const n of e.nodes)sums.set(n,(sums.get(n)||0)+e.w);
+     const bad=new Set([...sums].filter(([n,w])=>w<=n.cap+1e-10).map(([n])=>n));if(!bad.size)break;
+     let count=0;for(const e of liveSet)if(e.nodes.some(n=>bad.has(n))){liveSet.delete(e);count++;}ok(count>0,"batch core progress");rounds++;
+   }
+   for(const e of edgeList){ok(liveSet.has(e)===!e.dead,"order-independent core oracle");oracleChecks++;}
+   const upperBudget=2*N*globalCap+gridInfo.reduce((z,v,j)=>{const scale=analytic?unit*(hi?B*u**1.5:mg/u**.25)*v.d/H/(j+1)**2:hi?H/(gridStress?4:32):gridStress?.5:.08;return z+2*scale*v.members;},0);
+   ok(coreBudget<=upperBudget+1e-6,"full original core capacity budget");
    ok(!hi||rectWeight<=rectEnvelope+1e-6,"retained-tail rectangle upper bound");
    ok(rectMoment2===0||rectMoment1*rectMoment1/rectMoment2<=rectWitness+1e-6,"rectangle witness moment");
-   return {full,fullOther,paid,paidOther,remaining,otherRemaining,deleted,edges,nodes:nodes.size,nodePops,activeNodes,coreBudget,minDegree:Number.isFinite(minDegree)?minDegree:0,initialByKind,paidByKind,peelsByKind,rectangles,rectRaw,rectAllowed,rectWeight,rectEnvelope,rectWitness,rectMoment1,rectMoment2,rectMinLeft:Number.isFinite(rectMinLeft)?rectMinLeft:0,rectMinRight:Number.isFinite(rectMinRight)?rectMinRight:0,rectDegreeChecks,rectMaxDensity};
+   return {full,fullOther,paid,paidOther,remaining,otherRemaining,deleted,edges,rounds,oracleChecks,upperBudget,nodes:nodes.size,nodePops,activeNodes,coreBudget,minDegree:Number.isFinite(minDegree)?minDegree:0,initialByKind,paidByKind,peelsByKind,rectangles,rectRaw,rectAllowed,rectWeight,rectEnvelope,rectWitness,rectMoment1,rectMoment2,rectMinLeft:Number.isFinite(rectMinLeft)?rectMinLeft:0,rectMinRight:Number.isFinite(rectMinRight)?rectMinRight:0,rectDegreeChecks,rectMaxDensity};
  }
  const gridHighCore=gridCore("high"),gridMedCore=gridCore("med");
  const gridFinalHigh=jointBirthFlow("high",true,false,true),gridFinalMed=jointBirthFlow("med",true,false,true);delete gridFinalHigh.cutIds;delete gridFinalMed.cutIds;
- ok(near(gridFinalHigh.total,gridHighCore.remaining)&&near(gridFinalMed.total,gridMedCore.remaining)&&gridFinalHigh.residual<=gridAfterHigh.residual+1e-6&&gridFinalMed.residual<=gridAfterMed.residual+1e-6,"core-first flow conservation and monotonicity");
+ ok(near(gridHighCore.full,gridAfterHigh.residual)&&near(gridMedCore.full,gridAfterMed.residual)&&near(gridFinalHigh.total+gridHighCore.paid,gridAfterHigh.total)&&near(gridFinalMed.total+gridMedCore.paid,gridAfterMed.total)&&gridFinalHigh.residual<=gridHighCore.remaining+1e-6&&gridFinalMed.residual<=gridMedCore.remaining+1e-6,"unpaid core then reoptimization conservation");
  let anchorTagFactor=0,anchorCompressedFactor=0;
  for(const key of anchorKeySet.values())if(key.kind==="anchor-tag")anchorTagFactor+=key.factor;else anchorCompressedFactor+=key.factor;
  ok(anchorTagFactor<=anchorFactorScale*(anchorGainBudget+anchorRootBudget)+1e-6,"queried tag capacity budget");
