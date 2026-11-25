@@ -57,19 +57,17 @@ function audit(N=8000){
    for(let z=0;z<L;z++){let p=step(h,t);rows.push({H:h,t,d:2*t-h,p});h+=p?p-1:0;t++}
    st.abstractStarts++;inspect(rows,L,S,j,D,A,G,groups);
    let counts=new Map;for(let r of rows)if(r.p)counts.set(r.p,(counts.get(r.p)||0)+1);
-   for(let [p,c] of counts){if(c>2*(Math.floor((L-1)/(2*p))+1)||c*(p-1)>L+2*(p-1))throw Error("clock gain");st.clockGainChecks++}
-   let high=[...counts.keys()].filter(p=>p>S),lowGain=[...counts].filter(([p])=>p<=S).reduce((v,[p,c])=>v+c*(p-1),0),R=Math.max(S,...counts.keys()),capLow=ps.filter(p=>p<=S).reduce((v,p)=>v+L+2*(p-1),0);
+   for(let [p,c] of counts){if(c>1+Math.floor((L+1)/p)||c*(p-1)>=(L+p))throw Error("clock gain");st.clockGainChecks++}
+   let high=[...counts.keys()].filter(p=>p>S),lowGain=[...counts].filter(([p])=>p<=S).reduce((v,[p,c])=>v+c*(p-1),0),R=Math.max(S,...counts.keys()),capLow=ps.filter(p=>p<=S).reduce((v,p)=>v+(p-1)*(1+Math.floor((L+1)/p)),0);
    let total=h-H;
-   if(lowGain>capLow||total>capLow+high.length*(L+2*(R-1)))throw Error("gain forcing");
-   if(total>capLow+(j-1)*(L+2*(R-1))){if(high.length<j)throw Error("forced");st.forcedDiscoveries++}
+   if(lowGain>capLow||total>capLow+high.length*(L+R))throw Error("gain forcing");
+   if(total>capLow+(j-1)*(L+R)){if(high.length<j)throw Error("forced");st.forcedDiscoveries++}
   }verify(groups,L,S,j,D,G)
  }
  for(let M=5;M<=N;M+=2){
   let H=2*M-2,t=M+2,rows=[],ev=[];st.roots++;
   for(let z=0;z<3000;z++){let p=step(H,t);rows.push({H,t,d:2*t-H,p});t++;st.ticks++;if(p){H+=p-1;st.events++;ev.push(z)}if(H+3>=cap)throw Error("cap");if(spf[H-1]===H-1&&spf[H+1]===H+1)break}
   for(let [L,S,j,D] of [[8,5,1,24],[12,5,2,36],[24,7,2,48]]){let A=(D+2*L+3)**2+2,G=Math.max(0,H-A),groups=new Map;inspect(rows,L,S,j,D,A,G,groups);verify(groups,L,S,j,D,G)}
-  for(let z of ev){let r=rows[z],p=r.p;if(p<47||p<5*r.d+15)continue;let I=(r.t+1)%2,d1=r.d+3-p;if(d1-6*I!==2*p)continue; // use explicit preceding state from event tick; typical A1 condition is before waiting, not tick; separate abstract test below
-  }
   // Actual recoveries from post-A1 (identify pre-wait event state).
   let prevD=6;
   for(let idx=0;idx<ev.length;idx++){let z=ev[idx],r=rows[z],p=r.p,I=(r.t+1)%2,dp=r.d+3-p;
@@ -77,8 +75,8 @@ function audit(N=8000){
     let end=z+1;while(end<rows.length&&end-z<=60&&rows[end].d+3>p)end++;
     if(end<rows.length&&end-z<=60&&rows[end].d+3<=p){
      let w=rows.slice(z+1,end),L=w.length,counts=new Map;for(let a of w)if(a.p)counts.set(a.p,(counts.get(a.p)||0)+1);
-     let S=7,R=Math.max(S,...counts.keys()),gain=w.reduce((a,b)=>a+(b.p?b.p-1:0),0),lowCap=ps.filter(q=>q<=S).reduce((a,q)=>a+L+2*(q-1),0);
-     if(gain< p+3||gain>lowCap+[...counts.keys()].filter(q=>q>S).length*(L+2*(R-1)))throw Error("recovery");st.recoveryChecks++
+     let S=7,R=Math.max(S,...counts.keys()),gain=w.reduce((a,b)=>a+(b.p?b.p-1:0),0),lowCap=ps.filter(q=>q<=S).reduce((a,q)=>a+(q-1)*(1+Math.floor((L+1)/q)),0);
+     if(gain< p+3||gain>lowCap+[...counts.keys()].filter(q=>q>S).length*(L+R))throw Error("recovery");st.recoveryChecks++
     }
    }prevD=dp;
   }
