@@ -1,7 +1,7 @@
 // First common recorded high-deficit attainment transport.
-function recordLift(uses,B,L,expected,ok,close,Q,Y,factor){
+function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
  const pairs=new Map(),keys=new Map(),mem=new Map(),births=new Map(),stats={Q,Y,factor,raw:0,pos:0,small:0,smallEnergy:0,recent:0,old:0,lift:0,birth:0,birthStock:0,oldEnergy:0,maxPairBoundary:0,maxPairBirth:0,minPost:Infinity,minBirth:Infinity,maxLag:0,maxDensity:0,keys:0,vertices:0,labels:{},paid:0,residual:0,vertexPaid:0,vertexResidual:0,oracle:0,checks:0,detail:[]};
- const R={eligible:0,unsafe:0,initial:0,record:0,birthLevels:0,recordLevels:0,recordEnergy:0,recordCapacity:0,birthStock:0,maxPairLevel:0,maxTheta:0,recordEdges:0,recordKeys:0,labels:{},birthPairs:0,recordPairs:0,strict:0,atEntry:0,minLevel:null,maxLevel:0,earliestClock:null,latestClock:0,paid1:0,paid8:0,res1:0,res8:0,tokens:0,maxBirth:0,birthTypes:{},pairBirthMin:null,pairBirthMax:0};
+ const R={lower,upper,eligible:0,unsafe:0,initial:0,record:0,birthLevels:0,recordLevels:0,recordEnergy:0,recordCapacity:0,birthStock:0,maxPairLevel:0,maxTheta:0,recordEdges:0,recordKeys:0,labels:{},birthPairs:0,recordPairs:0,strict:0,atEntry:0,minLevel:null,maxLevel:0,earliestClock:null,latestClock:0,paid1:0,paid8:0,res1:0,res8:0,tokens:0,maxBirth:0,birthTypes:{},pairBirthMin:null,pairBirthMax:0};
  const role=new Map(),rkeys=new Set(),sourcePaths=new Map();
  for(const u of uses){
   const A=u.a.P.records,V=u.b.P.records,i0=A.findIndex((e,i)=>i>u.a.k&&e.C===u.recipient),j0=V.findIndex((e,i)=>i>u.b.k&&e.C===u.recipient),T=A[i0],U=V[j0],D=u.d-6,c=u.w*D;
@@ -42,11 +42,11 @@ function recordLift(uses,B,L,expected,ok,close,Q,Y,factor){
     if(factor>=20)ok(e.post>=6+I.D/4-1e-7,"high coarse entry");
     let key=[K,e.C,e.v,e.p].join(',');
     let old=Kweights.get(key);if(!old){old={w:0,e,K};Kweights.set(key,old)}old.w+=w;
-    if(I.D>=16&&e.post>=6+Math.floor(I.D/4)){recordMass+=w;minEntry=Math.min(minEntry,e.v);R.eligible+=w;}else{R.unsafe+=w;}
+    if(I.D>=16&&e.post>=6+Math.floor(I.D*upper)){recordMass+=w;minEntry=Math.min(minEntry,e.v);R.eligible+=w;}else{R.unsafe+=w;}
     stats.lift+=w;stats.labels[e.p]=(stats.labels[e.p]||0)+w;stats.minPost=Math.min(stats.minPost,e.post);stats.maxLag=Math.max(stats.maxLag,I.hi-J);
    }
    if(recordMass>0){
-     const lo=7+Math.floor(I.D/8),hi=6+Math.floor(I.D/4),n=hi-lo+1;
+     const lo=7+Math.floor(I.D*lower),hi=6+Math.floor(I.D*upper),n=hi-lo+1;
      ok(n>=I.D/16&&recordMass<=I.c+1e-6,"high record band and target mass");
      const wt=recordMass/n;
      ok(wt<=16*I.theta+1e-7,"per target per-level density");
@@ -1158,7 +1158,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  ok(shared<=globalBound+1e-7,"global upstream moment");ok(close(scaledTotal,scaledDiag+2*(scaledShared+scaledInherited))&&close(scaledUpstream,scaledUnweightedShared)&&scaledShared<=scaledUnweightedShared+1e-7&&scaledUnweightedShared<=12*maxReuseR*weightedKeyEnergy+1e-7,'global gain-weighted shared moment');
  ok(nearMoment<=nearBound+1e-7&&close(nearBound,4*(nearDiagonal+2*nearShared)),'near-origin band quadratic bound');
  const exit=exitAudit(exitUses,B,scaledShared+scaledInherited,ok,close),phase=targetPhaseAudit(exitUses,X,B,L,y,rr,scaledShared+scaledInherited,ok,close);
- return {L,y,R,raw,anchors:groups.size,exit,phase,prefix:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/4),prefixWide:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/2),adaptive:adaptiveAudit(exitUses,B,scaledShared+scaledInherited,ok,close),boundary6:boundaryDebit(exitUses,B,L,scaledShared+scaledInherited,ok,close,6,3),boundary30:boundaryDebit(exitUses,B,L,scaledShared+scaledInherited,ok,close,30,5),lift6:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,6,3,20),lift30:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,30,5,20),lift210:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,210,7,0),scaledShared,scaledInherited,scaledDiag,scaledTotal};
+ return {L,y,R,raw,anchors:groups.size,exit,phase,prefix:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/4),prefixWide:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/2),adaptive:adaptiveAudit(exitUses,B,scaledShared+scaledInherited,ok,close),boundary6:boundaryDebit(exitUses,B,L,scaledShared+scaledInherited,ok,close,6,3),boundary30:boundaryDebit(exitUses,B,L,scaledShared+scaledInherited,ok,close,30,5),lift6:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,6,3,20),lift30:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,30,5,20),lift210:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,210,7,0),recordUpper:recordLift(exitUses,B,L,scaledShared+scaledInherited,ok,close,210,7,0,1/4,3/8),scaledShared,scaledInherited,scaledDiag,scaledTotal};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
