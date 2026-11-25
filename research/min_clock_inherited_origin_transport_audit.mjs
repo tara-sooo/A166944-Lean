@@ -15,7 +15,7 @@ function originTransport(edges,B,ok,close,kappa=1){
    let g=groups.get(key);g.es.push(e);g.left.add(e.i);g.right.add(e.j);g.w+=e.w;
    ok(!seen.has(e.i+','+e.j+','+e.l),"unique directed pair-level");seen.add(e.i+','+e.j+','+e.l);raw+=e.w;
  }
- let Q=0,initialOutQ=0,initialInQ=0,maxTargets=0,maxOrigins=0,maxLeftRatio=0,maxRepeat=0,weightedQ=0,rawClassBalanced=0,rawClassUnbalanced=0,rawGainTransfer=0,maxGroupRatio=0,originFull=0;
+ let Q=0,initialOutQ=0,initialInQ=0,repeatOrigins=0,maxDegree=0,maxTargets=0,maxOrigins=0,maxLeftRatio=0,maxRepeat=0,weightedQ=0,rawClassBalanced=0,rawClassUnbalanced=0,rawGainTransfer=0,maxGroupRatio=0,originFull=0;
  for(const n of nodes.values()){
    Q+=n.vs.size**2;
    const ins=new Set([...n.ins].map(e=>e.i)),outs=new Set([...n.outs].map(e=>e.j));
@@ -29,6 +29,14 @@ function originTransport(edges,B,ok,close,kappa=1){
      ok(!left.has(e.i)||left.get(e.i)===e.A,"one left source per persistent right-origin class");left.set(e.i,e.A);
    }
    const rsum=[...tg.values()].reduce((a,g)=>a+g.r,0);
+   if(tg.size>1)repeatOrigins++;
+   const latest=[...n.outs].sort((a,b)=>b.recA.v-a.recA.v)[0];
+   for(const key of tg.keys()){
+     const t=nodes.get(key).record;
+     ok(latest.path.records.some(e=>e.C===t.C&&e.v===t.v&&e.r===t.r),"one actual longest right continuation covers every target");
+   }
+   maxDegree=Math.max(maxDegree,[...tg.values()].reduce((a,g)=>a+g.left.size,0));
+   ok(left.size===[...tg.values()].reduce((a,g)=>a+g.left.size,0),"disjoint opposite source sets");
    // All target slots are on the one deterministic continuation of this origin.
    ok(rsum<=1.5*(12*B+6),"origin target gain bound");
    maxTargets=Math.max(maxTargets,tg.size);maxRepeat=Math.max(maxRepeat,rsum/B);maxLeftRatio=Math.max(maxLeftRatio,left.size/right.size);
@@ -61,8 +69,9 @@ function originTransport(edges,B,ok,close,kappa=1){
  // A second independent comparison uses actual out-role weighted degree only:
  // allocate at most kappa*U0*n^2 even at a heavy origin, without deleting all edges.
  let partial=0;for(const n of nodes.values()){let nr=new Set([...n.outs].map(e=>e.j)).size;partial+=Math.min([...n.outs].reduce((a,e)=>a+e.w,0),27*kappa*nr*nr)}
+ let oracle=new Set(edges),changed=true;while(changed){changed=false;let degrees=new Map();for(const e of oracle)for(const c of inc.get(e))degrees.set(c,(degrees.get(c)||0)+e.w);let del=[...oracle].filter(e=>inc.get(e).some(c=>degrees.get(c)<=c.cap+1e-10));for(const e of del){oracle.delete(e);changed=true}}ok(oracle.size===alive.size&&[...oracle].every(e=>alive.has(e)),"independent origin graph core");
  let maxGroupWeight=0;for(const g of groups.values()){maxGroupWeight=Math.max(maxGroupWeight,g.w);maxGroupRatio=Math.max(maxGroupRatio,g.right.size/g.left.size);ok(g.w<=27*g.right.size*g.left.size+1e-7,"actual class pair envelope")}
- return {kappa,raw,Q,initialOutQ,initialInQ,nodes:nodes.size,tokens:tokens.size,groups:groups.size,maxTargets,maxOrigins,maxLeftRatio,maxRepeat,weightedQ,rawClassBalanced,rawClassUnbalanced,rawGainTransfer,originFull,paid,remaining,cap,partial,maxGroupWeight,maxGroupRatio};
+ return {kappa,raw,Q,initialOutQ,initialInQ,nodes:nodes.size,tokens:tokens.size,groups:groups.size,maxTargets,maxOrigins,maxLeftRatio,maxRepeat,repeatOrigins,maxDegree,weightedQ,rawClassBalanced,rawClassUnbalanced,rawGainTransfer,originFull,paid,remaining,cap,partial,maxGroupWeight,maxGroupRatio};
 }
 // Sharp same-slot inherited hit caps and positive/nonpositive occupation transfer.
 function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
@@ -86,7 +95,7 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
      const key=C+','+H.v;let s=S.get(key);if(!s){s={C,v:H.v,p,r,edges:new Map(),rec:new Map(),levels:new Map()};S.set(key,s)}
      for(const [M,e] of [[E.P.M,H],[L.P.M,A]]){let old=s.rec.get(M);ok(!old||old===e,"unique actual slot membership");s.rec.set(M,e)}
      let edge=s.edges.get(pk);if(!edge){ok(!pairsSeen.has(pk),"same-slot hit unique per pair");pairsSeen.add(pk);edge={i:L.P.M,j:E.P.M,w:0,n:0,wL,wE,dL,dE,dV,age,pre};s.edges.set(pk,edge)}
-     ok(edge.i===L.P.M&&edge.j===E.P.M,"fixed role");edge.w+=w;edge.n++;if(!s.levels.has(l))s.levels.set(l,[]);s.levels.get(l).push({edge,w,origin:E.levels[l],originRec:E.P.records[E.levels[l].i],leftRec:A});
+     ok(edge.i===L.P.M&&edge.j===E.P.M,"fixed role");edge.w+=w;edge.n++;if(!s.levels.has(l))s.levels.set(l,[]);s.levels.get(l).push({edge,w,origin:E.levels[l],originRec:E.P.records[E.levels[l].i],leftRec:A,path:E.P});
    }
  }
  const lev={raw:0,paid:0,remaining:0,balanced:0,unbalanced:0,positiveSquare:0,balancedSquare:0,fullPositiveSquare:0,membership:0,capacity:0,keys:0,fully:0,maxRatio:0,maxBalancedRatio:0,oracle:0};
@@ -141,7 +150,7 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
          ok(rec.C===O.C&&rec.b<O.z&&O.z<rec.v&&2*rec.b-rec.C<l&&post>=l&&O.z<z,"right independent positive net ascent");
          const akey=z+','+s.C+','+l,okey=O.z+','+O.C+','+l;
          for(const [key,rec0,M] of [[akey,A,e.edge.i],[okey,rec,e.edge.j]]){if(!originRecords.has(key))originRecords.set(key,new Map());originRecords.get(key).set(M,rec0)}
-         transportEdges.push({A:akey,O:okey,i:e.edge.i,j:e.edge.j,l,w:e.w,rA:s.r,rO:rec.r,recA:A,recO:rec});
+         transportEdges.push({A:akey,O:okey,i:e.edge.i,j:e.edge.j,l,w:e.w,rA:s.r,rO:rec.r,recA:A,recO:rec,path:e.path});
        }
      }
      if(lev.oracle<64){const aa=new Set(edges);let changed=true;while(changed){changed=false;const ds=new Map();for(const e of aa)for(const k of [e.edge.i,e.edge.j])ds.set(k,(ds.get(k)||0)+e.w);for(const e of aa)if(ds.get(e.edge.i)<=m+1e-10||ds.get(e.edge.j)<=m+1e-10){aa.delete(e);changed=true}}ok(aa.size===alive.size&&[...aa].every(e=>alive.has(e)),"independent level core");lev.oracle++}
@@ -168,10 +177,10 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
  }
  ok(close(expected,tot.low+tot.recent+tot.same+tot.distinct+tot.skip)&&close(tot.same,tot.small+tot.pos+tot.nonpos)&&close(tot.same,tot.small+tot.slotRolePaid+tot.slotRoleResidual)&&close(tot.nonpos,tot.balancedRaw+tot.unbalancedRaw),"complete same-slot ledger");
  ok(close(lev.raw,tot.pos+tot.nonpos)&&close(lev.raw,lev.paid+lev.remaining)&&close(lev.remaining,lev.balanced+lev.unbalanced)&&lev.paid<=lev.capacity+1e-7&&lev.positiveSquare<=lev.fullPositiveSquare+1e-7,'global level ledger');
- const origin=originTransport(transportEdges,B,ok,close,1),originSmall=originTransport(transportEdges,B,ok,close,1/64);
+ const origin=originTransport(transportEdges,B,ok,close,1),originSmall=originTransport(transportEdges,B,ok,close,1/64),originTiny=originTransport(transportEdges,B,ok,close,1/1024);
  let restrictedQ=0;for(const [key,vs] of originRecords){let l=Number(key.split(',')[2]);for(const e of vs.values())ok(2*e.b-e.C<l&&l<=2*e.v-(e.C+e.p-1),"origin-square actual positive visit");restrictedQ+=vs.size**2}
  ok(close(origin.raw,lev.unbalanced)&&close(originSmall.raw,lev.unbalanced)&&close(origin.Q,restrictedQ),"origin transport ledger");
- return {...tot,level:lev,origin,originSmall,ell,m,distinctPairs:pairsSeen.size,actualSlots:S.size};
+ return {...tot,level:lev,origin,originSmall,originTiny,ell,m,distinctPairs:pairsSeen.size,actualSlots:S.size};
 }
 // Inherited-level later-origin horizon crossing and overtaking audit.
 function crossingAudit(pairs,X,B,rr,expected,ok,close,eps=1/4,delay=4){
