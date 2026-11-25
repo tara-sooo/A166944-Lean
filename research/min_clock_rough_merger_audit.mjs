@@ -38,10 +38,10 @@ function audit(X,mode){
 
 
  const P=Math.ceil(B/(mode==='analytic'?u**.125:mode==='stress'?32:mode==='wide'?8:4)),ratio=mode==='analytic'?u**.125:mode==='stress'?4:2,
- caps=mode==='analytic'?[u**4.75,u**6.75,u**7.75,u**5.75]:mode==='wide'?[4,8,16,12]:[2,4,8,6];
+ caps=mode==='analytic'?[u**4.75,u**6.75,u**8.75,u**5.75,u**7.625]:mode==='wide'?[4,8,16,12,24]:[2,4,8,6,12];
  const exp=(J,p)=>r[(J-p+1)/2]>=p/ratio;
- const envelope=Array.from({length:4},()=>new Set()),stateKey=(t,J)=>t+':'+J;
- let residueTests=0,mixedLabelPairs=0,oneExpPairs=0,bothExpPairs=0,prevHorizonCount=0,sameCandidateKeys=0;
+ const envelope=Array.from({length:5},()=>new Set()),stateKey=(t,J)=>t+':'+J;
+ let twoStepTests=0,residueTests=0,mixedLabelPairs=0,oneExpPairs=0,bothExpPairs=0,prevHorizonCount=0,sameCandidateKeys=0;
  for(let J=2*X;J<7*X;J+=2)for(const side of [0,1]){
   const n=J+2*side,t=(J+6*side)/2;if(t%2!==side)continue;
   const ps=[];fac(n,p=>{if(p>=P)ps.push(p);});
@@ -69,13 +69,13 @@ function audit(X,mode){
   }
  }
  for(let D=2*X;D<7*X;D+=2){
-  let has=false;for(const n of [D,D+2])fac(n,q=>{if(q>=P)has=true;});
+  let has=false,hasExp=false;for(const n of [D,D+2])fac(n,q=>{if(q>=P){has=true;const E=D-q+1;if(E>=2*X&&exp(D,q)){hasExp=true;const side=n===D?0:1,eps=side?-2:2,m=n/q;ok(q*(m-1)===E+(side?1:-1)&&q*(m-1)+eps===E+(side?-1:1),'two-step forms');for(const l of [5,7,11,13,17,19,23,29]){if(l>=q/ratio||q%l===0)continue;const cs=[-2*side-1,-2*side+1,-q,-q+eps];if(new Set(cs.map(x=>(x%l+l)%l)).size!==4)continue;let n4=0;for(let x=0;x<l;x++)if(cs.some(c=>(q*x+c)%l===0))n4++;ok(n4===4,'two-step four residues');twoStepTests++;}}}});
   if(!has)continue;prevHorizonCount++;
   for(const side of [0,1])fac(D+(side?1:-1),p=>{
    if(p<P||r[D/2]<p/ratio)return;
    const J=D+p-1;if(J>=7*X)return;
    const res=side?p+2:0,mod=2*p,t0=Math.ceil(J/2),t1=Math.floor((J+12*B+6)/2);
-   for(let t=t0+(res-t0%mod+mod)%mod;t<=t1;t+=mod){envelope[3].add(stateKey(t,J));sameCandidateKeys++;}
+   for(let t=t0+(res-t0%mod+mod)%mod;t<=t1;t+=mod){envelope[3].add(stateKey(t,J));if(hasExp)envelope[4].add(stateKey(t,J));sameCandidateKeys++;}
   });
  }
  const results=[];
@@ -84,7 +84,7 @@ function audit(X,mode){
   const levels=mode==='analytic'?(sector===0?Math.floor(Math.log2(B)/8):Math.floor(Math.log2(u)/4)):2;
   const scales=Array.from({length:levels+1},(_,j)=>Math.max(1,Math.floor(B/2**j)));
   const schemes=[{name:'global',type:'global'},...scales.flatMap(d=>scales.map(D=>({name:'local '+d+'/'+D,type:'local',d,D}))),...scales.map(d=>({name:'incoming '+d,type:'incoming',d}))];
-  const arith=Array.from({length:4},(_,i)=>({cap:caps[i],raw:0,rawCapEnergy:0,rawCapRest:0,maxRawProduct:0,residualBefore:0,extra:0,rest:0,incidences:0,residualInc:0,vertices:new Set(),suffix:new Map(),maxProduct:0}));let nonreset=0,nonresetResidual=0,arithExtra=0,priorQuotaRest=0;
+  const arith=Array.from({length:5},(_,i)=>({cap:caps[i],raw:0,rawCapEnergy:0,rawCapRest:0,maxRawProduct:0,residualBefore:0,extra:0,rest:0,incidences:0,residualInc:0,vertices:new Set(),suffix:new Map(),maxProduct:0}));let nonreset=0,nonresetResidual=0,arithExtra=0,priorQuotaRest=0;
   let E=0,R1=0,diag=0,prior=0,priorProj=0,priorPhys=0,priorOverlap=0,globalExtra=0,localExtra=0,incomingExtra=0,reverseExtra=0,rest=0,lightLightAfter=0,residualInc=0,rankCertificate=0,asyncRest=0,syncRest=0,rawPairInc=0,physPairInc=0,prefixChecks=0,cohorts=0,maxMass=0,maxResidualPairRank=0,projectedEarlier=0,lightHeavyBefore=0,lightHeavyAfter=0,heavyHeavyBefore=0,heavyHeavyAfter=0;
   const info=schemes.map(s=>({...s,projEnergy:0,physEnergy:0,unionEnergy:0,projBudget:0,physBudget:0,maxUsed:0,partial:0,projPairs:0,physPairs:0}));
   for(const [C,row] of at){
@@ -185,7 +185,7 @@ function audit(X,mode){
      if(delta!==eps){nonreset++;nonresetResidual+=(1-coverage[p.id])*p.e;continue;}
      cl=exp(p.F,p.fi)&&exp(p.F,p.fj)?2:exp(p.F,p.fi)||exp(p.F,p.fj)?1:0;
     }else if(exp(p.F,p.fi)&&(p.ai>=P||p.bi>=P)){
-     cl=3;const D=p.F-p.fi+1;
+     cl=3;const D=p.F-p.fi+1;if((p.ai>=P&&exp(D,p.ai))||(p.bi>=P&&exp(D,p.bi)))cl=4;
      ok((p.ai>=P&&(D%p.ai===0||(D+2)%p.ai===0))||(p.bi>=P&&(D%p.bi===0||(D+2)%p.bi===0)),'previous high divides predecessor');
     }
     if(cl<0)continue;const key=stateKey(p.ft,p.F);
@@ -214,7 +214,7 @@ function audit(X,mode){
   ok(Math.abs(priorQuotaRest-arithExtra-rest)<=eps,'additional rare merger partition');
   results.push({sector,m,mLL,scales,priorQuotaRest,arithExtra,nonreset,nonresetResidual,arith:arith.map(({vertices,suffix,...a})=>({...a,vertices:vertices.size,maxSuffix:Math.max(0,...suffix.values())})),E,R:R1,diag,prior,priorProj,priorPhys,priorOverlap,globalExtra,localExtra,incomingExtra,reverseExtra,rest,residualInc,rankCertificate,lightLightAfter,syncRest,asyncRest,rawPairInc,physPairInc,prefixChecks,cohorts,maxMass,projectedEarlier,lightHeavyBefore,lightHeavyAfter,heavyHeavyBefore,heavyHeavyAfter,info});
  }
- return {X,B,mode,z,L,T,mH,mM,P,ratio,caps,envelope:envelope.map(x=>x.size),residueTests,mixedLabelPairs,oneExpPairs,bothExpPairs,prevHorizonCount,sameCandidateKeys,N,events,literal,twins,R,RM,RH,results};
+ return {X,B,mode,z,L,T,mH,mM,P,ratio,caps,envelope:envelope.map(x=>x.size),twoStepTests,residueTests,mixedLabelPairs,oneExpPairs,bothExpPairs,prevHorizonCount,sameCandidateKeys,N,events,literal,twins,R,RM,RH,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','stress'])console.log(JSON.stringify(audit(X,mode)));
