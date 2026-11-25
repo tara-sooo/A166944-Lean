@@ -60,6 +60,17 @@ function audit(X,mode){
  // byC constructed in ascending root order, so pair ordering stable.
  if(age===1){birthE+=2*rc[C];births++;}if(age<=k)youngE+=2*rc[C];else{oldE+=2*rc[C];longPairs++;}pairE+=2*rc[C];maxChain=Math.max(maxChain,age);seen.set(id,{ai:a.i,bi:b.i,age});}}
  ok(E0===diag+pairE&&pairE===youngE+oldE&&youngE*rmin<=k*B*birthE+1e-5,"chain energy ledger");
- return {mode,X,B,T,Q,k,G,tau,mass,N,R,events,literal,cross,twins,other,inputR,inputHits,H,SH,S,z,E0,lowHorizons,lowInc,endCost,endHits,spanCost,spanHits,globalCost,globalHits,postGate,groupCost,groupHits,groupRemoved,passes,cascadeHits,cascadeCost,initialSmall,localChecks,candidateGroupCount,peelCandidate,roughBound,finalR,finalHits,Efinal,finalHorizons,minGroup:Number.isFinite(minGroup)?minGroup:null,maxGroup,transfer,transferChecks,currentInternal,birthE,births,youngE,oldE,maxChain,longPairs};
+ function bandLedger(retained){
+   const map=new Map();let birth=0,young=0,old=0,diag=0,energy=0,nb=0,mc=0;
+   for(const [M,a] of roots){const ix=new Map();for(const e of a){if(retained&&!e.keep)continue;const b=Math.floor(Math.log2(e.r)),i=ix.get(b)||0;ix.set(b,i+1);e.bi=i;}}
+   for(const C of [...byC.keys()].sort((a,b)=>a-b)){
+     const es=byC.get(C).filter(e=>!retained||e.keep),r=rc[C],b=Math.floor(Math.log2(r));diag+=r*es.length;energy+=r*es.length**2;
+     for(let i=0;i<es.length;i++)for(let j=i+1;j<es.length;j++){const a=es[i],c=es[j],id=b+":"+a.M+":"+c.M,prev=map.get(id),age=prev&&prev.a===a.bi-1&&prev.c===c.bi-1?prev.age+1:1;
+       if(age===1){birth+=2*r;nb++;}if(age<=k)young+=2*r;else old+=2*r;mc=Math.max(mc,age);map.set(id,{a:a.bi,c:c.bi,age});}
+   }
+   ok(energy===diag+young+old&&young<=2*k*birth,"dyadic clock-band chain ledger");return {birth,young,old,diag,energy,nb,mc};
+ }
+ const bandInput=bandLedger(false),bandFinal=bandLedger(true);ok(bandInput.energy===E0&&bandFinal.energy===Efinal,"band energy matches");
+ return {mode,X,B,T,Q,k,G,tau,mass,N,R,events,literal,cross,twins,other,inputR,inputHits,H,SH,S,z,E0,lowHorizons,lowInc,endCost,endHits,spanCost,spanHits,globalCost,globalHits,postGate,groupCost,groupHits,groupRemoved,passes,cascadeHits,cascadeCost,initialSmall,localChecks,candidateGroupCount,peelCandidate,roughBound,finalR,finalHits,Efinal,finalHorizons,minGroup:Number.isFinite(minGroup)?minGroup:null,maxGroup,transfer,transferChecks,currentInternal,birthE,births,youngE,oldE,maxChain,longPairs,bandInput,bandFinal};
 }
 const xs=process.argv.slice(2).map(Number);for(const mode of ['analytic','short','wide','high','one'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
