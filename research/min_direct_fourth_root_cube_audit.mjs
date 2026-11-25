@@ -34,6 +34,30 @@ function audit(N=200000,steps=180){
  ev.push({...a,M,H,t});H+=a.p-1;t+=a.w;s.events++}
  if(ev.length){s.paths++;window(ev,0,ev.length,H,t);if(ev.length>=4)window(ev,Math.floor(ev.length/2),ev.length,H,t)}
  }
+ // Independent abstract starts at much larger horizons. No canonical ancestry claimed.
+ const fac=n=>{let fs=[];for(let r=3;r*r<=n;r+=2)while(n%r===0){fs.push(r);n/=r}if(n>1)fs.push(n);return fs};
+ function direct(t,H){let best=null;for(let e of [1,-1])for(let p of new Set(fac(H-e))){if(p*p>H+1)continue;let w=mod((e===1?0:p+2)-t,2*p)||2*p;if(!best||w<best.w||w===best.w&&p<best.p)best={p,e,w}}return best}
+ s.abstractTripleExamples=[];
+ for(let p of [5003,5039]){let H=p**3+1,w=Math.ceil((p-1)/4),n=2*p*Math.ceil((H/2+w)/(2*p)),t=n-w;
+ let a=direct(t,H),fs=fac(H+1);
+ if(a?.p!==p||a.e!==1||a.w!==w||H>2*t||BigInt(p-1)**4n<=4096n*BigInt(H+p)||4*w<p-1||fac(H-1).join()!==[p,p,p].join())throw Error("abstract triple");
+ for(let j=1;j<=w;j++){let e=(t+j)%2?-1:1,g=gcd(e===1?t+j:t+j-2,H-e);if(j<w&&g!==1||j===w&&g!==p)throw Error("abstract literal")}
+ s.abstractTripleExamples.push({p,H,t,n,w,chosen:[p,p,p],opposite:fs});
+ }
+ // Independent cube packing controls on relaxed increasing horizons; every
+ // sample is a genuine product of three odd integers, but need not be prime or clock-realizable.
+ s.syntheticCubeChecks=0;s.syntheticCubeGroups=0;
+ for(let den of [1,2,4,200])for(let S=15;S<=501;S+=2){
+ let x=S/3,pts=[];
+ for(let a=3;a<=S-6;a+=2)for(let b=a;b<=S-a-3;b+=2){let c=S-a-b;if(c<b||c%2===0)continue;
+ if(Math.max(...[a,b,c].map(v=>(3*v-S)**2))*den**2>3*S)continue;
+ for(let e of [1,-1]){let H=a*b*c+e;if(27*H>S**3+27||27*den*den*H<den*den*S**3-6*S*S-27*den*den)throw Error("synthetic band");pts.push({H,g:a-1});s.syntheticCubeChecks++}
+ }
+ pts.sort((a,b)=>a.H-b.H);let end=-1,G=0;
+ for(let v of pts)if(v.H>=end){G+=v.g;end=v.H+v.g}
+ if(9*den*den*G>2*S*S+6*den*den*S+18*den*den)throw Error("synthetic packing");
+ if(pts.length)s.syntheticCubeGroups++;
+ }
  return s
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||200000),Number(process.argv[3]||180)),null,2));
