@@ -4,7 +4,7 @@ function audit(N=150000,steps=180){
  const mod=(x,m)=>(x%m+m)%m,gcd=(a,b)=>{while(b)[a,b]=[b,a%b];return Math.abs(a)};
  function next(t,H){let best=null;for(let e of [1,-1]){let z=H-e;while(z>1){let p=spf[z];if(!p)throw Error("range");while(z%p===0)z/=p;if(p*p>H+1)continue;let w=mod((e===1?0:p+2)-t,2*p)||2*p;if(!best||w<best.w||w===best.w&&p<best.p)best={p,e,w}}}return best}
  function literal(t,H){for(let w=1;w<=2*Math.floor(Math.sqrt(H+1));w++){let n=t+w,e=n%2?-1:1,g=gcd(n%2?n-2:n,H-e);if(g>1&&spf[g]**2<=H+1)return {p:spf[g],e,w}}return null}
- let s={N,steps,events:0,paths:0,rangeTruncated:0,near:[0,0,0],pairs:[0,0,0],packing:[0,0,0],filteredPairs:0,filterChecks:0,filteredGainChecks:0,phaseChecks:0,phaseRepeated:0,phaseLowVariationChecks:0,literalChecks:0,largestNear:null,example:null,farGainExample:null};
+ let s={N,steps,events:0,paths:0,rangeTruncated:0,near:[0,0,0],pairs:[0,0,0],packing:[0,0,0],filteredPairs:0,filterChecks:0,filteredGainChecks:0,phaseChecks:0,phaseRepeated:0,phaseLowVariationChecks:0,primorialChecks:0,primorialIntervals:0,primorialFarBoundChecks:0,literalChecks:0,largestNear:null,example:null,farGainExample:null};
  const eps=[[1,4],[1,2],[3,4]];
  for(let M=5;M<=N;M+=2){
   let H=2*M-2,t=M+2,ev=[];
@@ -40,14 +40,31 @@ function audit(N=150000,steps=180){
    if(middleFar>far||(R-1)*(exactS-K*Math.max(0,nearList.length-1))>(R-1+K)*far)throw Error("sum filter");s.filteredGainChecks++;
    if(nearBefore&&(!s.farGainExample||nearBefore>s.farGainExample.nearBefore))s.farGainExample={M,R,K,low,high,near,far,nearBefore,middleFar,exactS};
   }
+  // Independent product barrier: no run of labels <=R can cross the next
+  // even multiple of their product. Verify the global far-gain inequality.
+  for(let [R,K] of [[3,6],[5,30],[7,210],[11,2310],[13,30030]]){
+   let start=null,low=0,high=0,near=0,far=0,nearList=[];
+   for(let v of ev){
+    if(v.p<=R){if(start===null)start=v.H;let J=K*Math.ceil(start/K);if(v.H+v.p-1>J)throw Error("product barrier");low+=v.p-1;s.primorialChecks++;}
+    else {start=null;high+=v.p-1;if(v.x>=256&&4*v.k*v.k<=3*v.x){near+=v.p-1;nearList.push(v)}else far+=v.p-1;}
+   }
+   if((R-1)*low>K*high+K*(R-1))throw Error("primorial global");
+   s.primorialIntervals++;
+   if(nearList.every(v=>v.p>=8*(K+1))){
+    const C=Math.floor(Math.sqrt(H+1)),A=R-1,B=R-1+K;
+    // F >= (A/(8B)) (N-C), and U <= K((N+F)/A+1).
+    if(8*B*far<A*(near-C))throw Error("far fraction");
+    // F >= A/(8B+A) * [A*(G-K)/B-C].
+    const G=H-ev[0].H;
+    if(BigInt(8*B+A)*BigInt(B)*BigInt(far)<BigInt(A)*(BigInt(A)*BigInt(G-K)-BigInt(B)*BigInt(C)))throw Error("combined far bound");
+    s.primorialFarBoundChecks++;
+   }
+  }
   // Exact phase lattice for pairs of successive nonunit events of distinct labels,
   // and repeat of the same signed phase pattern within a source.
   let mp=new Map();
   for(let i=1;i<ev.length;i++){let a=ev[i-1],b=ev[i];if(a.p===b.p||a.p<5||b.p<5)continue;let p=a.p,r=b.p,T=b.n-a.n,g=b.H-a.H,s0=g-p+1;
-   if(2*T!==s0+r-1+b.D-a.D+6*(b.I-a.I)||mod(a.D-((r-1)+s0-2*T+6*(b.I-a.I)),2*r)!==mod(b.D-2*((r-1)+s0-2*T+6*(b.I-a.I)),2*r)){
-    // The congruence is tested below directly from the identity.
-    if(2*T!==s0+r-1+b.D-a.D+6*(b.I-a.I))throw Error("phase identity");
-   }
+   if(2*T!==s0+r-1+b.D-a.D+6*(b.I-a.I))throw Error("phase identity");
    if(mod(a.D-(s0+r-1-2*T+6*(b.I-a.I)),2*r)!==0)throw Error("phase congruence");
    let key=[p,r,s0,a.e,b.e,T].join(":"),old=mp.get(key);
    if(old){let DH=a.H-old.H,DT=a.n-old.n,DD=a.D-old.D;
