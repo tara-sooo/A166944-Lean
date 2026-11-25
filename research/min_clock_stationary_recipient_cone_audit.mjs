@@ -1,6 +1,6 @@
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
- const R=Math.max(y+1,Math.ceil(B/16)),P=Math.max(y+1,Math.floor(B**.125)),Q=Math.max(y+1,Math.ceil(B/4)),U=6*B+3;
+ const R=Math.max(y+1,Math.ceil(B/16)),P=Math.max(y+1,Math.floor(Math.sqrt(B)/2)),Q=Math.max(y+1,Math.ceil(B/4)),U=6*B+3;
  const slots=new Map(),anchors=new Map(),recCache=new Map(),allR=new Map(),ageBins=[0,0,0,0],wKinds=[0,0,0,0],remainKinds=[0,0,0,0];
  let js=0,rough=0,longLow=0,longComp=0,shortLow=0,cutChecks=0,rootOnly=0,reset=0,maxAge=0,maxDef=0;
  function record(M,J){
@@ -103,7 +103,7 @@ function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
  }
  for(let i=0;i<3;i++)ok(actual[i]<=support[i]&&close(anchorRaw[i],anchorPaid[i]+anchorRemain[i]),"donor anchor support and ledger");
  ok(close(longLow,anchorRaw.reduce((a,b)=>a+b,0))&&close(rough,wKinds.reduce((a,b)=>a+b,0)),"long low ledger");
- return {base,R,P,Q,js,rough,longLow,longComp,shortLow,rootOnly,reset,cutChecks,maxAge,maxDef,ageBins,wKinds,remainKinds,capTotal,paid,remaining,events,fully,kept,compRemain,maxComp,maxArrival,slotMemberships,weightedMemberships,rawCrossPairs,rawCrossCap,oracle,anchor:{count:anchors.size,support,actual,raw:anchorRaw,paid:anchorPaid,remaining:anchorRemain}};
+ return {base,fComp:f,R,P,Q,js,rough,longLow,longComp,shortLow,rootOnly,reset,cutChecks,maxAge,maxDef,ageBins,wKinds,remainKinds,capTotal,paid,remaining,events,fully,kept,compRemain,maxComp,maxArrival,slotMemberships,weightedMemberships,rawCrossPairs,rawCrossCap,oracle,anchor:{count:anchors.size,support,actual,raw:anchorRaw,paid:anchorPaid,remaining:anchorRemain,details:[...anchors.values()].map(a=>({...a,donors:a.donors.size}))}};
 }
 // Global actual first-contact forest and entropy quotas; rough stationary recipient control.
 function entropyAudit(ledger,X,B,paths,rr,fac,sp,base,ok,close){
@@ -306,7 +306,7 @@ function multiscale(g,live,z,edges,L,y,B,X,f,m,ok,close,fac,ledger){
  return {cuts,shellRaw,shellPaid,shellRemain,shellPairs,types,remTypes,oracle,budget,vertices:vertices.size,keptPairs,parents:parents.size,maxComp,maxSmall,maxParent,compBound,minCompPartners};
 }
 // Exact compressed inverse stationary intervals, primorial entry cuts and cohort quotas.
-function audit(X,stress=true,scaleCap=4,entropyCap=1){
+function audit(X,stress=true,scaleCap=4,entropyCap=1,fComp=null){
  const B=Math.ceil(Math.sqrt(7*X)),H=4*B,u=Math.log(B),D=Math.max(1,Math.floor(stress?B/4:B/u**2)),rmin=Math.max(3,Math.ceil(D/4)),eta=stress?1/8:u**(-1/4),f=stress?4:u**(1/16),m=stress?4:u**(11/4),L=stress?30:2,y=stress?5:2;
  const ok=(x,s)=>{if(!x)throw Error(s)},close=(a,b)=>Math.abs(a-b)<1e-7*Math.max(1,Math.abs(a),Math.abs(b));
  const sp=new Int32Array(8*X+100);for(let i=2;i<sp.length;i++)if(!sp[i])for(let j=i;j<sp.length;j+=i)if(!sp[j])sp[j]=i;
@@ -516,7 +516,8 @@ function audit(X,stress=true,scaleCap=4,entropyCap=1){
    return {Q,support,pairLevels:g.seen.size,distinctPairs:g.pairs.size,stats};
  });
  const entropy=ledgers.map(g=>entropyAudit(g,X,B,paths,rr,fac,sp,entropyCap,ok,close));
- const recipient=ledgers.map(g=>recipientAudit(g,X,B,L,y,f,paths,rr,fac,entropyCap,ok,close));
+ const recipient=ledgers.map(g=>recipientAudit(g,X,B,L,y,fComp??f,paths,rr,fac,entropyCap,ok,close));
  return {X,B,L,y,rmin,f,m,scaleCap,entropyCap,entropy,recipient,firstContact,clock,roughVisits,slots:slots.size,checks,maxRoots,totalQuery,totalEdges,totalStationary,out};
 }
-for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[4096,16384,65536]))for(const c of [1,8])console.log(JSON.stringify(audit(X,true,16,c)));
+for(const X of (process.argv.length>2?process.argv.slice(2).filter(x=>!x.startsWith('--')).map(Number):[4096,16384,65536]))for(const c of [1,8])console.log(JSON.stringify(audit(X,true,16,c))); 
+if(process.argv.includes('--wide-comparable'))console.log(JSON.stringify(audit(65536,true,16,8,32)));
