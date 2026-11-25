@@ -24,7 +24,7 @@ function inheritedForest(pairs,X,B,paths,expected,ok,close,base=1,delay=4){
        const a=v.a.levels[l],b=v.b.levels[l];ok(a.z!==b.z&&a.C!==b.C&&2*(a.z-b.z)===a.C-b.C,"distinct last upcross keys at fixed level");
        // The odd/even level convention is identical for both keys, so the horizon gap is exactly twice the time gap.
        ok(a.z<=v.F.t&&b.z<=v.F.t&&l<=v.F.d,"inherited at contact");
-       caps.total+=w;caps.maxReuse=Math.max(caps.maxReuse,w);caps.maxLevel=Math.max(caps.maxLevel,l);
+       ok(w<=1.5*(12*B+6)/B+1e-8,'aggregate inherited pair-level cap');caps.total+=w;caps.maxReuse=Math.max(caps.maxReuse,w);caps.maxLevel=Math.max(caps.maxLevel,l);
        caps.byType[v.type]+=w;let sep=Math.abs(a.z-b.z),nb=sep<=delay?0:sep<=8*delay?1:2;caps.near[nb]+=w;
        if(l<=6+delay){caps.low+=w;continue}
        if(v.F.t-Math.max(a.z,b.z)<delay){caps.recent+=w;continue}
@@ -90,7 +90,7 @@ function inheritedForest(pairs,X,B,paths,expected,ok,close,base=1,delay=4){
 }
 // Actual donor last-upcross partitions, common-minimum decomposition and upstream positive-energy transfer.
 function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
- const U=6*B+3,R=Math.max(y+1,Math.ceil(B/16)),groups=new Map(),pairUses=new Map(),pairR=new Map(),edgeUses=new Map(),inheritedPairs=new Map();let nearMoment=0,nearBound=0,nearThin=0,nearRemaining=0,nearDiagonal=0,nearShared=0,lateBefore=0,lowBefore=0;let raw=0;
+ const U=6*B+3,R=Math.max(y+1,Math.ceil(B/16)),groups=new Map(),pairUses=new Map(),pairR=new Map(),edgeUses=new Map(),inheritedPairs=new Map();let nearMoment=0,nearBound=0,nearDiagonal=0,nearShared=0;let raw=0;
  for(const [pk,w] of ledger.pairs){
    const a=ledger.contacts.get(pk);if(a.type!==1||Math.max(a.p,a.q)>y||a.age<=3*L+3||rr(a.J)<R)continue;
    const P=paths.get(a.i),Q=paths.get(a.j),i=P.records.findIndex(e=>e.C===a.J),j=Q.records.findIndex(e=>e.C===a.J);
@@ -190,7 +190,9 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  ok(shared<=globalBound+1e-7,"global upstream moment");ok(close(scaledTotal,scaledDiag+2*(scaledShared+scaledInherited))&&close(scaledUpstream,scaledUnweightedShared)&&scaledShared<=scaledUnweightedShared+1e-7&&scaledUnweightedShared<=12*maxReuseR*weightedKeyEnergy+1e-7,'global gain-weighted shared moment');
  ok(nearMoment<=nearBound+1e-7&&close(nearBound,4*(nearDiagonal+2*nearShared)),'near-origin band quadratic bound');
  const inheritedLedger=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,1,4);
- return {L,y,R,raw,anchors:groups.size,inheritedLedger,nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
+ const inheritedWide=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,8,4);
+ ok(close(nearMoment,inheritedLedger.near[0]),'independent near-origin ledger');
+ return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
