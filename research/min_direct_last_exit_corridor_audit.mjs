@@ -6,7 +6,7 @@ function audit(N=60000){
  const prod=a=>a.reduce((v,p)=>v*BigInt(p),1n);
  const fct=a=>{let a0=a,f=[];assert(a>0&&a<cap,"sieve "+a0);while(a>1){let p=spf[a];f.push(p);while(a%p===0)a/=p}return f};
  function next(H,t){let best=null;for(let I=0;I<2;I++)for(let p of fct(H-1+2*I)){if(p===2||p*p>H+1)continue;let w=mod((I?p+2:0)-t,2*p)||2*p;if(!best||w<best.w||w===best.w&&p<best.p)best={H:BigInt(H),d:2*t-H,p,w,I}}return best}
- const stat={canonicalRoots:0,canonicalEvents:0,unresolved:0,actualWitnessRoots:0,witnessTicks:0,witnessResidues:0,relaxedControls:0,bandControls:0,marks:0,completeCores:0,pending:0,goodCorridors:0,badReset:0,badHighB:0,goodActual:0,goodRelaxed:0,goodEvents:0,corridorGain:0,corridorDrop:0,nearExclusion:0,allCorridorEvents:0,resetWeightChecks:0,highBWeightChecks:0,overlapChecks:0,colorChecks:0,maxOverlap:0,supportChecks:0,discoveryChecks:0,distinctForced:0,maxDistinct:0,laminarChecks:0,lowRunChecks:0,goodWitness:null,badWitness:null};
+ const stat={canonicalRoots:0,canonicalEvents:0,unresolved:0,actualWitnessRoots:0,witnessTicks:0,witnessResidues:0,relaxedControls:0,bandControls:0,marks:0,completeCores:0,pending:0,goodCorridors:0,badReset:0,badHighB:0,goodActual:0,goodRelaxed:0,goodEvents:0,corridorGain:0,corridorDrop:0,nearExclusion:0,allCorridorEvents:0,resetWeightChecks:0,highBWeightChecks:0,overlapChecks:0,colorChecks:0,maxOverlap:0,supportChecks:0,recordSupportChecks:0,recordEvents:0,recordDistinctForced:0,maxRecordDistinct:0,recordMultiplicityChecks:0,discoveryChecks:0,distinctForced:0,maxDistinct:0,laminarChecks:0,lowRunChecks:0,goodWitness:null,badWitness:null};
  const reset=z=>z.p>=5&&z.dp===6*z.I;
  const a1=z=>z.p>=47&&z.p>=5*(z.d+3)&&z.dp-6*z.I===2*z.p;
  function validate(rows){
@@ -54,11 +54,18 @@ function audit(N=60000){
     let run0=runs.get(a);assert(run0!==undefined&&run0!==prevRun&&runs.get(b-1)===run0,"different maximal low runs");prevRun=run0;stat.lowRunChecks++;
     const P=prod([...F]),drop=xs[a]-xs[b];
     assert(BigInt(gain)<2n*P&&BigInt(drop)<P+5n&&2n*P>BigInt(3*T-10),"support barriers");stat.supportChecks++;
+    let recMin=xs[a],recF=new Set,recCount=new Map;
+    for(let h=a;h<b;h++)if(xs[h+1]<recMin){let z=rows[h];assert(z.p>=5&&!reset(z)&&z.dp>=2*z.p,"record nonreset");recMin=xs[h+1];recF.add(z.p);recCount.set(z.p,(recCount.get(z.p)||0)+1);stat.recordEvents++}
+    assert(recMin===xs[b],"last is first low crossing");
+    let Pr=prod([...recF]);
+    assert(BigInt(drop)<Pr+5n&&2n*Pr>BigInt(3*T-10),"record-only deficit barrier");
+    for(let [p,n] of recCount){assert(n<=2*(1+Math.floor((xs[a]-xs[b])/(2*p))),"record multiplier multiplicity");stat.recordMultiplicityChecks++}
+    stat.recordSupportChecks++;stat.maxRecordDistinct=Math.max(stat.maxRecordDistinct,recF.size);
     for(let S of [3,7,Math.max(7,Math.floor(R/4)),Math.max(7,Math.floor(R/2)),R]){
      let j=[...F].filter(p=>p>S).length,upper=primeProd(S)*BigInt(R)**BigInt(j);
      assert(upper>=P&&2n*upper>BigInt(3*T-10),"discovery product");
      let forced=0,v=primeProd(S);while(2n*v<=BigInt(3*T-10)){forced++;v*=BigInt(R)}
-     assert(j>=forced,"forced distinct");stat.discoveryChecks++;stat.distinctForced+=forced
+     assert(j>=forced,"forced distinct");let jr=[...recF].filter(p=>p>S).length;assert(jr>=forced,"forced record labels");stat.recordDistinctForced+=forced;stat.discoveryChecks++;stat.distinctForced+=forced
     }
     // For a distinguished subset of at most 3 comparable labels, check a disjoint-leaf outside budget.
     let cand=[...F].filter(p=>p>=R/4).sort((a,b)=>b-a).slice(0,3),set=new Set(cand),q=2**cand.length-1,word=rows.slice(a,b).filter(z=>set.has(z.p)),B=rows.slice(a,b).filter(z=>!set.has(z.p)).reduce((s,z)=>s+z.p-1,0);
