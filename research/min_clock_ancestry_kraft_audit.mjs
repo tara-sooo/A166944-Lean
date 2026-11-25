@@ -8,15 +8,21 @@ function audit(X,variant='adaptive'){
  for(let p=2;p<spf.length;p++)if(!spf[p]){
   spf[p]=p;if(p*p<spf.length)for(let j=p*p;j<spf.length;j+=p)if(!spf[j])spf[j]=p;
  }
+ const slow=Math.max(1,Math.log(Math.log(Math.log(B))));
+ const Q=Math.ceil(B/slow**.25);
  let L=2,y=2;
- for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*Math.max(1,Math.log(Math.log(B)))**.25)break;L*=p;y=p;}
+ for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*slow**.25)break;L*=p;y=p;}
  if(variant==='noLOW'){L=2;y=2;}
- const thresholds=[Math.log(B)**1.75,4096,262144],logs=thresholds.map(Math.log),nModes=thresholds.length;
+ const maxHigh=Math.floor((2*H+B+6)/(Q-1)),dBound=2*Math.floor(logU/Math.log(3));
+ const tauMed=2*L*(4*L*logU/Math.log(3))**2*(4*L*logU/Math.log(Q))**maxHigh;
+ const thresholds=[Math.log(B)**2/Math.log(Math.log(B)),4096,262144,tauMed],logs=thresholds.map(Math.log),nModes=thresholds.length;
+ const zeros=()=>Array(nModes).fill(0),arrays=()=>Array.from({length:nModes},()=>[]);
+ function isGood(m,b,medium){return m===3?medium<=2:b<=logs[m]+1e-12;}
  const exact=X<=65536;
  const V=new Map(),key=(t,C)=>t*(7*X+4)+C;
  function get(t,C){
   const k=key(t,C);let v=V.get(k);
-  if(!v){v={n:0,g:[0,0,0],edges:new Map(),good:[[],[],[]],exp:[[],[],[]],slab:[]};V.set(k,v);}
+  if(!v){v={n:0,g:zeros(),edges:new Map(),good:arrays(),exp:arrays(),slab:[]};V.set(k,v);}
   return v;
  }
  const len=7*X/2+1, divisorCount=new Int16Array(len), divisorLog=new Float64Array(len);
@@ -29,7 +35,7 @@ function audit(X,variant='adaptive'){
  }
  const mass=new Float64Array(len),allW=new Float64Array(len);
  const G=thresholds.map(()=>new Int32Array(len)),GW=thresholds.map(()=>new Float64Array(len));
- const F=thresholds.map(()=>({gg:0,gb:0,bb:0,expiry:0,goodCost:0,maxGood:0,goodShared:0,goodCurrentShared:0,goodPairEnergyBound:0,goodHorizonEnergyRemoved:0,expiredPairCount:0,goodRootsAtStart:0}));
+ const F=thresholds.map(()=>({gg:0,gb:0,bb:0,expiry:0,goodCost:0,maxGood:0,goodShared:0,goodCurrentShared:0,goodPairEnergyBound:0,goodHorizonEnergyRemoved:0,maxComplexity:0,goodRootsAtStart:0}));
  let pairs=0,events=0,vertices=0,literal=0,R=0,finished=0;
  function hit(t,C,K){
   let T=K+1,P=0;
@@ -42,26 +48,26 @@ function audit(X,variant='adaptive'){
   }return [T,P];
  }
  const gcd=(a,b)=>{while(b){[a,b]=[b,a%b]}return a};
- function visit(t,C,prev,i,b,last){
+ function visit(t,C,prev,i,b,last,medium){
   const v=get(t,C),j=C/2;
-  let e=prev===null?{n:0,g:[0,0,0]}:v.edges.get(prev);
-  if(!e){e={n:0,g:[0,0,0]};v.edges.set(prev,e)}
+  let e=prev===null?{n:0,g:zeros()}:v.edges.get(prev);
+  if(!e){e={n:0,g:zeros()};v.edges.set(prev,e)}
   const fresh=v.n-e.n;pairs+=fresh;
   for(let m=0;m<nModes;m++){
-   const good=b<=logs[m]+1e-12,priorGood=v.g[m]-e.g[m],priorBad=fresh-priorGood;
+   const good=isGood(m,b,medium),priorGood=v.g[m]-e.g[m],priorBad=fresh-priorGood;
    check(priorGood>=0&&priorBad>=0,'first meet partition');
-   if(good){F[m].gg+=priorGood;F[m].gb+=priorBad;v.g[m]++;e.g[m]++;v.good[m].push(i);last[m]=v;G[m][j]++;}
+   if(good){F[m].maxComplexity=Math.max(F[m].maxComplexity,Math.exp(b));check(b<=logs[m]+1e-10,'complexity cap');F[m].gg+=priorGood;F[m].gb+=priorBad;v.g[m]++;e.g[m]++;v.good[m].push(i);last[m]=v;G[m][j]++;}
    else{F[m].gb+=priorGood;F[m].bb+=priorBad;}
   }
   mass[j]+=Math.exp(-b);v.n++;e.n++;vertices++;
   return v;
  }
  for(let M=X+1;M<2*X;M+=2){
-  const i=(M-X-1)/2,s=M+2,C0=2*M-2,K=Math.floor((7*M-1)/4),last=[null,null,null];
-  let t=s,C=C0,b=Math.log(variant==='log'?2*L:L),prev=null,lowGain=0,cost=0;
-  for(let m=0;m<nModes;m++)if(b<=logs[m]+1e-12)F[m].goodRootsAtStart++;
+  const i=(M-X-1)/2,s=M+2,C0=2*M-2,K=Math.floor((7*M-1)/4),last=Array(nModes).fill(null);
+  let t=s,C=C0,b=Math.log(variant==='log'?2*L:L),prev=null,lowGain=0,cost=0,medium=0,high=0;
+  for(let m=0;m<nModes;m++)if(isGood(m,b,medium))F[m].goodRootsAtStart++;
   for(;;){
-   const v=visit(t,C,prev,i,b,last);
+   const v=visit(t,C,prev,i,b,last,medium);
    if(t>=s+H)break;
    const [u,p]=hit(t,C,K);
    if(X<=1024){
@@ -75,7 +81,7 @@ function audit(X,variant='adaptive'){
    check(u-t<=2*r&&C<=2*t,'clock invariant');
    if(ell){
     R+=ell/2;cost+=ell/2;allW[C/2]+=w;
-    const good=logs.map(x=>b<=x+1e-12);
+    const good=logs.map((_,m)=>isGood(m,b,medium));
     v.slab.push({i,w,r,good});
     for(let m=0;m<nModes;m++)if(good[m]){GW[m][C/2]+=w;F[m].goodCost+=ell/2;}
    }
@@ -83,11 +89,11 @@ function audit(X,variant='adaptive'){
    if(p<=y){lowGain+=p-1;check(lowGain<L,'LOW barrier');}
    else{
     check(D%p===0||(D+2)%p===0,'reverse horizon divisibility');
-    b+=Math.log(variant==='log'?4*L*logU/Math.log(p):L/probability(D,p));lowGain=0;
+    b+=Math.log(variant==='log'?4*L*logU/Math.log(p):L/probability(D,p));lowGain=0;if(p>=Q)high++;else medium++;
    }
    prev=key(t,C);t=u;C=D;events++;
   }
-  check(cost<=B,'slab cost');
+  check(cost<=B&&high<=maxHigh,'slab cost and high cap');
   for(let m=0;m<nModes;m++)if(last[m])last[m].exp[m].push(i);
  }
  const sets=exact?thresholds.map(()=>new Set()):null;
@@ -119,7 +125,7 @@ function audit(X,variant='adaptive'){
   }
   if(v.slab.length){
    let total=0,diag=0;const r=v.slab[0].r;
-   const wGood=[0,0,0],diagGood=[0,0,0];
+   const wGood=zeros(),diagGood=zeros();
    for(const e of v.slab){total+=e.w;diag+=e.w**2;for(let m=0;m<nModes;m++)if(e.good[m]){wGood[m]+=e.w;diagGood[m]+=e.w**2;}}
    shared+=r*(total*total-diag);
    for(let m=0;m<nModes;m++)F[m].goodCurrentShared+=r*(wGood[m]**2-diagGood[m]);
@@ -136,13 +142,13 @@ function audit(X,variant='adaptive'){
  for(let m=0;m<nModes;m++){
   const f=F[m],tau=thresholds[m];
   check(f.gg+f.gb+f.bb===pairs&&f.gg===f.expiry,'exact first-meeting expiry identity');
-  check(f.gg<=N*Math.max(0,Math.floor(tau)-1),'first pair count cap');
+  check(f.gg<=N*Math.max(0,Math.floor(tau)-1)&&f.gg<=N*Math.max(0,f.maxGood-1),'first pair count cap');
   f.goodPairEnergyBound=2*B*f.gg;
   check(f.goodHorizonEnergyRemoved<=2*tau*R+1e-7*Math.max(1,E),'energy removal cap');
   if(exact){check(sets[m].size===f.gg,'marked pair set');check(f.goodShared<=f.goodPairEnergyBound+1e-7*Math.max(1,E)&&f.goodShared+1e-7*Math.max(1,E)>=f.goodCurrentShared,'suffix pair energy');}
   else f.goodShared=null;
  }
- return {X,B,H,L,y,variant,thresholds,events,vertices,physical:V.size,pairs,literal,R,E,shared,S0,maxMass,finished,exact,F};
+ return {X,B,H,L,y,Q,slow,maxHigh,variant,thresholds,events,vertices,physical:V.size,pairs,literal,R,E,shared,S0,maxMass,finished,exact,F};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536,262144]){
