@@ -2,11 +2,13 @@ function audit(N=100000,steps=24){
  const cap=8*N+10000,spf=new Int32Array(cap+1);for(let i=2;i<=cap;i++)if(!spf[i]){spf[i]=i;if(i*i<=cap)for(let j=i*i;j<=cap;j+=i)if(!spf[j])spf[j]=i}
  function factors(z){let a=[];while(z>1){if(z>cap)throw Error("range");let p=spf[z];a.push(p);z/=p}return a}
  function next(t,C){let B=Math.floor(Math.sqrt(C+1)),best=null;for(let s of [-1,1])for(let p of new Set(factors(C+s))){if(p>B)continue;let r=s===-1?0:p+2,w=((r-t)%(2*p)+2*p)%(2*p)||2*p;if(!best||w<best.w||w===best.w&&p<best.p)best={w,p,s}}return best}
- let res={N,steps,edges:0,resetEven:0,resetOdd:0,cofactorPrimeChecks:0,compositeDeficitChecks:0,minEven:0,minOdd:0,minEvenTwin:0,minOddTwin:0,minEvenComposite:0,minOddComposite:0,forced3:0,minEvenExamples:[],minOddExamples:[],lateExamples:[],highP3Prediction:0,pairChecks:0,primeRootsEven:0,primeRootsOdd:0};
- for(let M=5;M<=N;M+=2){let C=2*M-2,t=M+2,history=[];for(let i=0;i<steps;i++){
+ let res={N,steps,edges:0,resetEven:0,resetOdd:0,cofactorPrimeChecks:0,compositeDeficitChecks:0,minEven:0,minOdd:0,minEvenTwin:0,minOddTwin:0,minEvenComposite:0,minOddComposite:0,forced3:0,minEvenExamples:[],minOddExamples:[],lateExamples:[],backwardClockChecks:0,minBackwardChecks:0,sameSidePredecessorChecks:0,oppositeSidePredecessorChecks:0,lateSameSideChecks:0,pairChecks:0,primeRootsEven:0,primeRootsOdd:0};
+ for(let M=5;M<=N;M+=2){let C=2*M-2,t=M+2,history=[],prev=null;for(let i=0;i<steps;i++){
  if(C+Math.floor(Math.sqrt(C+1))+1>cap)throw Error("range upper");let e=next(t,C);if(!e)break;let {p,w,s}=e,d=2*t-C,n=t+w,Z=C+p-1,delta=2*n-Z,q=(C+s)/p;
  if(!Number.isInteger(q)||q<p||delta<0||d<0||delta!==d+2*w-p+1)throw Error("geometry");
  res.edges++;history.push([n,p,Z,delta]);
+ // Independent backwards-clock characterization of the chosen arrival.
+ let B=Math.floor(Math.sqrt(C+1));for(let side of [-1,1])for(let a of new Set(factors(C+side))){if(a>B)continue;let target=side===-1?0:a+2,lag=((n-target)%(2*a)+2*a)%(2*a);if(lag===0){if(a<p)throw Error('backward tie');lag=2*a;}if(w>lag)throw Error('backward clock');res.backwardClockChecks++;}
  let fa=factors(q),r=fa[0],comp=fa.length>1;
  if(comp&&r<p){if(w>=2*r||d<p+1+delta-4*r)throw Error("late entry");res.compositeDeficitChecks++}
  if(q<p*p&&d<p+1+delta-4*Math.floor(Math.sqrt(q))){if(comp)throw Error("prime cofactor");res.cofactorPrimeChecks++}
@@ -14,10 +16,11 @@ function audit(N=100000,steps=24){
  if(type){res['reset'+type]++;let m=q+1;if(Z!==p*m+(type==='Even'?0:-2)||q%4!==(type==='Even'?3:1))throw Error("reset quotient class");
  if(p%4===(type==='Even'?1:3)&&q===p+2&&p>=11){res['min'+type]++;if(spf[M]===M)res['primeRoots'+type]++;let rec={M,primeRoot:spf[M]===M,p,q,d,w,Z,n,delta,history:history.slice(),next:next(n,Z)};
  if(!comp){res['min'+type+'Twin']++;let e2=rec.next;if(!e2||e2.p!==3||e2.w!==4)throw Error("forced3");res.forced3++;if(res['min'+type+'Examples'].length<4)res['min'+type+'Examples'].push(rec)}
- else{res['min'+type+'Composite']++;if(d<p+1+delta-4*Math.floor(Math.sqrt(p+2)))throw Error("near non-twin");if(res.lateExamples.length<6)res.lateExamples.push(rec)}
+ else{res['min'+type+'Composite']++;if(d<p+1+delta-2*r||w>r-1)throw Error('sharp late entry');res.minBackwardChecks++;rec.r=r;if(res.lateExamples.length<6)res.lateExamples.push(rec)}
+ if(prev){let l=prev.p;if(prev.s===s){if((p+1)%l||w<l-1||w%2)throw Error('same-side square ancestry');res.sameSidePredecessorChecks++;if(comp){if(!(l<r))throw Error('small predecessor');res.lateSameSideChecks++;}}else {let u=s===-1?2*w+8:2*w-4,H=u*u+(s===-1?2:-2);if(H%l||H===0)throw Error('opposite-side square ancestry');res.oppositeSidePredecessorChecks++;}}
  }
  }
- t=n;C=Z;
+ t=n;C=Z;prev=e;
  }}
  // Independent exact conditional prediction for all actual prime pairs in both classes,
  // whether or not the reset is reachable; check only state arithmetic and next clock.
