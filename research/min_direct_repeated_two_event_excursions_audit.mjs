@@ -7,7 +7,7 @@ function audit(){
  function constraints(rs){
   let shifts=[0];for(let r of rs)shifts.push(shifts.at(-1)+r+5);
   let sets=[];
-  for(let l of ps){if(l>Math.max(21,rs.at(-1)))break;
+  for(let l of ps){if(l>Math.max(21,rs.at(-1)+4))break;
    let forced=null,bad=new Set();
    for(let i=0;i<rs.length;i++){
     let r=rs[i],s=shifts[i];
@@ -17,6 +17,7 @@ function audit(){
     }
     if(l<=21&&![3,5,7].includes(l)){bad.add(mod(1-s,l));bad.add(mod(3-s,l));}
     if(l<r){bad.add(mod(-3-s,l));bad.add(mod(-5-s,l))}
+    if(l===r+4)bad.add(mod(-3-s,l));
    }
    if(forced!==null&&bad.has(forced)||forced===null&&bad.size===l)return null;
    let a=forced??0;while(bad.has(a))a++;
