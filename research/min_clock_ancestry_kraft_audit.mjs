@@ -1,6 +1,6 @@
 // Reverse-horizon Kraft mass and expiry charging for canonical MIN [2B,4B) slab.
 // Run: node research/min_clock_ancestry_kraft_audit.mjs 1024 4096 16384 65536 262144
-function audit(X){
+function audit(X,variant='adaptive'){
  const B=Math.ceil(Math.sqrt(7*X)),H=4*B,a=2*B,N=X/2,U=7*X+2,logU=Math.log(U);
  const check=(x,m)=>{if(!x)throw Error(m)};
  check(H+2*B<=Math.floor((7*(X+1)-1)/4)-(X+3),'prefix gate');
@@ -10,15 +10,24 @@ function audit(X){
  }
  let L=2,y=2;
  for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*Math.max(1,Math.log(Math.log(B)))**.25)break;L*=p;y=p;}
+ if(variant==='noLOW'){L=2;y=2;}
  const thresholds=[Math.log(B)**1.75,4096,262144],logs=thresholds.map(Math.log),nModes=thresholds.length;
- const exact=X<=16384;
+ const exact=X<=65536;
  const V=new Map(),key=(t,C)=>t*(7*X+4)+C;
  function get(t,C){
   const k=key(t,C);let v=V.get(k);
   if(!v){v={n:0,g:[0,0,0],edges:new Map(),good:[[],[],[]],exp:[[],[],[]],slab:[]};V.set(k,v);}
   return v;
  }
- const len=7*X/2+1, mass=new Float64Array(len),allW=new Float64Array(len);
+ const len=7*X/2+1, divisorCount=new Int16Array(len), divisorLog=new Float64Array(len);
+ function probability(D,p){
+  const i=D/2;if(!divisorCount[i]){
+   for(let v of [D,D+2])while(v>1){const q=spf[v];if(q>B)break;if(q>y){divisorCount[i]++;divisorLog[i]+=Math.log(q);}while(v%q===0)v/=q;}
+  }
+  check(divisorCount[i]>0&&divisorLog[i]>=Math.log(p)-1e-10,'eligible reverse divisor');
+  return .5/divisorCount[i]+.5*Math.log(p)/divisorLog[i];
+ }
+ const mass=new Float64Array(len),allW=new Float64Array(len);
  const G=thresholds.map(()=>new Int32Array(len)),GW=thresholds.map(()=>new Float64Array(len));
  const F=thresholds.map(()=>({gg:0,gb:0,bb:0,expiry:0,goodCost:0,maxGood:0,goodShared:0,goodCurrentShared:0,goodPairEnergyBound:0,goodHorizonEnergyRemoved:0,expiredPairCount:0,goodRootsAtStart:0}));
  let pairs=0,events=0,vertices=0,literal=0,R=0,finished=0;
@@ -49,7 +58,7 @@ function audit(X){
  }
  for(let M=X+1;M<2*X;M+=2){
   const i=(M-X-1)/2,s=M+2,C0=2*M-2,K=Math.floor((7*M-1)/4),last=[null,null,null];
-  let t=s,C=C0,b=Math.log(2*L),prev=null,lowGain=0,cost=0;
+  let t=s,C=C0,b=Math.log(variant==='log'?2*L:L),prev=null,lowGain=0,cost=0;
   for(let m=0;m<nModes;m++)if(b<=logs[m]+1e-12)F[m].goodRootsAtStart++;
   for(;;){
    const v=visit(t,C,prev,i,b,last);
@@ -74,7 +83,7 @@ function audit(X){
    if(p<=y){lowGain+=p-1;check(lowGain<L,'LOW barrier');}
    else{
     check(D%p===0||(D+2)%p===0,'reverse horizon divisibility');
-    b+=Math.log(4*L*logU/Math.log(p));lowGain=0;
+    b+=Math.log(variant==='log'?4*L*logU/Math.log(p):L/probability(D,p));lowGain=0;
    }
    prev=key(t,C);t=u;C=D;events++;
   }
@@ -114,10 +123,6 @@ function audit(X){
    for(const e of v.slab){total+=e.w;diag+=e.w**2;for(let m=0;m<nModes;m++)if(e.good[m]){wGood[m]+=e.w;diagGood[m]+=e.w**2;}}
    shared+=r*(total*total-diag);
    for(let m=0;m<nModes;m++)F[m].goodCurrentShared+=r*(wGood[m]**2-diagGood[m]);
-   if(exact)for(let i=0;i<v.slab.length;i++)for(let j=0;j<i;j++){
-    const e=v.slab[i],b=v.slab[j],k=Math.min(e.i,b.i)*N+Math.max(e.i,b.i),w=2*r*e.w*b.w;
-    for(let m=0;m<nModes;m++)if(sets[m].has(k))F[m].goodShared+=w;
-   }
   }
  }
  // Expiry sets have to be complete before evaluating shared suffix, not dependent on Map order.
@@ -137,7 +142,11 @@ function audit(X){
   if(exact){check(sets[m].size===f.gg,'marked pair set');check(f.goodShared<=f.goodPairEnergyBound+1e-7*Math.max(1,E)&&f.goodShared+1e-7*Math.max(1,E)>=f.goodCurrentShared,'suffix pair energy');}
   else f.goodShared=null;
  }
- return {X,B,H,L,y,thresholds,events,vertices,physical:V.size,pairs,literal,R,E,shared,S0,maxMass,finished,exact,F};
+ return {X,B,H,L,y,variant,thresholds,events,vertices,physical:V.size,pairs,literal,R,E,shared,S0,maxMass,finished,exact,F};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536,262144])console.log(JSON.stringify(audit(X)));
+for(const X of args.length?args:[1024,4096,16384,65536,262144]){
+ console.log(JSON.stringify(audit(X)));
+ console.log(JSON.stringify(audit(X,'noLOW')));
+ if(X<=16384)console.log(JSON.stringify(audit(X,'log')));
+}
