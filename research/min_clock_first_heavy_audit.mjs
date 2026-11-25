@@ -119,7 +119,7 @@ function audit(X,mode='diagnostic'){
  const startCap=tauP+tauS*physicalKeyCap+gBound+1;
  let startMax=0,reverseStartMass=0,reverseHorizons=0,referencePhysicalMax=0;
  for(const [C,x] of horizons){
-  x.states=new Map();x.P=x.list.length;x.starts=0;x.projectedGood=0;x.extended=0;
+  x.states=new Map();x.P=x.list.length;x.starts=0;x.projectedGood=0;x.extended=0;x.moving=0;
   for(const e of x.list){const v=x.states.get(e.t)||{n:0,g:0,e:0};v.n++;x.states.set(e.t,v);}
   let regularTimes=new Set();
   for(const e of x.list){
@@ -135,7 +135,7 @@ function audit(X,mode='diagnostic'){
   if(reverse[C/2]){reverseHorizons++;reverseStartMass+=x.starts;}
  }
  let cut=0,cutR=0,retained=[],crossP=0,crossS=0,extendedS=0,neverP=0,neverS=0,deepP=0,deepS=0,maxDepthBeforeP=0,postPVisits=0,postSVisits=0,prePVisits=0,preSVisits=0,cutAtDeep=0;
- const W=new Float64Array(len),WP=new Float64Array(len),WX=new Float64Array(len);
+ const W=new Float64Array(len),WP=new Float64Array(len),WX=new Float64Array(len),WM=new Float64Array(len);
  const state=(e)=>horizons.get(e.C).states.get(e.t);
  for(const path of paths){
   let last=null,flag=false,deepFlag=false;
@@ -154,9 +154,12 @@ function audit(X,mode='diagnostic'){
   else neverS++;
   const extendS=is===0||is>0&&path[is-1].cert;
   if(extendS&&is>=0)extendedS++;
-  let lastGood=null,goodEnded=false;
+  let lastGood=null,goodEnded=false,lastStart=null;
   for(const e of path){
    const x=horizons.get(e.C),j=e.C/2;
+   if(e.start)lastStart=e;
+   e.moving=lastStart!==null&&e.depth-lastStart.depth<=k1;
+   if(e.moving){x.moving++;WM[j]+=e.w;}
    e.gp=ip<0||e.ix<ip||e.depth-path[ip].depth<=k0;
    e.freshP=ip>=0&&e.ix>=ip&&e.gp;
    e.gs=is<0||e.ix<is||extendS&&e.depth-path[is].depth<=k0;
@@ -169,6 +172,7 @@ function audit(X,mode='diagnostic'){
     ok(path[ip0].start&&e.depth-path[ip0].depth<=k1,'fresh crossing start');
     for(let l=ip0+1;l<=e.ix;l++)if(path[l].inc>y)ok(d[path[l].C/2]<=T,'regular actual fresh suffix');
    }
+   if(e.freshP||e.freshS||e.gp)ok(e.moving,'good projected and fresh are moving');
    if(e.gu)state(e).g++;
    W[j]+=e.w;
   }
@@ -176,19 +180,19 @@ function audit(X,mode='diagnostic'){
  }
  ok(cut<=reverseStartMass&&cutR<=cut*B,'exception root deletion');
  const cap=tauP+startCap*leaf,pcap=tauS+cap+startCap*leaf;
- let E2=0,R2=0,diag2=0,Rgood=0,EgCurrent=0,ExCurrent=0,maxGP=0,maxExt=0,maxPhysGood=0,expiry=0;
- for(let j=lo;j<=hi;j++){const q=r[j];E2+=q*W[j]**2;R2+=q*W[j];Rgood+=q*WP[j];EgCurrent+=q*(2*W[j]*WP[j]-WP[j]**2);ExCurrent+=q*(2*W[j]*WX[j]-WX[j]**2);}
+ let E2=0,R2=0,diag2=0,Rgood=0,EgCurrent=0,ExCurrent=0,maxGP=0,maxExt=0,maxPhysGood=0,expiry=0,maxMoving=0,Rmoving=0,Emoving=0;
+ for(let j=lo;j<=hi;j++){const q=r[j];E2+=q*W[j]**2;R2+=q*W[j];Rgood+=q*WP[j];EgCurrent+=q*(2*W[j]*WP[j]-WP[j]**2);ExCurrent+=q*(2*W[j]*WX[j]-WX[j]**2);Rmoving+=q*WM[j];Emoving+=q*(2*W[j]*WM[j]-WM[j]**2);}
  for(const x of horizons.values()){
-  maxGP=Math.max(maxGP,x.projectedGood);maxExt=Math.max(maxExt,x.extended);
+  maxGP=Math.max(maxGP,x.projectedGood);maxExt=Math.max(maxExt,x.extended);maxMoving=Math.max(maxMoving,x.moving);ok(x.moving<=startCap*leaf,'moving light-start mass');
   ok(x.projectedGood<=cap&&x.extended<=startCap*leaf,'moving reverse leaf mass');
   for(const v of x.states.values()){ok(v.e<=v.g&&v.g<=pcap,'physical prefix cap');maxPhysGood=Math.max(maxPhysGood,v.g);expiry+=v.e*(v.g-v.e)+v.e*(v.e-1)/2;}
  }
  ok(Math.abs(RK-R2-cutR)<=1e-7*Math.max(1,RK),'linear deletion identity');
  ok(EgCurrent<=2*cap*R2+1e-6*Math.max(1,E2)&&ExCurrent<=2*startCap*leaf*R2+1e-6*Math.max(1,E2),'current energy caps');
- const classEnergy=[0,0,0],classPairs=[0,0,0];
+ const classEnergy=[0,0,0],classPairs=[0,0,0],union=[0,0,0,0];let diagMoving=0;
  let ggPhysical=0,sharedGG=0,firstProjected=0,firstPhysical=0,freshPhysicalDeep=0,freshProjectedDeep=0,mixedRecentDeep=0,currentGG=0,physicalFreshGood=0;
  for(const path of retained){const seen=new Map();
-  for(const e of path){const x=horizons.get(e.C),q=r[e.C/2];diag2+=q*e.w**2;
+  for(const e of path){const x=horizons.get(e.C),q=r[e.C/2];diag2+=q*e.w**2;if(e.moving)diagMoving+=q*e.w**2;
    for(const b of x.list){if(b.M>=e.M)break;if(b.gu===undefined)continue;
     let v=seen.get(b.i);
     if(!v){firstProjected++;const fresh=(e.freshP&&b.gp)||(b.freshP&&e.gp),recent=(e.gp&&b.recent)||(b.gp&&e.recent);
@@ -198,16 +202,19 @@ function audit(X,mode='diagnostic'){
      classPairs[cls]++;v={cls,met:false,gg:false};seen.set(b.i,v);
     }
     if(!v.met&&e.t===b.t){v.met=true;firstPhysical++;v.gg=e.gu&&b.gu;if(v.gg){ggPhysical++;if(!e.good||!b.good)freshPhysicalDeep++;if(e.freshS||b.freshS||e.freshP||b.freshP)physicalFreshGood++;}}
-    const w=2*q*e.w*b.w;classEnergy[v.cls]+=w;if(v.gg&&e.t===b.t)sharedGG+=w;if(e.gu&&b.gu&&e.t===b.t)currentGG+=w;
+    const w=2*q*e.w*b.w;classEnergy[v.cls]+=w;union[e.moving||b.moving?0:v.cls<2?1:v.gg&&e.t===b.t?2:3]+=w;if(v.gg&&e.t===b.t)sharedGG+=w;if(e.gu&&b.gu&&e.t===b.t)currentGG+=w;
    }
   }
  }
  ok(ggPhysical===expiry&&ggPhysical<=retained.length*Math.max(0,maxPhysGood-1),'physical expiry exact');
  ok(sharedGG<=2*B*ggPhysical+1e-6*Math.max(1,E2),'whole same state suffix cap');
  ok(Math.abs(E2-diag2-classEnergy.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,E2),'energy oracle');
+ ok(Math.abs(Emoving-diagMoving-union[0])<=1e-7*Math.max(1,E2),'moving energy oracle');
+ ok(Emoving<=2*startCap*leaf*R2+1e-6*Math.max(1,E2),'moving energy bound');
+ ok(Math.abs(E2-diag2-union.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,E2),'disjoint new union');
  ok(classPairs[0]<=postPVisits*cap,'fresh projected pair cap');
  ok(classPairs[1]<=recentVisits*cap,'recent projected pair cap');
- return {X,B,mode,tauP,tauS,k0,k1,T,L,P,reference:kept,referencePhysicalMax,removed,cut,cutR,cutAtDeep,nD,Dedge,layers,reverseHorizons,reverseStartMass,startMax,startCap,leaf,cap,pcap,retained:retained.length,R2,E2,EK,S0,diag:diag2,events,literal,crossP,crossS,neverP,neverS,extendedS,deepP,deepS,maxDepthBeforeP,postPVisits,postSVisits,prePVisits,preSVisits,maxGP,maxExt,maxPhysGood,Rgood,EgCurrent,ExCurrent,firstProjected,firstPhysical,ggPhysical,expiry,sharedGG,currentGG,physicalFreshGood,freshPhysicalDeep,freshProjectedDeep,mixedRecentDeep,classPairs,classEnergy};
+ return {X,B,mode,tauP,tauS,k0,k1,T,L,P,reference:kept,referencePhysicalMax,removed,cut,cutR,cutAtDeep,nD,Dedge,layers,reverseHorizons,reverseStartMass,startMax,startCap,leaf,cap,pcap,retained:retained.length,R2,E2,EK,S0,diag:diag2,events,literal,crossP,crossS,neverP,neverS,extendedS,deepP,deepS,maxDepthBeforeP,postPVisits,postSVisits,prePVisits,preSVisits,maxGP,maxExt,maxPhysGood,Rgood,EgCurrent,ExCurrent,firstProjected,firstPhysical,ggPhysical,expiry,sharedGG,currentGG,physicalFreshGood,freshPhysicalDeep,freshProjectedDeep,mixedRecentDeep,classPairs,classEnergy,maxMoving,Rmoving,Emoving,diagMoving,union};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree','wide'])console.log(JSON.stringify(audit(X,mode)));
