@@ -22,9 +22,30 @@ function audit(X,mode){
  const pred=e=>e.prev?e.prev.C+":"+e.prev.t:"root:"+e.M,label=e=>e.prev?.p||0;
  const scales=[{d:0,m:m0},{d:mode==="analytic"?B:Math.max(4,Math.floor(B/16)),m:mode==="analytic"?Math.floor(u**1.75):2},{d:mode==="analytic"?4*B:4*Math.max(4,Math.floor(B/16)),m:mode==="analytic"?Math.floor(4*u**1.75):4}];
  const cell=(M,d)=>d?Math.floor((M-X)/d):0,rankCounters=scales.map(()=>new Map()),inc=(m,k,n=1)=>m.set(k,(m.get(k)||0)+n);
- const Dmax=Math.max(...Array.from({length:0},()=>0),1);let maxDiv=0;
+ let maxDiv=0;
  const labels=new Map();function divs(D){if(!labels.has(D)){let a=[...fs(D),...fs(D+2)];labels.set(D,a);maxDiv=Math.max(maxDiv,a.length);}return labels.get(D);}
  const layer=[1,128,512].map(x=>({x,mix:Math.max(1,Math.floor(baseMix*Math.sqrt(H/x))),same:Math.max(1,Math.floor(baseSame*Math.sqrt(H/x))),mixD:0,sameD:0,mixL:0,sameL:0,start:0,mixCover:0,sameCover:0,maxMixDeg:0,maxSameDeg:0}));
+ let admitExtra=0,admitRaw=0,admitGlobal=0,admitCell=0,afterDegree=0,admitFinal=0,localAdmitChecks=0,localAdmitCovered=0;
+ function admissionNeed(sel,a,b,hier){
+   const same=label(a)===label(b);
+   function directed(c,d){
+     const k=hier&&!same?label(c):pred(c),key=e=>hier&&!same?label(e):pred(e);
+     let own=0,n=0,rank=0;
+     for(const e of sel){if(key(e)===k){own++;continue;}if(hier&&same&&label(e)!==label(c))continue;n++;if(e.M<=d.M)rank++;}
+     ok(own>0&&rank>0&&rank<=n,"admission ranks");
+     return Math.max(own,Math.min(rank,n-rank+1));
+   }
+   return Math.min(directed(a,b),directed(b,a));
+ }
+ function checkAdmission(sel,m){
+   if(sel.length<2)return;
+   let flat=0,hier=0;const groups=new Map(),labs=new Map();
+   for(const e of sel){inc(groups,pred(e));inc(labs,label(e));}
+   for(let i=0;i<sel.length;i++)for(let j=i+1;j<sel.length;j++){const a=sel[i],b=sel[j];if(pred(a)===pred(b))continue;if(admissionNeed(sel,a,b,false)<=m)flat+=2;if(admissionNeed(sel,a,b,true)<=m)hier+=2;}
+   const D=k=>f(sel.length,k)-[...groups.values()].reduce((s,n)=>s+f(n,k),0);
+   ok(flat<=D(2*m)+8*D(m)&&hier<=D(2*m)+8*D(m),"local admission potential");
+   localAdmitChecks++;localAdmitCovered+=flat+hier;
+ }
  let E=0,exact=0,old=0,newMix=0,newSame=0,oldExtraMix=0,oldExtraSame=0,remaining=0,mergers=0,pairs=0,regChecks=0,rootChecks=0,sameEdges=0,mixedEdges=0,shortEdges=0,regEdges=0,regularOnly=0,maxDegree=0,maxReg=0,layerChecks=0,irregResidual=0,largeBranchResidual=0;
  const massCut=(b,n)=>n?Math.floor(b*b*H/(n*n)):Infinity;
  for(const es of vlist){
@@ -57,19 +78,28 @@ function audit(X,mode){
    }
    const cuts=[...new Set(es.map(e=>e.tail).filter(x=>x>0))].sort((a,b)=>a-b);let last=0;
    for(const end of cuts){const sel=es.filter(e=>e.tail>=end),{sz,lab}=calc(sel,m0);const len=end-last;
+     checkAdmission(sel,Math.max(1,Math.floor(m0*Math.sqrt(H/end))));
+     const checked=new Set();
      for(const {a,b,gi,gj,rank} of pp){if(a.tail<end)continue;const same=label(a)===label(b);let base=Math.max(rank,massCut(m0,sel.length),same?massCut(m0,lab.get(label(a))):0);
        for(let z=1;z<scales.length;z++){const s=scales[z],i=cell(a.M,s.d),j=cell(b.M,s.d);if(i===j)continue;const ss=sel.filter(e=>{let c=cell(e.M,s.d);return c===i||c===j;});base=Math.max(base,massCut(s.m,ss.length),same?massCut(s.m,ss.filter(e=>label(e)===label(a)).length):0);}
        const cover=c=>Math.max(0,Math.min(end,c)-last),o=cover(base);old+=2*o;
        let cap=0,qual=false;if(!same){cap=massCut(baseMix,Math.max(lab.get(label(a)),lab.get(label(b))));newMix+=2*cover(cap);}
        else{const k=Math.min(gi,gj)+":"+Math.max(gi,gj);qual=graph.has(k);if(qual){cap=massCut(baseSame,Math.max(sz[gi],sz[gj]));newSame+=2*cover(cap);}}
-       const v=cover(Math.max(base,cap));if(same)oldExtraSame+=2*(v-o);else oldExtraMix+=2*(v-o);remaining+=2*(len-v);
+       let ad=massCut(m0,Math.min(admissionNeed(sel,a,b,false),admissionNeed(sel,a,b,true)));
+       const rawGlobal=ad;let adCell=0;
+       for(let z=1;z<scales.length;z++){const s=scales[z],i=cell(a.M,s.d),j=cell(b.M,s.d);if(i===j)continue;const ss=sel.filter(e=>{let c=cell(e.M,s.d);return c===i||c===j;});const key=z+":"+i+":"+j;if(!checked.has(key)){checked.add(key);checkAdmission(ss,Math.max(1,Math.floor(s.m*Math.sqrt(H/end))));}
+         adCell=Math.max(adCell,massCut(s.m,Math.min(admissionNeed(ss,a,b,false),admissionNeed(ss,a,b,true))));}
+       ad=Math.max(ad,adCell);admitRaw+=2*cover(ad);
+       const v=cover(Math.max(base,cap)),af=cover(Math.max(base,cap,ad)),ag=cover(Math.max(base,cap,rawGlobal));
+       admitGlobal+=2*(ag-v);admitCell+=2*(af-ag);admitExtra+=2*(af-v);admitFinal+=2*(len-af);
+       if(same)oldExtraSame+=2*(v-o);else oldExtraMix+=2*(v-o);remaining+=2*(len-v);
        if(same){if(!qual)irregResidual+=2*(len-v);else largeBranchResidual+=2*(len-v);}
      }last=end;
    }
  }
  for(const o of layer){ok(o.mixD===o.mixL-o.start&&o.sameD===o.sameL-o.start&&o.mixD<=2*o.mix*o.start&&o.sameD<=2*o.same*o.start,"layer telescope");ok(o.mixCover<=2*Math.max(0,2*o.maxMixDeg-1)*o.mixD&&o.sameCover<=2*Math.max(0,2*o.maxSameDeg-1)*o.sameD,"layer global matching");}
- ok(E===exact&&E===old+oldExtraMix+oldExtraSame+remaining,"energy partition");
- return {mode,X,B,T,Q,N,R,G,events,high,literal,Z,baseMix,baseSame,E,old,newMix,newSame,oldExtraMix,oldExtraSame,remaining,mergers,pairs,regChecks,rootChecks,sameEdges,mixedEdges,shortEdges,regEdges,regularOnly,maxDegree,maxReg,maxDiv,layerChecks,irregResidual,largeBranchResidual,layer};
+ ok(E===exact&&E===old+oldExtraMix+oldExtraSame+remaining&&remaining===admitExtra+admitFinal&&admitExtra===admitGlobal+admitCell,"energy partition");
+ return {mode,X,B,T,Q,N,R,G,events,high,literal,Z,baseMix,baseSame,E,old,newMix,newSame,oldExtraMix,oldExtraSame,remaining,mergers,pairs,regChecks,rootChecks,sameEdges,mixedEdges,shortEdges,regEdges,regularOnly,maxDegree,maxReg,maxDiv,layerChecks,irregResidual,largeBranchResidual,admitRaw,admitGlobal,admitCell,admitExtra,admitFinal,localAdmitChecks,localAdmitCovered,layer};
 }
 
 const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
