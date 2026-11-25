@@ -74,3 +74,22 @@ Keep all previous actual linear masks and add (3) by priority. In the previous s
 The last statement concerns each surviving hit and all actual next high hits, even if those next hits are subsequently deleted. To obtain diversity of the new residual itself one could freeze a new measure after the present deletion and repeat the previous sparse-interval cover (one additional absolute O(NT/u^.25) payment). This is valid because the present mask depends only on original tick states and arithmetic support and the prior entropy mask is not needed to define it. It gives the previous local diversity conclusions with the NEW frozen measure, on moderate stable spans. All global masks still apply only a fixed number of times, not indefinitely for free.
 
 These constraints do not bound the total remaining occupation. In particular intervening gain >L is much smaller than the size of a high gain p-1>=Q-1, so it is not enough by itself to charge all high clock to the medium clock. The remaining large-mass stable strands and non-HIGH clock are also open. No Lean compilation and no external novelty claim. Main and independent branches unchanged.
+
+## 5. Finite audit
+
+Source [min_unified_rough_pair_audit.mjs](https://github.com/tara-sooo/A166944-Lean/blob/60ddd1aa696f560799bac5807ade953df7ab1bf5/research/min_unified_rough_pair_audit.mjs), exact remote readback. Ran the function in the available ECMAScript tool runtime, not an independent Node process:
+    node research/min_unified_rough_pair_audit.mjs 256 1024 4096 16384 65536
+
+All five corrected runs pass. Initial diagnostic attempt failed because its roughness threshold exceeded the implied lower bound for the diagnostic natural high predicate. Corrected before committing by choosing R=max(3,min(ceil(sqrt(B)),ceil(Q/2))), Q=max(5,ceil(B/10)), r>p/2. Other parameters T=min(8B,floor(X/2)), L=8,m=8. Finite parameters deliberately differ from analytic scaling. The diagnostic regards a horizon without an eligible prime as rough (sentinel B+1). These are standalone masks on original paths, not cumulative with previous entropy/deficit/sparse masks.
+
+Exact support enumeration by p/sign/quotient and independent by C/factors, four form identities, literal small-prime residue counts on good primes, complete actual high event/nearby next-high pair support, deterministic true-tick exit and exact linear removal partition. For each original high incidence with at least one retained tick of mass <=m, checked every even horizon from actual post through L and the actual next-high gain separation if a next high exists. No actual stable-group reconstruction in this audit; that is inherited from the parent. The finite good-prime checks test the four distinct residue classes, not the asymptotic Selberg bound or its constants.
+
+| X | triples | forward horizons | backward horizons | raw HIGH | forward paid HIGH | backward paid HIGH | remaining HIGH |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+|256|2040|352|639|1765|1702|0|63|
+|1024|810|309|535|3908|3564|0|344|
+|4096|847|653|651|37458|28518|3466|5474|
+|16384|1351|1131|1161|195474|74200|23811|97463|
+|65536|2582|2288|2329|1380549|358722|80924|940903|
+
+Largest diagnostic: 5709 prime tags, 140255 completed events, 578522 distinct occupied true tick states, original actual clock2395330. 2582 exact four-form checks,11232 literal good-prime residue checks,1187 actual close high pairs,1237 actual rough landings. Actual clock paid across all labels491906, including439646 HIGH and52260 non-HIGH. The remaining HIGH at horizons in the forward/back supports with mass>8 totals527223; other remaining HIGH413680. Retained small-mass incidence isolation checks8245 and actual next-high gap checks1037 (nonvacuous). These counts are finite diagnostics, not asymptotic reduction fractions. No independent literal GCD oracle in this new standalone script, no Lean execution.
