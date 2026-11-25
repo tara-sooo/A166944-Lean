@@ -36,7 +36,7 @@ function entropyAudit(ledger,X,B,paths,rr,fac,sp,base,ok,close){
  for(const [p,n] of arithByP)ok(n<=(sup.get(p)||0),"rough stationary key support");
  ok(close(smallRough,arithmeticPaid+arithRemain),"stationary arithmetic ledger");
  let capTotal=0,paid=0,remain=0,events=0,mergingChildren=0,maxChildren=0,maxSize=0,maxGrowth=0,maxVertexLog=0,lightEventsMax=0,thinEvents=0,allPaidEvents=0,keptPairs=0,bigSide=0,smallSide=0,lightPaid=0,rootCount=0,independent=0;
- const rootLogs=new Map();
+ const rootLogs=new Map(),samplePairCap=Math.max(0,...ledger.pairs.values());
  for(const es of groups.values()){
    const vs=[...new Set(es.flatMap(e=>[e.i,e.j]))],parent=new Map(vs.map(v=>[v,v])),members=new Map(vs.map(v=>[v,[v]])),growth=new Map(vs.map(v=>[v,0])),light=new Map(vs.map(v=>[v,0]));
    rootCount+=vs.length;ok(vs.length<=5*B+1,"cell width bound");
@@ -74,7 +74,7 @@ function entropyAudit(ledger,X,B,paths,rr,fac,sp,base,ok,close){
        let left=[...alive].reduce((s,e)=>s+e.w,0);remain+=left;keptPairs+=alive.size;
        for(const c of constraints.values())capTotal+=c.cap;
        if(left<=1e-10)allPaidEvents++;
-       if(ns<=1+2*base*Math.log(2)/U){thinEvents++;ok(left<=1e-8,"small union complete payment");}
+       if(samplePairCap>0&&ns<=1+base*Math.log(2)/samplePairCap){thinEvents++;ok(left<=1e-8,"small union complete payment");}
        for(const e of alive){
          for(const c of inc.get(e))ok(c.degree>c.cap-1e-8,"actual entropy core");
          const a=sizes.get(find(e.i)),b=sizes.get(find(e.j));
@@ -99,7 +99,7 @@ function entropyAudit(ledger,X,B,paths,rr,fac,sp,base,ok,close){
  const entropy=[...rootLogs.values()].reduce((s,x)=>s+x,0);
  ok(capTotal<=base*entropy+1e-6&&paid<=capTotal+1e-6&&close(total,paid+remain),"global entropy capacity");
  ok(entropy<=rootCount*Math.log(5*B+1)+1e-6,"cell entropy");
- return {base,total,paid,remain,rawKinds,paidKinds:kinds,events,mergingChildren,maxChildren,maxSize,maxGrowth,maxVertexLog,lightEventsMax,rootCount,entropy,capTotal,allPaidEvents,thinEvents,keptPairs,bigSide,smallSide,lightPaid,independent,stationary:{jump,smallJump,receiverRough,smallRough,ageBands,R,P,arithKeys,arithmeticPaid,arithRemain,support:[...sup.values()].reduce((s,x)=>s+x,0)}};
+ return {base,samplePairCap,total,paid,remain,rawKinds,paidKinds:kinds,events,mergingChildren,maxChildren,maxSize,maxGrowth,maxVertexLog,lightEventsMax,rootCount,entropy,capTotal,allPaidEvents,thinEvents,keptPairs,bigSide,smallSide,lightPaid,independent,stationary:{jump,smallJump,receiverRough,smallRough,ageBands,R,P,arithKeys,arithmeticPaid,arithRemain,support:[...sup.values()].reduce((s,x)=>s+x,0)}};
 }
 // Multiscale actual first-contact cuts and summable opposite-cohort peeling.
 function multiscale(g,live,z,edges,L,y,B,X,f,m,ok,close,fac,ledger){
