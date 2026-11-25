@@ -15,19 +15,23 @@ function audit(X,focus=false){
  }
  function word(e,L){let a=e.tag.es,i=e.i+1,s=[];while(a[i-1].J-e.J<L){let x=a[i++];ok(x,"room");s.push(x.p+":"+x.w)}return s.join(",")}
  function birth(e,f){let a=e.tag,b=f.tag,k=Math.min(a.M,b.M)+"|"+Math.max(a.M,b.M);if(birthCache.has(k))return birthCache.get(k);let i=0,j=0;while(i<a.es.length&&j<b.es.length){let x=a.es[i],y=b.es[j];if(x.C<y.C){i++;continue}if(y.C<x.C){j++;continue}if(Math.max(x.t,y.t)<Math.min(x.v,y.v)){ok(x.v===y.v&&x.p===y.p,"shared exit");let z={x,y,J:x.C,h:Math.abs(x.t-y.t),later:x.t>y.t?x:y};birthCache.set(k,z);return z}i++;j++}throw Error("missing common birth")}
- const stats=Ps.map(P=>({P,source:0,back:0,forward:0,unstable:0,diag:0,recent:0,small:0,long:0,other:0,highPaid:0,columns:0,rows:0,kernelChecks:0,defectChecks:0,longPairs:0,episodes:0,envelope:0,oldPairEnvelope:0,unionBound:0,intersectionBound:0,jointCap:0,separateCap:0}));
+ const stats=Ps.map(P=>({P,source:0,back:0,forward:0,unstable:0,diag:0,recent:0,small:0,long:0,other:0,highPaid:0,columns:0,rows:0,kernelChecks:0,defectChecks:0,longPairs:0,episodes:0,envelope:0,oldPairEnvelope:0,targetActual:0,targetBack:0,targetForward:0,unionBound:0,intersectionBound:0,targetChecks:0,jointCap:0,separateCap:0}));
  for(let o of proj.values()){let cls=new Map();for(let sl of o.slots.values()){sl.ready=sl.refs.filter(e=>e.tag.end-e.J>=Ll);if(sl.ready.length){sl.wl=word(sl.ready[0],Ll);sl.wh=word(sl.ready[0],Lh)}let c0=mod(sl.v,6),a=cls.get(c0)||[];a.push(sl);cls.set(c0,a)}
   for(let a of cls.values()){let n=a.reduce((v,s)=>v+s.refs.length,0),stable=a.reduce((v,s)=>v+s.ready.length,0),long=new Map(),short=new Map();for(let s of a)if(s.ready.length){long.set(s.wl,(long.get(s.wl)||0)+s.ready.length);short.set(s.wh,(short.get(s.wh)||0)+s.ready.length)}
    for(let j=0;j<Ps.length;j++){let z=stats[j],P=Ps[j],k=Math.ceil((o.C+o.p-1)/P)-Math.ceil(o.C/P);if(!k)continue;let cap=c*P*k,cols=new Map(),bc=new Map(),dc=new Map(),rows=new Map(),live=[];
     const add=(m,key,v)=>m.set(key,(m.get(key)||0)+v);
-    for(let s of a)for(let e of s.ready){let l=e.lo[j],h=e.hi[j],mass=short.get(s.wh);if(h&&mass!==s.ready.length){z.highPaid+=h;h=0}let w=l+h;if(!w)continue;ok(w<=cap,"row clock");let A=long.get(s.wl);if(h)ok(A===s.ready.length,"positive high singleton nested");z.source+=w;z.unstable+=w*(n-stable)/n;rows.set(e,w);live.push(e);
+    const Bmask=new Map(),Dmask=new Map(),Bcount=new Map(),Dword=new Map();let Dtotal=0;
+    for(let s of a)for(let f of s.refs){let b=f.tag.es.slice(0,f.i).some(x=>x.C<=o.C-2&&x.C%10===0),d=f.tag.end-f.J>=Ll&&f.tag.es.slice(f.i+1).some(x=>x.C<f.J+Ll&&x.C%10===0);Bmask.set(f,b);Dmask.set(f,d);if(b)add(Bcount,s,1);if(d){Dtotal++;add(Dword,s.wl,1)}}
+    for(let s of a)for(let e of s.ready){let l=e.lo[j],h=e.hi[j],mass=short.get(s.wh);if(h&&mass!==s.ready.length){z.highPaid+=h;h=0}let w=l+h;if(!w)continue;ok(w<=cap,"row clock");let A=long.get(s.wl);if(h)ok(A===s.ready.length,"positive high singleton nested");if(Bmask.get(e)||Dmask.get(e))z.unionBound+=w;
+     z.intersectionBound+=w*((Bmask.get(e)?A/n*(Bcount.get(s)||0)/s.refs.length:0)+(Dmask.get(e)?(Dtotal-(Dword.get(s.wl)||0))/n:0));
+     z.source+=w;z.unstable+=w*(n-stable)/n;rows.set(e,w);live.push(e);
      for(let t of a){if(!t.ready.length)continue;if(h){ok((s.wh===t.wh)===(s.wl===t.wl),"common forward kernel");z.kernelChecks++}
       if(s.wl===t.wl)continue;
       let q=w/n;for(let f of t.ready){add(cols,f,q);add(dc,f,q);z.forward+=q}
       // Long/short actual first defect comparison for each positive row sector.
-      for(let [weight,L] of [[l,Ll],[h,Lh]])if(weight){let x=e.tag.es,y=t.ready[0].tag.es,i=e.i+1,b=t.ready[0].i+1,lag=t.v-s.v,found=false;while(x[i-1].J-e.J<L){let u=x[i],v=y[b];ok(u&&v&&u.C===v.C&&v.t-u.t===lag,"translated");if(u.p!==v.p||u.w!==v.w){ok(lag%(2*u.p)!==0||lag%(2*v.p)!==0,"nonperiodic");found=true;break}i++;b++}ok(found,"word defect");z.defectChecks++}
+      for(let [weight,L] of [[l,Ll],[h,Lh]])if(weight){let x=e.tag.es,y=t.ready[0].tag.es,i=e.i+1,b=t.ready[0].i+1,lag=t.v-s.v,found=false;while(x[i-1].J-e.J<L){let u=x[i],v=y[b];ok(u&&v&&u.C===v.C&&v.t-u.t===lag,"translated");if(u.p!==v.p||u.w!==v.w){ok(lag%(2*u.p)!==0||lag%(2*v.p)!==0,"nonperiodic");if(u.C%10===0){ok(Dmask.get(e)&&t.ready.every(f=>Dmask.get(f)),"defect target intersection");let amount=weight*t.ready.length/n;z.targetActual+=amount;z.targetForward+=amount;z.targetChecks++;}found=true;break}i++;b++}ok(found,"word defect");z.defectChecks++}
      }
-     const bw=w*A/n/s.refs.length;for(let f of s.refs){add(cols,f,bw);add(bc,f,bw);z.back+=bw;if(f===e){z.diag+=bw;continue}if(s.refs.length<cut){z.small+=bw;continue}let b=birth(e,f);if(o.C-b.J<2){z.recent+=bw;continue}if(b.h>R&&b.later.i>0){z.long+=bw;z.longPairs++;let slot=b.x.sl,ep=episodes.get(slot)||{slot,charge:[0,0,0]};episodes.set(slot,ep);ep.charge[j]+=bw;}else z.other+=bw}
+     const bw=w*A/n/s.refs.length;for(let f of s.refs){add(cols,f,bw);add(bc,f,bw);z.back+=bw;if(f===e){z.diag+=bw;continue}if(s.refs.length<cut){z.small+=bw;continue}let b=birth(e,f);if(o.C-b.J<2){z.recent+=bw;continue}if(b.h>R&&b.later.i>0){z.long+=bw;z.longPairs++;if(b.J%10===0){ok(Bmask.get(e)&&Bmask.get(f),"birth target intersection");z.targetActual+=bw;z.targetBack+=bw;z.targetChecks++;}let slot=b.x.sl,ep=episodes.get(slot)||{slot,charge:[0,0,0]};episodes.set(slot,ep);ep.charge[j]+=bw;}else z.other+=bw}
     }
     for(let s of a)for(let f of s.refs){let v=cols.get(f)||0,b=bc.get(f)||0,d=dc.get(f)||0;ok(eq(v,b+d)&&v<=cap+1e-7,"combined column");if(v){z.columns++;z.jointCap+=cap;z.separateCap+=cap*((b>0?1:0)+(d>0?1:0))}}
     z.rows+=rows.size;
@@ -41,7 +45,7 @@ function audit(X,focus=false){
    }ok(charge<=sum+1e-7&&sum<=old+1e-7,"episode envelope");z.episodes++;z.envelope+=sum;z.oldPairEnvelope+=old;
   }
  }
- for(let z of stats){ok(eq(z.source,z.back+z.forward+z.unstable)&&eq(z.back,z.diag+z.recent+z.small+z.long+z.other),"partition");for(let k of Object.keys(z))if(typeof z[k]==="number")z[k]=+z[k].toFixed(6)}
+ for(let z of stats){ok(z.targetActual<=z.intersectionBound+1e-7&&z.intersectionBound<=z.unionBound+1e-7&&eq(z.targetActual,z.targetBack+z.targetForward),"joint target cover");ok(eq(z.source,z.back+z.forward+z.unstable)&&eq(z.back,z.diag+z.recent+z.small+z.long+z.other),"partition");for(let k of Object.keys(z))if(typeof z[k]==="number")z[k]=+z[k].toFixed(6)}
  return {X,focus,B,T,Ll,Lh,N,W,events,hit,birthCache:birthCache.size,stats};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
