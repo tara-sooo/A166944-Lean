@@ -44,7 +44,7 @@ This reconstructs all projected overlap, including asynchronous overlaps, not me
 
 ## 4. NEW inverse bound for elementary large returns
 
-Call an edge elementary if its first selected prime p after canonical m>=? (here p>=Y>=7, not a restriction on m) immediately enters an odd or even reset, and the next canonical point is that odd reset or the even bridge of section 2. The first event may follow a virtual start. For the odd case with destination n=f(m), J=2n-2 and p|J+2, hence p|n, and m=n-(p-1)/2. For the even case J=2n-2-4k, 0<=k<=2, p|J, hence p|n-1-2k, and m=n-2k-(p-1)/2. Thus every incoming elementary edge is indexed by a prime factor of one of
+Call an edge elementary if its first selected prime p>=Y>=7 after canonical m immediately enters an odd or even reset, and the next canonical point is that odd reset or the even bridge of section 2. The first event may follow a virtual start. For the odd case with destination n=f(m), J=2n-2 and p|J+2, hence p|n, and m=n-(p-1)/2. For the even case J=2n-2-4k, 0<=k<=2, p|J, hence p|n-1-2k, and m=n-2k-(p-1)/2. Thus every incoming elementary edge is indexed by a prime factor of one of
     n, n-1, n-3, n-5,
 plus the indicated case. Each such p/case fixes m. For n in the ambient range, the inverse degree of elementary edges with p>=Y is O(log B/log Y), hence O(1) for Y=B^delta, fixed delta>0. Extra parity, exact first return, and MIN constraints only reduce the degree. This does not bound the incoming degree of general renewal edges with long nonreset excursions. Nor does constant elementary degree alone bound an arbitrary-depth basin.
 
