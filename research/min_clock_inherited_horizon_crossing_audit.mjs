@@ -1,6 +1,6 @@
 // Inherited-level later-origin horizon crossing and overtaking audit.
 function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
- const z={total:0,low:0,recent:0,eligible:0,hit:0,hitSame:0,hitDistinct:0,hitGood:0,hitShort:0,skip:0,skipLow:0,skipHigh:0,skipSupport:0,hitEnergy:0,hitRatio:0,flip:0,flipSameTick:0,flipStationary:0,flipDouble:0,flipBound:0,firstBefore:0,firstAfter:0,checks:0,literal:0,maxGap:0,maxLag:0,maxReuse:0,maxSkip:0,byP:{},byR:{},byAnchor:{},byContact:{},hitGoodKeys:0,hitAllKeys:0,skipKeys:0,skipCrossMoment:0,skipThinPaid:0,skipResidual:0,skipCap:0,skipVertex:0};
+ const z={total:0,low:0,recent:0,eligible:0,hit:0,hitSame:0,hitDistinct:0,hitGood:0,hitShort:0,skip:0,skipLow:0,skipHigh:0,hitEnergy:0,hitDownEnergy:0,hitDownRatio:0,hitDownKeys:0,hitRatio:0,flip:0,flipStationary:0,flipDouble:0,firstBefore:0,firstAfter:0,checks:0,literal:0,maxGap:0,maxLag:0,maxReuse:0,maxSkip:0,byP:{},byR:{},hitGoodKeys:0,hitAllKeys:0,skipKeys:0,skipCrossMoment:0,skipThinPaid:0,skipResidual:0,skipCap:0,skipVertex:0};
  const hitGroups=new Map(),skips=new Map(),skipPairKeys=new Map(),skipTokenGroups=new Map();
  function state(P,t){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].v<=t)a=m+1;else b=m}if(a<P.records.length)return {C:P.records[a].C,k:a};return {C:P.endC,k:a}}
  function lower(P,C){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].C<C)a=m+1;else b=m}return a}
@@ -24,7 +24,7 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
    const flips=getFlips(v),P=v.a.P,Q=v.b.P,F=v.F;
    const beforeA=state(P,F.t-1).C,beforeB=state(Q,F.t-1).C;
    ok(beforeA!==beforeB,"distinct precontact horizons");
-   let pairWeight=0;
+   
    for(let l=7;l<=v.hi;l++){
      let w=0;for(const u of v.uses)if(u.hi>=l)w+=u.w;
      if(w<=0)continue;
@@ -52,7 +52,7 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
        const g=flips.filter(s=>s.t>b.z).at(-1);
        ok(g&&g.t<F.t&&g.N*sign<0,"last strict reversal after later upcross");
        z.flip+=w;if(g.q===1)z.flipStationary+=w;else z.flipDouble+=w;
-       z.flipBound+=w;
+       
      }
      if(v.type===1){
        const earlyIsRecipient=state(E,F.t-1).C===F.C;
@@ -70,11 +70,11 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
        if(H.v===Lwait.v){ok(arrival===F.t,"same-slot hit is first contact");z.hitSame+=w;}else{ok(Lwait.v<=arrival,"distinct slots disjoint");z.hitDistinct+=w;}
        const key=pk+'|'+C;
        let h=hitGroups.get(key);
-       const energy=wL*wH/(2*r);
-       if(!h){h={weight:0,good:0,r,wL,wH,energy,arrival,late:Lwait.v,levels:0};hitGroups.set(key,h)}
+       const energy=wL*wH/(2*r),drop=Math.max(0,H.p-1-2*wH),downEnergy=wL*drop/(2*r);
+       if(!h){h={weight:0,good:0,short:0,r,wL,wH,energy,downEnergy,drop,arrival,late:Lwait.v,levels:0};hitGroups.set(key,h)}
        ok(h.arrival===arrival&&h.late===Lwait.v&&close(h.energy,energy),"fixed orientation per pair/horizon");
        h.weight+=w;h.levels++;
-       if(wH>=eps*r){h.good+=w;z.hitGood+=w;}else z.hitShort+=w;
+       if(wH>=eps*r){h.good+=w;z.hitGood+=w;}else {ok(drop>=r/6&&downEnergy>=wL/12,'short hit net descent');z.hitShort+=w;h.short+=w;}
        let rb=r<=B/16?"low":r<=B/4?"mid":"high";z.byR[rb]=(z.byR[rb]||0)+w;
      }else{
        z.skip+=w;ok(event.p>=5&&C<=land-2,"skip needs p>=5");
@@ -96,6 +96,7 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
  for(const h of hitGroups.values()){
    ok(h.levels<=2*h.wL&&h.weight<=27*2*h.wL+1e-7,"pair horizon level bound");
    if(h.good>0){ok(h.good<=108/eps*h.energy+1e-7,"hit transfer inequality");z.hitEnergy+=h.energy;z.hitGoodKeys++;z.hitRatio=Math.max(z.hitRatio,h.good/h.energy)}
+   if(h.short>0){ok(h.short<=648*h.downEnergy+1e-7,'short hit downward transfer');z.hitDownEnergy+=h.downEnergy;z.hitDownKeys++;z.hitDownRatio=Math.max(z.hitDownRatio,h.short/h.downEnergy)}
  }
  z.hitAllKeys=hitGroups.size;z.skipKeys=skips.size;
  for(const s of skips.values())ok(s.origins.size<=(s.p-3)/2,"skip interior horizon count");
@@ -305,7 +306,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  const inheritedLedger=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,1,4);
  const inheritedWide=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,8,4);
  ok(close(nearMoment,inheritedLedger.near[0]),'independent near-origin ledger');
- return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,B,scaledInherited,ok,close),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
+ return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,B,scaledInherited,ok,close),crossingWide:crossingAudit(inheritedPairs,B,scaledInherited,ok,close,1/4,16),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
