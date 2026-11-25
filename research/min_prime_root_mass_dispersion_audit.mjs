@@ -1,7 +1,7 @@
 // Reproduce: node research/min_prime_root_mass_dispersion_audit.mjs
 function audit(X,mode){
- const B=Math.ceil(Math.sqrt(7*X)),u=Math.log(B),l=Math.max(1,Math.log(u)),analytic=mode==="gain",T=analytic?Math.floor(X/u**.25):mode==="four"?4*B:B,Q=Math.ceil(B/u),P=analytic?Math.ceil(B/Math.sqrt(u)):Math.max(5,Math.ceil(B/4)),L=6,y=3,h=analytic?Math.ceil(20*l):8,g=h*L,k=analytic?Math.floor(l/(8*Math.log(g))):2,w=analytic?k:2,H=analytic?Math.ceil(B*Math.sqrt(u)):mode==="four"?12:5;
- const d0=analytic?B:Math.max(4,Math.floor(B/8)),d1=d0*(analytic?Math.ceil(u):4),m0=analytic?Math.max(1,Math.floor(u**.75)):2,m1=analytic?Math.max(1,Math.floor(u**1.75)):3,K0=analytic?Math.max(1,Math.floor(u**1.5)):2,K1=analytic?Math.max(1,Math.floor(Math.sqrt(u))):1;
+ const B=Math.ceil(Math.sqrt(7*X)),u=Math.log(B),l=Math.max(1,Math.log(u)),analytic=mode==="gain",T=analytic?Math.floor(X/u**.25):(mode==="four"||mode==="skew")?4*B:B,Q=Math.ceil(B/u),P=analytic?Math.ceil(B/Math.sqrt(u)):Math.max(5,Math.ceil(B/4)),L=6,y=3,h=analytic?Math.ceil(20*l):8,g=h*L,k=analytic?Math.floor(l/(8*Math.log(g))):2,w=analytic?k:2,H=analytic?Math.ceil(B*Math.sqrt(u)):(mode==="four"||mode==="skew")?12:5;
+ const d0=analytic?B:Math.max(4,Math.floor(B/8)),d1=d0*(analytic?Math.ceil(u):4),m0=analytic?Math.max(1,Math.floor(u**.75)):2,m1=analytic?Math.max(1,Math.floor(u**1.75)):3,K0=analytic?Math.max(1,Math.floor(u**1.5)):mode==="skew"?4:2,K1=analytic?Math.max(1,Math.floor(Math.sqrt(u))):mode==="skew"?2:1;
  const low=2*X-2,hi=7*X,lim=hi+5,ok=(b,msg)=>{if(!b)throw Error(msg);},mod=(a,m)=>((a%m)+m)%m,gcd=(a,b)=>{while(b){let c=a%b;a=b;b=c;}return a;};
  const spf=new Int32Array(lim+1);for(let n=2;n<=lim;n++)if(!spf[n]){spf[n]=n;if(n*n<=lim)for(let j=n*n;j<=lim;j+=n)if(!spf[j])spf[j]=n;}
  const fs=n=>{let a=[];while(n>1){let p=spf[n];if(p<=B&&p%2)a.push(p);while(n%p===0)n/=p;}return a;},labels=J=>[...fs(J),...fs(J+2)].filter(p=>p>y);
@@ -82,4 +82,4 @@ function audit(X,mode){
  ok(cellE0===diag1+nearE0&&cellE1===diag1+nearE1&&nearE0<=3*(T+B)*nearPairs0&&nearE1<=3*(T+B)*nearPairs1,"same cell pair budget");
  return {mode,X,B,T,Q,P,L,h,k,w,H,d0,d1,m0,m1,K0,K1,N,R,G,events,visits,literal,cross,twins,recent,positiveRecent,highArrivals,shallow,nHeavy,maxRecentMass,degExc,edgeMass,layers,edges,relaxed,removed:removed.size,removedR,removedWitness,pairs,independentMixed,positiveMixed,shallowRecentHeavy,shallowRecentHeavyKept,first,en,finalEn,budget,diag0,diag1,E0,E1,E2,E3,thin0,thin1,thinHits0,thinHits1,disp,dispHits,dispE0,dispE1,cellE0,cellE1,nearPairs0,nearPairs1,finalR,nFinalHorizons,concentratedMany,concentratedManyClock,maxCells0,maxCells1,maxCellMass0,maxCellMass1};
 }
-const xs=process.argv.slice(2).map(Number);for(const mode of ['short','four','gain'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
+const xs=process.argv.slice(2).map(Number);for(const mode of ['short','four','gain','skew'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
