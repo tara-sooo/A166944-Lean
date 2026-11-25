@@ -174,18 +174,61 @@ function audit(X,mode='diagnostic'){
   }
   return dist<=near||short||gg||rg||pt||ac||layer;
  }
- const names=['prior','projThin','projImb','projFilter','physThin','physImb','physFilter','rest'];
+
+ const Y=mode==='analytic'?Math.log(B)**.125:mode==='wide'?Math.ceil(P/4):12;
+ const merges=new Map();
+ function makeMerge(e,b){
+  if(!e.anchor||e.anchor!==b.anchor)return null;
+  ok(e.C===e.anchorJ&&e.t===e.anchorT&&e.C===b.anchorJ&&e.inc===e.anchorP&&b.inc===b.anchorP,'same anchor first physical meeting at high event');
+  const alpha=e.anchor,x=get(e.C);
+  let rec=merges.get(alpha);
+  if(!rec){
+   const group=x.list.filter(v=>v.anchor===alpha);
+   const D0=e.C-e.anchorP+1,rr=r[D0/2],groups=new Map(),cells=new Map(),tags=new Map();
+   ok(rr>0,'same anchor pre horizon active');
+   for(const v of group){
+    const path=byI.get(v.i),pre=path[v.ix-1];ok(pre.C===D0&&v.t-pre.t<=2*rr&&v.t>pre.t,'same label predecessor interval');
+    const key=pre.t;let meta=groups.get(key);if(!meta){meta={n:0,reg:0,good:0};groups.set(key,meta);}
+    meta.n++;meta.reg+=+pre.regular;meta.good+=+pre.good;tags.set(v.i,{key,reg:pre.regular,good:pre.good});
+    for(let j=v.ix;j<path.length;j++){const w=path[j];if(!w.w)continue;
+     let c=cells.get(w.C);if(!c){c={g:new Map(),actual:0};cells.set(w.C,c);}
+     let a=c.g.get(key);if(!a){a={w:0,reg:0,good:0};c.g.set(key,a);}
+     a.w+=w.w;if(pre.regular)a.reg+=w.w;if(pre.good)a.good+=w.w;
+    }
+   }
+   const nr=[...groups.values()].filter(v=>v.reg).length,ng=[...groups.values()].reduce((n,v)=>n+v.good,0);
+   ok(groups.size<=2*rr&&nr<=kBound*2*(Math.floor(Amax/(4*P))+2)&&ng<=gBound,'same anchor incoming group caps');
+   rec={alpha,C:e.C,rr,groups,cells,tags,n:group.length,nr,ng,pairs:0};merges.set(alpha,rec);
+  }
+  const a=rec.tags.get(e.i),c=rec.tags.get(b.i);ok(a&&c&&a.key!==c.key,'different predecessors at first meeting');rec.pairs++;
+  return {rec,a,b:c};
+ }
+ function mergeClass(v,C,w){
+  if(!v)return 0;
+  const {rec,a,b}=v,c=rec.cells.get(C);ok(c,'same anchor cell');
+  const u=c.g.get(a.key),z=c.g.get(b.key);ok(u&&z,'same anchor predecessor weights');
+  c.actual+=w;
+  if(a.good||b.good)return 1;
+  if((a.reg&&u.reg<=thin)||(b.reg&&z.reg<=thin))return 2;
+  if(rec.rr<=Y){
+   if(Math.min(u.w,z.w)<=thin)return 3;
+   if(Math.min(u.w,z.w)*Kimb<=Math.max(u.w,z.w))return 4;
+  }
+  return 5;
+ }
+ const names=['prior','projThin','projImb','projFilter','physThin','physImb','physFilter','sameGood','sameRegThin','sameClockThin','sameClockImb','rest'];
  const energy=Array(names.length).fill(0),visits=energy.slice();
  const typeEnergy=[Array(5).fill(0),Array(5).fill(0)],typeVisits=[Array(5).fill(0),Array(5).fill(0)];
+ const mergeEnergy=Array(6).fill(0),mergeVisits=mergeEnergy.slice();
  let pairs=0,physPairs=0,physicalNew=0,positive=0,physicalSameAnchor=0,filterPositive=0,filterRawBalanced=0,filterImproved=0,physicalOldNoEdge=0;
  for(const path of paths){const seen=new Map();
   for(const e of path){const x=get(e.C),q=r[e.C/2];diag+=q*e.w**2;
    for(const b of x.list){if(b.M>=e.M)break;
     let v=seen.get(b.i);
-    if(!v){pairs++;const rec=makeEdge(e,b,false);confirm(rec,e,b);v={prior:oldPriority(e,b,x),projected:rec,physical:null,met:false};seen.set(b.i,v);}
+    if(!v){pairs++;const rec=makeEdge(e,b,false);confirm(rec,e,b);v={prior:oldPriority(e,b,x),projected:rec,physical:null,merge:null,met:false};seen.set(b.i,v);}
     if(!v.met&&e.t===b.t){v.met=true;physPairs++;
      if(e.anchor&&e.anchor===b.anchor)physicalSameAnchor++;
-     v.physical=makeEdge(e,b,true);confirm(v.physical,e,b);
+     v.physical=makeEdge(e,b,true);confirm(v.physical,e,b);v.merge=makeMerge(e,b);
      if(v.physical&&!v.projected)physicalOldNoEdge++;
     }
     const w=2*q*e.w*b.w;if(!w)continue;positive++;
@@ -195,13 +238,26 @@ function audit(X,mode='diagnostic'){
      row[2]+=w;rec.energy+=w;typeEnergy[i][cl]+=w;typeVisits[i][cl]++;
      if(cl===3){filterPositive++;filterRawBalanced++;}
     }
-    let cls=v.prior?0:pc>=1&&pc<=3?pc:sc>=1&&sc<=3?3+sc:7;
+    const mc=e.t===b.t?mergeClass(v.merge,e.C,w):0;
+    if(mc){mergeEnergy[mc]+=w;mergeVisits[mc]++;}
+    let cls=v.prior?0:pc>=1&&pc<=3?pc:sc>=1&&sc<=3?3+sc:mc>=1&&mc<=4?6+mc:11;
     if(cls>=4&&cls<=6)physicalNew++;
     if(cls===3||cls===6)filterImproved++;
     energy[cls]+=w;visits[cls]++;
    }
   }
  }
+ let mergePairs=0,mergeActual=0,mergeDirect=0,mergeMaxDegree=0,mergeMaxRegular=0,mergeShort=0,mergeShortMass=0,mergeRegularMass=0,mergeGoodMass=0;
+ for(const rec of merges.values()){
+  mergePairs+=rec.pairs;mergeMaxDegree=Math.max(mergeMaxDegree,rec.groups.size);mergeMaxRegular=Math.max(mergeMaxRegular,rec.nr);if(rec.rr<=Y)mergeShort++;
+  for(const [C,c] of rec.cells){let s=0,sq=0;for(const a of c.g.values()){s+=a.w;sq+=a.w*a.w;}const rr=r[C/2],expected=rr*(s*s-sq);
+   ok(Math.abs(c.actual-expected)<=1e-7*Math.max(1,expected),'same high anchor exact cross predecessor energy');mergeActual+=c.actual;mergeDirect+=expected;
+   mergeRegularMass+=rr*s*rec.nr;mergeGoodMass+=rr*s*rec.ng;if(rec.rr<=Y)mergeShortMass+=rr*s*rec.groups.size;
+  }
+ }
+ ok(mergePairs===physicalSameAnchor&&Math.abs(mergeActual-mergeEnergy.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,EK),'same anchor pair identity');
+ ok(mergeEnergy[1]<=2*mergeGoodMass+1e-6*Math.max(1,EK)&&mergeEnergy[2]<=2*thin*mergeRegularMass+1e-6*Math.max(1,EK)&&mergeEnergy[3]<=2*thin*mergeShortMass+1e-6*Math.max(1,EK),'same anchor thin bounds');
+ ok(mergeEnergy[4]<=4*Y*occupationE/Kimb+1e-6*Math.max(1,EK),'same anchor imbalance bound');
  const reports=[];
  for(let i=0;i<2;i++){
   let removedA=0,rawA=0,edgeMass=0,filterEdges=0,positiveEdges=0,thinBudget=0,imbBudget=0,filterBudget=0,filterOnlyBudget=0,maxRatio=0;
@@ -220,7 +276,7 @@ function audit(X,mode='diagnostic'){
   reports.push({edges:maps[i].size,rawA,removedA,filterEdges,positiveEdges,edgeMass,thinBudget,imbBudget,filterBudget,filterOnlyBudget,typeEnergy:typeEnergy[i],typeVisits:typeVisits[i]});
  }
  ok(Math.abs(EK-diag-energy.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,EK),'energy partition');
- return {X,B,mode,P,A,D,h,anchors:aa.length,edges,removed,kept,events,literal,RK,EK,diag,occupationR,occupationE,maxActualH,pairs,physPairs,physicalSameAnchor,physicalOldNoEdge,positive,physicalNew,filterImproved,energy:Object.fromEntries(names.map((n,i)=>[n,energy[i]])),visits:Object.fromEntries(names.map((n,i)=>[n,visits[i]])),reports};
+ return {X,B,mode,P,A,D,h,Y,merge:{anchors:merges.size,pairs:mergePairs,actual:mergeActual,direct:mergeDirect,maxDegree:mergeMaxDegree,maxRegular:mergeMaxRegular,short:mergeShort,energy:mergeEnergy,visits:mergeVisits},anchors:aa.length,edges,removed,kept,events,literal,RK,EK,diag,occupationR,occupationE,maxActualH,pairs,physPairs,physicalSameAnchor,physicalOldNoEdge,positive,physicalNew,filterImproved,energy:Object.fromEntries(names.map((n,i)=>[n,energy[i]])),visits:Object.fromEntries(names.map((n,i)=>[n,visits[i]])),reports};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree','wide'])console.log(JSON.stringify(audit(X,mode)));
