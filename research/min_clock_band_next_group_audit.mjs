@@ -194,6 +194,35 @@ function audit(X,mode='diagnostic'){
   }
  }
  ok(trimLost<=kept*margin+1e-6*Math.max(1,RK),'two-sided trim cost');
+
+ // Stronger two-sided common-history core: remove large gain span, trim boundary.
+ const spanGate=mode==='analytic'?B/u**(1/16):B/8;
+ const futureMargin=Math.ceil(margin+3*spanGate);
+ let spanDeleted=0,spanWeight=0,spanCost=0,coreTrimLost=0,coreCost=0,coreEvents=0,coreCompanions=0,coreStateChecks=0,coreMaxSpan=0,coreMinGroup=Infinity,coreMaxGroup=0;
+ const spanSum=new Map(),spanWeightByBand=new Map();
+ for(const path of paths)for(const [P0,list] of path.bands){const b=getBand(P0);if(b.high)continue;
+  for(let i=b.k;i+b.k<list.length;i++){
+   const e=list[i],early=list[i-b.k],late=list[i+b.k],last=path[late.ix+1],span=last.C-early.C;
+   spanSum.set(P0,(spanSum.get(P0)||0)+span);
+   if(e.cls!=='kept')continue;
+   if(span>spanGate){spanDeleted++;spanWeight+=e.selected;spanCost+=e.cost;spanWeightByBand.set(P0,(spanWeightByBand.get(P0)||0)+e.selected);continue;}
+   const v=path[e.ix+1],s=e.M+2,l=Math.max(e.t,s+a+margin),u0=Math.min(v.t,s+H-futureMargin),dur=Math.max(0,u0-l);
+   coreTrimLost+=e.cost-dur/2;if(!dur)continue;
+   coreEvents++;coreCost+=dur/2;coreMaxSpan=Math.max(coreMaxSpan,span);
+   const gr=groups.get(early.group);coreMinGroup=Math.min(coreMinGroup,gr.mass);coreMaxGroup=Math.max(coreMaxGroup,gr.mass);
+   ok(last.t-e.t<=3*span,'future span time');
+   for(const other of gr.list){const p=byI.get(other.i),idx=other.ix+1;coreCompanions++;
+    ok(last.t<(other.M+2+H),'future common endpoint before cutoff');
+    for(let j=i-b.k+1;j<=i+b.k;j++){
+     const c=list[j],post=path[c.ix+1],ix=p.findIndex(w=>w.C===c.C);
+     ok(ix>=idx&&p[ix].t===c.t&&ix+1<p.length&&p[ix+1].C===post.C&&p[ix+1].t===post.t,'two-sided common physical history');
+     coreStateChecks++;
+    }
+   }
+  }
+ }
+ for(const [P0,ss] of spanSum){const b=getBand(P0);ok(ss<=(2*b.k+1)*kept*G,'sum of band spans');ok((spanWeightByBand.get(P0)||0)<=2*P0*ss/spanGate+1e-7,'span deletion weight');}
+ ok(coreTrimLost<=kept*(margin+futureMargin)/2+1e-6*Math.max(1,RK),'future trim clock bound');
  let total={input:0,weight:0,R:0,cheap:0,cheapR:0,seed:0,seedW:0,seedR:0,halo:0,haloW:0,haloR:0,end:0,endW:0,endR:0,kept:0,keptW:0,keptR:0,groups:0,thinGroups:0,candidates:0,arithKeys:0,arithW:0,arithCellW:0,neighborChecks:0};
  for(const b of bands.values()){
   ok(b.groups<=b.arithKeys*(Math.ceil(G/(2*b.width))+2),'group count arithmetic bound');
@@ -205,10 +234,11 @@ function audit(X,mode='diagnostic'){
   for(const key of Object.keys(total))total[key]+=b[key];
  }
  ok(selected===lowWeight+total.weight&&Math.abs(fullCost-lowCost-total.R)<=1e-6*Math.max(1,fullCost)&&Math.abs(fullCost-RK)<=1e-6*Math.max(1,RK),'global selected/clock budget');
+ ok(Math.abs(coreCost+spanCost+coreTrimLost-[...bands.values()].filter(b=>!b.high).reduce((s,b)=>s+b.keptR,0))<=1e-6*Math.max(1,RK),'stronger medium budget partition');
  const W=new Float64Array(len);for(const path of paths)for(const e of path)if(e.cls==='kept'||e.cls==='low')W[e.C/2]+=e.w;
  let E2=0,R2=0;for(let j=lo;j<=hi;j++){E2+=r[j]*W[j]**2;R2+=r[j]*W[j];}
  ok(Math.abs(R2-keptCost-lowCost)<=1e-6*Math.max(1,R2)&&E2<=EK+1e-6*Math.max(1,EK),'retained energy oracle');
- return {X,B,mode,Y,Q,margin,interior,interiorCost,trimLost,companionChecks,companionStateChecks,minCompanions:Number.isFinite(minCompanions)?minCompanions:null,maxCompanions,commonEnergyLower,kept,removed,events,literal,RK,EK,R2,E2,low,lowCost,lowWeight,selected,postMassChecks,pairLower,maxActualSpread,total,bands:[...bands.values()].sort((a,b)=>a.P-b.P)};
+ return {X,B,mode,Y,Q,spanGate,futureMargin,spanDeleted,spanWeight,spanCost,coreTrimLost,coreCost,coreEvents,coreCompanions,coreStateChecks,coreMaxSpan,coreMinGroup:Number.isFinite(coreMinGroup)?coreMinGroup:null,coreMaxGroup,margin,interior,interiorCost,trimLost,companionChecks,companionStateChecks,minCompanions:Number.isFinite(minCompanions)?minCompanions:null,maxCompanions,commonEnergyLower,kept,removed,events,literal,RK,EK,R2,E2,low,lowCost,lowWeight,selected,postMassChecks,pairLower,maxActualSpread,total,bands:[...bands.values()].sort((a,b)=>a.P-b.P)};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
