@@ -42,17 +42,20 @@ function audit(X, mode="diagnostic"){
  }
  for(const k of bad){const c=centers.get(k);badWeight+=c.p;badTagWeight+=c.p*c.count;}
  ok(badWeight<=conflictPairWeight,"unique support weighted bound");
- let haloProxyAll=0,haloActualAll=0,haloGainAll=0,haloHitsAll=0,haloCenterTags=0,haloBound=0,haloRootChecks=0,haloCenterChecks=0;
+ const byLabel=new Map();let globalSpacingChecks=0;for(const e of cs){if(!byLabel.has(e.p))byLabel.set(e.p,[]);byLabel.get(e.p).push(e.C);}for(const [p,vals] of byLabel)for(let i=1;i<vals.length;i++){ok(vals[i]-vals[i-1]>=2*(p-1),"global rough label spacing");globalSpacingChecks++;}
+ let allHaloGain=0,allHaloProxy=0,allHaloActual=0,allHaloHits=0,fullDiamondCovered=0,fullDiamondGain=0,haloProxyAll=0,haloActualAll=0,haloGainAll=0,haloHitsAll=0,haloCenterTags=0,haloBound=0,haloRootChecks=0,haloCenterChecks=0;
  for(const a of roots){
-   const b=a.filter(e=>e.high&&e.r>3&&bad.has(centerKey(e)));let mass=0,cost=0;
+   const b=a.filter(e=>e.high&&e.r>3&&bad.has(centerKey(e)));let mass=0,cost=0,allCost=0;
    for(const e of b){mass+=e.p;haloCenterTags++;}
-   for(const e of a)if(e.high&&b.some(f=>e.C>=f.C-kappa*f.p&&e.J<=f.C+kappa*f.p)){
+   for(const e of a)if(e.p&&b.some(f=>e.C>=f.C-kappa*f.p&&e.J<=f.C+kappa*f.p)){
+     e.allHalo=true;allHaloGain+=e.p-1;allHaloProxy+=e.r;allHaloActual+=e.w;allHaloHits++;allCost+=e.p-1;
+     if(!e.high)continue;
      e.halo=true;haloProxyAll+=e.r;haloActualAll+=e.w;haloGainAll+=e.p-1;haloHitsAll++;cost+=e.p-1;
    }
    for(const e of b){ok(e.halo,"marked center itself");haloCenterChecks++;}
-   ok(cost<=2*kappa*mass,"disjoint gain intervals in union of center halos");haloBound+=2*kappa*mass;haloRootChecks++;
+   ok(cost<=allCost&&allCost<=2*kappa*mass,"disjoint all-event gain intervals in union of center halos");haloBound+=2*kappa*mass;haloRootChecks++;
  }
- ok(haloBound===2*kappa*badTagWeight&&haloProxyAll<=1.5*haloGainAll&&haloActualAll<=3*haloGainAll&&haloGainAll<=haloBound,"global halo linear bound");
+ ok(haloBound===2*kappa*badTagWeight&&haloProxyAll<=1.5*haloGainAll&&haloActualAll<=3*haloGainAll&&haloGainAll<=allHaloGain&&allHaloGain<=haloBound&&allHaloProxy<=1.5*allHaloGain&&allHaloActual<=3*allHaloGain,"global all-event halo linear bound");
  // Independent original source order; terminal snapshots counted in rank, not in completed mass.
  for(let k=roots.length-1;k>=0;k--){
    const a=roots[k];let prev=1,sum=0,marks=0;
@@ -137,7 +140,7 @@ function audit(X, mode="diagnostic"){
        one=true;oneEach++;const p=ha[0].p,q=hb[0].p,ga=L-(p-1),gb=L-(q-1);
        if(ga<=J0&&gb<=J0&&J0<Math.min(p,q)-1){
          small=true;oneEachSmall++;ok(p!==q&&Math.abs(p-q)<=J0&&Math.abs(ha[0].C-hb[0].C)<=J0,"one-high small-background close distinct centers");
-         ok(bad.has(centerKey(ha[0]))&&bad.has(centerKey(hb[0]))&&ha[0].halo&&hb[0].halo,"both actual center incidences masked");oneEachClose++;
+         ok(bad.has(centerKey(ha[0]))&&bad.has(centerKey(hb[0]))&&ha[0].halo&&hb[0].halo,"both actual center incidences masked");oneEachClose++;if(kappa>=2){ok(aa.every(e=>e.allHalo)&&bb.every(e=>e.allHalo),"entire two-sided primitive diamond covered by actual halos");fullDiamondCovered++;fullDiamondGain+=2*L;}
          const na=initialA.C>=ha[0].C-kappa*p&&initialA.J<=ha[0].C+kappa*p,nb=initialB.C>=hb[0].C-kappa*q&&initialB.J<=hb[0].C+kappa*q;
          if(na&&nb){near=true;oneEachNearCurrent++;ok(initialA.halo&&initialB.halo,"nearby prior common high gain covered by both actual halos");oneEachCurrentMasked++;}
          if(sample.length<6)sample.push({C,start:D,end,p,q,ga,gb,centers:[ha[0].C,hb[0].C],near});
@@ -175,6 +178,6 @@ function audit(X, mode="diagnostic"){
    ok(E<=maxLabels*((2*Ks[k]+1)*sync+farSame[k])+1e-6,"far same-label sufficient envelope");
  }
  ok(postHaloProxy+haloRetainedProxy===retainedHigh&&farSameAfter<=farSame[0]&&farWithNear<=farWithOneEachSmall&&farWithOneEachSmall<=farWithOneEach&&farWithOneEach<=farWithDiamond,"halo and far partitions");
- return {X,mode,B,T,Q,delta,J0,kappa,centerCount:cs.length,conflictChecks,conflictPairs,conflictPairWeight,badCenters:bad.size,badWeight,badTagWeight,maxConflictGap,maxConflictLabelGap,haloProxyAll,haloActualAll,haloGainAll,haloHitsAll,haloCenterTags,haloBound,haloRootChecks,haloCenterChecks,diamondChecks,diamondShort,diamondWithHigh,diamondBothHigh,diamondSharedLabel,sharedLabelChecks,sameLabelSpacingChecks,oneEach,oneEachSmall,oneEachClose,oneEachNearCurrent,oneEachCurrentMasked,dominantMultisetChecks,dominantMultisetEqual,diamondMaxSpan,farBucketChecks,farWithDiamond,farWithShort,farWithOneEach,farWithOneEachSmall,farWithNear,farWithSharedLabel,farNoReturn,farSameAfter,postHaloProxy,haloRetainedHits,haloRetainedProxy,farBothRepresentativesMasked,sample,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
+ return {X,mode,B,T,Q,delta,J0,kappa,centerCount:cs.length,globalSpacingChecks,allHaloGain,allHaloProxy,allHaloActual,allHaloHits,fullDiamondCovered,fullDiamondGain,conflictChecks,conflictPairs,conflictPairWeight,badCenters:bad.size,badWeight,badTagWeight,maxConflictGap,maxConflictLabelGap,haloProxyAll,haloActualAll,haloGainAll,haloHitsAll,haloCenterTags,haloBound,haloRootChecks,haloCenterChecks,diamondChecks,diamondShort,diamondWithHigh,diamondBothHigh,diamondSharedLabel,sharedLabelChecks,sameLabelSpacingChecks,oneEach,oneEachSmall,oneEachClose,oneEachNearCurrent,oneEachCurrentMasked,dominantMultisetChecks,dominantMultisetEqual,diamondMaxSpan,farBucketChecks,farWithDiamond,farWithShort,farWithOneEach,farWithOneEachSmall,farWithNear,farWithSharedLabel,farNoReturn,farSameAfter,postHaloProxy,haloRetainedHits,haloRetainedProxy,farBothRepresentativesMasked,sample,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
 }
 const argv=process.argv.slice(2),mode=argv[0]||'diagnostic',xs=argv.slice(1).map(Number);for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
