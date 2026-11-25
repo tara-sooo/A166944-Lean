@@ -111,6 +111,7 @@ function audit(X,mode='diagnostic'){
    input:0,weight:0,R:0,cheap:0,cheapR:0,seed:0,seedW:0,seedR:0,end:0,endW:0,endR:0,halo:0,haloW:0,haloR:0,kept:0,keptW:0,keptR:0,groups:0,thinGroups:0,candidates:0,arithKeys:0,arithW:0,arithCellW:0,maxMass:0,neighborChecks:0};
   bands.set(P,v);}return v;};
  const G=2*H+B+6,maxDelta=2*(H+2*B)+6;
+ const byI=new Map(paths.map(p=>[p[0].i,p]));
  let selected=0,cheap=0,seed=0,end=0,halo=0,keptCost=0,low=0,lowWeight=0,fullCost=0,lowCost=0,marks=0;
  // Build full-prefix selected-event ledger (including unoccupied events), not just slab hits.
  for(const path of paths){const seq=new Map();
@@ -170,6 +171,29 @@ function audit(X,mode='diagnostic'){
    }
   }
  }
+ // Verify common companions from the earliest frozen band event, not merely per-event thickness.
+ let interior=0,interiorCost=0,companionChecks=0,companionStateChecks=0,minCompanions=Infinity,maxCompanions=0,trimLost=0,commonEnergyLower=0;
+ const margin=Math.ceil(Math.max(0,...[...bands.values()].map(b=>b.width)));
+ for(const path of paths)for(const [P0,list] of path.bands){const b=getBand(P0);if(b.high)continue;
+  for(let i=0;i<list.length;i++){const e=list[i];if(e.cls!=='kept'||!e.cost)continue;
+   const s=e.M+2,v=path[e.ix+1],l=Math.max(e.t,s+a+margin),u0=Math.min(v.t,s+H-margin),dur=Math.max(0,u0-l);
+   trimLost+=e.cost-dur/2;if(!dur)continue;
+   interior++;interiorCost+=dur/2;
+   const early=list[i-b.k],gr=groups.get(early.group),q=r[e.C/2];ok(gr.mass>b.tau,'earliest group thick');
+   minCompanions=Math.min(minCompanions,gr.mass);maxCompanions=Math.max(maxCompanions,gr.mass);
+   let sum=0;
+   for(const other of gr.list){const p=byI.get(other.i),idx=other.ix+1,central=p.findIndex(v=>v.C===e.C);
+    ok(Math.abs(other.M-e.M)<b.width+1e-8&&central>=idx,'companion root proximity and earlier common anchor');
+    ok(p[central].t===e.t&&central+1<p.length&&p[central+1].t===v.t&&p[central+1].C===v.C,'companion shares center event');
+    const cs=other.M+2;ok(l>=cs+a&&u0<=cs+H,'trimmed common slab');
+    ok(p[central].w+1e-8>=dur/(2*q),'companion occupied weight');sum+=p[central].w;companionChecks++;
+    for(let j=i-b.k+1;j<=i;j++){const c=list[j],ix=p.findIndex(w=>w.C===c.C);ok(ix>=idx&&p[ix].t===c.t,'same companions across prior band states');companionStateChecks++;}
+   }
+   ok(sum+1e-7>=gr.mass*dur/(2*q),'common group weight');
+   commonEnergyLower+=q*dur/(2*q)*sum;
+  }
+ }
+ ok(trimLost<=kept*margin+1e-6*Math.max(1,RK),'two-sided trim cost');
  let total={input:0,weight:0,R:0,cheap:0,cheapR:0,seed:0,seedW:0,seedR:0,halo:0,haloW:0,haloR:0,end:0,endW:0,endR:0,kept:0,keptW:0,keptR:0,groups:0,thinGroups:0,candidates:0,arithKeys:0,arithW:0,arithCellW:0,neighborChecks:0};
  for(const b of bands.values()){
   ok(b.groups<=b.arithKeys*(Math.ceil(G/(2*b.width))+2),'group count arithmetic bound');
@@ -184,7 +208,7 @@ function audit(X,mode='diagnostic'){
  const W=new Float64Array(len);for(const path of paths)for(const e of path)if(e.cls==='kept'||e.cls==='low')W[e.C/2]+=e.w;
  let E2=0,R2=0;for(let j=lo;j<=hi;j++){E2+=r[j]*W[j]**2;R2+=r[j]*W[j];}
  ok(Math.abs(R2-keptCost-lowCost)<=1e-6*Math.max(1,R2)&&E2<=EK+1e-6*Math.max(1,EK),'retained energy oracle');
- return {X,B,mode,Y,Q,kept,removed,events,literal,RK,EK,R2,E2,low,lowCost,lowWeight,selected,postMassChecks,pairLower,maxActualSpread,total,bands:[...bands.values()].sort((a,b)=>a.P-b.P)};
+ return {X,B,mode,Y,Q,margin,interior,interiorCost,trimLost,companionChecks,companionStateChecks,minCompanions:Number.isFinite(minCompanions)?minCompanions:null,maxCompanions,commonEnergyLower,kept,removed,events,literal,RK,EK,R2,E2,low,lowCost,lowWeight,selected,postMassChecks,pairLower,maxActualSpread,total,bands:[...bands.values()].sort((a,b)=>a.P-b.P)};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
