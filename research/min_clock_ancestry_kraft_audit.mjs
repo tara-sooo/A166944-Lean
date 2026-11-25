@@ -13,7 +13,7 @@ function audit(X,variant='adaptive'){
  let L=2,y=2;
  for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*slow**.25)break;L*=p;y=p;}
  if(variant==='noLOW'){L=2;y=2;}
- const maxHigh=Math.floor((2*H+B+6)/(Q-1)),dBound=2*Math.floor(logU/Math.log(3));
+ const maxHigh=Math.floor((2*H+B+6)/(Q-1));
  const tauMed=2*L*(4*L*logU/Math.log(3))**2*(4*L*logU/Math.log(Q))**maxHigh;
  const thresholds=[Math.log(B)**2/Math.log(Math.log(B)),4096,262144,tauMed],logs=thresholds.map(Math.log),nModes=thresholds.length;
  const zeros=()=>Array(nModes).fill(0),arrays=()=>Array.from({length:nModes},()=>[]);
@@ -102,13 +102,13 @@ function audit(X,variant='adaptive'){
  for(let C=2*X;C<7*X;C+=2){
   const j=C/2,r=Math.min(spf[C-1],spf[C+1]);maxMass=Math.max(maxMass,mass[j]);
   check(mass[j]<=1+1e-8,'Kraft mass');
+  for(let m=0;m<nModes;m++){
+   const f=F[m];check(G[m][j]<=thresholds[m]+1e-8,'good root cap including terminals');
+   f.maxGood=Math.max(f.maxGood,G[m][j]);
+  }
   if(r>B){check(allW[j]===0,'twin no occupation');continue;}
   S0+=r;E+=r*allW[j]**2;
-  for(let m=0;m<nModes;m++){
-   const f=F[m];check(G[m][j]<=thresholds[m]+1e-8,'good root cap');
-   f.maxGood=Math.max(f.maxGood,G[m][j]);
-   f.goodHorizonEnergyRemoved+=r*(2*allW[j]*GW[m][j]-GW[m][j]**2);
-  }
+  for(let m=0;m<nModes;m++)F[m].goodHorizonEnergyRemoved+=r*(2*allW[j]*GW[m][j]-GW[m][j]**2);
  }
  for(const v of V.values()){
   for(let m=0;m<nModes;m++){
