@@ -16,7 +16,7 @@ function audit(X,mode){
   let gain=C-(2*M-2);R+=cost;G+=gain;ok(gain<T+B&&2*cost<=3*gain,"gain");
   let tail=0;for(let i=a.length-1;i>=0;i--){tail+=a[i].w;a[i].tail=tail;a[i].next=a[i+1]||null;}roots.set(M,a);
  }
- const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:(mode==="phase"||(mode==="stress"||mode==="broad"))?3:1,scale=analytic?u**1.5:(mode==="phase"||(mode==="stress"||mode==="broad"))?0.5:0.125;
+ const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:(mode==="phase"||(mode==="stress"||(mode==="broad"||mode==="relaxed")))?3:1,scale=analytic?u**1.5:(mode==="phase"||(mode==="stress"||(mode==="broad"||mode==="relaxed")))?0.5:0.125;
  const pr=[];for(let p=3;p<Qm&&p<=B;p+=2)if(spf[p]===p)pr.push(p);
  const wt=r=>r+1.5*L,A=r=>Math.ceil(wt(r)**2*scale),blk=(r,C)=>Math.floor(C/A(r)),cap=r=>analytic?Math.max(1,Math.floor(Math.log(r)**6)):mode==="wide"?4:2;
  let initialLow=0,highLow=0,mediumClock=0,mediumLow=0,lowBlocks=0,lowMax=0,mediumTags=0,lowTotal=0,quotientChecks=0;
@@ -31,7 +31,7 @@ function audit(X,mode){
  const D=r=>Math.max(1,Math.floor(analytic?r*u**1.5*Math.log(2+Math.min(r,u))**2/ell**1.5:r*(mode==="wide"?6:3)));
  const c=r=>Math.max(1,Math.floor(cap(r)/lambda(r)));
  const cellWidths=analytic?[Math.ceil(H),Math.ceil(H/Math.max(1,u**.125)),Math.ceil(H/Math.max(1,u**.25))]:[Math.ceil(H),Math.ceil(H/2),Math.ceil(H/4)];
- const bcap=r=>{const p=P(r),lp=Math.log(2*p),ep=1+Math.log(lp);return Math.max(1,Math.floor(analytic?(B/p)**2/u**1.5*Math.sqrt(p/Qm)*(p>=u*u?lp**6/ep**4:lp**2/(1+L/p)**2):(mode==="stress"||mode==="broad")?2:c(r)*2*Math.sqrt(Qm/p)));};
+ const bcap=r=>{const p=P(r),lp=Math.log(2*p),ep=1+Math.log(lp);return Math.max(1,Math.floor(analytic?(B/p)**2/u**1.5*Math.sqrt(p/Qm)*(p>=u*u?lp**6/ep**4:lp**2/(1+L/p)**2):(mode==="stress"||(mode==="broad"||mode==="relaxed"))?2:c(r)*2*Math.sqrt(Qm/p)));};
  const subcap=(r,d)=>Math.max(1,Math.floor(bcap(r)/(Math.ceil(H/(2*d))+2)));
  const ell0=1+Math.log(u),quota=r=>analytic?Math.max(1,Math.ceil(u**1.5/ell0**1.25+u**1.5*Math.log(2*P(r))*(1+L/P(r))*(P(r)/Qm)**.25/ell0)):k;
  const d=cellWidths.at(-1),sourceCell=M=>Math.floor((M-X)/d),mcell=r=>subcap(r,d);
@@ -49,16 +49,18 @@ function audit(X,mode){
  const near=(x,y)=>Math.abs(x-y)<=1e-6*Math.max(1,Math.abs(x),Math.abs(y));
  ok(near(medium,first+short+long)&&medium===mediumClock+mediumLow&&selectedPairs+shortEdges===edges&&edges<=fullPairs,"quota partition");
  // Short-wait gain witnesses on FULL original paths, not just the medium set.
- const eps=analytic?u**(-1/64):1,rho=analytic?2*u**(-1/32):.85,theta=analytic?u**(-1/256):.1;
+ const eps=analytic?u**(-1/64):mode==="relaxed"?2.5:1,rho=analytic?2*u**(-1/32):mode==="relaxed"?2:.85,theta=analytic?u**(-1/512):mode==="relaxed"?.35:.1;
  const qcut=analytic?Math.max(5,Math.ceil(B/u)):5,mass=analytic?Math.max(1,Math.floor(u**(1/128))):8;
+ const qThreshold=p=>analytic?Math.min(qcut,Math.max(5,Math.ceil(p*u**(1-1/512)/Math.log(2*p)))):qcut;
+ let adaptiveExtra=0,adaptiveStates=0;
  let cheapGain=0,goodGain=0,heavyGain=0,smallQGain=0,rootGain=0,cheapTags=0,goodTags=0,arithStates=0,arithChecks=0,arithEnvelope=0;
  const arith=new Map();
  for(const es of vertices.values()){
    const groups=new Map();for(const e of es){const q=e.prev?.p||0;if(!groups.has(q))groups.set(q,[]);groups.get(q).push(e);}
    for(const [q,g] of groups){const done=g.filter(e=>e.p&&e.next.t-e.t<=eps*(e.p-1));if(!done.length)continue;const e=done[0],p=e.p,w=e.next.t-e.t,ss=e.t%2,tt=e.next.t%2;
      for(const v of done){ok(v.p===p&&v.next.t===e.next.t,"deterministic cheap exit");cheapTags++;cheapGain+=p-1;
-       if(!q){v.kind=1;rootGain+=p-1;}else if(q<qcut){v.kind=2;smallQGain+=p-1;}else if(g.length>mass){v.kind=3;heavyGain+=p-1;}else{v.kind=4;goodTags++;goodGain+=p-1;}}
-     if(q>=qcut){ok(q!==p&&q>=5,"distinct incoming outgoing primes");ok(mod(e.C+2*ss,q)===0&&mod(e.C+(2*tt-1),p)===0,"two horizon congruences");ok(mod(e.t,2*q)===(ss?q+2:0)&&mod(e.t+w,2*p)===(tt?p+2:0),"two clock congruences");
+       if(!q){v.kind=1;rootGain+=p-1;}else if(q<qThreshold(p)){v.kind=2;smallQGain+=p-1;}else if(g.length>mass){v.kind=3;heavyGain+=p-1;}else{v.kind=4;goodTags++;goodGain+=p-1;if(q<qcut)adaptiveExtra+=p-1;}}
+     if(q>=qThreshold(p)){if(q<qcut)adaptiveStates++;ok(q!==p&&q>=5,"distinct incoming outgoing primes");ok(mod(e.C+2*ss,q)===0&&mod(e.C+(2*tt-1),p)===0,"two horizon congruences");ok(mod(e.t,2*q)===(ss?q+2:0)&&mod(e.t+w,2*p)===(tt?p+2:0),"two clock congruences");
        ok(e.t>=e.C/2&&e.t<=e.C/2+3*H+3,"clock slab");
        const key=[q,p,w,ss,tt].join(":"),rec=arith.get(key)||{cs:new Map(),baseC:e.C,baseT:e.t,q,p,gain:0};ok(mod(e.C-rec.baseC,p*q)===0&&mod(e.t-rec.baseT,2*p*q)===0,"CRT progression");
        if(!rec.cs.has(e.C))rec.cs.set(e.C,new Set());ok(!rec.cs.get(e.C).has(e.t),"unique physical key");rec.cs.get(e.C).add(e.t);if(g.length<=mass)rec.gain+=done.length*(p-1);arith.set(key,rec);arithStates++;arithChecks++;
@@ -91,12 +93,12 @@ function audit(X,mode){
  ok(goodQuotaCost<=endpointCost+1e-6&&selectedGood<=goodGain,"global interval budget");
  let supportedFocal=0,supportedPartner=0,supportedChecks=0,fastResidual=0,unclassifiedDisjoint=0,fastDisjointAfterOrigin=0;
  let band=0,cellCost=0,res=0,tiny=0,close=0,far=0,heavy=0,already=0,immediate=0,heavyFocal=0,smallFocal=0,tinyFocal=0,groups=0,cellChecks=0,degreeChecks=0,partnerChecks=0,maxDegree=0,maxRatio=0,maxMult=0,keys=0,maxKappa=0;
- const kappa=r=>analytic?Math.ceil(u**.125*u/Math.log(2*P(r))):(mode==="stress"||mode==="broad")?2:mode==="short"?3:4;
- const eta=r=>analytic?u**(1/32):(mode==="stress"||mode==="broad")?4:2;
- const gap=r=>analytic?Math.floor(P(r)*u**(1/16)):mode==="short"||(mode==="stress"||mode==="broad")?1:Math.max(1,Math.floor(P(r)/2));
+ const kappa=r=>analytic?Math.ceil(u**.125*u/Math.log(2*P(r))):(mode==="stress"||(mode==="broad"||mode==="relaxed"))?2:mode==="short"?3:4;
+ const eta=r=>analytic?u**(1/32):(mode==="stress"||(mode==="broad"||mode==="relaxed"))?4:2;
+ const gap=r=>analytic?Math.floor(P(r)*u**(1/16)):mode==="short"||(mode==="stress"||(mode==="broad"||mode==="relaxed"))?1:Math.max(1,Math.floor(P(r)/2));
  const outKey=a=>a.out+":"+a.J,earlyKey=a=>a.earlyOut+":"+a.earlyJ;
  const gapBand=h=>2**Math.floor(Math.log2(h)),Ab=r=>Math.ceil((2*P(r)+1.5*L)**2*scale);
- const phaseWidth=(r,S)=>analytic?Math.max(1,Math.ceil(S*u**(-1/16)*(Qm/P(r))**.75)):mode==="broad"?4*H:Math.max(2,Math.ceil(S*(mode==="stress"?1:2)));
+ const phaseWidth=(r,S)=>analytic?Math.max(1,Math.ceil(S*u**(-1/16)*(Qm/P(r))**.75)):(mode==="broad"||mode==="relaxed")?4*H:Math.max(2,Math.ceil(S*(mode==="stress"?1:2)));
  const gapCap=(r,S)=>Math.max(1,Math.floor(bcap(r)*Ab(r)/(Math.max(1,u)*S)));
  const phaseCount=(r,S)=>{const W=phaseWidth(r,S);return (Math.ceil(4*H/W)+4)*(Math.ceil(6*S/W)+3);};
  const phaseCap=(r,S)=>Math.max(1,Math.floor(gapCap(r,S)/((Math.ceil(H/(2*d))+2)*phaseCount(r,S))));
@@ -176,7 +178,7 @@ function audit(X,mode){
  ok(near(nearOriginFar,nearOriginEndpointCost)&&nearOriginEndpointCost<=nearOriginEndpointBound+1e-6&&near(far,nearOriginFar+farOriginFar),"near origin transfer");
  ok(near(long,band+cellCost+phaseThin+res)&&near(res,tiny+close+earlyClose+far+heavy)&&near(far,farDisjoint+farOverlap)&&near(heavy,already+immediate)&&near(already,smallAlready+largeAlready)&&near(immediate,smallImmediate+largeImmediate),"allocation partition");
  ok(near(fastDisjointAfterOrigin,supportedFocal+supportedPartner+fastResidual+unclassifiedDisjoint)&&supportedFocal+supportedPartner<=(1+2*maxCostRatio)*goodQuotaCost+1e-5,"supported fast pair cost");
- return {mode,X,B,T,Qm,N,literal,eps,rho,theta,qcut,mass,cheapGain,goodGain,heavyGain,smallQGain,rootGain,cheapTags,goodTags,arithStates,arithChecks,arithEnvelope,arithKeys:arith.size,fastQuotaCost,fastQuotaEdges,goodQuotaCost,goodQuotaEdges,fastGainChecks,unionLength,selectedLength,selectedGood,selectedIntervals,endpointCost,coverChecks,supportedFocal,supportedPartner,supportedChecks,fastResidual,unclassifiedDisjoint,fastDisjointAfterOrigin,finalAfterFast:farOriginFar+largeAlready+largeImmediate-supportedFocal-supportedPartner,nearOriginFar,nearOriginChecks,farOriginFar,nearOriginEndpointBound,nearOriginEndpointCost,finalAfterOrigin:farOriginFar+largeAlready+largeImmediate,gapChecks,earlierTransfers,earlierMaxMult,maxLagRatio,fastDisjoint,fastChecks,driftChecks,capChecks,medium,first,short,long,edges,fullPairs,band,cellCost,phaseThin,phaseGroups,phaseChecks2,earlyClose,farDisjoint,farOverlap,farFlip,earlyDegreeChecks,maxPhaseCount,maxElapsed,maxDrift,earlyRefinement,res,tiny,close,far,heavy,already,immediate,smallAlready,smallImmediate,largeAlready,largeImmediate,final:far+largeAlready+largeImmediate,heavyFocal,smallFocal,tinyFocal,groups,keys,cellChecks,degreeChecks,partnerChecks,maxDegree,maxRatio,maxMult,maxKappa,endpointBound,tailChecks,immediateChecks,alreadyPairs,immediatePairs,oracleChecks,oracleLocal,pa,pb};
+ return {mode,X,B,T,Qm,N,literal,eps,rho,theta,qcut,mass,adaptiveExtra,adaptiveStates,cheapGain,goodGain,heavyGain,smallQGain,rootGain,cheapTags,goodTags,arithStates,arithChecks,arithEnvelope,arithKeys:arith.size,fastQuotaCost,fastQuotaEdges,goodQuotaCost,goodQuotaEdges,fastGainChecks,unionLength,selectedLength,selectedGood,selectedIntervals,endpointCost,coverChecks,supportedFocal,supportedPartner,supportedChecks,fastResidual,unclassifiedDisjoint,fastDisjointAfterOrigin,finalAfterFast:farOriginFar+largeAlready+largeImmediate-supportedFocal-supportedPartner,nearOriginFar,nearOriginChecks,farOriginFar,nearOriginEndpointBound,nearOriginEndpointCost,finalAfterOrigin:farOriginFar+largeAlready+largeImmediate,gapChecks,earlierTransfers,earlierMaxMult,maxLagRatio,fastDisjoint,fastChecks,driftChecks,capChecks,medium,first,short,long,edges,fullPairs,band,cellCost,phaseThin,phaseGroups,phaseChecks2,earlyClose,farDisjoint,farOverlap,farFlip,earlyDegreeChecks,maxPhaseCount,maxElapsed,maxDrift,earlyRefinement,res,tiny,close,far,heavy,already,immediate,smallAlready,smallImmediate,largeAlready,largeImmediate,final:far+largeAlready+largeImmediate,heavyFocal,smallFocal,tinyFocal,groups,keys,cellChecks,degreeChecks,partnerChecks,maxDegree,maxRatio,maxMult,maxKappa,endpointBound,tailChecks,immediateChecks,alreadyPairs,immediatePairs,oracleChecks,oracleLocal,pa,pb};
 }
 
-const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase','stress','broad'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
+const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase','stress','broad','relaxed'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
