@@ -170,7 +170,7 @@ function audit(X,mode){
    for(let t=Math.max(x.t,x.t2);t<Math.min(x.s,x.s2);t++){if(!q.has(t))q.set(t,[]);q.get(t).push(x);}
  }
  let occupationChecks=0,degreeChecksOcc=0,distinctWaitingChecks=0,clockChecks=0,queryTicks=0,maxActive=0,maxGroup=0,maxDegreeOcc=0,goodTicks=0,crossingChecks=0,positiveCrossings=0;
- const sampledGood=new Map();
+ const sampledGood=new Map();let totalOrientedMassTime=0,totalSymmetricMassTime=0,sampledRootTime=0,degreeTimeEnvelope=0,maxEndpointCoefficient=0,acceptedEndpointCost=0;
  // Group by waiting horizon at a common integer time; all active tags at one horizon have the same next event.
  for(const [c,q] of queries){
    const ars=byCell.get(c),ptr=new Int32Array(ars.length);
@@ -201,11 +201,10 @@ function audit(X,mode){
      ok(d2<=bd2&&d3<=2*(sameJ+1),"arithmetic occupation degree");
      const bound=crowd+thin*(2*closeH+bd2+2*(sameJ+1));ok(n<=bound,"directed occupation tag degree");maxDegreeOcc=Math.max(maxDegreeOcc,n);oriented+=g.n*n;degreeChecksOcc++;
      }
-     ok(symmetric<=2*oriented,"symmetric total tag degree");
+     ok(symmetric<=2*oriented,"symmetric total tag degree");totalOrientedMassTime+=oriented;totalSymmetricMassTime+=symmetric;sampledRootTime+=tag.size;degreeTimeEnvelope+=2*tag.size*(crowd+thin*(2*closeH+(2*nearTick+1)*factorMax*(Math.floor(wideH/largeP)+1)+2*(sameJ+1)));
      for(const x of q.get(t)){const g=tag.get(x.M),h=tag.get(x.Mp);ok(g&&h&&g.C!==h.C&&g.C>=x.C&&g.C<x.E&&h.C>=x.C&&h.C<x.E,"async active distinct horizons");distinctWaitingChecks++;
        const f=kind(g,h),b=kind(h,g),j=f>=0?f:b;occupationChecks++;
        if(j>=0){x.good++;x.kinds[j]++;goodTicks++;const ky=x.M+":"+x.Mp;if(!sampledGood.has(ky))sampledGood.set(ky,new Set());sampledGood.get(ky).add(t);}
-       const a0=roots.get(x.M),b0=roots.get(x.Mp);
        // Clock order crossing is necessarily a jump, not an equal waiting state. Test only interior consecutive ticks.
        if(t+1<Math.min(x.s,x.s2)){const g2=g.s===t+1?g.C+g.p-1:g.C,h2=h.s===t+1?h.C+h.p-1:h.C;ok(g2!==h2,"no interior waiting merger");crossingChecks++;if((g.C-h.C)*(g2-h2)<0){positiveCrossings++;ok(Math.max(g.s===t+1?g.p-1:0,h.s===t+1?h.p-1:0)>Math.abs(g.C-h.C),"crossing requires overtaking jump");}}
      }
@@ -228,11 +227,14 @@ function audit(X,mode){
    const covered=new Set();for(const x of chosen)for(let t=x.t;t<x.Ftime;t++)covered.add(t);
    ok(ticks.size===ul&&covered.size===ul&&[...ticks].every(t=>covered.has(t)),"occupation union cover");
    const good=sampledGood.get(ky);let gu=0;for(const t of ticks)if(good.has(t))gu++;
-   for(const [k,e] of ends){const r=Number(k.split(":")[0]);ok(e.n<=quota(r)&&e.w<=2*weight(r)+1e-6,"occupation endpoint domination");eu+=e.b;ec+=e.w;}
-   ok(eu<=ul&&ul<=sl&&sl<=2*ul&&etaOcc*sl<=sg+1e-6&&sg<=2*gu&&ul<=2*gu/etaOcc+1e-6,"occupation time-cover bound");occCoverChecks++;occUnion+=ul;occSelectedLength+=sl;occEndpointTime+=eu;occGoodUnion+=gu;
+   for(const [k,e] of ends){const r=Number(k.split(":")[0]),coef=weight(r)/wt(r);ok(e.n<=quota(r)&&e.w<=coef*e.b+1e-6,"occupation actual-relative endpoint domination");maxEndpointCoefficient=Math.max(maxEndpointCoefficient,coef);eu+=e.b;ec+=e.w;}
+   ok(eu<=ul&&ul<=sl&&sl<=2*ul&&etaOcc*sl<=sg+1e-6&&sg<=2*gu&&ul<=2*gu/etaOcc+1e-6,"occupation time-cover bound");occCoverChecks++;occUnion+=ul;occSelectedLength+=sl;occEndpointTime+=eu;occGoodUnion+=gu;acceptedEndpointCost+=ec;
  }
+ let allSampledGood=0;for(const ts of sampledGood.values())allSampledGood+=ts.size;
+ ok(allSampledGood<=totalSymmetricMassTime&&totalSymmetricMassTime<=2*totalOrientedMassTime&&totalSymmetricMassTime<=degreeTimeEnvelope&&sampledRootTime<=totalTime,"global sampled occupation budget");
+ ok(occGoodUnion<=allSampledGood&&near(occPaid,acceptedEndpointCost)&&occPaid<=maxEndpointCoefficient*occEndpointTime+1e-6&&occPaid<=2*maxEndpointCoefficient*occGoodUnion/etaOcc+1e-6,"global time-transfer charge");
  ok(near(occPaid+occKept,ac.farOverlapSlow),"occupation residual partition");
- return {mode,X,B,T,Qm,N,literal,occupationEdges:occupationEdges.length,occPaid,occKept,occEdgesPaid,occEdgesKept,occKinds,occCoverChecks,occUnion,occSelectedLength,occEndpointTime,occGoodUnion,occupationChecks,degreeChecksOcc,distinctWaitingChecks,clockChecks,queryTicks,maxActive,maxGroup,maxDegreeOcc,goodTicks,crossingChecks,positiveCrossings,thin,crowd,closeH,nearTick,largeP,wideH,sameJ,etaOcc,actualFinalAfterOccupation:ac.largeAlready+ac.largeImmediate+ac.farDisjointSlow+occKept,totalTime,deltaFinal,crossingRoots,G,R,initialActual,highActual,mediumActual,actualFirst,actualShort,actualLong,fastEdgeCost,fastEdges,rho,unionGain,coverGain,coverTime,endpointTime,coverN,coverRoots,depthChecks,unionChecks,upperDisjointChecks,actualRes,fastResidualCost,slowOverlapChecks,ac,actualFinal:ac.largeAlready+ac.largeImmediate+ac.farDisjointSlow+ac.farOverlapSlow,nearOriginFar,nearOriginChecks,farOriginFar,nearOriginEndpointBound,nearOriginEndpointCost,finalAfterOrigin:farOriginFar+largeAlready+largeImmediate,gapChecks,earlierTransfers,earlierMaxMult,maxLagRatio,fastDisjoint,fastChecks,driftChecks,capChecks,medium,first,short,long,edges,fullPairs,band,cellCost,phaseThin,phaseGroups,phaseChecks2,earlyClose,farDisjoint,farOverlap,farFlip,earlyDegreeChecks,maxPhaseCount,maxElapsed,maxDrift,earlyRefinement,res,tiny,close,far,heavy,already,immediate,smallAlready,smallImmediate,largeAlready,largeImmediate,final:far+largeAlready+largeImmediate,heavyFocal,smallFocal,tinyFocal,groups,keys,cellChecks,degreeChecks,partnerChecks,maxDegree,maxRatio,maxMult,maxKappa,endpointBound,tailChecks,immediateChecks,alreadyPairs,immediatePairs,oracleChecks,oracleLocal,pa,pb};
+ return {mode,X,B,T,Qm,N,literal,totalOrientedMassTime,totalSymmetricMassTime,sampledRootTime,degreeTimeEnvelope,allSampledGood,maxEndpointCoefficient,acceptedEndpointCost,occupationEdges:occupationEdges.length,occPaid,occKept,occEdgesPaid,occEdgesKept,occKinds,occCoverChecks,occUnion,occSelectedLength,occEndpointTime,occGoodUnion,occupationChecks,degreeChecksOcc,distinctWaitingChecks,clockChecks,queryTicks,maxActive,maxGroup,maxDegreeOcc,goodTicks,crossingChecks,positiveCrossings,thin,crowd,closeH,nearTick,largeP,wideH,sameJ,etaOcc,actualFinalAfterOccupation:ac.largeAlready+ac.largeImmediate+ac.farDisjointSlow+occKept,totalTime,deltaFinal,crossingRoots,G,R,initialActual,highActual,mediumActual,actualFirst,actualShort,actualLong,fastEdgeCost,fastEdges,rho,unionGain,coverGain,coverTime,endpointTime,coverN,coverRoots,depthChecks,unionChecks,upperDisjointChecks,actualRes,fastResidualCost,slowOverlapChecks,ac,actualFinal:ac.largeAlready+ac.largeImmediate+ac.farDisjointSlow+ac.farOverlapSlow,nearOriginFar,nearOriginChecks,farOriginFar,nearOriginEndpointBound,nearOriginEndpointCost,finalAfterOrigin:farOriginFar+largeAlready+largeImmediate,gapChecks,earlierTransfers,earlierMaxMult,maxLagRatio,fastDisjoint,fastChecks,driftChecks,capChecks,medium,first,short,long,edges,fullPairs,band,cellCost,phaseThin,phaseGroups,phaseChecks2,earlyClose,farDisjoint,farOverlap,farFlip,earlyDegreeChecks,maxPhaseCount,maxElapsed,maxDrift,earlyRefinement,res,tiny,close,far,heavy,already,immediate,smallAlready,smallImmediate,largeAlready,largeImmediate,final:far+largeAlready+largeImmediate,heavyFocal,smallFocal,tinyFocal,groups,keys,cellChecks,degreeChecks,partnerChecks,maxDegree,maxRatio,maxMult,maxKappa,endpointBound,tailChecks,immediateChecks,alreadyPairs,immediatePairs,oracleChecks,oracleLocal,pa,pb};
 }
 
 const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase','stress','broad','concurrent'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
