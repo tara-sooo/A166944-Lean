@@ -60,6 +60,38 @@ function audit(N=150000,steps=180){
    if(inspect(H,t,a,f)){s.abstract++;let hit=null;for(let j=1;j<=a.w;j++){let n=t+j,e=n%2?-1:1,x=e===1?n:n-2,y=H-e;while(y)[x,y]=[y,x%y];let p=x===1?0:spf[x];s.abstractTicks++;if(p&&p*p<=H+1){hit={p,e,w:j};break}}if(!hit||hit.p!==a.p||hit.e!==a.e||hit.w!==a.w)throw Error("literal")}
   }
  }
+ // Targeted abstract triple controls outside the SPF scan.
+ const trial=x=>{let a=[];for(let f=3;f*f<=x;f+=2)while(x%f===0){a.push(f);x/=f}if(x>1)a.push(x);return a};
+ s.tripleControls=[];s.tripleCandidateChecks=0;s.tripleLiteralTicks=0;
+ const isPrime=x=>x>=3&&x%2&&trial(x).length===1;
+ for(let e of [-1,1]){
+  let found=false;
+  for(let p of [47,53,59,61,67,71,73,79,83,89,97]){
+   if(found)break;
+   for(let a=p;a<4*p&&!found;a+=2){
+    if(!isPrime(a))continue;
+    for(let b=a;b<5*p;b+=2){
+     if(!isPrime(b))continue;
+     let H=p*a*b+e,c=mod(1-H,4);
+     if(p%4===c||p**4<=H+1)continue;
+     if(e===1&&!(a%4===c&&b%4===c))continue;
+     if(e===-1&&(a%4===c)===(b%4===c))continue;
+     let fs=[trial(H-1),trial(H+1)],t=H/2,win=null;
+     for(let ef of [1,-1])for(let f of new Set(fs[ef===1?0:1])){
+      if(f*f>H+1)continue;
+      let w=mod((ef===1?0:f+2)-t,2*f)||2*f;
+      if(!win||w<win.w||w===win.w&&f<win.p)win={p:f,e:ef,w};
+     }
+     s.tripleCandidateChecks++;
+     if(!win||win.p!==p||win.e!==e)continue;
+     if(!inspect(H,t,win,fs))throw Error("targeted triple");
+     for(let j=1;j<=win.w;j++){let n=t+j,ef=n%2?-1:1,x=ef===1?n:n-2,y=H-ef;while(y)[x,y]=[y,x%y];let f=x===1?0:trial(x)[0];if(j<win.w?f&&f*f<=H+1:f!==p||ef!==e)throw Error("triple literal");s.tripleLiteralTicks++}
+     s.tripleControls.push({H,t,p,a,b,e,w:win.w,factors:fs});found=true;break;
+    }
+   }
+  }
+  if(!found)throw Error("no targeted triple");
+ }
  return s
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||150000),Number(process.argv[3]||180)),null,2));
