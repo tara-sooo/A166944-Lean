@@ -11,9 +11,10 @@ function audit(X,mode='analytic'){
  const S=Math.max(1,Math.log(ell));
  let L=2,y=2;
  for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*S**.25)break;L*=p;y=p;}
+ const rough=mode.startsWith('rough'),Z=mode==='roughDiagnostic'?Math.ceil(B/10):Math.ceil(B**.25);
  const Q=mode==='analytic'?Math.ceil(B/Math.exp(Math.sqrt(ell))):Math.ceil(.95*B);
  const T=mode==='analytic'?Math.ceil(20*ell):mode==='degree'?4:Math.ceil(20*ell);
- const g=Math.max(2,T*L),k=mode==='analytic'?Math.max(0,Math.floor(ell/(2*Math.log(g)))):mode==='degree'?3:5;
+ const g=Math.max(2,T*L),k=mode==='analytic'?Math.max(0,Math.floor(ell/(2*Math.log(g)))):mode==='roughAnalytic'?Math.max(0,Math.floor(1.5*ell/Math.log(g))):mode==='degree'?3:5;
  const lo=X,hi=7*X/2-1,len=hi+1;
  const d=new Uint8Array(len),exposed=new Uint8Array(len),A=new Uint8Array(len),r=new Int32Array(len);
  function factors(n,cb){while(n>1){const p=spf[n];if(p>B)break;if(p>2)cb(p);while(n%p===0)n/=p;}}
@@ -23,10 +24,11 @@ function audit(X,mode='analytic'){
    for(const x of [C,C+2])factors(x,p=>{if(p>y)n++;if(p>=Q)exposed[j]=1;});
    for(const x of [C-1,C+1])factors(x,p=>{if(p>=Q)exposed[j]=1;});
    d[j]=n;maxDegree=Math.max(maxDegree,n);
+   const q=Math.min(spf[C-1],spf[C+1]);if(q<=B){r[j]=q;S0+=q;}
+   if(rough)exposed[j]=+(r[j]>=Z);
    if(n>T){tail+=n;nExc++;}
    if(exposed[j])nHigh++;
    if(exposed[j]||n>T){A[j]=1;nA++;}
-   const q=Math.min(spf[C-1],spf[C+1]);if(q<=B){r[j]=q;S0+=q;}
  }
  let cur=A,curN=nA,relaxed=new Uint8Array(len),layers=[nA],relaxedN=0;
  for(let i=0;i<=k;i++){
@@ -90,7 +92,7 @@ function audit(X,mode='analytic'){
      check(q>0&&u-t<=2*q&&q<=p,'wait bound');
      rec.w=dur/(2*q);rec.ell=dur;
      U[j]+=rec.w;cost+=dur/2;R+=dur/2;
-     if(p>=Q&&medium<=k){check(flagH,'shallow high selection must mark');shallowWithHigh++;}
+     if(!rough&&p>=Q&&medium<=k){check(flagH,'shallow high selection must mark');shallowWithHigh++;}
      if(p<=y){low+=p-1;check(low<L,'LOW barrier');}
      else{depth++;low=0;check((C+p-1)%p===0||(C+p+1)%p===0,'reverse congruence');if(p>=Q)large++;else medium++;}
      prev=key(t,C);t=u;C+=p-1;events++;
@@ -105,14 +107,15 @@ function audit(X,mode='analytic'){
    if(cost>0)keptSlabRoots++;
    let lastGood=null;
    for(const rec of path){
-     const j=rec.C/2,v=vertex(rec),inc=v.edges.get(rec.prev)||[0,0],good=rec.medium<=k;
+     const j=rec.C/2,v=vertex(rec),inc=v.edges.get(rec.prev)||[0,0],good=rough?rec.depth<=k:rec.medium<=k;
      if(good){
-       check(rec.large===0&&rec.depth<=k&&!A[j],'retained shallow property');
+       check((rough||rec.large===0)&&rec.depth<=k&&!A[j],'retained shallow property');
        goodH[j]++;lastGood=v;if(oracle)v.good.push(M);
        shallowCost+=rec.ell/2;
-       check(rec.C-C0<=k*(Q-1)+(k+1)*(L-2),'shallow gain');
+       if(!rough)check(rec.C-C0<=k*(Q-1)+(k+1)*(L-2),'shallow gain');
+       else check(r[j]<Z,'retained shallow rough gate');
        maxShallowAge=Math.max(maxShallowAge,rec.t-s);
-       check(rec.t-s<=3*(k*(Q-1)+(k+1)*(L-2)),'shallow arrival age');
+       check(rec.t-s<=(rough?2*Z*(k+1)*L:3*(k*(Q-1)+(k+1)*(L-2))),'shallow arrival age');
      }
      const fresh=v.n-inc[0],fg=v.g-inc[1];
      check(fresh>=fg&&fg>=0,'first meet counts');
@@ -132,7 +135,7 @@ function audit(X,mode='analytic'){
    maxGood=Math.max(maxGood,goodH[j]);check(goodH[j]<=cap,'bounded reverse branching shallow mass');
    E+=r[j]*U[j]**2;EK+=r[j]*UK[j]**2;
  }
- const ageBound=(3*k+2)*Q+3*(k+1)*L;
+ const ageBound=rough?2*Z*(k+1)*L:(3*k+2)*Q+3*(k+1)*L;
  if(ageBound<=a)check(shallowCost===0,'no shallow occupation');
  let expiry=0,totalExpiry=0;
  const pairs=oracle?new Set():null,pairKey=(u,v)=>(Math.min(u,v)-X)*X+Math.max(u,v)-X;
@@ -155,7 +158,7 @@ function audit(X,mode='analytic'){
    }
    check(goodSuffix<=2*B*gg+1e-7*Math.max(1,E),'whole suffix cap');
  }
- return {X,B,Q,L,y,T,g,k,mode,nA,nHigh,nExc,tail,maxDegree,layers,relaxedN,relaxedRoots,marked,markedHigh,markedDegree,markedBoth,keptRoots,keptSlabRoots,events,literal,finished,keptFinished,actualMaxDepth,shallowWithHigh,shallowCost,maxShallowAge,ageBound,R,RK,E,EK,S0,cap,maxGood,allPairs,gg,gb,bb,expiry,goodSuffix,shared};
+ return {X,B,Q,Z,L,y,T,g,k,mode,nA,nHigh,nExc,tail,maxDegree,layers,relaxedN,relaxedRoots,marked,markedHigh,markedDegree,markedBoth,keptRoots,keptSlabRoots,events,literal,finished,keptFinished,actualMaxDepth,shallowWithHigh,shallowCost,maxShallowAge,ageBound,R,RK,E,EK,S0,cap,maxGood,allPairs,gg,gb,bb,expiry,goodSuffix,shared};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536,262144])for(const mode of ['analytic','narrow','degree'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536,262144])for(const mode of ['analytic','narrow','degree','roughAnalytic','roughDiagnostic'])console.log(JSON.stringify(audit(X,mode)));
