@@ -1,5 +1,5 @@
 // Two-horizon fractional first-defect transport audit.
-function audit(X,focus=false){
+function audit(X,focus=false,sharp=false){
  const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,L=Math.max(8,Math.floor(B/8)),Y=Math.max(5,Math.ceil(Math.sqrt(B))),Lh=Math.max(2,Math.floor(L/4)),Ps=[6,30,210],Ls=[2,Math.max(2,Math.floor(L/2)),0],lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(x,m)=>{if(!x)throw Error(`${X}/${focus} ${m}`)},eq=(a,b)=>Math.abs(a-b)<=1e-7*Math.max(1,Math.abs(a),Math.abs(b)),mod=(a,b)=>(a%b+b)%b;
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
@@ -11,7 +11,7 @@ function audit(X,focus=false){
   while(C-C0<T){let p=0,v=Infinity,r=Infinity;for(let s of [-1,1])for(let q of fac(C+s)){r=Math.min(r,q);let j=t+1+mod((s===-1?0:q+2)-t-1,2*q);if(j<v||(j===v&&q<p)){p=q;v=j}}
    if(!p||v>cut)break;let J=C+p-1,g=p-1,w=v-t;ok(w<=2*r&&w<=3*g,"wait");let e={C,J,p,g,w,t,v,i:es.length,tag,lo:mk(),hi:mk(),old:mk(),dl:mk(),dh:mk()};es.push(e);let k=C+"|"+p,o=proj.get(k)||{C,p,n:0,slots:new Map()};proj.set(k,o);let sl=o.slots.get(v)||{v,b:0,refs:[]};o.slots.set(v,sl);sl.b++;sl.refs.push(e);o.n++;W+=w;events++;C=J;t=v;
   }tag.end=C;if(C-C0>=T)hit++;tags.push(tag);
-  for(let j=0;j<Ps.length;j++){let P=Ps[j],lo=0,hi=0;for(let e of es){if(e.p<Y)lo+=e.w;else hi+=e.w;let n=Math.ceil(e.J/P)-Math.ceil(e.C/P);if(!n)continue;ok(lo+hi<=9*P*n,"cell capacity");e.lo[j]=Ls[j]?lo/(9*P*n):0;e.hi[j]=hi/(9*P*n);ok(e.lo[j]+e.hi[j]<=1+1e-9,"fraction sum");lo=hi=0;cellChecks++}}
+  for(let j=0;j<Ps.length;j++){let P=Ps[j],lo=0,hi=0;for(let e of es){if(!sharp||e.p<=P/2){if(e.p<Y)lo+=e.w;else hi+=e.w;}let n=Math.ceil(e.J/P)-Math.ceil(e.C/P);if(!n)continue;if(sharp){if(e.p>=2*P){lo=e.p<Y?e.w:0;hi=e.p>=Y?e.w:0;}else if(e.p>P/2){lo=0;hi=0;}}let cap=(sharp?6:9)*P*n;ok(lo+hi<=cap,"cell capacity");e.lo[j]=Ls[j]?lo/cap:0;e.hi[j]=hi/cap;ok(e.lo[j]+e.hi[j]<=1+1e-9,"fraction sum");lo=hi=0;cellChecks++}}
  }
  let grids=Ps.map((P,j)=>({P,Ll:Ls[j],Lh,old:0,low:0,high:0,lowEligible:0,highEligible:0,lowLate:0,highLate:0,rawPairs:0,oldKeys:0,newKeys:0,lowKeys:0,highKeys:0,maxLow:0,maxHigh:0}));
  for(let o of proj.values()){let cls=new Map();for(let s of o.slots.values()){s.ready=s.refs.filter(e=>e.tag.end-e.J>=L);let c=mod(s.v,6),a=cls.get(c)||[];a.push(s);cls.set(c,a)}
@@ -39,6 +39,8 @@ function audit(X,focus=false){
   z.oldKeys=old.size;z.lowKeys=lo.size;z.highKeys=hi.size;z.newKeys=new Set([...lo.keys(),...hi.keys()]).size;
   for(let p of Object.keys(z))if(typeof z[p]==="number")z[p]=+z[p].toFixed(6)
  }
- return {X,focus,B,T,L,Lh,Ls,Y,N,hit,events,W,cellChecks,pairs,persistent,defects,shortDefects,lateDefects,routeChecks,capChecks,comparisonChecks,grids};
+ return {X,focus,sharp,B,T,L,Lh,Ls,Y,N,hit,events,W,cellChecks,pairs,persistent,defects,shortDefects,lateDefects,routeChecks,capChecks,comparisonChecks,grids};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
+
+for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,false,true)));
