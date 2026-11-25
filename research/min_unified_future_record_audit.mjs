@@ -38,7 +38,7 @@ function audit(X,focus=false){
      ok(eq(ex,prev+part)&&part<=e.len+1e-9,"target level identity");
      if(ex>1e-9)positiveTargets++;localEx+=ex*rr;weights[j]+=rr;own[j]+=part*rr;localReachedW+=rr;
      if(i+1<gaps.length||can.some(z=>z.g===T&&h===T)){completeTargets++;ok(ds<=6+1e-9,"completed gap ceiling");completeCredit+=(Wh-Ws)*rr;}
-     if(Wh>0){let scale=Ws/Wh;if(di<=e.dq){add(oldLoad,c.t,ts,rr);add(oldLoad,ts,e.v,rr*f);add(load,c.t,ts,rr*scale);add(load,ts,e.v,rr*f*scale)}else{add(oldLoad,c.t,e.v,rr*Wh/W);add(load,c.t,e.v,rr*Ws/W)}}
+     if(Wh>0){let scale=Ws/Wh;if(2*(e.v-ts)>=e.G-e.g||f===1){add(oldLoad,c.t,ts,rr);add(oldLoad,ts,e.v,rr*f);add(load,c.t,ts,rr*scale);add(load,ts,e.v,rr*f*scale)}else{add(oldLoad,c.t,e.v,rr*Wh/W);add(load,c.t,e.v,rr*Ws/W)}}
     }else{missing+=(x-(C-C0))*rr;add(oldLoad,c.t,t,rr);add(load,c.t,t,rr);}
     rawH+=Wh*rr;U+=Ws*rr;
    }
@@ -60,7 +60,7 @@ function audit(X,focus=false){
  }
  let paid=0,heavy=0,thin=0,heavyHit=0,maxForward=0,maxMass=0,partialSlots=0,maxReachedMass=0;
  for(let [z,g] of groups){ok(g.n<=fullSlots.get(z)&&g.charge<=4*g.p*g.n+1e-7,"persistent mass");if(g.n<fullSlots.get(z))partialSlots++;
-  let cap=2*B/(g.p*(g.k+1));maxMass=Math.max(maxMass,g.n);maxReachedMass=Math.max(maxReachedMass,g.hit);
+  let cap=(focus ? .02 : 2)*B/(g.p*(g.k+1));maxMass=Math.max(maxMass,g.n);maxReachedMass=Math.max(maxReachedMass,g.hit);
   if(g.charge/(4*g.p)<=cap){thin++;paid+=g.charge}else{heavy++;if(g.hit){heavyHit++;ok(g.maxHitEnd>=g.maxTarget&&g.maxTarget-g.C>=4*(g.hit-1),"reached root spread");maxForward=Math.max(maxForward,g.maxHitEnd-g.C)}}
  }
  let rd=x=>+x.toFixed(6);
