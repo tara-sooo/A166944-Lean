@@ -52,7 +52,7 @@ function audit(X,mode){
   for(const p of b.labels){const [v,q]=hit(t,C,t+3);ok(p===q&&v-t===(p===3?1:2),'even bridge explicit event');t=v;C+=p-1;}
   ok(C===b.J&&t+3===b.t&&!hit(t,C,t+3)[1],'even bridge quiet suffix');bridgeChecks++;maxBridge=Math.max(maxBridge,b.k);
  }
- const renew=new Map(),elementary=new Map(),groups=new Map(),rootGroups=Array.from({length:N},()=>[]),canRoots=new Set();
+ const actualVisits=[],basins=new Map(),arcs=new Map(),renew=new Map(),elementary=new Map(),groups=new Map(),rootGroups=Array.from({length:N},()=>[]),canRoots=new Set();
  let rawGain=[0,0],rawClock=[0,0],origFirst=0,origFirstHigh=0;
  for(const path of paths){
   const root=path[0],cut=root.t+H,cs=[];
@@ -65,6 +65,26 @@ function audit(X,mode){
    }
   }
   ok(cs.length&&cs[0].M===root.M,'original canonical start');
+  actualVisits.push(cs.map(v=>v.M));
+  for(const v of cs){let b=basins.get(v.M);if(!b){b=[];basins.set(v.M,b);}b.push(root.M);}
+  // Store clock segments of a single deterministic arc, independently of tags.
+  // Actual segment ledger on the original tags includes virtual roots inside waits.
+  let cur=0;
+  function segment(c,C,l,h,w){
+   if(h<=l)return;
+   let a=arcs.get(c);if(!a){a=new Map();arcs.set(c,a);}let e=a.get(C);
+   if(!e){e={l,h,w:0};a.set(C,e);}else{ok(e.l===l,'canonical arc common left endpoint');e.h=Math.max(e.h,h);}
+   e.w+=w;
+  }
+  for(let j=0;j+1<path.length;j++){
+   const e=path[j],n=path[j+1],q=r[e.C/2],l=e.t,h=Math.min(n.t,cut);
+   if(h<=l)continue;
+   const mark=cur+1<cs.length&&cs[cur+1].j===j?cs[cur+1]:null;
+   const mid=mark?mark.t:h;
+   const w=(a,b)=>Math.max(0,Math.min(b,cut)-Math.max(a,root.t+2*B))/(2*q);
+   if(mark){segment(cs[cur].M,e.C,l,mid,w(l,mid));cur++;segment(cs[cur].M,e.C,mid,h,w(mid,h));}
+   else segment(cs[cur].M,e.C,cur===0&&j===0?root.t:l,h,w(l,h));
+  }
   const byC=new Set(cs.map(v=>v.C));
   for(let j=0;j<path.length;j++){const e=path[j];if(e.t%2||2*e.t!==e.C)continue;const b=bridge(e.C);
    if(b.t>cut){bridgeCut++;continue;}
@@ -134,9 +154,30 @@ function audit(X,mode){
  let retainedThin=0,retainedThick=0,maxRootThin=0;const remain=[0,0];
  for(let i=0;i<N;i++)if(!deleted[i]){let n=0;for(const g of rootGroups[i]){ok(counts.get(g.id)>0,'retained group');if(counts.get(g.id)<=m){n+=g.p-1;remain[g.type]+=g.p-1;}else retainedThick+=g.p-1;}ok(n<eps0*B,'peel fixed point');retainedThin+=n;maxRootThin=Math.max(maxRootThin,n);}
  ok(chargedGain>=removed*eps0*B-1e-8&&chargedGain<=m*(sums[0]+sums[1])&&retainedThin<=eps0*B*(N-removed),'peeling bound');
+ // Reconstruct every tag's canonical history solely from the first-return
+ // graph and its absolute source cutoff. Reconstruct arc occupancy from ancestor lists.
+ let mapChecks=0,basinChecks=0,arcChecks=0,arcR=0,arcE=0,arcSelf=0,maxBasin=0,nonemptyArcs=0;
+ const reconstructed=new Map(),byHorizon=new Float64Array(len);
+ for(let i=0;i<N;i++){const M=X+1+2*i,actual=actualVisits[i],got=[M];let x=M;
+  while(renew.has(x)&&renew.get(x)<=M+H){x=renew.get(x);got.push(x);}
+  ok(got.length===actual.length&&got.every((v,j)=>v===actual[j]),'return map exact composition');
+  for(const c of got){let a=reconstructed.get(c);if(!a){a=[];reconstructed.set(c,a);}a.push(M);mapChecks++;}
+ }
+ for(const [c,bs] of basins){const b=reconstructed.get(c);ok(b&&b.length===bs.length&&b.every((v,i)=>v===bs[i]),'exact sliding basin');
+  for(const M of bs)ok(M<=c&&M>=c-H,'basin age interval');basinChecks++;maxBasin=Math.max(maxBasin,bs.length);
+ }
+ for(const [c,rows] of arcs){const bs=reconstructed.get(c);let has=false;
+  for(const [C,e] of rows){const q=r[C/2];let sum=0;
+   for(const M of bs)sum+=Math.max(0,Math.min(e.h,M+2+H)-Math.max(e.l,M+2+2*B))/(2*q);
+   ok(Math.abs(sum-e.w)<=1e-7*Math.max(1,sum),'arc ancestor interval convolution');
+   byHorizon[C/2]+=sum;arcR+=q*sum;arcSelf+=q*sum*sum;arcChecks++;has||=sum>0;
+  }nonemptyArcs+=+has;
+ }
+ let E=0;for(let j=lo;j<=hi;j++){ok(Math.abs(byHorizon[j]-W0[j])<=1e-7*Math.max(1,W0[j]),'arc reconstruction full occupation');arcE+=r[j]*byHorizon[j]**2;E+=r[j]*W0[j]**2;}
+ ok(Math.abs(arcR-R)<=1e-6*Math.max(1,R)&&Math.abs(arcE-E)<=1e-6*Math.max(1,E)&&arcSelf<=E+1e-6*Math.max(1,E),'exact reconstructed energy');
  const inv=new Map();let maxIn=0;for(const a of elementary.values()){let s=inv.get(a.dest);if(!s){s=new Set();inv.set(a.dest,s);}s.add(a.M);maxIn=Math.max(maxIn,s.size);}
  for(const [M,s] of inv){let cap=0;for(const n of [M,M-1,M-3,M-5])fac(n,p=>{if(p>=Y)cap++;});ok(s.size<=cap,'elementary inverse degree');}
- return {X,B,mode,L0,Y,Q,m,eps0,N,R,events,literal,bridgeChecks,maxBridge,bridgeActual,bridgeCut,bridgeTwin,canonical,virtual,canonicalKeys:canRoots.size,renewalInc,renewalKeys:renew.size,elementaryInc,elementaryKeys:elementary.size,maxIn,directCheck,nearCheck,origFirst,origFirstHigh,rawGain,rawClock,sums,support,groupN,maxMass,weightedSupport,thinN,thinGain,thinClock,removed,rounds,chargedGain,retainedThin,retainedThick,remain,maxRootThin};
+ return {mapChecks,basinChecks,arcChecks,arcR,arcE,arcSelf,maxBasin,nonemptyArcs,X,B,mode,L0,Y,Q,m,eps0,N,R,events,literal,bridgeChecks,maxBridge,bridgeActual,bridgeCut,bridgeTwin,canonical,virtual,canonicalKeys:canRoots.size,renewalInc,renewalKeys:renew.size,elementaryInc,elementaryKeys:elementary.size,maxIn,directCheck,nearCheck,origFirst,origFirstHigh,rawGain,rawClock,sums,support,groupN,maxMass,weightedSupport,thinN,thinGain,thinClock,removed,rounds,chargedGain,retainedThin,retainedThick,remain,maxRootThin};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
