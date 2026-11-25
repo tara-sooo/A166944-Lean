@@ -1,6 +1,6 @@
 // Two-sided multigrid annulus witness audit.
-function audit(X,focus=false){
- const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,Ps=[6,30,210],a=2,sqrtA=Math.sqrt(a),lim=7*X+B+20,S=new Int32Array(lim);
+function audit(X,focus=false,wide=false){
+ const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,Ps=wide?[30,210,2310]:[6,30,210],a=2,stripFraction=wide?1/8:1/Math.sqrt(a),lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(x,m)=>{if(!x)throw Error(`${X}/${focus} ${m}`)},eq=(x,y)=>Math.abs(x-y)<=1e-8*Math.max(1,Math.abs(x),Math.abs(y)),mod=(x,y)=>(x%y+y)%y;
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)if(!S[n])S[n]=p}
  function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
@@ -39,19 +39,19 @@ function audit(X,focus=false){
     else if(!cross[i]){
       let Kleft=P*(Math.ceil(l.J/P)-1),Kright=P*Math.ceil(r.C/P);
       ok(Kright-Kleft===P&&l.J<=e.C&&e.J<=r.C,"adjacent grid");
-      if(Math.min(e.C-Kleft,Kright-e.C)<P/sqrtA){reason="strip";tagStrip+=e.w}
+      if(Math.min(e.C-Kleft,Kright-e.C)<P*stripFraction||(wide&&r.C-e.C<P*stripFraction)){reason="strip";tagStrip+=e.w}
     }
     if(reason){e.bad++;z[reason]+=e.w;z.paid+=e.w;continue}
     z.good+=e.w;
     if(cross[i]){ok(L===i&&R===i&&e.p>=a*P,"self large");z.self+=e.w;e.good.push({P,self:true,L,R});}
     else{ok(e.p<=P/a&&l.p<=P/a&&r.p<=P/a&&L<i&&i<R,"small triple");let dL=e.C-l.C,dR=r.C-e.C;
-     ok(dL>=P/sqrtA-1e-8&&dL<=P+P/a+1e-8&&dR>=P/sqrtA-P/a-1e-8&&dR<=P,"annuli");annulusChecks++;z.small+=e.w;e.good.push({P,self:false,L,R});
+     ok(dL>=P*stripFraction-1e-8&&dL<=P+P/a+1e-8&&dR>=P*(wide?stripFraction:stripFraction-1/a)-1e-8&&dR<=P,"annuli");annulusChecks++;z.small+=e.w;e.good.push({P,self:false,L,R});
     }
     partitionChecks++;
    }
    ok(tagEdge<=6*P+1e-8&&tagMid<= (6*(1+2*a)+3)*localMid+1e-8&&tagSmall<=3*P/a*count+1e-8,"packing");
    // A small noncrossing event in a grid strip has all its gain in an enlarged strip.
-   ok(tagStrip<=3*(g/P+2)*(2*P/sqrtA+2*P/a)+1e-8,"strip bound");
+   ok(tagStrip<=3*(g/P+2)*(2*P*stripFraction+3*P/a)+1e-8,"strip bound");
   }
   for(let e of es){let h=e.bad/Ps.length;averageBad+=h*e.w;
    if(h>1/3){trim+=e.w;continue}retained+=e.w;manyGood++;ok(e.good.length>=2,"many good");
@@ -59,13 +59,15 @@ function audit(X,focus=false){
    if(small.length){smallEvents++;if(small.length>=2)smallBoth++;if(e.p<=Math.min(...Ps)/a)retainedSmall++;}
    for(let i=0;i<small.length;i++)for(let j=i+1;j<small.length;j++){let x=small[i],y=small[j];
     // Finite grids need a larger scale ratio for these particular finite annulus constants.
-    if(y.P*(1/sqrtA-1/a)>x.P*(1+1/a)){ok(x.L!==y.L&&x.R!==y.R,"distinct witnesses");distinctChecks++}
+    if(y.P*(wide?stripFraction:stripFraction-1/a)>x.P*(1+1/a)){ok(x.L!==y.L&&x.R!==y.R,"distinct witnesses");distinctChecks++}
     if(x.L===y.L||x.R===y.R)rawRepeatChecks++;
    }
   }
  }
  for(let z of grids){z.keys=z.counts.size;for(let v of z.counts.values())if(v<=(focus?.5:2))z.thin++;else z.heavy++;ok(z.thinLeft<=9*z.P*(focus?.5:2)*z.thin+1e-7&&z.thinRight<=9*z.P*(focus?.5:2)*z.thin+1e-7&&z.thinUnion<=z.thinLeft+z.thinRight+1e-7&&eq(z.good+z.paid,W),"global grid")}
  ok(grids.reduce((s,z)=>s+z.midGain,0)<=G+1e-7&&eq(retained+trim,W)&&trim<=3*averageBad+1e-7,"global");
- let rd=x=>+x.toFixed(6);return {X,focus,B,T,N,events,hit,G,W,averageBad:rd(averageBad),trim,retained,manyGood,smallEvents,smallBoth,retainedSmall,annulusChecks,capacityChecks,partitionChecks,distinctChecks,rawRepeatChecks,grids:grids.map(({counts,...z})=>z)};
+ let rd=x=>+x.toFixed(6);return {X,focus,wide,B,T,N,events,hit,G,W,averageBad:rd(averageBad),trim,retained,manyGood,smallEvents,smallBoth,retainedSmall,annulusChecks,capacityChecks,partitionChecks,distinctChecks,rawRepeatChecks,grids:grids.map(({counts,...z})=>z)};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[256,1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
+
+for(const X of [16384,65536])console.log(JSON.stringify(audit(X,false,true)));
