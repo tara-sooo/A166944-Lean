@@ -50,13 +50,14 @@ function audit(X,mode){
  const nodes=new Map(),key=e=>e.t+':'+e.C,def=e=>2*e.t-e.C;
  for(const path of paths){const stop=path[path.length-1].t;let a=null;
   for(const e of path){let v=nodes.get(key(e));if(!v){v={id:key(e),t:e.t,C:e.C,d:def(e),n:0,root:null,children:new Map(),next:null,stops:[]};nodes.set(v.id,v);}
-   v.n++;v.stops.push({stop,child:a?a.id:'root',p:e.inc});if(a){let g=v.children.get(a.id);if(!g){g={a,p:e.inc,n:0};v.children.set(a.id,g);}g.n++;ok(g.p===e.inc&&(!a.next||a.next===v),'common successor');a.next=v;}else{ok(v.root===null,'unique root');v.root=e.i;}a=v;
+   v.n++;v.stops.push({stop,M:e.M,pre:a?a.d:0,child:a?a.id:'root',p:e.inc});if(a){let g=v.children.get(a.id);if(!g){g={a,p:e.inc,n:0};v.children.set(a.id,g);}g.n++;ok(g.p===e.inc&&(!a.next||a.next===v),'common successor');a.next=v;}else{ok(v.root===null,'unique root');v.root=e.i;}a=v;
   }
  }
  const P=n=>n*(n-1),band=d=>Math.floor(Math.log2(lim/d));
  function cap(d,p,q){const j=band(d),D=lim/2**j;return B*p*q*m/(D*D*(j+1)**2*(p>=y&&q>=y?1:ell0**2));}
  let birth=0,expiry=0,A=0,D=0,pairs=0,initial=0,matched=0,unused=0,unspent=0,entry=0,entryNR=0,actualNR=0,rawNR=0;
  let mixed=0,mixedDraw=0,mixedQuota=0,mixedDrawQuota=0,mixedSmall=0,mixedQuotaAfterSmall=0,mixedDrawQuotaAfterSmall=0,smallDraw=0,smallRaw=0,smallPairs=0,largeDraw=0,zeroDrawPairs=0,positiveDrawPairs=0,layerCount=0,oracle=0,maxDepth=0,nonresetMixedPairs=0,mixedKeys=0,mixedHeavyKeys=0,largeBothMixed=0;
+ const sourceBands=new Map();let pairOracle=0,sourcePaid=0,sourceRest=0,smallPaid=0,mixedPaid=0,unionRest=0,unionSmall=0,unionSource=0,unionMixed=0,entryOracle=0,drawOracle=0,smallEntryPaid=0,wholePaidPairs=0,rawSameResidual=0;
  const keyBands=new Map(),actualKeys=new Map(),byType={same:{pairs:0,raw:0,draw:0},mixed:{pairs:0,raw:0,draw:0},root:{pairs:0,raw:0,draw:0}};
  for(const v of nodes.values()){
   const cs=[...v.children.values()],b=P(v.n)-cs.reduce((a,e)=>a+P(e.n),0);if(!b)continue;
@@ -93,10 +94,29 @@ function audit(X,mode){
    }
   }
   ok(local===b,'ordered birth count');
+  // Exact initial-level debit per distinct pair, including same-label
+  // nonreset entry correction. Spend small-birth, source, mixed quotas in order.
+  for(let i=0;i<sorted.length;i++)for(let j=0;j<i;j++){
+   const a=sorted[i],b=sorted[j];if(a.child===b.child)continue;
+   const I=v.d-suffix.get(Math.min(a.stop,b.stop)).mi;
+   const J=v.d!==6*(v.t%2)&&a.p>0&&a.p===b.p?Math.min(Math.max(0,a.pre-v.d),Math.max(0,b.pre-v.d)):0;
+   const debit=I+J,dist=Math.abs(a.M-b.M),j0=Math.floor(Math.log2(8*B/dist)),width=8*B/2**j0;
+   ok(dist>0&&dist<=G/2&&j0>=0&&dist>width/2&&dist<=width,'birth source distance');
+   const c=B*m/(width*(j0+1)**2),q=Math.min(debit,c),s=sourceBands.get(j0)||{width,c,pairs:0,paid:0};s.pairs+=2;s.paid+=2*q;sourceBands.set(j0,s);
+   pairOracle++;drawOracle+=2*I;entryOracle+=2*J;sourcePaid+=2*q;sourceRest+=2*(debit-q);
+   if(small){unionSmall+=2*debit;smallPaid+=2*debit;if(!J||a.p<=m)smallEntryPaid+=2*J;continue;}
+   unionSource+=2*q;let rest=debit-q;
+   if(a.p>0&&b.p>0&&a.p!==b.p&&nr){const f=quota.get(Math.min(a.p,b.p)+':'+Math.max(a.p,b.p));const amount=f*rest;unionMixed+=2*amount;rest-=amount;}
+   unionRest+=2*rest;if(a.p===b.p)rawSameResidual+=2*rest;
+   if(rest<1e-9)wholePaidPairs+=2;
+  }
   // Independent explicit pair oracle for small nodes, including true suffix minima.
   if(v.n<=16){let bb=0,dd=0;for(let i=0;i<sorted.length;i++)for(let j=0;j<i;j++){const a=sorted[i],b=sorted[j];if(a.child===b.child)continue;bb+=2;dd+=2*(v.d-suffix.get(Math.min(a.stop,b.stop)).mi);oracle++;}ok(bb===local&&dd===localDraw,'drawdown pair oracle');}
   for(let i=0;i<cs.length;i++)for(let j=0;j<i;j++){const a=cs[i],b=cs[j];if(a.p!==b.p)continue;const k=2*a.n*b.n*Math.min(Math.max(0,a.a.d-v.d),Math.max(0,b.a.d-v.d));entry+=k;if(v.d!==6*(v.t%2))entryNR+=k;}
  }
+ ok(drawOracle===initial&&entryOracle===entryNR&&2*pairOracle===pairs,'complete debit oracle');
+ for(const s of sourceBands.values())ok(s.paid<=s.c*s.pairs+1e-5&&s.pairs<=2*N*(s.width+2),'source budget');
+ ok(Math.abs(initial+entryNR-unionSmall-unionSource-unionMixed-unionRest)<=1e-5*Math.max(1,initial),'union debit partition');
  ok(D===initial+matched&&A===matched+unused&&birth===initial+unspent&&expiry===unused+unspent,'exact four-way conservation');
  ok(byType.same.pairs+byType.mixed.pairs+byType.root.pairs===pairs&&byType.same.draw+byType.mixed.draw+byType.root.draw===initial,'birth classes');
  // Direct independent edge flow (including expiry multiplicity).
@@ -116,7 +136,8 @@ function audit(X,mode){
  }
  ok(mixedQuota<=quotaUsed+1e-5&&mixedDrawQuota<=mixedQuota+1e-5&&mixedDrawQuotaAfterSmall<=mixedQuotaAfterSmall+1e-5,'mixed quota budget');
  ok(smallDraw<=smallRaw&&initial===smallDraw+largeDraw,'small drawdown union');
- return {X,B,mode,m,y,N,R,events,literal,nodes:nodes.size,pairs,birth,expiry,A,D,initial,matched,unused,unspent,entry,entryNR,rawNR:birth+entryNR,actualNR:initial+entryNR,smallDraw,smallRaw,smallPairs,largeDraw,zeroDrawPairs,positiveDrawPairs,byType,mixed,mixedDraw,mixedQuota,mixedDrawQuota,mixedSmall,mixedQuotaAfterSmall,mixedDrawQuotaAfterSmall,nonresetMixedPairs,mixedKeys,mixedHeavyKeys,largeBothMixed,oracle,maxDepth,envelope,quotaEnvelope,quotaUsed,supportChecks};
+ const debit={pairOracle,entryOracle,drawOracle,sourcePaid,sourceRest,unionSmall,unionSource,unionMixed,unionRest,wholePaidPairs,rawSameResidual,sourceBands:[...sourceBands.entries()]};
+ return {debit,X,B,mode,m,y,N,R,events,literal,nodes:nodes.size,pairs,birth,expiry,A,D,initial,matched,unused,unspent,entry,entryNR,rawNR:birth+entryNR,actualNR:initial+entryNR,smallDraw,smallRaw,smallPairs,largeDraw,zeroDrawPairs,positiveDrawPairs,byType,mixed,mixedDraw,mixedQuota,mixedDrawQuota,mixedSmall,mixedQuotaAfterSmall,mixedDrawQuotaAfterSmall,nonresetMixedPairs,mixedKeys,mixedHeavyKeys,largeBothMixed,oracle,maxDepth,envelope,quotaEnvelope,quotaUsed,supportChecks};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
