@@ -1,6 +1,6 @@
 // High deficit predecessor descent debit and primorial boundary allocations.
 function boundaryDebit(uses,B,L,expected,ok,close,P=6,Y=3){
- const pairs=new Map(),keys=new Map(),vertices=new Map(),debitKeys=new Map(),naturalKeys=new Map(),births=new Map(),out={P,Y,raw:0,pos:0,small:0,recent:0,old:0,gridSmall:0,gridRaw:0,gridAllocated:0,gridPositive:0,gridNegative:0,gridLowLabel:0,gridMedLabel:0,gridHighLabel:0,gridMaxMultiplicity:0,gridMaxPairKey:0,gridKeys:0,gridVertices:0,gridThinPaid:0,gridThinResidual:0,gridKeyPaid:0,gridKeyResidual:0,gridGain:0,gridNatural:0,gridDrop:0,gridSmallLabelNatural:0,gridSmallLabelDrop:0,oldNatural:0,oldDrop:0,oldBirthDebit:0,oldAscentDebit:0,oldAscentEnergy:0,oldAscentSmall:0,oldAscentLarge:0,oldAscentKeys:0,oldDropWeight:0,oldAscentWeight:0,oldBirthWeight:0,oldDirectWeight:0,oldAllocated:0,oldMinPost:Infinity,oldMaxCoef:0,checks:0};
+ const pairs=new Map(),keys=new Map(),vertices=new Map(),edgeGroups=new Map(),births=new Map(),out={P,Y,raw:0,pos:0,small:0,recent:0,old:0,gridSmall:0,gridRaw:0,gridAllocated:0,gridPositive:0,gridNegative:0,gridLowLabel:0,gridMedLabel:0,gridHighLabel:0,gridMaxMultiplicity:0,gridMaxPairKey:0,gridKeys:0,gridVertices:0,gridThinPaid:0,gridThinResidual:0,gridKeyPaid:0,gridKeyResidual:0,gridRoleCap:0,gridRoleFull:0,gridRoleOracle:0,gridRolePaidSmall:0,gridRoleResidualSmall:0,gridSupport:0,gridLabels:{},ascentLabels:{},gridGain:0,gridNatural:0,gridDrop:0,gridSmallLabelNatural:0,gridSmallLabelDrop:0,oldNatural:0,oldDrop:0,oldBirthDebit:0,oldAscentDebit:0,oldAscentEnergy:0,oldAscentSmall:0,oldAscentLarge:0,oldAscentKeys:0,oldDropWeight:0,oldAscentWeight:0,oldBirthWeight:0,oldDirectWeight:0,oldAllocated:0,oldMinPost:Infinity,oldMaxCoef:0,checks:0};
  for(const u of uses){
    const A=u.a.P.records,Q=u.b.P.records,i0=A.findIndex((e,i)=>i>u.a.k&&e.C===u.recipient),j0=Q.findIndex((e,i)=>i>u.b.k&&e.C===u.recipient),T=A[i0],V=Q[j0],D=u.d-6,c=u.w*D;
    out.raw+=c;ok(i0>u.a.k&&j0>u.b.k&&T.C===V.C&&T.b===V.b&&T.v===V.v,"actual common target");
@@ -51,7 +51,7 @@ function boundaryDebit(uses,B,L,expected,ok,close,P=6,Y=3){
    if(birth.size){out.oldBirthDebit+=Math.max(0,a.db-6);births.set(a.pk,a.db)}
    for(const [k,ls] of asc){const e=A[k],w=e.v-e.b,net=e.post-(2*e.b-e.C),n=w*w/(2*e.r);ok(net>0&&net<=3*n+1e-7&&ls.size<=net,"positive net ascent budget");
      out.oldAscentDebit+=net;out.oldAscentEnergy+=n;out.oldAscentKeys++;
-     for(const [l,wt] of ls){ok(wt<=48+1e-7&&l>2*e.b-e.C&&l<=e.post,"unique consumed ascent level");out.oldAscentWeight+=wt}
+     for(const [l,wt] of ls){ok(wt<=48+1e-7&&l>2*e.b-e.C&&l<=e.post,"unique consumed ascent level");out.oldAscentWeight+=wt;out.ascentLabels[e.p]=(out.ascentLabels[e.p]||0)+wt}
    }
    // Independently allocate each sufficiently long strip to primorial
    // boundary crossings, with capacity three rather than two per boundary.
@@ -66,15 +66,15 @@ function boundaryDebit(uses,B,L,expected,ok,close,P=6,Y=3){
        let e=t.A[k],q=e.p,amount=m*coef;
        ok(k<t.idx&&e.C<=K&&K<e.C+q-1&&q>Y&&K%P===0,"actual nonLOW boundary crossing");
        ok((e.C+2*(e.v%2)-1)%q===0&&(e.v-2*(e.v%2))%q===0&&e.post>=6+t.D/2,"high deficit boundary phase");
-       let key=K+','+e.C+','+e.b+','+e.v+','+q,pe=e.C+','+e.b+','+e.v;
+       let key=K+','+e.C+','+e.v+','+q,pe=e.C+','+e.b+','+e.v;
        perBoundary.set(key,(perBoundary.get(key)||0)+amount);
        if(!perEdge.has(pe))perEdge.set(pe,{e,n:0});perEdge.get(pe).n+=amount;
-       out.gridAllocated+=amount;if(e.post>2*e.b-e.C)out.gridPositive+=amount;else out.gridNegative+=amount;
+       out.gridAllocated+=amount;out.gridLabels[q]=(out.gridLabels[q]||0)+amount;if(e.post>2*e.b-e.C)out.gridPositive+=amount;else out.gridNegative+=amount;
        if(q<P)out.gridLowLabel+=amount;else if(q<=B/4)out.gridMedLabel+=amount;else out.gridHighLabel+=amount;
      }
      ok(left===0,"capacity-three greedy grid allocation");
    }
-   for(const [key,w] of perBoundary){ok(w<=96*P+1e-7,"pair boundary weight cap");out.gridMaxPairKey=Math.max(out.gridMaxPairKey,w);keys.set(key,(keys.get(key)||0)+w);for(const M of a.ids){const v=M+'|'+key;vertices.set(v,(vertices.get(v)||0)+w)}}
+   for(const [key,w] of perBoundary){ok(w<=96*P+1e-7,"pair boundary weight cap");out.gridMaxPairKey=Math.max(out.gridMaxPairKey,w);keys.set(key,(keys.get(key)||0)+w);if(!edgeGroups.has(key))edgeGroups.set(key,[]);edgeGroups.get(key).push({ids:a.ids,w});for(const M of a.ids){const v=M+'|'+key;vertices.set(v,(vertices.get(v)||0)+w)}}
    for(const {e,n} of perEdge.values()){
      let g=e.p-1,w=e.v-e.b,en=w*w/(2*e.r),d=Math.max(0,g-2*w);
      ok(n<=96*(g+P)+1e-7,"boundary gain envelope");out.gridGain+=g;out.gridNatural+=en;out.gridDrop+=d;
@@ -83,7 +83,41 @@ function boundaryDebit(uses,B,L,expected,ok,close,P=6,Y=3){
  }
  for(const [k,w] of keys){let p=Math.min(w,8*P);out.gridKeyPaid+=p;out.gridKeyResidual+=w-p}
  // Independent one-sided thin-role diagnostic, count each pair once by its smaller source.
- const thin=new Map(); // use both sides to bound the payment, not double count actual paid weight
+ function peel(m){
+   let paid=0,remain=0,full=0,cap=0;
+   for(const es of edgeGroups.values()){
+     const inc=new Map(),d=new Map(),alive=new Set(es);
+     for(const e of es)for(const M of e.ids){if(!inc.has(M))inc.set(M,[]);inc.get(M).push(e);d.set(M,(d.get(M)||0)+e.w)}
+     cap+=m*P*d.size;
+     const Q=[...d.keys()].filter(k=>d.get(k)<=m*P+1e-10);
+     for(let i=0;i<Q.length;i++){const k=Q[i];if(d.get(k)>m*P+1e-10)continue;
+       for(const e of inc.get(k)){if(!alive.delete(e))continue;paid+=e.w;for(const v of e.ids){let old=d.get(v);d.set(v,old-e.w);if(old>m*P+1e-10&&d.get(v)<=m*P+1e-10)Q.push(v)}}
+     }
+     if(!alive.size)full++;
+     for(const e of alive){remain+=e.w;for(const v of e.ids)ok(d.get(v)>m*P-1e-8,"boundary bilateral weighted core")}
+     const a=new Set(es);let changed=true;while(changed){changed=false;const deg=new Map();for(const e of a)for(const v of e.ids)deg.set(v,(deg.get(v)||0)+e.w);
+       const del=[...a].filter(e=>e.ids.some(v=>deg.get(v)<=m*P+1e-10));for(const e of del){a.delete(e);changed=true}}
+     ok(a.size===alive.size&&[...a].every(e=>alive.has(e)),"boundary core independent batch oracle");out.gridRoleOracle++;
+   }
+   ok(close(paid+remain,out.gridRaw)&&paid<=cap+1e-6,"boundary bilateral ledger");return {paid,remain,full,cap};
+ }
+ const p8=peel(8),p1=peel(1);out.gridThinPaid=p8.paid;out.gridThinResidual=p8.remain;out.gridRoleCap=p8.cap;out.gridRoleFull=p8.full;out.gridRolePaidSmall=p1.paid;out.gridRoleResidualSmall=p1.remain;
+ const bySource=new Map(),byPrime=new Map();
+ for(const v of vertices.keys()){
+   const [M,key]=v.split('|');let K=Number(key.split(',')[0]);if(!bySource.has(M))bySource.set(M,new Set());const ks=bySource.get(M);ok(!ks.has(K),"one physical boundary event per source and boundary");ks.add(K);
+ }
+ for(const ks of bySource.values())ok(ks.size<=Math.ceil((12*B+6)/P)+1,"actual boundary membership budget");
+ for(const k of keys.keys()){
+   const [K,C,v,q]=k.split(',').map(Number);ok(K%P===0&&C<=K&&K<C+q-1,"physical key");
+   if(!byPrime.has(q))byPrime.set(q,new Set());let set=byPrime.get(q);set.add(k);
+ }
+ // Exact per-prime relaxed bound: one even predecessor per side at each boundary,
+ // at most floor((12B+6)/(4q))+1 outgoing phases for that predecessor.
+ for(const [q,ks] of byPrime){
+   const arr=[...ks].map(k=>k.split(',').map(Number)),Kmin=Math.min(...arr.map(a=>a[0])),Kmax=Math.max(...arr.map(a=>a[0])),nK=(Kmax-Kmin)/P+1;
+   const support=2*nK*(Math.floor((12*B+6)/(4*q))+1);ok(ks.size<=support,"relaxed boundary key support");out.gridSupport+=support;
+   for(const [K,C,v,p] of arr){let s=v%2,lo=K-q+2,hi=K,first=((-(2*s-1))%q+q)%q;let count=0;for(let d=lo;d<=hi;d++)if(d%2===0&&d%q===first)count++;ok(count===1,"unique parity and label predecessor candidate");}
+ }
  let sum=0;for(const w of vertices.values())sum+=w;
  out.gridKeys=keys.size;out.gridVertices=vertices.size;
  ok(close(sum,2*out.gridRaw),"boundary source membership moment");
