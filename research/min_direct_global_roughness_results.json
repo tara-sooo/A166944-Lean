@@ -1,0 +1,53 @@
+{
+  "N": 300000,
+  "steps": 180,
+  "events": 3636351,
+  "truncated": 0,
+  "windows": 410643,
+  "budgetChecks": 410643,
+  "goodEvents": 10746,
+  "goodPrimeOther": 9612,
+  "goodSemiOther": 1134,
+  "lowPositive": 410641,
+  "goodPositive": 10550,
+  "positiveDemand": 336824,
+  "goodOnly": 144,
+  "lowOnly": 326733,
+  "both": 9947,
+  "full16Windows": 0,
+  "richChecks": 10091,
+  "lowMultiplicityChecks": 336680,
+  "literalChecks": 4031,
+  "largestGood": {
+    "M": 289163,
+    "H": 579120,
+    "t": 289584,
+    "p": 761,
+    "e": -1,
+    "w": 359,
+    "Y": 579882,
+    "q": 761
+  },
+  "largestGoodFraction": {
+    "X": 404472,
+    "Y": 405072,
+    "G": 600,
+    "d": 6,
+    "lo": 0,
+    "good": 600,
+    "B": 592,
+    "C": 636
+  },
+  "richExample": {
+    "X": 340792,
+    "Y": 344208,
+    "G": 3416,
+    "d": 6,
+    "lo": 2284,
+    "good": 1132,
+    "rich": 2,
+    "threshold": 0.03399105288384726,
+    "B": 561,
+    "C": 586
+  }
+}
