@@ -61,7 +61,21 @@ function audit(X,mode){
   }
  }
  ok(charged<=subGain&&repeatGain<=(B/P)*charged,'disjoint intermediate gain charges');
- const excursions={P,nonreset,reset,firstLow,repeatedLow,charged,repeatGain,subGain,minimumRatio:Number.isFinite(minimumRatio)?minimumRatio:null,nonresetChecks};
+ // A separate low threshold makes the repeated-launch class nonvacuous.
+ const repeatTests=[];
+ for(const P0 of [7,17,Math.max(17,Math.ceil(B/16))]){
+  let hits=0,gain=0,cost=0,small=0;
+  for(const path of paths){let prev=null;
+   for(let j=1;j<path.length;j++){const e=path[j-1],v=path[j],p=v.inc,d0=2*e.t-e.C,d1=2*v.t-v.C;
+    if(d1===6*(v.t%2)){prev=null;continue;}
+    if(p<P0){small+=p-1;continue;}
+    ok(d1>=2*p,'diagnostic nonreset deficit');
+    if(prev&&d0<=P0){const g=e.C-prev.C;ok(g>=2*prev.inc-P0&&v.t-e.t>=p,'diagnostic repeat');hits++;gain+=g;cost+=p-1;}
+    prev=v;
+   }
+  }ok(gain<=small&&cost<=(B/P0)*gain,'diagnostic disjoint repeat charges');repeatTests.push({P0,hits,gain,cost,small});
+ }
+ const excursions={repeatTests,P,nonreset,reset,firstLow,repeatedLow,charged,repeatGain,subGain,minimumRatio:Number.isFinite(minimumRatio)?minimumRatio:null,nonresetChecks};
  const results=[],overlap=(l,h,x,y)=>Math.max(0,Math.min(h,y)-Math.max(l,x));
  for(const path of paths)for(let j=0;j+1<path.length;j++){const e=path[j],v=path[j+1];e.l=Math.max(e.t,e.M+2+a);e.h=Math.min(v.t,e.M+2+H);e.v=v.t;e.cut=e.M+2+H;e.start=e.M+2+a;}
  for(const b of [0,1]){
@@ -113,7 +127,22 @@ function audit(X,mode){
   ok(Rx<=N*E0/2+eps&&Ex<=3*E0*Rx+eps&&lowPaid<=8*rho*E+2*Math.sqrt(E*Ex)+eps&&lowPaid<=(8*rho+eta)*E+Ex/eta+eps,'low-strip absorption');
   results.push({sector:b,D,E0,E,R:Rb,Ec,Et,Rt,paid,allTail,sync,nearAsync,farAsync,cutPaid,startPaid,oracleChecks,maxTail,cellChecks,nearPairs,allSync,allAsync,low,lowStrong,lowExc,Ex,Rx,maxExc,lowPaid,lowGain,exceptions,strongInc,lowAndTail});
  }
- return {excursions,X,B,mode,a,H,eta,rho,N,R,events,literal,results};
+ // Independently shortened prefix cutoffs to exercise low-strip exceptions.
+ const shortened=[];
+ for(let hh=2;hh<=H;hh*=2){
+  let total=0,exceptions=0,maxMass=0,Rx=0,Ex=0;
+  const D=Math.sqrt(B);
+  for(const [C,row] of at){const q=r[C/2];let sum=0;
+   for(const e of row){if(e.p<17)continue;const dp=Math.min(D,rho*e.p),end=C/2+dp,cut=e.M+2+hh,lo0=Math.max(e.t,e.M+2),hi0=Math.min(e.v,cut);
+    const w=overlap(lo0,hi0,C/2,end)/(2*q);if(!w)continue;total++;
+    if(cut<end+e.p/4){ok(cut<e.v,'shortened exceptional last wait');sum+=w;exceptions++;}
+    else ok(w<=4*rho*overlap(lo0,hi0,end,end+e.p/4)/(2*q)+1e-9,'shortened strong ratio');
+   }
+   ok(sum<=3*D+1e-9,'shortened exceptional mass');maxMass=Math.max(maxMass,sum);Rx+=q*sum;Ex+=q*sum*sum;
+  }ok(Rx<=N*D/2+1e-6&&Ex<=3*D*Rx+1e-6,'shortened exceptional energy');
+  shortened.push({hh,total,exceptions,maxMass,Rx,Ex});
+ }
+ return {shortened,excursions,X,B,mode,a,H,eta,rho,N,R,events,literal,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','full'])console.log(JSON.stringify(audit(X,mode)));
