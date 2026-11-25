@@ -32,10 +32,10 @@ function audit(X,mode){
  function add(e){if(!horizons.has(e.C))horizons.set(e.C,[]);horizons.get(e.C).push(e);}
  for(let M=X+1;M<2*X;M+=2)if(spf[M]===M){
    N++;const C0=2*M-2;if(rootCandidates[C0])rootsRelax++;
-   let C=C0,t=M+2,cut=Math.floor((7*M-1)/4),depth=0,lastq=0,lastD=C0,incoming=0,cost=0,flag=0,all=[];
+   let C=C0,t=M+2,cut=Math.floor((7*M-1)/4),depth=0,lastq=0,lastD=C0,lastTime=t,incoming=0,cost=0,flag=0,all=[];
    while(true){
-     const e={M,C,t,depth,lastq,lastD,incoming,p:0,r:0};all.push(e);add(e);visits++;
-     ok(C-lastD<L&&C>=lastD,"compressed LOW offset");
+     const e={M,C,t,depth,lastq,lastD,lastTime,incoming,p:0,r:0};all.push(e);add(e);visits++;
+     ok(C-lastD<L&&C>=lastD&&t-lastTime<=3*(C-lastD),"compressed LOW offset/time");
      if(lastq)ok(lastD%lastq===0||(lastD+2)%lastq===0,"compressed post divisor");
      if(lastq>=Pstar)superVisits++;
      if(depth<=k){if(twoSet[C])flag|=1;if(asymSet[C])flag|=8;if(rough(C))flag|=2;if(deg[C]>degreeLimit)flag|=4;if(base[C]){ok(rootCandidates[C0]===1,"actual shallow root in reverse union");pruneWitness++;}}
@@ -46,7 +46,7 @@ function audit(X,mode){
      if(tt>cut){if(spf[C-1]===C-1&&spf[C+1]===C+1)twins++;break;}
      const r=Math.min(...active);ok(r<=p&&tt-t<=2*r,"clock");e.p=p;e.r=r;events++;cost+=r;
      t=tt;C+=p-1;incoming=p;ok(C<=2*t,"horizon");
-     if(p>y){depth++;lastq=p;lastD=C;if(p>=Pstar)superArrivals++;}
+     if(p>y){depth++;lastq=p;lastD=C;lastTime=t;if(p>=Pstar)superArrivals++;}
    }
    const gain=C-C0;R+=cost;G+=gain;ok(gain<T+B&&2*cost<=3*gain,"prefix budget");
    const isMarked=!!((flag&4)||((mode!=="rough")&&(flag&9))||((mode!=="two")&&(flag&2)));
@@ -56,7 +56,7 @@ function audit(X,mode){
    else{eligibleRoot++;keptR+=cost;for(const e of all)if(e.depth<=k){ok(!base[e.C],"kept shallow avoids rare sets");shallowKept++;}}
    for(const e of all){e.end=C;if(e.p>=Q){highRBefore+=e.r;Wbefore.set(e.C,(Wbefore.get(e.C)||0)+1);if(!isMarked){highRAfter+=e.r;Wafter.set(e.C,(Wafter.get(e.C)||0)+1);}}}
  }
- const seen=new Map(),cls=["pruned","superThin","remaining"],first=[0,0,0],ener=[0,0,0],bud=[0,0,0];let pairs=0,thinIndependent=0,thinMixedSmall=0,thinSameScale=0,twoDistinct=0,asymDistinct=0,asymShallow=0,asymShallowKept=0,asymDeepKept=0,twoSame=0,twoShallow=0,twoDeepKept=0,twoShallowKept=0,highRoughShallow=0,maxCapSum=0,maxKeys=0,maxThinMass=0,diag=0,oracle=0;
+ const seen=new Map(),cls=["pruned","superThin","remaining"],first=[0,0,0],ener=[0,0,0],bud=[0,0,0];let pairs=0,thinIndependent=0,thinMixedSmall=0,thinSameScale=0,twoDistinct=0,asymDistinct=0,asymShallow=0,asymShallowKept=0,asymDeepKept=0,twoSame=0,sameLagChecks=0,twoShallow=0,twoDeepKept=0,twoShallowKept=0,highRoughShallow=0,maxCapSum=0,maxKeys=0,maxThinMass=0,diag=0,oracle=0;
  for(const C of [...horizons.keys()].sort((a,b)=>a-b)){
    const es=horizons.get(C),groups=new Map(),key=e=>e.lastD+":"+e.lastq;
    for(const e of es){const k=key(e);groups.set(k,(groups.get(k)||0)+1);}
@@ -70,7 +70,7 @@ function audit(X,mode){
      if(!v){
        pairs++;ok(key(a)!==key(b),"distinct compressed keys at first contact");
        const tw=a.lastq>=P&&b.lastq>=P,distinct=tw&&a.lastq!==b.lastq;
-       if(tw&&!distinct){twoSame++;ok(twoSet[C]||a.lastD!==b.lastD,"same-label exception");}
+       if(tw&&!distinct){twoSame++;ok(a.lastD!==b.lastD,"same-label exception");const q=a.lastq;if(q>L+2){ok(Math.abs(a.lastD-b.lastD)===2,"same-label shifted post horizons");ok(Math.abs(a.lastTime-b.lastTime)>=q-2&&Math.abs(a.t-b.t)>=q-2-3*L,"same-label asynchronous lag");sameLagChecks++;}}
        if(distinct){twoDistinct++;ok(twoSet[C]===1,"two distinct high contact exposed");if(Math.min(a.depth,b.depth)<=k){twoShallow++;if(!removed.has(a.M)&&!removed.has(b.M))twoShallowKept++;if(mode!=="rough")ok(removed.has(a.M)||removed.has(b.M),"one-sided shallow contact pruned");}else if(!removed.has(a.M)&&!removed.has(b.M))twoDeepKept++;}
        const asym=a.lastq!==b.lastq&&((a.lastq>=Qasym&&b.lastq>=V)||(b.lastq>=Qasym&&a.lastq>=V));
        if(asym){asymDistinct++;ok(asymSet[C]===1,"asymmetric exposure");if(Math.min(a.depth,b.depth)<=k){asymShallow++;if(!removed.has(a.M)&&!removed.has(b.M))asymShallowKept++;if(mode!=="rough")ok(removed.has(a.M)||removed.has(b.M),"asymmetric shallow contact pruned");}else if(!removed.has(a.M)&&!removed.has(b.M))asymDeepKept++;}
@@ -86,6 +86,6 @@ function audit(X,mode){
  const energy=m=>{let s=0;for(const [C,n] of m){const r=Math.min(...fs(C-1),...fs(C+1));s+=r*n*n;}ok(Number.isSafeInteger(s),"integer energy");return s;};
  const E=energy(Wbefore),Ekept=energy(Wafter);
  ok(marked+eligibleRoot===N&&R===markedCost+keptR&&marked<=rootsRelax,"root partition");ok(superVisits<=(L/2+1)*superArrivals&&superArrivals*(Pstar-1)<=G,"super visit budget");ok(thinIndependent<=superVisits*maxCapSum,"thin pair count");ok(pairs===first.reduce((s,x)=>s+x,0)&&E===oracle&&diag===highRBefore&&E===diag+ener.reduce((s,x)=>s+x,0)&&Ekept===highRAfter+ener[1]+ener[2],"energy partition");ok(ener.every((x,i)=>x<=bud[i]&&bud[i]<=3*(T+B)*first[i]),"whole pair budgets");
- return {mode,X,B,T,P,V,Qasym,Pstar,Q,Z,L,degreeLimit,k,N,nA,nTwo,nAsym,nRough,nExceptional,edgeMass,sameOnly,maxDegree,layerSizes,layerEdges,rootsRelax,marked,markedTwo,markedAsym,markedRough,markedDeg,markedCost,keptR,events,visits,R,G,cross,twins,literal,pruneWitness,shallowKept,superVisits,superArrivals,maxCapSum,maxKeys,maxThinMass,pairs,thinIndependent,thinMixedSmall,thinSameScale,twoDistinct,asymDistinct,asymShallow,asymShallowKept,asymDeepKept,twoSame,twoShallow,twoShallowKept,twoDeepKept,highRoughShallow,first:Object.fromEntries(cls.map((c,i)=>[c,first[i]])),energy:Object.fromEntries(cls.map((c,i)=>[c,ener[i]])),E,Ekept,highRBefore,highRAfter};
+ return {mode,X,B,T,P,V,Qasym,Pstar,Q,Z,L,degreeLimit,k,N,nA,nTwo,nAsym,nRough,nExceptional,edgeMass,sameOnly,maxDegree,layerSizes,layerEdges,rootsRelax,marked,markedTwo,markedAsym,markedRough,markedDeg,markedCost,keptR,events,visits,R,G,cross,twins,literal,pruneWitness,shallowKept,superVisits,superArrivals,maxCapSum,maxKeys,maxThinMass,pairs,thinIndependent,thinMixedSmall,thinSameScale,twoDistinct,asymDistinct,asymShallow,asymShallowKept,asymDeepKept,twoSame,sameLagChecks,twoShallow,twoShallowKept,twoDeepKept,highRoughShallow,first:Object.fromEntries(cls.map((c,i)=>[c,first[i]])),energy:Object.fromEntries(cls.map((c,i)=>[c,ener[i]])),E,Ekept,highRBefore,highRAfter};
 }
 const xs=process.argv.slice(2).map(Number);for(const mode of ['two','rough','gain'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
