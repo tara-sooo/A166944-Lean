@@ -47,3 +47,31 @@ function audit(X,mode){
  return {mode,X,B,N,b,Y,R,G,events,literal,nontwin,blocks,compact,compactLow,compactHigh,otherLow,highBlocks,prefix,lowCost,cheap,retained,small,Z,roughChecks,roughCount,roughCapacity,actualSpan,periodChecks,removedHits,retainedHits,maxMultiplicity,highRetained,E:energy(W),Elate:energy(Wlate)};
 }
 const xs=process.argv.slice(2).map(Number),windows=xs.length?xs:[256,1024,4096,16384,65536,262144];for(const mode of ['analytic','wide','fixed'])for(const X of windows)console.log(JSON.stringify(audit(X,mode)));
+
+function selbergOracle(){
+ const gcd=(a,b)=>{while(b){const c=a%b;a=b;b=c;}return a;};
+ const ok=(b,msg)=>{if(!b)throw Error(msg);};
+ const prime=n=>n>=2&&Array.from({length:Math.max(0,Math.floor(Math.sqrt(n))-1)},(_,i)=>i+2).every(d=>n%d!==0);
+ let systems=0,intervals=0,majorants=0,weightChecks=0,maxError=0;
+ for(const z of [3,5,7,11,17,31,61,101]){
+   const qs=[];for(let q=3;q<=z;q+=2)if(prime(q))qs.push(q);
+   const ds=[];function gen(i,d,mu,g,h){if(i===qs.length){ds.push({d,mu,g,h});return;}gen(i+1,d,mu,g,h);const q=qs[i];if(d*q<=z)gen(i+1,d*q,-mu,g*2/q,h*(q-2)/2);}gen(0,1,1,1,1);
+   const GG=ds.reduce((s,e)=>s+1/e.h,0);
+   for(const a of ds){a.lambda=ds.filter(e=>e.d%a.d===0).reduce((s,e)=>s+a.mu/(GG*e.h*a.g),0);ok(Math.abs(a.lambda)<=a.d+1e-10,"Selberg weight bound");weightChecks++;}
+   ok(Math.abs(ds.find(e=>e.d===1).lambda-1)<1e-10,"lambda one");
+   const gg=d=>qs.filter(q=>d%q===0).reduce((s,q)=>s*2/q,1);
+   let main=0,err=0;for(const a of ds)for(const c of ds){const lcm=a.d*c.d/gcd(a.d,c.d);main+=a.lambda*c.lambda*gg(lcm);err+=Math.abs(a.lambda*c.lambda)*qs.filter(q=>lcm%q===0).reduce((s,q)=>2*s,1);}
+   const delta=Math.abs(main-1/GG);maxError=Math.max(maxError,delta);ok(delta<1e-9,"Selberg diagonal identity");
+   const pp=[z+1,z+2,z+3].find(prime)||Array.from({length:100},(_,i)=>z+i+1).find(prime);
+   for(const p of [pp,1009])for(const s of [-1,1]){
+     systems++;
+     const allowed=n=>qs.every(q=>(2*n+1)%q!==0&&(p*(2*n+1)-2*s)%q!==0);
+     for(const start of [1,37,137])for(const H of [101,257]){
+       let count=0,major=0;for(let n=start;n<start+H;n++){const a=2*n+1,c=p*a-2*s;let lambda=0;for(const e of ds)if(qs.every(q=>e.d%q!==0||a%q===0||c%q===0))lambda+=e.lambda;major+=lambda*lambda;if(allowed(n)){count++;ok(Math.abs(lambda-1)<1e-10,"survivor majorant");majorants++;}}
+       ok(count<=major+1e-8&&major<=H/GG+err+1e-7,"Selberg interval bound");intervals++;
+     }
+   }
+ }
+ return {systems,intervals,majorants,weightChecks,maxError};
+}
+console.log(JSON.stringify({selberg:selbergOracle()}));
