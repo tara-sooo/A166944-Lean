@@ -1,6 +1,6 @@
 // Stable partner pools, common anchor groups, and constant-lag defect audit.
-function audit(X,focus=false){
- const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),D=Math.max(8,Math.floor(B/3)),S0=Math.max(2,Math.floor(B/16)),theta=.5,delta=.25,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
+function audit(X,focus=false,local=false){
+ const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),D=local?4:Math.max(8,Math.floor(B/3)),S0=local?2:Math.max(2,Math.floor(B/16)),theta=local ? .75 : .5,delta=local ? .5 : .25,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(b,s)=>{if(!b)throw Error(`${X}/${focus} ${s}`)},mod=(a,b)=>(a%b+b)%b,eq=(a,b)=>Math.abs(a-b)<=1e-7*Math.max(1,Math.abs(a),Math.abs(b));
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
  function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
@@ -63,6 +63,8 @@ function audit(X,focus=false){
  }
  for(let z of grids){ok(z.keyPaid<=8*z.bad/theta+1e-7&&z.rankPaid<=theta*z.raw+1e-7,"uniform boundary bad key budget");rawBad+=z.bad;rawKeyPaid+=z.keyPaid}
  ok(entropy<=N*(2+Math.log(N))+1e-7&&stable+unstable===events,"entropy total");
- return {X,focus,B,T,D,S0,N,hit,events,G,W,entropy:+entropy.toFixed(6),stable,unstable,anchorChecks,anchorActive,anchorStateChecks,rankChecks,stableFarChecks,positiveStableFar,stablePartners,farMass,rawBad,rawKeyPaid,repeatPairs,translationSteps,defects,lagChanges,splits,stops,radChecks,repeatedAfterDefect,signChecks,grids};
+ return {X,focus,local,B,T,D,S0,N,hit,events,G,W,entropy:+entropy.toFixed(6),stable,unstable,anchorChecks,anchorActive,anchorStateChecks,rankChecks,stableFarChecks,positiveStableFar,stablePartners,farMass,rawBad,rawKeyPaid,repeatPairs,translationSteps,defects,lagChanges,splits,stops,radChecks,repeatedAfterDefect,signChecks,grids};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
+
+console.log(JSON.stringify(audit(65536,false,true)));
