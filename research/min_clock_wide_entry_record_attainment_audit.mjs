@@ -2,7 +2,7 @@
 function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
  const pairs=new Map(),keys=new Map(),mem=new Map(),births=new Map(),stats={Q,Y,factor,raw:0,pos:0,small:0,smallEnergy:0,recent:0,old:0,lift:0,birth:0,birthStock:0,oldEnergy:0,maxPairBoundary:0,maxPairBirth:0,minPost:Infinity,minBirth:Infinity,maxLag:0,maxDensity:0,keys:0,vertices:0,labels:{},paid:0,residual:0,vertexPaid:0,vertexResidual:0,oracle:0,checks:0,detail:[]};
  const R={lower,upper,eligible:0,unsafe:0,initial:0,record:0,birthLevels:0,recordLevels:0,recordEnergy:0,recordCapacity:0,birthStock:0,maxPairLevel:0,maxTheta:0,recordEdges:0,recordKeys:0,labels:{},birthPairs:0,recordPairs:0,strict:0,atEntry:0,minLevel:null,maxLevel:0,earliestClock:null,latestClock:0,paid1:0,paid8:0,res1:0,res8:0,tokens:0,maxBirth:0,birthTypes:{},pairBirthMin:null,pairBirthMax:0};
- const role=new Map(),rkeys=new Set(),sourcePaths=new Map();
+ const role=new Map(),rkeys=new Set(),sourcePaths=new Map(),physical=new Map();let literal=0;
  for(const u of uses){
   const A=u.a.P.records,V=u.b.P.records,i0=A.findIndex((e,i)=>i>u.a.k&&e.C===u.recipient),j0=V.findIndex((e,i)=>i>u.b.k&&e.C===u.recipient),T=A[i0],U=V[j0],D=u.d-6,c=u.w*D;
   ok(i0>u.a.k&&j0>u.b.k&&T.C===U.C&&T.b===U.b&&T.v===U.v,"actual target");
@@ -60,6 +60,8 @@ function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
     const e=first.get(l);
     if(!e){ok(l<=a.d,"initial stock level");R.initial+=w;R.birthLevels++;nBirth++;continue}
     ok(e.post>=l&&2*e.b-e.C<l,"actual positive record ascent");
+    if(literal<128){let k=last.i;while(k<last.idx&&F[k].post<l)k++;ok(k<last.idx&&F[k].C===e.C&&F[k].v===e.v,"independent literal first recorded attainment");literal++;}
+    const sk=[e.C,e.b,e.v,e.p].join(',');let slot=physical.get(sk);if(!slot){slot={key:sk,w:0,src:new Set(),pairLevels:0};physical.set(sk,slot)}slot.w+=w;slot.pairLevels++;for(const M of a.ids)slot.src.add(M);
     let d=e.post-(2*e.b-e.C);ok(d>0,"positive recorded drift");
     if(e.v<entryTimes.get(l))R.strict+=w;else R.atEntry+=w;
     R.record+=w;R.recordLevels++;nRecord++;
@@ -99,7 +101,7 @@ function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
  if(!Number.isFinite(stats.minPost))stats.minPost=null;if(!Number.isFinite(stats.minBirth))stats.minBirth=null;
  const sc=new Map();for(const [k,w] of role){const M=Number(k.split('|')[0]);sc.set(M,(sc.get(M)||0)+1);if(w<=1+1e-9)R.paid1+=w;else R.res1+=w;if(w<=8+1e-9)R.paid8+=w;else R.res8+=w}
  for(const [M,n] of sc){let p=sourcePaths.get(M);ok(n<=2*(p.end-p.s),"actual stationary upcross token budget")}
- R.tokens=role.size;R.recordKeys=rkeys.size;
+ R.tokens=role.size;R.recordKeys=rkeys.size;R.literal=literal;R.physical=[...physical.values()].map(g=>({key:g.key,w:g.w,n:g.src.size,pairLevels:g.pairLevels})).sort((a,b)=>b.w-a.w);
  ok(close(R.eligible,R.initial+R.record)&&close(stats.lift,R.eligible+R.unsafe)&&close(R.record,R.strict+R.atEntry)&&close(R.record,R.paid1+R.res1)&&close(R.record,R.paid8+R.res8)&&R.initial<=432*R.birthStock+1e-6&&R.record<=1296*R.recordEnergy+1e-6,"record ledger");
  return {...stats,R};
 }
