@@ -9,14 +9,14 @@ function audit(X,mode='diagnostic'){
   spf[p]=p;if(p*p<spf.length)for(let j=p*p;j<spf.length;j+=p)if(!spf[j])spf[j]=p;
  }
  let L=2,y=2;for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*S**.25)break;L*=p;y=p;}
- const T=mode==='degree'?4:mode==='diagnostic'?6:Math.ceil(20*ell),g=Math.max(2,T*L),
+ const T=mode==='degree'?4:(mode==='diagnostic'||mode==='wide')?6:Math.ceil(20*ell),g=Math.max(2,T*L),
   kg=mode==='analytic'?Math.floor(1.5*ell/Math.log(g)):5,
   k=mode==='analytic'?Math.floor(ell/(8*Math.log(g))):3,
-  P=mode==='analytic'?Math.ceil(B/Math.log(B)**.125):Math.ceil(B/4),
+  P=mode==='analytic'?Math.ceil(B/Math.log(B)**.125):Math.ceil(B/(mode==='wide'?8:4)),
   tau=mode==='analytic'?Math.log(B)**1.5:12,
   Z=mode==='analytic'?Math.log(B)**1.5:12,
   near=mode==='analytic'?Math.floor(4*Math.log(B)):Math.max(2,Math.floor(B/64));
- const A=mode==='analytic'?Math.floor(Math.log(B)**.125):Math.max(2,Math.floor(P/8)), capDiff=mode==='analytic'?Math.log(B)**3.5:256,capSame=mode==='analytic'?Math.log(B)**2.5:144;
+ const A=mode==='analytic'?Math.floor(Math.log(B)**.125):Math.max(2,Math.floor(P/(mode==='wide'?2:8))), capDiff=mode==='analytic'?Math.log(B)**3.5:256,capSame=mode==='analytic'?Math.log(B)**2.5:144;
  const lo=X,hi=7*X/2-1,len=hi+1,r=new Int32Array(len),d=new Uint8Array(len),paths=[],horizons=new Map();
  const gBound=(L/2)*Array.from({length:kg+1},(_,i)=>(T*L/2)**i).reduce((s,v)=>s+v,0),
   kBound=(L/2)*Array.from({length:k+1},(_,i)=>(T*L/2)**i).reduce((s,v)=>s+v,0)*Math.floor(2*Math.log(U)/Math.log(P));
@@ -128,6 +128,27 @@ function audit(X,mode='diagnostic'){
   return {x,n2,cell2,pairs,mass,maxCells,weightedCells};
  });
  for(const v of internal)ok(v.pairs*v.x*v.x*B/48<=h*EK+1e-6*Math.max(1,EK),'internal energy lower bound aggregate');
+ let oracle=0,oracleMinRatio=Infinity;
+ if(X<=16384){
+  const byM=new Map(paths.map(p=>[p[0].M,p]));
+  for(const an of aa)for(let i=0;i<an.tags.length;i++)for(let j=0;j<i;j++){
+   const a0=an.tags[i],b0=an.tags[j],tail=Math.min(a0.tail,b0.tail);
+   if(!tail)continue;
+   const x=2**(-Math.max(0,Math.ceil(Math.log2(B/tail)-1e-12)));
+   if(Math.abs(a0.M-b0.M)>x*B+1e-9)continue;
+   const p=byM.get(a0.M),q=byM.get(b0.M);let k=p.findIndex(e=>e.C===an.J),l=q.findIndex(e=>e.C===an.J),overlap=0,rs=0,ee=0;
+   ok(k>=0&&l>=0,'anchor oracle start');
+   while(k<p.length&&l<q.length){
+    const u=p[k++],v=q[l++];ok(u.C===v.C&&u.t===v.t,'anchor common physical suffix');
+    if(u.cost&&v.cost){
+     const a1=Math.max(u.t,u.M+2+a),b1=Math.max(v.t,v.M+2+a),w=Math.max(0,Math.min(a1+2*u.cost,b1+2*v.cost)-Math.max(a1,b1));
+     const rr=r[u.C/2];overlap+=w;if(w)rs+=rr;ee+=2*rr*u.w*v.w;
+    }
+   }
+   ok(overlap>=x*B-1e-8&&rs<=24*B,'overlap and gain budget');
+   ok(ee>=x*x*B/48-1e-8,'internal pair actual energy');oracle++;oracleMinRatio=Math.min(oracleMinRatio,ee/(x*x*B/48));
+  }
+ }
  const names=['prior','thinLayer','imbalance','rest'],counts=Array(4).fill(0),energy=counts.slice();
  const allCounts=[0,0,0,0],allEnergy=[0,0,0,0],per=xs.map(x=>({x,thinPairs:0,imbPairs:0,thinEnergy:0,imbEnergy:0,thinBudget:0,imbBudget:0}));
  let pairs=0,contacts=0,bothThick=0,bothThickImb=0,oldCapExtra=0,closeEnergy=0,zeroTail=0,priorEnergy=0,priorResidual=0,layerThinExtra=0,layerImbExtra=0;
@@ -192,7 +213,7 @@ function audit(X,mode='diagnostic'){
  }
  ok(Math.abs(EK-diag-energy.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,EK),'exact energy partition');
  ok(pairs===counts.reduce((s,v)=>s+v,0),'pair partition');
- return {X,B,mode,P,A,thin,Kimb,z,h,D,Dbound,anchors:aa.length,edges,highHits,removed,kept,events,literal,E,EK,RK,diag,pairs,contacts,uniqueContacts:anchorContact.size,zeroTail,bothThick,bothThickImb,oldCapExtra,layerThinExtra,layerImbExtra,closeEnergy,counts,energy,allCounts,allEnergy,thinBudget,imbBudget,thinTheory,imbTheory,per:per.filter(p=>p.thinPairs||p.imbPairs),internal:internal.slice(0,5)};
+ return {X,B,mode,P,A,oracle,oracleMinRatio:Number.isFinite(oracleMinRatio)?oracleMinRatio:null,thin,Kimb,z,h,D,Dbound,anchors:aa.length,edges,highHits,removed,kept,events,literal,E,EK,RK,diag,pairs,contacts,uniqueContacts:anchorContact.size,zeroTail,bothThick,bothThickImb,oldCapExtra,layerThinExtra,layerImbExtra,closeEnergy,counts,energy,allCounts,allEnergy,thinBudget,imbBudget,thinTheory,imbTheory,per:per.filter(p=>p.thinPairs||p.imbPairs),internal:internal.slice(0,5)};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree','wide'])console.log(JSON.stringify(audit(X,mode)));
