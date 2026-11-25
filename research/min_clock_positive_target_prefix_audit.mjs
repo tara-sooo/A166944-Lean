@@ -77,6 +77,107 @@ function prefixAudit(uses,B,expected,ok,close,eta=1/4){
  ok(z.old<=192/eta*z.maxOverlap*(12*z.oldNatural+2*z.oldDrop)+1e-6,"old upstream transport");
  return {...z,details:[...slots.values()]};
 }
+function allocateStrips(I,ok){
+ const sorted=I.slice().sort((a,b)=>a.hi-b.hi),use=new Map();let sum=0,union=0,end=-Infinity,max=0;
+ for(const a of sorted){
+   ok(a.hi>a.lo&&a.hi-a.lo<=Math.ceil(a.r/2),"strip length");
+   sum+=a.hi-a.lo;
+ }
+ for(let i=1;i<sorted.length;i++)ok(sorted[i].hi>=sorted[i-1].hi+sorted[i-1].r-1,"disjoint forward target gains");
+ for(const a of I.slice().sort((a,b)=>a.lo-b.lo)){
+   union+=Math.max(0,a.hi-Math.max(a.lo,end));end=Math.max(end,a.hi);
+ }
+ ok(sum<=2*union,"backward strip union packing");
+ for(const a of sorted){
+   let need=a.hi-a.lo;a.parts=[];
+   for(let k=a.lo;k<a.hi&&need;k++){
+     let n=Math.min(need,2-(use.get(k)||0));if(!n)continue;
+     use.set(k,(use.get(k)||0)+n);max=Math.max(max,use.get(k));need-=n;a.parts.push({k,n});
+   }
+   ok(need===0,"capacity-two interval allocation");
+ }
+ return {sum,union,max};
+}
+function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
+ const z={eta,raw:0,positive:0,low:0,old:0,recent:0,oldNatural:0,oldDrop:0,oldPositiveGain:0,oldNonpositiveGain:0,oldSmallGain:0,oldLargeGain:0,oldMass:0,recentBirth:0,recentNonTop:0,recentTop:0,recentNonTopBirth:0,recentTopBirth:0,checks:0,oldCount:0,recentCount:0,lowCount:0,maxBirthGain:0,maxBandOverlap:0,maxOverlap:0,maxRecentSum:0,maxNonTopSum:0,stripLength:0,keys:0,topCut:B/2,lowNatural:0,oldKeys:0,earliestBirths:0};
+ const pairs=new Map(),strips=new Map(),upstream=new Map(),slots=new Map();let packed=0,union=0,maxAllocated=0,allocationCharge=0,allocPositive=0,allocNonpositive=0,allocSmall=0,allocLarge=0,allocNatural=0,allocDrop=0;
+ // Use integer strip length h=ceil(eta*r/16); with rounding,
+ // the exact recent high-birth comparison includes +5 and is checked below.
+ for(const u of uses){
+   const A=u.a.P.records,Q=u.b.P.records,idx=A.findIndex((e,i)=>i>u.a.k&&e.C===u.recipient),jdx=Q.findIndex((e,i)=>i>u.b.k&&e.C===u.recipient),T=A[idx],V=Q[jdx];
+   ok(idx>u.a.k&&jdx>u.b.k&&T.C===V.C&&T.b===V.b&&T.v===V.v,"actual target");
+   const r=T.r,w=T.v-T.b,p=T.p,delta=2*w-(p-1),D=u.d-6,x=u.w*B/r,c=u.w*D;
+   z.raw+=c;if(delta<=0)continue;z.positive+=c;
+   const pk=Math.min(u.a.P.M,u.b.P.M)+','+Math.max(u.a.P.M,u.b.P.M),key=pk+'|'+T.C;
+   ok(!strips.has(key),"distinct pair target");strips.set(key,1);
+   let i=idx,j=jdx;
+   while(i>0&&j>0&&A[i-1].C===Q[j-1].C&&A[i-1].b===Q[j-1].b&&A[i-1].v===Q[j-1].v){i--;j--;}
+   const S=A[i],S1=Q[j],J=S.C,t=S.b,db=2*t-J,G=T.C-J;
+   ok(S.C===S1.C&&S.b===S1.b&&S.v===S1.v&&i<=u.a.k+1&&j<=u.b.k+1,"actual common recorded start");
+   // u.F is the actual first physical contact. No previous shared recorded state
+   // can be before that contact. The first common recorded state is either F or
+   // the next event after F (possibly the end of a differing-arrival wait).
+   ok(t>=u.F.t&&(t===u.F.t||A[i-1].v===t&&Q[j-1].v===t),"first common recorded state after true contact");
+   if(t>u.F.t)ok(i>0&&j>0&&A[i-1].C===u.F.C&&Q[j-1].C===u.F.C&&Math.max(A[i-1].b,Q[j-1].b)===u.F.t,"first shared recorded departure");
+   if(!pairs.has(pk))pairs.set(pk,{J,t,db,top:0,nontop:0,charge:0,topCharge:0,nonTopCharge:0,intervals:[]});
+   const a=pairs.get(pk);ok(a.J===J&&a.t===t&&a.db===db,"unique pair recorded birth");z.checks++;z.maxBirthGain=Math.max(z.maxBirthGain,G);
+   const sk=T.C+','+T.b+','+T.v;if(!slots.has(sk))slots.set(sk,{C:T.C,b:T.b,v:T.v,r,p,w,raw:0,old:0,recent:0,low:0,birthMin:Infinity,birthMax:0,gapMin:Infinity,gapMax:0,pairs:0});
+   const s=slots.get(sk);s.raw+=c;s.pairs++;s.birthMin=Math.min(s.birthMin,db);s.birthMax=Math.max(s.birthMax,db);s.gapMin=Math.min(s.gapMin,G);s.gapMax=Math.max(s.gapMax,G);
+   const e=w*w/(2*r);
+   if(D<=0){z.low+=c;z.lowCount++;s.low+=c;z.lowNatural+=x*e;ok(c<=18*eta*x*e+1e-7,"low anchor deficit transfer");continue}
+   const h=Math.max(1,Math.ceil(Math.min(r/2,D/10)));
+   if(G<h){
+     const anchor=A[u.a.k].C+A[u.a.k].p-1;
+     ok(anchor>=J&&anchor<=T.C&&u.d-db<=5*(anchor-J)&&D>0,"recent common birth deficit");
+     ok(D<=db+5*G&&db>D/2,'adaptive recent high birth');
+     // G<h and G integer imply G<eta*r/16 (ceil); so no rounding loss.
+     ok(D<=2*db+1e-7,'adaptive birth-relative charge');
+     z.recent+=c;s.recent+=c;z.recentCount++;a.charge+=c;
+     if(r<=B/2){a.nontop+=r/B;a.nonTopCharge+=c;z.recentNonTop+=c}
+     else{a.top+=r/B;a.topCharge+=c;z.recentTop+=c}
+     continue
+   }
+   z.old+=c;s.old+=c;z.oldCount++;z.stripLength+=h;
+   const lo=T.C-h,hi=T.C,band=Math.floor(Math.log2(r)),coeff=c/h;
+   ok(lo>=J&&coeff<=48+1e-7,"old backward strip density");
+   a.intervals.push({lo,hi,band,r,c,coeff,A,i,idx,pk});
+   let covered=0;for(let k=i;k<idx;k++){
+     const E=A[k],F=Q[j+k-i],g=E.p-1,H=E.C+g;
+     ok(E.C===F.C&&E.b===F.b&&E.v===F.v&&E.p===F.p,"actual upstream shared edge");
+     const l=Math.max(lo,E.C),v=Math.min(hi,H),n=Math.max(0,v-l);if(!n)continue;
+     covered+=n;const f=n/g,ee=(E.v-E.b)**2/(2*E.r),dd=Math.max(0,g-2*(E.v-E.b));
+     ok(g<=12*ee+2*dd+1e-7,"upstream selected gain coercivity");
+     z.oldMass+=coeff*n;
+     if(E.post>2*E.b-E.C)z.oldPositiveGain+=coeff*n;else z.oldNonpositiveGain+=coeff*n;
+     if(E.p<r/4)z.oldSmallGain+=coeff*n;else z.oldLargeGain+=coeff*n;
+     let k0=pk+'|'+E.C,up=upstream.get(k0);if(!up){up={g,ee,dd,weight:0,parts:[]};upstream.set(k0,up)}ok(up.g===g&&close(up.ee,ee)&&up.dd===dd,"unique upstream physical pair edge");
+     up.weight+=f;up.parts.push({lo:l,hi:v,band});
+   }
+   ok(covered===h,"backward strip exactly covered");
+ }
+ for(const a of pairs.values()){
+   z.maxRecentSum=Math.max(z.maxRecentSum,a.top+a.nontop);z.maxNonTopSum=Math.max(z.maxNonTopSum,a.nontop);
+   ok(a.charge<=2*a.db*(a.top+a.nontop)+1e-6&&a.nonTopCharge<=2*a.db*a.nontop+1e-6,"recent birth total");
+   // All recent target starts lie in [J,J+eta B/16). Their outgoing gains
+   // are disjoint; except last, they are inside that interval.
+   ok(a.top+a.nontop<=1.75+1e-7,"recent gain packing");
+   ok(a.nontop<=.875+1e-7,"non-top recent gain packing");
+   if(a.charge){z.recentBirth+=a.db;z.recentNonTopBirth+=a.nonTopCharge>0?a.db:0;z.recentTopBirth+=a.topCharge>0?a.db:0;z.earliestBirths++}
+   const pack=allocateStrips(a.intervals,ok);packed+=pack.sum;union+=pack.union;maxAllocated=Math.max(maxAllocated,pack.max);
+   for(const I of a.intervals){let k=I.i;for(const part of I.parts){while(I.A[k].C+I.A[k].p-1<=part.k)k++;let e=I.A[k],gain=e.p-1;ok(k<I.idx&&e.C<=part.k&&part.k<e.C+gain,'allocated earlier actual edge');let c=I.coeff*part.n;allocationCharge+=c;if(e.post>2*e.b-e.C)allocPositive+=c;else allocNonpositive+=c;if(e.p<I.r/4)allocSmall+=c;else allocLarge+=c;let u=upstream.get(I.pk+'|'+e.C);ok(u,'allocated supporting edge');u.allocated=(u.allocated||0)+part.n;}}
+   let events=[];for(const I of a.intervals)events.push([I.lo,1,I.band],[I.hi,-1,I.band]);
+   events.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);let active=0,by=new Map();
+   for(const [t,s,b] of events){active+=s;by.set(b,(by.get(b)||0)+s);z.maxBandOverlap=Math.max(z.maxBandOverlap,by.get(b));z.maxOverlap=Math.max(z.maxOverlap,active);ok(by.get(b)<=1,"disjoint same dyadic band strips")}
+ }
+ for(const u of upstream.values()){
+   ok(u.weight<=z.maxOverlap+1e-7&&(!u.allocated||u.allocated<=2*u.g),'upstream allocated capacity');if(u.allocated){allocNatural+=u.ee;allocDrop+=u.dd;}
+   z.oldNatural+=u.ee;z.oldDrop+=u.dd;
+ }
+ z.keys=slots.size;z.oldKeys=upstream.size;
+ ok(close(z.raw,expected)&&close(z.positive,z.low+z.old+z.recent)&&close(z.old,z.oldMass)&&close(z.old,z.oldPositiveGain+z.oldNonpositiveGain)&&close(z.old,z.oldSmallGain+z.oldLargeGain)&&close(z.recent,z.recentNonTop+z.recentTop),"complete prefix ledger");
+ ok(close(allocationCharge,z.old)&&close(allocPositive+allocNonpositive,z.old)&&close(allocSmall+allocLarge,z.old)&&z.old<=96*(12*allocNatural+2*allocDrop)+1e-6,'constant old upstream transport');
+ return {...z,packed,union,maxAllocated,allocationCharge,allocPositive,allocNonpositive,allocSmall,allocLarge,allocNatural,allocDrop,details:[...slots.values()]};
+}
 // Rough target RESET/nonreset and near-neutral entry phase audit.
 function targetPhaseAudit(uses,X,B,L,y,rr,expected,ok,close){
  const epsilons=[1/16,1/4,1/2],bands=epsilons.map(eps=>({eps,raw:0,strong:0,near:0,strongDrop:0,nearNatural:0,nearKeys:new Map(),minWait:Infinity}));
@@ -755,7 +856,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  ok(shared<=globalBound+1e-7,"global upstream moment");ok(close(scaledTotal,scaledDiag+2*(scaledShared+scaledInherited))&&close(scaledUpstream,scaledUnweightedShared)&&scaledShared<=scaledUnweightedShared+1e-7&&scaledUnweightedShared<=12*maxReuseR*weightedKeyEnergy+1e-7,'global gain-weighted shared moment');
  ok(nearMoment<=nearBound+1e-7&&close(nearBound,4*(nearDiagonal+2*nearShared)),'near-origin band quadratic bound');
  const exit=exitAudit(exitUses,B,scaledShared+scaledInherited,ok,close),phase=targetPhaseAudit(exitUses,X,B,L,y,rr,scaledShared+scaledInherited,ok,close);
- return {L,y,R,raw,anchors:groups.size,exit,phase,prefix:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/4),prefixWide:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/2),scaledShared,scaledInherited,scaledDiag,scaledTotal};
+ return {L,y,R,raw,anchors:groups.size,exit,phase,prefix:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/4),prefixWide:prefixAudit(exitUses,B,scaledShared+scaledInherited,ok,close,1/2),adaptive:adaptiveAudit(exitUses,B,scaledShared+scaledInherited,ok,close),scaledShared,scaledInherited,scaledDiag,scaledTotal};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
@@ -1279,4 +1380,5 @@ function audit(X,stress=true,scaleCap=4,entropyCap=1,fComp=null){
  const ascent=ledgers.map(g=>ascentAudit(g,X,B,L,y,paths,rr,ok,close)),ascentLow3=ledgers.map(g=>ascentAudit(g,X,B,6,3,paths,rr,ok,close));
  return {X,B,L,y,rmin,f,m,scaleCap,entropyCap,entropy,recipient,ascent,ascentLow3,firstContact,clock,roughVisits,slots:slots.size,checks,maxRoots,totalQuery,totalEdges,totalStationary,out};
 }
+{const test=[];let C=100;for(let i=0;i<8;i++){let r=3*4**i+2;test.push({lo:C-Math.ceil(r/2),hi:C,r});C+=r-1}allocateStrips(test,(x,msg)=>{if(!x)throw Error(msg)});}
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[4096,16384,65536]))console.log(JSON.stringify(audit(X,true,16,8)));
