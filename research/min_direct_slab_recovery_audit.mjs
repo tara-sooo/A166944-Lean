@@ -68,7 +68,7 @@ function audit(N=50000,steps=180){
    s.tailChecks++;
   }
   s.marks+=marks.length;s.goodMarks+=good.length;s.badMarks+=bad;s.unfinishedSlabs+=unfinished;s.resetHits+=resetHits;s.highHits+=highHits;s.weightedChecks++;s.rootChecks++;
-  if(witness)s.witness.push({R,beta:`${A}/${B}`,marks:marks.map(i=>ev[i].p),good:good.map(r=>Number(r.p)),bad,slabs:[...rec.values()].map(r=>r.slabs.length),weightedRequired:Number(need)/Number(den),assignedActual:Number(have)/Number(den),availableLow:Number(total)/Number(den),resetHits,highHits,unfinished});
+  if(witness)s.witness.push({R,beta:`${A}/${B}`,marks:marks.map(i=>ev[i].p),good:good.map(r=>Number(r.p)),bad,slabs:[...rec.values()].map(r=>r.slabs.length),weightedRequired:Number(need*1000000n/den)/1e6,assignedActual:Number(have*1000000n/den)/1e6,availableLow:Number(total*1000000n/den)/1e6,resetHits,highHits,unfinished});
  }
  for(let M=5;M<=N;M+=2){s.roots++;let H=2*M-2,t=M+2,ev=[],roots=[];
   for(let i=0;i<steps;i++){if(H+Math.sqrt(H+1)+30>=cap)throw Error("cap");let a=next(t,H);if(!a){s.terminal++;break}
