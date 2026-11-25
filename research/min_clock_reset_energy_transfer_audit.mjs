@@ -120,7 +120,49 @@ function audit(X,mode){
   ok(selfGood<=kappa*E+eps&&one<=2*degree*Math.sqrt(kappa)*E+eps&&both<=degree*kappa*E+eps,'absorption');
   results.push({sector,E,diag,RA,RF,asum,fsum,credit,good,goodF,goodA,lowTail,positive,certKeys,certEntries,self,selfGood,cross,one,both,sync,async,edgeHits,rest:self+cross-selfGood-one});
  }
- return {X,B,mode,startAge,P,V,A,kappa,z,T,events,literal,R,short,eligible,fullWitness,checks,distinctWitness,keys:arr.length,edges:edges/2,degree,results};
+
+ // Weighted joint MED/HIGH energy and a distinct-window bridge. Same paths;
+ // past uses [0,H), future uses [2B,H), irrespective of the displayed mode.
+ const c=B**(-.625),bridgeCoeff=[0,c,1],lateEnergy=[0,0,0],fullEnergy=[0,0,0],AA=new Map(),FF=new Map();
+ for(const path of paths)for(let j=0;j+1<path.length;j++){
+  const e=path[j],v=path[j+1],q=r[e.C/2],s=e.M+2;
+  e.fullW=Math.max(0,Math.min(v.t,s+H)-Math.max(e.t,s))/(2*q);
+  e.lateW=Math.max(0,Math.min(v.t,s+H)-Math.max(e.t,s+2*B))/(2*q);
+ }
+ for(const a of arr){AA.set(a,0);FF.set(a,0);}
+ let maxSupport=0;
+ for(const [C,row] of at){const q=r[C/2];maxSupport=Math.max(maxSupport,row.length);
+  for(let b=1;b<nsec;b++){
+   let up=0,uf=0;const past=new Map(),future=new Map();
+   for(const e of row){if(!accept[b](e))continue;
+    const wa=e.fullW||0,wf=e.lateW||0;up+=wa;uf+=wf;
+    if(wa&&e.past){const a=e.past.a;past.set(a,(past.get(a)||0)+wa);}
+    if(wf&&e.future){const a=e.future.a;future.set(a,(future.get(a)||0)+wf);}
+   }
+   fullEnergy[b]+=q*up*up;lateEnergy[b]+=q*uf*uf;
+   let sa=0,sf=0;for(const [a,w] of past){const v=q*w*w;sa+=v;AA.set(a,AA.get(a)+bridgeCoeff[b]*v);}
+   for(const [a,w] of future){const v=q*w*w;sf+=v;FF.set(a,FF.get(a)+bridgeCoeff[b]*v);}
+   ok(sa<=q*up*up+1e-6&&sf<=q*uf*uf+1e-6,'bridge partitions');
+  }
+ }
+ const Ea=c*fullEnergy[1]+fullEnergy[2],Ef=c*lateEnergy[1]+lateEnergy[2],sumA=[...AA.values()].reduce((a,b)=>a+b,0),sumF=[...FF.values()].reduce((a,b)=>a+b,0);
+ const kk=mode==='analytic'?u*u/(B*(1+A)**2):mode==='diagnostic'?.25:1,eta=u**(-.25);
+ ok(sumA<=Ea+1e-5&&sumF<=Ef+1e-5&&Ea<=maxSupport*2*B*N+1e-5&&maxSupport<=G/4+2,'weighted bridge global bounds');
+ const good=new Set(arr.filter(a=>FF.get(a)<=kk*AA.get(a)+1e-9));
+ let self=0,cross=0,paidSelf=0,paidCross=0,oracle=0,positiveGood=0;
+ for(const a of good)positiveGood+=+(FF.get(a)>0);
+ for(const [C,row] of at){const q=r[C/2];for(let b=1;b<nsec;b++){
+   const tags=row.filter(e=>e.lateW>0&&accept[b](e)&&e.future),groups=new Map();
+   for(const e of tags){const a=e.future.a;let g=groups.get(a);if(!g){g={w:0,d:0};groups.set(a,g);}g.w+=e.lateW;g.d+=e.lateW**2;}
+   for(const [a,g] of groups){const e=bridgeCoeff[b]*q*(g.w*g.w-g.d);self+=e;if(good.has(a))paidSelf+=e;
+    for(const v of a.neighbors)if(a.id<v.id&&groups.has(v)){const w=2*bridgeCoeff[b]*q*g.w*groups.get(v).w;cross+=w;if(good.has(a)||good.has(v))paidCross+=w;}
+   }
+   for(let i=0;i<tags.length;i++)for(let j=0;j<i;j++){const a=tags[i].future.a,b0=tags[j].future.a;if(a===b0||Math.abs(a.J-b0.J)<=A)oracle+=2*bridgeCoeff[b]*q*tags[i].lateW*tags[j].lateW;}
+ }}
+ const ep=1e-6*Math.max(1,Ea,Ef);
+ ok(Math.abs(oracle-self-cross)<=ep&&paidSelf<=kk*Ea+ep&&paidCross<=2*degree*Math.sqrt(kk*Ea*Ef)+ep&&paidCross<=eta*Ef+degree*degree*kk*Ea/eta+ep,'two-window bridge and Young bound');
+ const bridge={Ea,Ef,sumA,sumF,kk,eta,maxSupport,good:good.size,positiveGood,self,cross,paidSelf,paidCross,rest:self+cross-paidSelf-paidCross};
+ return {bridge,X,B,mode,startAge,P,V,A,kappa,z,T,events,literal,R,short,eligible,fullWitness,checks,distinctWitness,keys:arr.length,edges:edges/2,degree,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','stress','early','full'])console.log(JSON.stringify(audit(X,mode)));
