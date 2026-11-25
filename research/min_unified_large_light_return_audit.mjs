@@ -1,6 +1,6 @@
 // Large-to-light return disjoint retirement and global final expiry audit.
-function audit(X,focus=false,scale=1){
- const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,Ps=[6,30,210],L=6,y=3,theta=scale*L*Math.max(2,Math.floor(Math.sqrt(B))),logTheta=Math.log(theta),bmin=3,lim=7*X+B+20,S=new Int32Array(lim);
+function audit(X,focus=false,scale=1,gainFactor=8){
+ const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(Math.floor(gainFactor*B),Math.floor(X/2)),H=T+B,Ps=[6,30,210],L=6,y=3,theta=scale*L*Math.max(2,Math.floor(Math.sqrt(B))),logTheta=Math.log(theta),bmin=3,lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(v,m)=>{if(!v)throw Error(`${X}/${focus}: ${m}`)},eq=(a,b)=>Math.abs(a-b)<1e-7*Math.max(1,Math.abs(a),Math.abs(b)),mod=(a,b)=>(a%b+b)%b, key=(a,b)=>Math.min(a,b)+"|"+Math.max(a,b);
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
  function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
@@ -58,7 +58,7 @@ function audit(X,focus=false,scale=1){
  }
  const cache=new Map();function meet(a,b){let k=key(a.tag.id,b.tag.id),q=cache.get(k);if(q)return a.tag.id<b.tag.id?q:[q[1],q[0],q[2]];let x=a.tag.es,y=b.tag.es,i=0,j=0;while(i<x.length&&j<y.length){let u=x[i],v=y[j];if(u.C<v.C){i++;continue}if(v.C<u.C){j++;continue}let t=Math.max(u.t,v.t);if(t<=Math.min(u.end,v.end)){q=[u,v,t];cache.set(k,a.tag.id<b.tag.id?q:[v,u,t]);return q}i++;j++}throw Error("missing birth")}
  function occupied(e,C,t){let x=e.tag.byC.get(C);return x&&x.i<=e.i&&x.t<=t&&t<=x.end?x:null}
- let groups=new Map(),sourceChecks=0,lightPairs=0,bothPairs=0,mixedPairs=0,oldPairs=0,sourceMovingPairs=0,expiryChecks=0,mixedSmall=0,mixedLarge=0,sourceCohorts=0;
+ let globalGroups=new Map(),globalAge=.05*H,globalMixedPairs=0,globalAtomChecks=0;let groups=new Map(),sourceChecks=0,lightPairs=0,bothPairs=0,mixedPairs=0,oldPairs=0,sourceMovingPairs=0,expiryChecks=0,mixedSmall=0,mixedLarge=0,sourceCohorts=0;
  let rows=Ps.map(P=>({P,mixed:0,both:0,light:0,old:0,expiryCap:0,oldCap:0,expiryKeys:0,resetKeys:0,sourceMoving:0,sourceMovingCap:0,mixedSmall:0}));
  for(let a of slots.values()){let b=a.length;if(b<bmin)continue;sourceCohorts++;let e=a[0],mv=a.filter(f=>f.moving).length,exp=new Map(),expCount=0;
   for(let f of a){let x=f.finalExp,k=x.C+"|"+x.end,g=exp.get(k)||{C:x.C,t:x.end,n:0};g.n++;exp.set(k,g)}
@@ -71,7 +71,15 @@ function audit(X,focus=false,scale=1){
    mixed++;mixedPairs++;let m=u.moving?f:h,o=u.moving?h:f,x=m.finalExp,me=u.moving?u:v;ok(x.i>=me.i&&x.i<m.i,"expiry after birth before source");
    let y0=occupied(o,x.C,x.end);ok(y0&&!y0.moving&&y0.v===x.v&&y0.p===x.p,"old partner at expiry");let xn=x.tag.es[x.i+1],yn=y0.tag.es[y0.i+1];ok(!xn.moving&&!yn.moving&&xn.C===yn.C&&xn.t===yn.t&&x.p>y,"expiry poststate");
    let k=x.C+"|"+x.p+"|"+x.v,g=groups.get(k);if(!g){let all=slots.get(k),fresh=all.filter(f=>f.moving&&!f.tag.es[f.i+1].moving),older=all.filter(f=>!f.moving&&!f.tag.es[f.i+1].moving);g={x,fresh,older,load:Ps.map(()=>0)};groups.set(k,g)}
-   ok(g.fresh.includes(x)&&g.older.includes(y0),"actual expiry branch sets");let q=counts.get(k)||{g,n:0};q.n++;counts.set(k,q);expiryChecks++;
+   ok(g.fresh.includes(x)&&g.older.includes(y0),"actual expiry branch sets");
+   if(b>=largeCut&&!resetTags.has(m.tag.id)&&!resetTags.has(o.tag.id)){
+     ok(m.tag.lastExpiry===x&&o.tag.lastExpiry&&o.tag.lastExpiry.i<y0.i,"global final pair expiry");
+     let g0=globalGroups.get(k)||{g,loads:Ps.map(()=>0)};globalGroups.set(k,g0);globalMixedPairs++;
+     for(let jj=0;jj<Ps.length;jj++){let P=Ps[jj];for(let K=P*Math.ceil(e.C/P);K<e.J;K+=P){
+       if(K<x.J+globalAge||K<o.tag.lastExpiry.J+globalAge||K>m.tag.es.at(-1).C-globalAge||K>o.tag.es.at(-1).C-globalAge)continue;
+       g0.loads[jj]+=2*P/b;globalAtomChecks++;
+     }}
+   }let q=counts.get(k)||{g,n:0};q.n++;counts.set(k,q);expiryChecks++;
    let n=a.filter(f=>{let z=occupied(f,x.C,x.end);return z&&!z.moving}).length;if(n<=b/2){small++;mixedSmall++;let id=m.tag.id;byTag.set(id,(byTag.get(id)||0)+1)}else mixedLarge++;
   }
   ok(both<=expCount&&small<=b*b/2+1e-7&&[...byTag.values()].every(n=>n<=b/2),"expiry pair counts");
@@ -87,7 +95,20 @@ function audit(X,focus=false,scale=1){
    ok(w<=cap+1e-7&&cap<=old+1e-7,"expiry lifetime cap");sum+=w;z.expiryCap+=cap;z.oldCap+=old;z.expiryKeys++;if(k===0)z.resetKeys++;
   }ok(eq(sum,z.mixed)&&z.sourceMoving<=z.sourceMovingCap+1e-7,"global mixed conservation");for(let k of Object.keys(z))z[k]=+z[k].toFixed(6)
  }
- return {X,focus,scale,lightCut,largeCut,returnKeys:returns.size,returnInc,resetTags:resetTags.size,retired:retired.size,largeVisitChecks,retireChecks,returnSlotChecks,finalSourceChecks,globalFinalChecks,B,T,N:tags.length,events,hit,theta,moving,oldMoving,newOnly,oldOnly,maxMoving,scoreChecks,witnessChecks,kraftChecks,maxKraft,rootWitnesses,ordinaryWitnesses,expiries,reset,sourceCohorts,sourceChecks,lightPairs,bothPairs,mixedPairs,oldPairs,sourceMovingPairs,expiryChecks,mixedSmall,mixedLarge,keys:groups.size,rows}
+ let globalAudit=Ps.map((P,j)=>{let actual=0,cap=0,linear=0,checks=0;
+  for(let {g,loads} of globalGroups.values()){
+   let a=g.fresh.filter(f=>!resetTags.has(f.tag.id)&&f.tag.lastExpiry===f),b=g.older.filter(f=>!resetTags.has(f.tag.id)&&f.tag.lastExpiry&&f.tag.lastExpiry.i<f.i),z=0;
+   for(let K=P*Math.ceil((g.x.J+globalAge)/P);K<g.x.J+H;K+=P){let x=a.filter(f=>K<=f.tag.es.at(-1).C-globalAge).length,y=b.filter(f=>K>=f.tag.lastExpiry.J+globalAge&&K<=f.tag.es.at(-1).C-globalAge).length;z+=2*P*x*y/Math.max(largeCut,x+y)}
+   ok(loads[j]<=z+1e-7,"global final-expiry harmonic cap");actual+=loads[j];cap+=z;checks++;
+  }
+  for(let t of tags){if(resetTags.has(t.id)||!t.lastExpiry||t.es.at(-1).moving)continue;linear+=2*(Math.max(0,t.es.at(-1).C-t.lastExpiry.J-2*globalAge)+P)}
+  ok(cap<=linear+1e-7,"global disjoint final-life sum");
+  return {P,actual:+actual.toFixed(6),cap:+cap.toFixed(6),linear:+linear.toFixed(6),checks}
+ });
+ return {globalAudit,globalMixedPairs,globalAtomChecks,X,focus,scale,gainFactor,lightCut,largeCut,returnKeys:returns.size,returnInc,resetTags:resetTags.size,retired:retired.size,largeVisitChecks,retireChecks,returnSlotChecks,finalSourceChecks,globalFinalChecks,B,T,N:tags.length,events,hit,theta,moving,oldMoving,newOnly,oldOnly,maxMoving,scoreChecks,witnessChecks,kraftChecks,maxKraft,rootWitnesses,ordinaryWitnesses,expiries,reset,sourceCohorts,sourceChecks,lightPairs,bothPairs,mixedPairs,oldPairs,sourceMovingPairs,expiryChecks,mixedSmall,mixedLarge,keys:groups.size,rows}
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
 console.log(JSON.stringify(audit(65536,false,2)));
+console.log(JSON.stringify(audit(65536,false,.25,2)));
+console.log(JSON.stringify(audit(65536,false,.5,2)));
+console.log(JSON.stringify(audit(65536,false,1,2)));
