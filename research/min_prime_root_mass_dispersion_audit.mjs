@@ -37,7 +37,7 @@ function audit(X,mode){
  for(const [M,{ar,cost}] of roots){if(candRoot[2*M-2])relaxed++;if(ar.some(e=>e.depth<=k&&heavy[e.C])){ok(candRoot[2*M-2],"actual root reverse containment");removed.add(M);removedR+=cost;removedWitness+=ar.filter(e=>e.depth<=k&&heavy[e.C]).length;}}
  ok(removed.size<=relaxed,"candidate cap");
  const W0=new Map(),W1=new Map(),W2=new Map(),W3=new Map();
- let diag0=0,diag1=0,thin0=0,thin1=0,thinHits0=0,thinHits1=0,disp=0,dispHits=0,finalR=0,E0=0,E1=0,E2=0,E3=0,cellE0=0,cellE1=0,dispE0=0,dispE1=0,dispCellE0=0,dispCellE1=0,support=0,thinBound0=0,thinBound1=0,fullSupport=0,nFinalHorizons=0,maxCells0=0,maxCells1=0,maxCellMass0=0,maxCellMass1=0;
+ let diag0=0,diag1=0,thin0=0,thin1=0,thinHits0=0,thinHits1=0,disp=0,dispHits=0,finalR=0,E0=0,E1=0,E2=0,E3=0,cellE0=0,cellE1=0,dispE0=0,dispE1=0,dispCellE0=0,dispCellE1=0,support=0,thinBound0=0,thinBound1=0,fullSupport=0,nFinalHorizons=0,concentratedMany=0,concentratedManyClock=0,maxCells0=0,maxCells1=0,maxCellMass0=0,maxCellMass1=0;
  const bin=(M,d)=>Math.floor((M-X)/d),groups=(es,d)=>{const m=new Map();for(const e of es){const j=bin(e.M,d);if(!m.has(j))m.set(j,[]);m.get(j).push(e);}return m;};
  for(const [C,es] of horizons){
    const full=es.filter(e=>e.p>=Q);if(!full.length)continue;const r=full[0].r;ok(full.every(e=>e.r===r),"common r");W0.set(C,full.length);E0+=r*full.length**2;diag0+=r*full.length;fullSupport+=r;
@@ -50,13 +50,16 @@ function audit(X,mode){
    if(!a1.length)continue;W2.set(C,a1.length);E2+=r*a1.length**2;
    const g0=groups(a1,d0),g1=groups(a1,d1);ok([...g0.values()].every(a=>a.length>m0)&&[...g1.values()].every(a=>a.length>m1),"nested thickness");
    maxCells0=Math.max(maxCells0,g0.size);maxCells1=Math.max(maxCells1,g1.size);
-   if(g0.size<=K0||g1.size<=K1){
+   const s0=[...g0.values()].reduce((s,a)=>s+a.length**2,0),s1=[...g1.values()].reduce((s,a)=>s+a.length**2,0),sq=a1.length**2;
+   ok(sq<=g0.size*s0&&sq<=g1.size*s1,"effective cell count bounded by actual count");
+   if(sq<=K0*s0||sq<=K1*s1){
+     if(g0.size>K0&&g1.size>K1){concentratedMany++;concentratedManyClock+=r*a1.length;}
      disp+=r*a1.length;dispHits+=a1.length;
-     if(g0.size<=K0){dispE0+=r*a1.length**2;dispCellE0+=r*[...g0.values()].reduce((s,a)=>s+a.length**2,0);}
+     if(sq<=K0*s0){dispE0+=r*a1.length**2;dispCellE0+=r*[...g0.values()].reduce((s,a)=>s+a.length**2,0);}
      else{dispE1+=r*a1.length**2;dispCellE1+=r*[...g1.values()].reduce((s,a)=>s+a.length**2,0);}
      continue;
    }
-   W3.set(C,a1.length);E3+=r*a1.length**2;finalR+=r*a1.length;nFinalHorizons++;for(const a of a1)a.keep=true;
+   ok(sq>K0*s0&&sq>K1*s1,"effective dispersion residual");W3.set(C,a1.length);E3+=r*a1.length**2;finalR+=r*a1.length;nFinalHorizons++;for(const a of a1)a.keep=true;
    maxCellMass0=Math.max(maxCellMass0,...[...g0.values()].map(a=>a.length));maxCellMass1=Math.max(maxCellMass1,...[...g1.values()].map(a=>a.length));
  }
  ok(thin0<=thinBound0&&thin1<=thinBound1&&dispE0<=K0*dispCellE0&&dispE1<=K1*dispCellE1&&dispCellE0<=cellE0&&dispCellE1<=cellE1,"cell upper bounds");
@@ -77,6 +80,6 @@ function audit(X,mode){
  ok(first[1]<=shallow*H&&shallowRecentHeavyKept===0,"mixed whole-pair count");
  ok(E0===diag0+en.reduce((s,n)=>s+n,0)&&E1===diag1+en[1]+en[2]&&E3===finalR+finalEn[1]+finalEn[2],"pair energy oracle");
  ok(cellE0===diag1+nearE0&&cellE1===diag1+nearE1&&nearE0<=3*(T+B)*nearPairs0&&nearE1<=3*(T+B)*nearPairs1,"same cell pair budget");
- return {mode,X,B,T,Q,P,L,h,k,w,H,d0,d1,m0,m1,K0,K1,N,R,G,events,visits,literal,cross,twins,recent,positiveRecent,highArrivals,shallow,nHeavy,maxRecentMass,degExc,edgeMass,layers,edges,relaxed,removed:removed.size,removedR,removedWitness,pairs,independentMixed,positiveMixed,shallowRecentHeavy,shallowRecentHeavyKept,first,en,finalEn,budget,diag0,diag1,E0,E1,E2,E3,thin0,thin1,thinHits0,thinHits1,disp,dispHits,dispE0,dispE1,cellE0,cellE1,nearPairs0,nearPairs1,finalR,nFinalHorizons,maxCells0,maxCells1,maxCellMass0,maxCellMass1};
+ return {mode,X,B,T,Q,P,L,h,k,w,H,d0,d1,m0,m1,K0,K1,N,R,G,events,visits,literal,cross,twins,recent,positiveRecent,highArrivals,shallow,nHeavy,maxRecentMass,degExc,edgeMass,layers,edges,relaxed,removed:removed.size,removedR,removedWitness,pairs,independentMixed,positiveMixed,shallowRecentHeavy,shallowRecentHeavyKept,first,en,finalEn,budget,diag0,diag1,E0,E1,E2,E3,thin0,thin1,thinHits0,thinHits1,disp,dispHits,dispE0,dispE1,cellE0,cellE1,nearPairs0,nearPairs1,finalR,nFinalHorizons,concentratedMany,concentratedManyClock,maxCells0,maxCells1,maxCellMass0,maxCellMass1};
 }
 const xs=process.argv.slice(2).map(Number);for(const mode of ['short','four','gain'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
