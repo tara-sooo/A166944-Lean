@@ -1,7 +1,7 @@
 // Two-sided actual reset-cohort energy transfer.
 // Run node research/min_clock_reset_energy_transfer_audit.mjs 1024 4096 16384 65536
 function audit(X,mode){
- const B=Math.ceil(Math.sqrt(7*X)),H=4*B,a=2*B,N=X/2,G=2*H+B+6,U=7*X+4,W=16*B,u=Math.log(B),ell=Math.log(u);
+ const B=Math.ceil(Math.sqrt(7*X)),H=4*B,startAge=mode==='full'?0:mode==='early'?B:2*B,a=startAge,N=X/2,G=2*H+B+6,U=7*X+4,W=16*B,u=Math.log(B),ell=Math.log(u);
  const ok=(b,m)=>{if(!b)throw Error(m);};
  ok(H+2*B<=Math.floor((7*(X+1)-1)/4)-(X+3),'prefix gate');
  const spf=new Int32Array(U);
@@ -33,17 +33,17 @@ function audit(X,mode){
    if(p>z&&p<=T){RM+=cost;WM[C/2]+=e.w;}if(p>T){RH+=cost;WH[C/2]+=e.w;}
    t=v;C+=p-1;inc=p;events++;
   }
-  ok(rr<=B,'root cost');paths.push(path);
+  ok(rr<=(H-startAge)/2,'root cost');paths.push(path);
  }
 
 
 
 
 
- const P=mode==='analytic'?Math.ceil(B/u**.125):Math.max(19,Math.ceil(B/(mode==='stress'?8:4)));
+ const P=mode==='analytic'?Math.ceil(B/u**.125):Math.max(19,Math.ceil(B/(['stress','full','early'].includes(mode)?8:4)));
  const V=mode==='analytic'?Math.max(1,Math.floor(B**.0625)):Math.max(1,Math.min(8,Math.floor((P-9)/10)));
- const A=mode==='analytic'?2*Math.floor(u**.125):mode==='stress'?24:12;
- const kappa=mode==='analytic'?1/u:mode==='stress'?1:.25;
+ const A=mode==='analytic'?2*Math.floor(u**.125):mode==='full'||mode==='early'?2*B:mode==='stress'?24:12;
+ const kappa=mode==='analytic'?1/u:['stress','full','early'].includes(mode)?1:.25;
  const keys=new Map(),witnessDest=new Map(),entries=[],accept=[e=>e.p>0,e=>e.p>z&&e.p<=T,e=>e.p>T],nsec=accept.length;
  const phys=e=>e.C+':'+e.t,lab=e=>phys(e)+':'+e.inc;
  let short=0,eligible=0,fullWitness=0,checks=0,distinctWitness=0;
@@ -70,7 +70,7 @@ function audit(X,mode){
       const K=accept.map((f,b)=>(f(pre)?r[pre.C/2]/36:0)+drift[b]/24);
       g={gkey,n:0,full:0,K,drift,q,preC:pre.C};a.groups.set(gkey,g);distinctWitness++;
      }
-     const full=pre.t>=v.M+2+2*B&&v.t<=v.M+2+H;
+     const full=pre.t>=v.M+2+startAge&&v.t<=v.M+2+H;
      if(full){fullWitness++;g.full++;ok(pre.w>=(q-1)/(4*q)-1e-9,'full positive witness weight');}
      g.n++;a.n++;
      const entry={a,root:v.i,j,k,reset,full,tail:Array(nsec).fill(0)};entries.push(entry);a.entries.push(entry);
@@ -120,7 +120,7 @@ function audit(X,mode){
   ok(selfGood<=kappa*E+eps&&one<=2*degree*Math.sqrt(kappa)*E+eps&&both<=degree*kappa*E+eps,'absorption');
   results.push({sector,E,diag,RA,RF,asum,fsum,credit,good,goodF,goodA,lowTail,positive,certKeys,certEntries,self,selfGood,cross,one,both,sync,async,edgeHits,rest:self+cross-selfGood-one});
  }
- return {X,B,mode,P,V,A,kappa,z,T,events,literal,R,short,eligible,fullWitness,checks,distinctWitness,keys:arr.length,edges:edges/2,degree,results};
+ return {X,B,mode,startAge,P,V,A,kappa,z,T,events,literal,R,short,eligible,fullWitness,checks,distinctWitness,keys:arr.length,edges:edges/2,degree,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','stress'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','stress','early','full'])console.log(JSON.stringify(audit(X,mode)));
