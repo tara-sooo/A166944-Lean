@@ -19,8 +19,10 @@ function audit(P=59){
   // Exact integer elimination (primitive row reduction preserves Q span).
   const gcd=(a,b)=>{a=a<0n?-a:a;b=b<0n?-b:b;while(b)[a,b]=[b,a%b];return a};
   const norm=v=>{let g=v.reduce((a,b)=>gcd(a,b),0n);return g?v.map(a=>a/g):v};
-  let basis=[];for(let r of rows){let v=r.map(BigInt);for(let {j,u} of basis)if(v[j]){let a=u[j],b=v[j];v=norm(v.map((x,i)=>a*x-b*u[i]))}let j=v.findIndex(x=>x!==0n);if(j>=0)basis.push({j,u:norm(v)})}
+  let basis=[];for(let r of rows){let v=r.map(BigInt);for(let {j,u} of basis)if(v[j]){let a=u[j],b=v[j];v=norm(v.map((x,i)=>a*x-b*u[i]))}let j=v.findIndex(x=>x!==0n);if(j>=0){basis.push({j,u:norm(v)});basis.sort((a,b)=>a.j-b.j)}}
   if(basis.length>dim-1)throw Error("rank with witness");
+  for(let row of rows){let v=row.map(BigInt);for(let {j,u} of basis)if(v[j]){let a=u[j],b=v[j];v=norm(v.map((x,i)=>a*x-b*u[i]))}if(v.some(x=>x!==0n))throw Error("basis span")}
+
   // CRT of first appearances via direct modular search on the finite period;
   // confirms that no additional constraint is needed for relaxed horizon words.
   let E=0,first=new Map();for(let {p,s} of word){if(!first.has(p))first.set(p,mod(s-E,p));E+=p-1}
