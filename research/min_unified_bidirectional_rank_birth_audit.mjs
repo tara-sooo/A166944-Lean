@@ -55,12 +55,12 @@ function audit(X,focus=false,scale=1,gainFactor=8,coarse=false){
   for(let k=Math.floor(e0.C/D)+1;k*D<=e0.J;k++){let e=k*D,l=e-D;if(e<=e0.C)continue;endpointGroups++;endpointArea+=D*q;
    let arr=a.filter(f=>f.tag.firstBig).sort((a,b)=>a.tag.id-b.tag.id),fullIds=a.map(f=>f.tag.id).sort((a,b)=>a-b),nodes=new Map(),ps=[];
    for(let f of arr)for(let U of f.tag.seq){if(U.t>f.end)break;let g=nodes.get(U)||new Map();nodes.set(U,g);let v=f.tag.byC.get(U.C),key0=branch(v,U.t),ar=g.get(key0)||[];g.set(key0,ar);ar.push(f)}
-   let endpoints=new Set([l,e]);
+   ok(arr.length===q,'large source first maturity');let nodeRanks=new Map();for(let [U,groups] of nodes)nodeRanks.set(U,[...groups.values()].flat().map(f=>f.tag.id).sort((a,b)=>a-b));let endpoints=new Set([l,e]);
    function interval(f,U,oldAge=false){let A=U.ages.get(f.tag.id);ok(A,"birth age member");let lo=Math.max(l,f.tag.firstBig.C+h,U.C+age,U.C+Math.floor(oldAge?A.old:A.A)+.5),hi=Math.min(e,f.tag.es.at(-1).C-h);return [lo,hi]}
    for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){let f=arr[i],g=arr[j],[u,v,t]=meet(f,g),U=verts.get(u.C+"|"+t),k1=branch(u,t),k2=branch(v,t);if(Math.max(U.groups.get(k1).length,U.groups.get(k2).length)<large)continue;pairChecks++;
     let [x,y]=interval(f,U),[z,w]=interval(g,U),[x0,y0]=interval(f,U,true),[z0,w0]=interval(g,U,true),lo=Math.max(x,z),hi=Math.min(y,w),lo0=Math.max(x0,z0),hi0=Math.min(y0,w0);let len=Math.max(0,hi-lo),len0=Math.max(0,hi0-lo0);ok(len<=len0+1e-7,"age nesting");
-    let tail=rank(fullIds,f.tag.id)[1],birth=U.ages.get(f.tag.id).suf; // historical rank may include retired members
-    let prefix=U.ages.get(g.tag.id).pre,pass=birth>=rho*q&&prefix>=rho*q;if(pass&&len>0){ok(U.C-f.tag.es[0].C>=4*(birth-1),'birth suffix root spacing');spacingChecks++;}old+=2*len0/q;newAge+=2*len/q;if(!pass)rankTrim+=2*len/q;if(pass)rankAllowed+=2*len/q;
+    let tail=rank(fullIds,f.tag.id)[1],birth=rank(nodeRanks.get(U),f.tag.id)[1];ok(birth<=U.ages.get(f.tag.id).suf,'induced suffix bounded by historical');
+    let prefix=rank(nodeRanks.get(U),g.tag.id)[0];ok(prefix<=U.ages.get(g.tag.id).pre,'induced prefix bounded by historical');let pass=birth>=rho*q&&prefix>=rho*q;if(pass&&len>0){ok(U.C-f.tag.es[0].C>=4*(birth-1),'birth suffix root spacing');spacingChecks++;}old+=2*len0/q;newAge+=2*len/q;if(!pass)rankTrim+=2*len/q;if(pass)rankAllowed+=2*len/q;
     if(len0>len)youngChecks++;for(let a0 of [lo,hi])if(l<a0&&a0<e)endpoints.add(a0);ps.push({f,g,U,k1,k2,lo,hi,pass,sufPass:birth>=rho*q,prePass:prefix>=rho*q});
     for(let row of rows){let v0=2*row.P*count(row.P,lo0,hi0)/q,v1=2*row.P*count(row.P,lo,hi)/q;row.old+=v0;row.newAge+=v1;row.agePaid+=v0-v1;if(pass)row.rank+=v1;else row.rankPaid+=v1}
    }
@@ -72,7 +72,7 @@ function audit(X,focus=false,scale=1,gainFactor=8,coarse=false){
    // Direct branch-wise piecewise census, with no pair enumeration in the census itself.
    for(let [U,branches] of nodes){if(branches.size<2)continue;
     let cuts=new Set([l,e]),g=[];
-    for(let [key0,ar] of branches){let v=[];for(let f of ar){let [lo,hi]=interval(f,U);if(lo>=hi)continue;cuts.add(lo);cuts.add(hi);v.push({id:f.tag.id,lo,hi,birth:U.ages.get(f.tag.id).suf,pre:U.ages.get(f.tag.id).pre})}g.push({key:key0,large:U.groups.get(key0).length>=large,v})}
+    for(let [key0,ar] of branches){let v=[];for(let f of ar){let [lo,hi]=interval(f,U);if(lo>=hi)continue;cuts.add(lo);cuts.add(hi);v.push({id:f.tag.id,lo,hi,birth:rank(nodeRanks.get(U),f.tag.id)[1],pre:rank(nodeRanks.get(U),f.tag.id)[0]})}g.push({key:key0,large:U.groups.get(key0).length>=large,v})}
     let xs=[...cuts].sort((a,b)=>a-b);
     for(let i=1;i<xs.length;i++){let x=xs[i-1],y=xs[i],K=(x+y)/2,groups=g.map(g0=>({...g0,v:g0.v.filter(z=>z.lo<=K&&K<z.hi)})),n=groups.reduce((v,g)=>v+g.v.length,0),small=groups.filter(g=>!g.large),sm=small.reduce((v,g)=>v+g.v.length,0),c=n*n-groups.reduce((v,g)=>v+g.v.length**2,0)-sm*sm+small.reduce((v,g)=>v+g.v.length**2,0);
      let cR=0;for(let g of groups)for(let v of g.v){if(v.birth<rho*q)continue;for(let other of groups)if(other.key!==g.key&&(other.large||g.large))cR+=2*other.v.filter(w=>w.id>v.id&&w.pre>=rho*q).length}
