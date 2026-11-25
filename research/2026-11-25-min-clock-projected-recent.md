@@ -109,7 +109,7 @@ Thus the original short-clock certificate follows if on unbounded windows the RE
 
 ## 7. Actual finite audit
 
-Standalone ECMAScript research/min_clock_projected_recent_audit.mjs, exact remote readback at 77661aa2d9d9cb762cd5933cd27c307f85dd23fd, blob 3edfb3440576a67d1e92a87a10e744ae7a6f07c5. Run:
+Standalone ECMAScript research/min_clock_projected_recent_audit.mjs, exact remote readback at f6b5ae194937b49ee30a2beb5f6e4e5fc50ec4e8, blob 8fe05c016c98bac26b54e32061679323b6126a08. Run:
 
     node research/min_clock_projected_recent_audit.mjs 1024 4096 16384 65536
 
@@ -117,7 +117,7 @@ Actual audit function executed in available JS runtime for all four windows and 
 
 Largest X65536, B678,N32768, analytic no degree deletion: all energy18998125.55, first projected contact pairs2603741, of these144654 same arrival time and2459087 different arrival times. 796598 later first physical synchronizations. The large fraction of asynchronous first projected contacts is why the earlier physical-first-meeting decomposition alone cannot count these pair classes.
 
-Largest diagnostic X65536: 944 roots deleted by shallow degree condition, retained31824, full retained E16529423.70, R373244.5. First projected contacts2438629, asynchronous2301117 (94.36%), same arrival137512; later first physical synchronizations758272. 25348 high hits, recent source visits126942, regular125380; max regular key count4 and max group mass274, max GOOD mass61. Independent overlapping class counts: recent-good468065 (378141 with not both good); recent-thin26182, of which7180 both-deep and6774 both-deep with at least one current C differing from its high anchor. This last diagnostic includes LOW as well as non-LOW intervening steps; it does not by itself count a positive non-LOW suffix length.
+Largest diagnostic X65536: 944 roots deleted by shallow degree condition, retained31824, full retained E16529423.70, R373244.5. First projected contacts2438629, asynchronous2301117 (94.36%), same arrival137512; later first physical synchronizations758272. 25348 high hits, recent source visits126942, regular125380; max regular key count4 and max group mass274, max GOOD mass61. Independent overlapping class counts: recent-good468065 (378141 with not both good); recent-thin26182, of which7180 both-deep and6774 both-deep with at least one current C differing from its high anchor. The extended audit explicitly tracks the number of intervening non-LOW selections: 6630 of those both-deep thin contacts have at least one positive non-LOW suffix length; 237877 of the not-both-good recent-good contacts have a positive non-LOW suffix on the recent side. All 12 runs were rerun with these counters and unchanged energy/class totals.
 
 Disjoint priority class energies, rounded, at X65536 diagnostic:
 
