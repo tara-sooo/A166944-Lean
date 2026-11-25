@@ -10,8 +10,8 @@ function audit(X,mode){
  if(mode==='analytic'){for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>B**(1/16))break;L*=p;z=p;}}
  else {z=3;L=6;}
  const T=mode==='analytic'?Math.max(z+1,Math.ceil(B**.25)):Math.ceil(Math.sqrt(B));
- const mH=mode==='analytic'?Math.max(1,Math.floor(u**2.75)):mode==='diagnostic'?8:16;
- const mM=mode==='analytic'?Math.max(1,Math.floor(B**.625)):mode==='diagnostic'?12:24;
+ const mH=mode==='analytic'?Math.max(1,Math.floor(u**2.75)):mode==='diagnostic'||mode==='stress'?8:16;
+ const mM=mode==='analytic'?Math.max(1,Math.floor(B**.625)):mode==='diagnostic'||mode==='stress'?12:24;
  const D0=mode==='analytic'?Math.ceil(40*ell)+1:4;
  const lo=X,hi=7*X/2-1,len=hi+1,r=new Int32Array(len),degrees=new Uint8Array(len);
  function fac(n,cb){while(n>1){const p=spf[n];if(p>B)break;if(p>2)cb(p);while(n%p===0)n/=p;}}
@@ -146,13 +146,13 @@ function audit(X,mode){
    }
    const beforeNew=coverage.slice(),cf=new Uint8Array(n*n),gf=new Uint8Array(n*n);
    const f=(x,m)=>x<=m?x*x:2*m*x-m*m;
-   const M0=mode==='analytic'?(sector===0?B**.625*u*u:u**3/(1+ell)):mode==='wide'?24:12;
+   const M0=mode==='analytic'?(sector===0?B**.625*u*u:u**3/(1+ell)):mode==='stress'?64:mode==='wide'?24:12;
    for(let j=0;j<scales.length;j++){
     const d=scales[j],md=mode==='analytic'?M0*d/B/(j+1)**2:M0*d/B;
     const byCell=new Map();for(let i=0;i<n;i++){const c=Math.floor((tags[i].M-X)/d);if(!byCell.has(c))byCell.set(c,[]);byCell.get(c).push(i);}
     const K=byCell.size;ok(K<=Math.ceil(G/(2*d))+2,'source cell count');
-    if(!newScale[j])newScale[j]={d,md,clockRaw:0,graphRaw:0,clockExtra:0,graphExtra:0,potential:0,clockBound:0,graphBound:0,groups:0};
-    const st=newScale[j];let potSum=0,clockSum=0,graphSum=0;
+    if(!newScale[j])newScale[j]={d,md,clockRaw:0,graphRaw:0,clockExtra:0,graphExtra:0,potential:0,clockBound:0,graphBound:0,graphPotentialBound:0,groups:0};
+    const st=newScale[j];let potSum=0,clockSum=0,graphSum=0;const gp=new Map(),ge=new Map();
     // Each unordered pair of source cells gets its own restricted cohort; same-cell
     // pairs use the singleton cell. A tag belongs to exactly K such cohorts.
     for(const row of hs.values()){
@@ -201,7 +201,7 @@ function audit(X,mode){
        for(let x=0;x<ts.length;x++)for(let y=x+1;y<ts.length;y++)if(Math.ceil(Math.log2(ts[y]-ts[x]))===k&&times.get(ts[x])<=mu+1e-10&&times.get(ts[y])<=mu+1e-10){edges+=2*times.get(ts[x])*times.get(ts[y]);ds.set(ts[x],(ds.get(ts[x])||0)+1);ds.set(ts[y],(ds.get(ts[y])||0)+1);}
        degree=Math.max(0,...ds.values());ok(degree<=2*Hk,'lag degree');
        const dp=f(total,mu)-[...times.values()].reduce((a,b)=>a+f(b,mu),0);
-       ok(edges<=2*Math.max(0,2*degree-1)*dp+1e-7*Math.max(1,edges),'light graph potential');potentialChecks++;
+       ok(edges<=2*Math.max(0,2*degree-1)*dp+1e-7*Math.max(1,edges),'light graph potential');gp.set(k,(gp.get(k)||0)+dp);ge.set(k,(ge.get(k)||0)+edges);potentialChecks++;
       }
      }
     }
@@ -209,7 +209,7 @@ function audit(X,mode){
     // pairs were included, so their potential is no greater than the full forest.
     ok(potSum<=2*md*K*U0+1e-7*Math.max(1,potSum),'restricted potential summed');
     ok(clockSum<=2*potSum+1e-7*Math.max(1,clockSum),'two grids');
-    st.potential+=q*potSum;st.clockBound+=4*q*md*K*U0;st.graphBound+=q*graphSum;
+    let gb=0,geSum=0;for(const [k,dp] of gp){const Hk=2**k,mu=mode==='analytic'?md/(Hk*(k+1)**2):md/Hk;ok(dp<=2*mu*K*U0+1e-7*Math.max(1,dp),'restricted graph potential summed');const es=ge.get(k)||0;ok(es<=8*Hk*dp+1e-7*Math.max(1,es),'lag graph summed');gb+=16*Hk*mu*K*U0;geSum+=es;}ok(graphSum<=geSum+1e-7*Math.max(1,geSum),'assigned graph bound');st.graphPotentialBound+=q*gb;st.potential+=q*potSum;st.clockBound+=4*q*md*K*U0;st.graphBound+=q*graphSum;
    }
    for(const p of pairs){
     oldRest+=(1-beforeNew[p.id])*p.e;
@@ -229,4 +229,4 @@ function audit(X,mode){
  return {X,B,mode,z,L,T,mH,mM,N,events,literal,twins,R,RM,RH,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','stress'])console.log(JSON.stringify(audit(X,mode)));
