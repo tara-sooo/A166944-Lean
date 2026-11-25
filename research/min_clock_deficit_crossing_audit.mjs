@@ -106,7 +106,32 @@ function audit(X,mode){
  ok(pSums[0]<=15*small&&pSums[1]<=15*thin&&pSums[2]<=15*thick,'weighted entry budgets');
  // Near-B version: use exact actual smaller-label drift count, not an independence assumption.
  ok(totalP<=5*(small+mid+near)&&totalP<=5*(small+mid+Math.sqrt(sup[1]*second[1]))+eps,'near-band clock transfer');
- return {X,B,mode,P,V,Y,h,events,literal,R,allShort,short,totalP,levels,small,mid,near,thin,thick,smallCost,envelope,sup,maxSup,usedSupport,maxMass,second,E,Eunion,counts,pSums,rootCounts:roots.map(s=>s.size),checks,maxDepth};
+ // Monotone peeling: delete each original root once, decrement all its assigned
+ // group memberships. Only the triggering entry's currently thin marks pay.
+ const byRoot=new Map();for(const a of assign){let x=byRoot.get(a.root);if(!x){x=[];byRoot.set(a.root,x);}x.push(a);}
+ const peeling=[];
+ for(const removeSmall of [false,true]){
+  const active=new Map([...groups].map(([id,g])=>[id,g.n])),removed=new Set(),charged=new Map();let smallRemoved=0,thinRemoved=0,rounds=0,pCharge=0,charges=0;
+  function erase(root){ok(!removed.has(root),'unique peeled root');removed.add(root);for(const a of byRoot.get(root))for(const id of a.marks){const n=active.get(id);ok(n>0,'active count');active.set(id,n-1);}}
+  if(removeSmall)for(const [root,es] of byRoot)if(es.some(a=>3*a.small>=a.levels)){smallRemoved++;erase(root);}
+  for(;;){let changes=0;for(const [root,es] of byRoot){
+    if(removed.has(root))continue;
+    let trigger=null,marks=[];
+    for(const a of es){const ids=a.marks.filter(id=>active.get(id)<=h);if(3*ids.length>=a.levels){trigger=a;marks=ids;break;}}
+    if(!trigger)continue;
+    for(const id of marks){const n=charged.get(id)||0;charged.set(id,n+1);ok(n+1<=h,'lifetime thin charge cap');charges++;}
+    pCharge+=trigger.q;thinRemoved++;changes++;erase(root);
+   }if(!changes)break;rounds++;
+  }
+  let survivors=0,survivingEntries=0,smallDominant=0,thickDominant=0,minThick=Infinity;
+  for(const [root,es] of byRoot)if(!removed.has(root)){survivors++;for(const a of es){survivingEntries++;let thin=0;for(const id of a.marks){ok(active.get(id)>0,'surviving crossing');thin+=+(active.get(id)<=h);}
+   const thick=a.marks.length-thin;ok(3*thin<a.levels,'peeling fixed point');if(3*a.small>=a.levels)smallDominant++;else{ok(3*thick>a.levels,'retained thick crossing fraction');thickDominant++;minThick=Math.min(minThick,thick/a.levels);}
+  }}
+  ok(pCharge<=15*charges&&charges<=h*(sup[0]+sup[1])&&thinRemoved*P<=pCharge,'lifetime peeling bound');
+  ok(!removeSmall||smallDominant===0,'conditional small deletion');
+  peeling.push({removeSmall,smallRemoved,thinRemoved,rounds,pCharge,charges,chargedKeys:charged.size,survivors,survivingEntries,smallDominant,thickDominant,minThick:Number.isFinite(minThick)?minThick:null});
+ }
+ return {peeling,X,B,mode,P,V,Y,h,events,literal,R,allShort,short,totalP,levels,small,mid,near,thin,thick,smallCost,envelope,sup,maxSup,usedSupport,maxMass,second,E,Eunion,counts,pSums,rootCounts:roots.map(s=>s.size),checks,maxDepth};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','stress'])console.log(JSON.stringify(audit(X,mode)));
