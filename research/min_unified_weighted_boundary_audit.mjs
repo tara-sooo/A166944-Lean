@@ -5,6 +5,24 @@ const ok=(x,m)=>{if(!x)throw Error(X+" "+m)},eq=(a,b)=>Math.abs(a-b)<=1e-7*Math.
 for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)if(!S[n])S[n]=p}
 function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
 let N=0,events=0,hit=0,G=0,F=0,Fs=0,Fr=0,R=0,discard=0,initial=0,Ex=0,Es=0,Er=0,rawEx=0,positiveEx=0,sourceChecks=0,cellChecks=0,paired=0,unpaired=0,p3Consecutive=0,p3Ex=0,maxCell=0,maxEffectiveCell=0,weightedL=0,weightedR=0,refinedR=0,nonvacuous=0,fullL=0,fullR=0,fullRefined=0,fullGain=0,firstBadEarlier=0,firstBadNotDisparate=0,capChecks=0,liveR=0,nonzero=0,synthetic=0;
+let badBlocks=0,bridgeBlocks=0,groupChecks=0,tailGroups=0,wordChecks=0,syntheticGroups=0;
+function packed(es){
+ let blocks=[];
+ for(let i=0;i<es.length;){let a=es[i],b=es[i+1];if(a.p!==3&&b?.p===3&&b.E>0){blocks.push({p:a.p,pair:true,g:a.g+b.g,E:a.E+b.E});i+=2;}else{blocks.push({p:a.p,pair:false,g:a.g,E:a.E});i++;}}
+ let sumG=0,sumE=0,tail=0;
+ for(let i=0;i<blocks.length;){let a=blocks[i];sumG+=a.g;sumE+=a.E;i++;
+  if(a.p===5&&a.pair){badBlocks++;let b=blocks[i];if(!b){tail+=2;tailGroups++;continue;}
+   ok(b.p!==5,"forbidden 5,3,5");
+   let g=a.g+b.g,e=a.E+b.E;sumG+=b.g;sumE+=b.E;i++;
+   if(b.p===7&&b.pair){bridgeBlocks++;let c=blocks[i];if(!c){tail+=2;tailGroups++;continue;}
+    ok(c.p!==5&&c.p!==7,"forbidden 5,3,7,3,5 or 7,3,7");g+=c.g;e+=c.E;sumG+=c.g;sumE+=c.E;i++;
+   }
+   ok(e<=g,"compensated small-prime block");groupChecks++;
+  }else if(a.E>a.g){ok(i===1&&a.p===3&&!a.pair&&a.E-a.g<=2,"initial single 3");tail+=2;}
+ }
+ ok(tail<=4&&sumE<=sumG+tail&&eq(sumG,es.reduce((s,e)=>s+e.g,0))&&eq(sumE,es.reduce((s,e)=>s+e.E,0)),"unit excess packing");
+ return sumE;
+}
 for(let M=X;M<2*X;M++)if(S[M]===M){
  N++;let C0=2*M-2,C=C0,t=M+2,cut=Math.floor((7*M-1)/4),es=[],st=[[-1,6]],matches=[],ig=0,gm=0;
  while(C-C0<T){
@@ -21,6 +39,8 @@ for(let M=X;M<2*X;M++)if(S[M]===M){
     while(left){let a=st.at(-1),l=Math.min(left,a[1]);left-=l;a[1]-=l;if(!a[1])st.pop();if(a[0]<0)ig+=gamma*l;else if(gamma)matches.push({i:a[0],j:i,c:gamma*l});}
   }C=J;t=v;
  }
+ for(let i=0;i+2<es.length;i++){if(es[i].p>=5&&es[i+1].p===3){wordChecks++;ok(es[i+2].p!==es[i].p,"q,3,q impossible");}
+ if(i+4<es.length&&es[i].p===5&&es[i+1].p===3&&es[i+2].p===7&&es[i+3].p===3){wordChecks++;ok(es[i+4].p!==5,"5,3,7,3,5 impossible");}}
  const gain=C-C0,gg=es.reduce((z,e)=>z+e.cost,0),fs=es.reduce((z,e)=>z+(!e.bad&&e.p<kap*P?e.cost:0),0),fr=es.reduce((z,e)=>z+(!e.bad&&e.p>=kap*P?e.cost:0),0),f=fs+fr;
  const next=new Int32Array(es.length);let k=-1;for(let i=es.length-1;i>=0;i--){if(es[i].n)k=i;next[i]=k}
  let rr=0,dd=0,src=new Map(),snk=new Map(),cell=new Map(),ex=0,exs=0,exr=0,cs=0,cr=0;
@@ -36,9 +56,9 @@ for(let M=X;M<2*X;M++)if(S[M]===M){
  for(let [j,c] of snk)ok(c<=gm*es[j].g+1e-7,"sink capacity");
  let prev=-1;
  for(let h=0;h<es.length;h++)if(es[h].n){let f=es[h],l=0,ee=0;for(let i=prev+1;i<h;i++){let a=es[i];l+=a.g;ee+=a.E;if(a.p===3&&a.E){if(i===prev+1)unpaired++;else{ok(es[i-1].p!==3,"pair predecessor");paired++;}}}
-  ok(l<=P&&ee<=4*l/3+4+1e-7,"cell excess packing");capChecks++;
-  let z=cell.get(h)||0;if(z>1e-9)nonzero++;ok(z<=ee+f.E+1e-7&&z<=4*P/3+8+1e-7,"effective cell excess");
-  if(!f.bad){cellChecks++;maxCell=Math.max(maxCell,(ee+f.E)/P);maxEffectiveCell=Math.max(maxEffectiveCell,z/P);if(f.p<kap*P){exs+=z;cs+=(4*P/3+8);}else{exr+=z;cr+=(4*P/3+8);}}
+  ok(l<=P&&ee<=l+4+1e-7&&packed(es.slice(prev+1,h))===ee,"cell excess packing");capChecks++;
+  let z=cell.get(h)||0;if(z>1e-9)nonzero++;ok(z<=ee+f.E+1e-7&&z<=P+8+1e-7,"effective cell excess");
+  if(!f.bad){cellChecks++;maxCell=Math.max(maxCell,(ee+f.E)/P);maxEffectiveCell=Math.max(maxEffectiveCell,z/P);if(f.p<kap*P){exs+=z;cs+=(P+8);}else{exr+=z;cr+=(P+8);}}
   else ok(z===0,"bad cell removed");prev=h;
  }
  let rem=rr-dd,gs=[...src.keys()].reduce((z,i)=>z+es[i].g,0),gt=[...snk.keys()].reduce((z,i)=>z+es[i].g,0);
@@ -49,9 +69,11 @@ for(let M=X;M<2*X;M++)if(S[M]===M){
  weightedL+=lhs;weightedR+=rhs;refinedR+=ref;G+=gain;F+=f;Fs+=fs;Fr+=fr;R+=rr;discard+=dd;initial+=ig;Ex+=ex;Es+=exs;Er+=exr;liveR+=rem;
  if(gain>=T){hit++;fullGain+=gain;fullL+=lhs;fullR+=rhs;fullRefined+=ref;}
 }
-// Synthetic tightness for the noncrossing excess packing: alternating 5,3 gains with E=4,4.
-// It is an abstract local capacity test, not an assertion of a realized MIN word.
-for(let n=1;n<=64;n++){ok(8*n===4*(6*n)/3,"abstract pair capacity");synthetic++}
-const rd=x=>+x.toFixed(6);return {X,focus,B,T,P,N,events,hit,G,F,Fs,Fr,R:rd(R),discard:rd(discard),initial:rd(initial),liveR:rd(liveR),Ex:rd(Ex),Es:rd(Es),Er:rd(Er),rawEx,positiveEx,sourceChecks,cellChecks,paired,unpaired,p3Consecutive,p3Ex,maxCell:rd(maxCell),maxEffectiveCell:rd(maxEffectiveCell),weightedL:rd(weightedL),weightedR:rd(weightedR),refinedR:rd(refinedR),nonvacuous,fullGain,fullL:rd(fullL),fullR:rd(fullR),fullRefined:rd(fullRefined),firstBadEarlier,firstBadNotDisparate:rd(firstBadNotDisparate),capChecks,nonzero,synthetic}
+// Abstract block cases (not claimed to be realized trajectories).
+for(let ps of [[5,3],[5,3,7,3],[5,3,7,3,11,3],[5,3,7,3,3],[5,3,7],[3,5,3,7,3]]){let a=ps.map((p,i)=>({p,g:p-1,E:p===3&&i&&ps[i-1]===3?0:4}));packed(a);syntheticGroups++;}
+// Independent modular exhaustion of forbidden words, no time assumptions.
+for(let q of [5,7,11,13,17,19,23,29,31])for(let x of [1,q-1]){let y=(x+q-1+2)%q;ok(y!==1&&y!==q-1,"modular q,3,q");synthetic++;}
+for(let x of [1,4]){let y=(x+14)%5;ok(y!==1&&y!==4,"modular 5,3,7,3,5");synthetic++;}
+const rd=x=>+x.toFixed(6);return {X,focus,B,T,P,N,events,hit,G,F,Fs,Fr,R:rd(R),discard:rd(discard),initial:rd(initial),liveR:rd(liveR),Ex:rd(Ex),Es:rd(Es),Er:rd(Er),rawEx,positiveEx,sourceChecks,cellChecks,paired,unpaired,p3Consecutive,p3Ex,maxCell:rd(maxCell),maxEffectiveCell:rd(maxEffectiveCell),weightedL:rd(weightedL),weightedR:rd(weightedR),refinedR:rd(refinedR),nonvacuous,fullGain,fullL:rd(fullL),fullR:rd(fullR),fullRefined:rd(fullRefined),firstBadEarlier,firstBadNotDisparate:rd(firstBadNotDisparate),capChecks,nonzero,synthetic,badBlocks,bridgeBlocks,groupChecks,tailGroups,wordChecks,syntheticGroups}
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[256,1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
