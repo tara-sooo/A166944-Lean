@@ -138,6 +138,37 @@ function reachability(){
  const later=search(97764,195498),final=search(97957,195634);if(later.roots.length!==57||final.roots.length!==57)throw Error('later basins');
  return {B,H,dead,later,final,known:search(88113,176186)};
 }
+// Periodic dead-state/forward-word certificates using arbitrary precision.
+function translations(){
+ const primes=[];for(let p=2;p<=500;p++){let prime=true;for(let d=2;d*d<=p;d++)if(p%d===0){prime=false;break;}if(prime)primes.push(BigInt(p));}
+ const period=primes.reduce((a,b)=>a*b,1n),gcd=(a,b)=>{while(b)[a,b]=[b,a%b];return a<0n?-a:a;};
+ function tick(t,C,B){const s=t%2n,n=gcd(t-2n*s,C+2n*s-1n);
+  if(n===1n)return 0n;
+  for(const p of primes)if(n%p===0n)return p<=B?p:0n;
+  throw Error('tick gcd outside finite prime support');
+ }
+ function tree(shift,B){let t=97712n+shift,level=[195362n+2n*shift],rows=[];
+  while(level.length){const next=new Set();for(const J of level){const s=t%2n,d=2n*t-J,n=gcd(t-2n*s,J+2n*s),a=[];
+    if(d===6n)throw Error('unexpected canonical candidate');if(!tick(t,J,B))a.push(J);
+    if(n>1n){let rest=n;for(const p of primes){if(rest%p!==0n)continue;while(rest%p===0n)rest/=p;if(p>2n&&p<=B&&tick(t,J-p+1n,B)===p)a.push(J-p+1n);}if(rest!==1n)throw Error('inverse divisor outside bound');}
+    const ps=a.filter(D=>D<=2n*(t-1n)&&D>=2n);rows.push([Number(t-shift),Number(J-2n*shift),ps.map(D=>Number(D-2n*shift))]);for(const D of ps)next.add(D);
+  }t--;level=[...next];}
+  return rows;
+ }
+ function word(shift,B){let t=97711n+shift,C=195332n+2n*shift,rows=[];
+  for(let k=0;k<26;k++){let v=t+1n,p=0n;while(v<=t+2n*B&&!(p=tick(v,C,B)))v++;
+   if(!p)throw Error('translated event missing');rows.push([Number(v-shift),Number(C-2n*shift),Number(p)]);t=v;C+=p-1n;
+  }return rows;
+ }
+ const original=tree(0n,678n),originalWord=word(0n,678n),tests=[];
+ for(const [a,B] of [[1n,500n],[2n,10000n],[17n,1000000n]]){
+  const shift=a*period,t=tree(shift,B),w=word(shift,B);
+  if(JSON.stringify(t)!==JSON.stringify(original)||JSON.stringify(w)!==JSON.stringify(originalWord))throw Error('translated certificate mismatch');
+  tests.push({multiple:Number(a),B:Number(B),states:t.length,events:w.length});
+ }
+ return {periodDigits:period.toString().length,tests};
+}
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
 console.log(JSON.stringify(reachability()));
+console.log(JSON.stringify(translations()));
