@@ -2,7 +2,7 @@
 function audit(X,stress=false){
  const B=Math.ceil(Math.sqrt(7*X)),H=4*B,a=2*B,u=Math.log(B),D=Math.max(1,Math.floor(stress?B/4:B/u**2)),rough=Math.max(3,Math.ceil(D/4)),m=stress?12:u**(11/4),eta=stress?1/8:u**(-1/4),L=stress?30:2,y=stress?5:2,factor=stress?4:u**(1/4);
  const ok=(v,s)=>{if(!v)throw Error(s)},close=(x,y)=>Math.abs(x-y)<1e-7*Math.max(1,Math.abs(x),Math.abs(y));
- const sp=new Int32Array(8*X+100);for(let p=2;p<sp.length;p++)if(!sp[p])for(let j=p;j<sp.length;j+=p)sp[j]=p;
+ const sp=new Int32Array(8*X+100);for(let p=2;p<sp.length;p++)if(!sp[p])for(let j=p;j<sp.length;j+=p)if(!sp[j])sp[j]=p;
  function gcd(a,b){while(b){let c=a%b;a=b;b=c}return a}
  function r(C){let p=Math.min(sp[C-1]||Infinity,sp[C+1]||Infinity);return p<=B?p:0}
  function fac(n){let out=[];while(n>1){let p=sp[n];out.push(p);while(n%p===0)n/=p}return out}
