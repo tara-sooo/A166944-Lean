@@ -109,6 +109,30 @@ function audit(X,mode='diagnostic'){
    envelopeDiff+=4*((2*A+1)*nnC*cTime*cTq+(2*A+1)*nnT*cHor*cHq);
   }
  }
+ // Independent relaxed arithmetic enumeration on the smallest window.
+ let relaxed=null;
+ if(X===1024){
+  const anchors=[];
+  for(const p of plist)for(let t=tLo;t<=tHi;t++){
+   const side=t%2;
+   if(side?(t-p-2)%(2*p)!==0:t%(2*p)!==0)continue;
+   for(let J=Math.max(2*lo,2*t-maxDelta);J<=Math.min(2*hi,2*t);J+=2){
+    if((J+2*side)%p===0)anchors.push({p,t,J});
+   }
+  }
+  let diff=0,sameH=0,sameT=0;
+  for(let i=0;i<anchors.length;i++)for(let j=0;j<i;j++){
+   const u=anchors[i],v=anchors[j],dh=Math.abs(u.J-v.J),dt=Math.abs(u.t-v.t);
+   if(dh>A&&dt>A)continue;
+   if(u.p!==v.p){diff++;continue;}
+   if(u.J===v.J)continue; // equal projected keys cannot first-contact
+   if(dh<=A){ok(dh===2&&dt>=u.p-2,'relaxed same horizon geometry');sameH++;}
+   if(dt<=A){ok(dt===0&&dh>=2*u.p,'relaxed same time geometry');sameT++;}
+   ok(!(dh<=A&&dt<=A),'relaxed same prime separation');
+  }
+  ok(diff<=envelopeDiff&&sameH+sameT<=envelopeSame,'relaxed CRT envelope');
+  relaxed={anchors:anchors.length,diff,sameH,sameT};
+ }
  const names=['near','shortTail','bothGood','recentGood','recentThin','physicalThin','anchorDiff','anchorSame','remaining'];
  const counts=Array(names.length).fill(0),energy=counts.slice(),sameEnergy=counts.slice(),budget=counts.slice();
  const ind={physicalThin:0,physicalThinExtra:0,anchorDiff:0,anchorSame:0,anchorDiffExtra:0,anchorSameExtra:0,diffBothThick:0,diffDeep:0,diffLongSuffix:0,diffWeightedExtra:0,closeH:0,closeT:0,sameNearH:0,sameNearT:0};
@@ -195,7 +219,7 @@ function audit(X,mode='diagnostic'){
  ok(Math.abs(EK-diag-energy.reduce((s,v)=>s+v,0))<=1e-7*Math.max(1,EK),'exact E decomposition');
  ok(pairs===counts.reduce((s,n)=>s+n,0),'pair partition');
  const named=a=>Object.fromEntries(names.map((n,i)=>[n,a[i]]));
- return {X,B,mode,P,A,kg,k,L,T,tau,capDiff,capSame,removed,kept,events,literal,RK,E,EK,diag,pairs,physicalFirst,asyncFirst,laterSync,highHits,recentVisits,regVisits,maxGroups,maxGroupMass,thinKeyMax,anchorCount:anchorMap.size,nearAnchorDiffRecords,nearAnchorSameRecords,envelopeDiff,envelopeSame,physicalAnchorPairMaxMass,nearAnchorDiffBound,nearAnchorSameBound,measuredDiff,measuredSame,ind,counts:named(counts),energy:named(energy),sameEnergy:named(sameEnergy)};
+ return {X,B,mode,P,A,kg,k,L,T,tau,capDiff,capSame,removed,kept,events,literal,RK,E,EK,diag,pairs,physicalFirst,asyncFirst,laterSync,highHits,recentVisits,regVisits,maxGroups,maxGroupMass,thinKeyMax,anchorCount:anchorMap.size,relaxed,nearAnchorDiffRecords,nearAnchorSameRecords,envelopeDiff,envelopeSame,physicalAnchorPairMaxMass,nearAnchorDiffBound,nearAnchorSameBound,measuredDiff,measuredSame,ind,counts:named(counts),energy:named(energy),sameEnergy:named(sameEnergy)};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree'])console.log(JSON.stringify(audit(X,mode)));
