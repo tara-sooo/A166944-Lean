@@ -114,7 +114,7 @@ function audit(X,mode){
    if(rem>0){
     if(same&&q&&d>6&&d!==6*(t%2)){
      const rr=(q>=Y&&lag>=q)||lag>=lagCut;
-     if(rr)ok(2*r[C/2]>Math.min(lagCut,q),'large-lag roughness');
+     if(rr)ok(2*r[C/2]>lagCut,'large-lag roughness');
      const id=C+':'+t+':'+q+':'+(+rr),g=improved.get(id)||{C,t,q,d,rough:rr,mass:0,rest:0};
      g.mass+=2;g.rest+=2*rem;improved.set(id,g);if(rr&&q<Y)impLongSmall+=2*rem;
     }else if(same)impSame+=2*rem;else impDirect+=2*rem;
@@ -149,7 +149,7 @@ function audit(X,mode){
   const D=lim/2**j;let cnt=0;
   for(const s of [0,1])for(let k=1;6*s+2*q*k<=D;k++){const d=6*s+2*q*k;if(d<=D/2)continue;
    let C=2*X+(((-2*s-2*X)%q+q)%q);if(C%2)C+=q;if(((C+d)/2)%2!==s)C+=2*q;
-   for(;C<7*X;C+=4*q)if(!rough||2*r[C/2]>Math.min(lagCut,q))cnt++;
+   for(;C<7*X;C+=4*q)if(!rough||2*r[C/2]>lagCut)cnt++;
   }ok(n<=cnt,'improved long-lag envelope');impEnvelope+=cnt;impChecks++;
  }
  const impRest=impRawRough+impRawPlain-impRoughPaid-impPlainPaid+impSame+impDirect;
