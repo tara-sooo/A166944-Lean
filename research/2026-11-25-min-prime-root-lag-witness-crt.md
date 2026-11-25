@@ -1,0 +1,90 @@
+# Future high-label witnesses: three-prime lag graph, two-prime root-phase budget, and forced witnesses in macroblocks
+
+Continuation of d186d3fa17ef9c55d3afff1d9c752ba0d66735b5 on the selected prime-root branch. New reductions for the far same-label asynchronous high energy. A fixed finite set of actual future high witnesses of a physical bucket makes slowly varying lags a bounded-degree graph. A different CRT on the root separation gives an absolute little-o energy exclusion for two root-relative phase alignments, with polynomially growing phase tolerance. The earlier macroblock density mask can ensure existence of arbitrarily many (fixed number) future distinct-label witnesses at negligible additional LINEAR cost; it does not imply they match across different paths. A constant-lag occupation bound also follows from the existing quotient sieve. No general far-tail estimate, no Lean compilation or twin-prime proof.
+
+## 1. Original setup and lag lattice
+
+Use dyadic X, B=ceil(sqrt(7X)), u=log B, N=Theta(X/u), T=floor(X/u^.25), H=T+B, F=T²Bu, Q=ceil(B/u). Original prime-root MIN prefixes and original terminal snapshots unchanged. Each completed edge at (C,t) has selected odd p<=B, least eligible r(C)<=p, actual positive wait w<=2r<=3(p-1), poststate (J,s)=(C+p-1,t+w). Natural high is p>=Q and r>p/sqrt(log p). Let R_all=sum original r<=1.5NH. Apply the earlier linear exit-rank mask (exit-rank-far-lag) and any applicable linear masks. At each projected C, the retained physical buckets correspond injectively to (p,s). Write n_i for their actual retained masses; E_phys=sum_C r(C) sum_i n_i² (including diagonal). Recall E<=4[(2K+1)E_phys+E_far,same(K)], where far means same p and |s'-s|>2Kp for integer K>=1.
+
+For any actual common projected high edge (same prehorizon C and selected p) in two original paths, the signs of p|(C+sigma) agree and the two exit ticks lie in one residue mod 2p. Put d=(s'-s)/2, an INTEGER multiple of p, with sign oriented from first to second path. Any two sources visiting C have |M'-M|<T/2 (pre-gain <T). Every original vertex has t in [M+2,M+2+3H], so |s'-s|<=4H and |d|<=2H. This range also applies to actual shared future high edges, even if the paths never physically meet.
+
+For distinct labels p,q,a>=Q at three such shared edges, put d_q=d+b and d_a=d+c. The exact congruences are
+    d=0 mod p,  d=-b mod q,  d=-c mod a.              (1)
+No requirement that the edges are consecutive or that the intervening projected paths agree. Since Q³/ H -> infinity, eventually p q a>4H. For each fixed signed integer pair (b,c), there is at most ONE possible d in [-2H,2H] by CRT. At finite sizes the general count is <=floor(4H/(p q a))+1. In particular if b=c=0, the only possible d is 0 for large X. Three distinct high labels cannot support a nonzero constant lag. This statement concerns exit lags at matched original selected edges, not the differences of arbitrary visits to common horizons.
+
+More generally let an unordered pair of actual original roots have a set of same-label shared high hits within a horizon interval of length L0>=ceil(B^1.5), with all nonzero half-lags drawn from at most D0 different integer values. At each lag d!=0 at most two distinct high primes can divide d (Q³>2H). The existing uniform quotient sieve of macro-rank-stability bounds the total 2r weight of any one selected high label on one actual source in this interval by O(L0/u²). Hence the total ordered weight of this pair's specified hits is
+    O(min(L0+B, D0 L0/u²)).                           (2)
+Use the gain bound for the first term, allowing a last edge overshoot B. Thus if a pair's shared nonzero-lag actual high occupation on an interval of length L0 is >=eta L0, whether measured by ordered 2r or by actual waits of one endpoint, it must have D0>>eta u² distinct nonzero lags. For eta=u^-1/8 this is Omega(u^15/8). This is a per-pair occupancy restriction, NOT a bound on total energy of all constant-lag or few-lag pairs. The local density property from macro-rank-stability concerns one source; it cannot automatically be transferred to the intersection of two different paths.
+
+## 2. Finite deterministic witness lists and bilateral graph
+
+Fix an integer L>=2. At each nonempty retained physical high bucket choose its largest retained original root as representative. Follow its ACTUAL completed original suffix after the current hit and take the first occurrence of each of the first L different natural high selected labels other than the current p, in chronological order (fewer if it stops). Freeze these witnesses before pair classification. Each witness is its actual (C_q,q,s_q), not merely a possible prime. All original continuing roots in this physical bucket have an initial segment of that same suffix, by deterministic source-ordered stops. Thus their own lists are prefixes of the representative list. The representative can have more witnesses than a smaller root; never extrapolate a smaller root's actual history.
+
+At fixed C and p, for two distinct retained physical buckets i,j, their representatives have signed initial half-lag d_ij. Say i -> j has a bounded-drift triple at tolerance A>=0 (integer, half-tick units) if at least two distinct witness labels q,a in i's list occur at the SAME projected prehorizons with SAME selected labels on j's ORIGINAL representative, and both their actual signed half-lags differ from d_ij by <=A. The counterpart hits need not survive any accounting mask or be among its own first L witnesses. Define an undirected edge only if BOTH i->j and j->i pass; their witnesses may differ. Optionally restrict to far pairs K>=1; this only reduces edges. The direction-both condition is important: an outdegree bound alone would not bound the sum of squared vertex weights with arbitrary incoming degrees.
+
+For fixed i, there are <=choose(L,2) pairs of actual fixed witnesses. For each pair and the (2A+1)^2 possible signed drift pairs (b,c), (1) gives at most one lag d, eventually. Since the remaining bucket (C,p,s_j=s_i+2d) specifies a UNIQUE physical bucket by exit-rank stability, the undirected graph maximum degree is
+    Delta(L,A)<=choose(L,2)(2A+1)^2                     (3)
+for sufficiently large X. In finite checks multiply by floor(4H/Q³)+1. The degree counts actual physical bucket keys, not original tag masses or possible paths. Applying 2 n_i n_j<=n_i²+n_j² on each undirected edge and summing:
+    E_drift(L,A;K) <= Delta(L,A) E_phys.                 (4)
+All tag products of an eligible bucket pair can be paid by this bound, even those whose own prefix stops before a representative witness; they are an overcover of genuine actual-tag witness pairs. It is not asserted that every tag traverses every representative witness. No independence between actual label sequences or clock phases, and no assumption of small individual physical mass.
+
+For fixed K,L,A the new sufficient far target may omit the whole graph (4) once E_phys=o(F). The limit can also be taken in L and A after the X limsup, or let L,A grow slowly enough with E_phys/F to absorb (4); no explicit diverging rate follows from the present synchronous little-o target. For a pair whose representatives have two matched witnesses in each direction, it must either fail the bounded-drift condition in at least one direction, or belong to the paid graph. If even one direction has fewer than two matches, (4) does not control it. A pair can have plenty of high witnesses on each path individually and still have no common ones.
+
+## 3. Forced actual future witnesses from the preceding macroblock mask
+
+Use the preceding macrogrid S=Theta(T/u^1.5), s0=ceil(B^1.5), with its frozen post-cheap/post-rank, pre-sparse actual wait measure mu. Work on the retained incidences of that construction before or after exit-rank and the macro rank stability masks. An additional simple LINEAR mask deletes every retained high incidence whose own actual macroblock final posthorizon is <C+s0. On any one original macroblock the removed completed gain intervals lie within its last s0+B gain units (indeed s0 suffices with strict endpoint convention); each root has <=H/S+2 blocks. Thus
+    R_future << N(H/S+2)(s0+B)
+             = O(NT u^1.75/sqrt B)=o(NT).             (5)
+Actual cost is <=2R_future. No need to delete all late partners or pay their quadratic products.
+
+At every remaining high incidence choose the first ACTUAL vertex b>=C+s0 in its own block (including final postvertex). Then I=[C,b) contains the entire current completed gain interval, L0=b-C in [s0,s0+B], and the earlier sparse deletion implies mu(I)>u^-1/8 L0. The same uniform quotient bound used in macro-rank-stability forces Omega(u^15/8) different contributing high labels within I. They are actual original completed high hits, with the frozen cheap-wait and local rank predicates, though not necessarily retained after subsequent masks. Excluding the current p loses at most one distinct label, so for any FIXED L all of the first L distinct OTHER natural high witnesses are actually completed on EVERY retained tag of its bucket, within gain s0+B from the current prehorizon, for all sufficiently large X. The representative and the tag's own witness list then coincide. The natural witness selection includes all original natural high events, so it may find the distinct labels even earlier than the frozen contributing list.
+
+This avoids leaving a vacuous 'no individual future witnesses' case for the new residual in the asymptotic combined route. It does not force projected witness agreement between different physical buckets. The finite audit below isolates the exit-rank and witness graph on the original natural high list, and does NOT implement the preceding macro density mask or (5); finite missing witness counts include both missing individual witnesses and distinct future projected paths. Thus the numerical unmatched mass is not an estimate of the analytic post-(5) mismatch sector.
+
+## 4. Independent two-prime CRT budget on original root-relative phases
+
+Let M,M' be any two original tags in a candidate pair of same-label physical buckets at C, with root difference h=M'-M, |h|<T/2. At a matched high edge of label p let d_full=s'-s (whole ticks, not half ticks). Since 2p|d_full, the root-relative difference of completed elapsed time, (s'-(M'+2))-(s-(M+2))=d_full-h, is congruent to -h modulo p. This is independent of the actual departure lag and remains true if that lag is arbitrarily large.
+
+For any fixed focal retained tag M and its representative witness list of at most L labels q!=p, declare a directed root-phase admission if some q is a matched actual representative witness and
+    dist(h,p)<=A0,  dist(h,q)<=A0,                    (6)
+where dist(h,m)=min(h mod m, -h mod m), and
+    A0=floor(sqrt B/u^(1/8)).
+Equivalently both root-relative elapsed differences (for the representatives with root correction h) are within A0 of zero modulo their respective selected primes. If both tags really traverse both edges, this is also their own actual elapsed phase condition; if not, the representative condition overcovers. There is no assertion of equal elapsed duration or bounded actual lag. In fact the arithmetic count below also pays the stronger rule without requiring any witness match, since (6) by itself is a root-gap restriction; the finite audit uses the matched version.
+
+For fixed distinct p,q, h must belong to one of <=(2A0+1)^2 CRT classes mod pq. In the full root-local interval of length T it has at most floor(T/(pq))+1 representatives per class. Each h identifies a unique possible original source M'. Therefore for each focal incidence the number of partners admitted across ALL same-label buckets is
+    <= L(2A0+1)^2 (floor(T/Q²)+1)
+     = O(L B u^1.5),                                 (7)
+because T/Q²=Theta(u^1.75) and A0²=O(B/u^.25). The estimate counts ALL integer roots, so no extra prime distribution theorem, time-bin counting, or independence is needed. The same partner may pass several witnesses, counted only once for that focal. Sum r(C) per directed admitted pair; the union of unordered pairs admitted from either endpoint has ordered cost at most twice that directed sum. Consequently for fixed L
+    E_root <= O(L B u^1.5 R_all)
+            = O(L F/u^.25)=o(F).                     (8)
+The same proof allows L=o(u^.25) if one chooses that many witnesses. Compare to a single-prime restriction: in (7) the product pq permits a polynomial tolerance A0, without relying on prime-root AP counts. This is an ABSOLUTE pair energy exclusion, not a linear deletion of their endpoints. It is independent of (4), and may overlap it. Apply priority or the union bound, not numerical double subtraction.
+
+## 5. New sufficient remaining high target
+
+Apply the original high linear masks (including macro density, future room (5), exit-rank stability), retain an actual incidence set J, and use the exact corresponding E_phys. All earlier absolute energy payments and applicable joint quota eligibility restrict to its actual pair subledger. For fixed integers K>=1,L>=2,A>=0, define E_new as the ordered far same-p asynchronous energy AFTER omitting the graph of section 2 and the absolute root-phase union of section 4. Then the total original remaining high energy satisfies
+    E(J) <= 4[(2K+1+Delta(L,A)) E_phys(J) + E_new + E_root].
+In particular E_phys=o(F) and E_new=o(F) suffice for high proxy clock o(NT), since E_root=o(F). One may additionally use the earlier absolute pair payments to reduce E_new, with the same accounting on J. The old full synchronous macro Hall estimate remains a sufficient route to E_phys=o(F); no new proof of it here.
+
+Every unabsorbed far same-label pair in the combined analytic route has L distinct actual future witnesses within gain s0+B on each path. Either some direction matches fewer than two of its fixed witnesses in the opposite representative, or some direction has fewer than two matched witnesses with half-lag drift within A. In addition it fails every admitted root-phase test in both directions. The new task is to bound the actual projected witness-disagreement sector (which can include repeated common-horizon contacts) and the unabsorbed large drift sector, not just to count potential CRT codes. Condition (2) can be used when there is substantial shared high occupation across a larger interval. The unchanged actual medium focal residual o(NT) is still needed, on the same unbounded dyadic sequence. Neither far remainder nor synchronous nor medium estimate is proved. No Lean compilation.
+
+## 6. Finite audit and limitations
+
+Source research/min_prime_root_lag_witness_audit.mjs, source commit d9abc9ffc66c0b3c00e3f263d74e439ee5596920, blob 8d056cf7897dfc48f1e438132992f0ba81b5f1b3, exact committed source readback. Actual 18 tests in available ECMAScript runtime (not separate Node process), all passed:
+    node research/min_prime_root_lag_witness_audit.mjs diagnostic 256 1024 4096 16384 65536 262144
+    node research/min_prime_root_lag_witness_audit.mjs stress 256 1024 4096 16384 65536 262144
+    node research/min_prime_root_lag_witness_audit.mjs analytic 256 1024 4096 16384 65536 262144
+Inherit exact original MIN reconstruction and prior exit-rank checks, identical settings/paths/masks as cc8712b5. L=4, A=0,1,4,16,64 half ticks, K=1. A0=max(1,floor(sqrt B/u^.125)). Check every retained tag's actual witness list is a prefix of its bucket representative list; actual matched prime and projected horizon, signed lag range and congruences, triple CRT, bilateral graph degree (with finite multiplicity), exact partition into unmatched / sufficient matched but excessive drift / paid graph, root locality, signed two-prime root congruences and per-focal and per-witness directed counts, exact union/overlap and energy bounds. Literal CRT progression enumerations on X<=16384 for up to256 actual triples per run; all enumerated triples had one candidate, with current actual lag included. Constant-lag three-label check has no nonzero examples, as expected for these parameters. No independent numerical proof of (2) or of the additional combined density trimming (5); those are paper deductions using the previous sieve and density result. No extra medium/flow audit.
+
+| X/mode | far same K=1 | >=1 matched witness either direction | >=2 matched each direction | root-phase paid (union) | drift paid A=64 | union paid A=64 |
+|---:|---:|---:|---:|---:|---:|---:|
+|256/diagnostic|300|166|76|104|76|104|
+|4096/diagnostic|13580|4680|2014|1890|2014|3008|
+|16384/diagnostic|68614|19208|1272|4354|1272|5202|
+|65536/diagnostic|357516|36844|13350|3790|0|3790|
+|262144/diagnostic|2818904|911968|147268|41452|5040|46492|
+|262144/stress|3703692|1257396|206886|54332|7908|60806|
+|4096/analytic|25876|6654|1220|882|1220|1736|
+|65536/analytic|335030|11390|0|1760|0|1760|
+|262144/analytic|2874168|887160|50826|30340|2868|33208|
+
+Largest analytic: 13059 tag witness-prefix checks, 1868 buckets with >=1 future witness and 1031 with >=2 (7008/3780 retained tags by bucket classification, NOT individual witness availability). 212 actual triple CRT checks; 96 root CRT checks; root admission max6 partners at any focal hit, 48 unordered pair hits paid, ordered cost30340, no overlap with paid drift at A64. Far same-p K1 energy2874168; for A=0,1,4,16 drift graph paid0; A64 paid2868, one physical edge, max degree1. At A64 raw far remainder after drift alone=2871300, of which2823342 have fewer than two matched witnesses in at least one representative direction, 47958 have >=2 each but one direction fails bounded drift. Joint union pays33208, leaving2840960. This is the same isolated exit-rank input as previous, not the cumulative macroblock route. The observed remaining mismatch mass motivates targeting actual projected divergences, but it does not establish prevalence after (5). The finite root-phase payments use matched witness rule only, not its relaxed arithmetic-only extension. Main and independent branches unchanged; twins OPEN.
