@@ -63,6 +63,10 @@ function audit(X,mode){
  }}
  let birth=0,expiry=0,birthPairs=0,expiryPairs=0,positive=0,negative=0,cheapSharedGain=0,cheapSharedDrop=0,entryDown=0,entryCheapGain=0,entryCheapDrop=0,birthCap=0,allBirthCap=0,lowBirth=0,highBirth=0,thinBirth=0,thinPairs=0,thinCharge=0,thinAll=0,diag=0,groups=0,mixedPairs=0,sameLabelBirth=0,levelOracle=0,levelFormula=0,cheapLevelOracle=0,cheapLevelFormula=0,maxMass=0;
  let allBirthByLabel=0;const out=[];
+ const lim=12*B+6,flux=Array.from({length:4},()=>new Float64Array(lim+3));
+ const addRange=(b,l,h,n)=>{if(l<=h&&n){ok(l>=1&&h<=lim,'level flux bounds');flux[b][l]+=n;flux[b][h+1]-=n;}};
+ let nonresetEntry=0,nonresetCheapEntry=0,nonresetBirthCap=0,smallBirthUnion=0,smallBirthPairCount=0,smallBirthOverlap=0,nonresetCheapShared=0,nonresetCheapGain=0,nonresetCheapDiag=0,sourceClosePairs=0;
+
  function f(n){return n<=m?n*n:2*m*n-m*m;}
  for(const v of nodes.values()){
   maxMass=Math.max(maxMass,v.n);
@@ -71,14 +75,17 @@ function audit(X,mode){
   ok(v.root<=1&&v.out<=v.n,'mass');
   for(const e of cs){
    sumN+=e.n;sumF+=f(e.n);const pp=P(e.n);inP+=pp;
-   if(e.drift>0)positive+=e.drift*pp;
-   if(e.drift<0)negative-=e.drift*pp;
+   if(e.drift>0){positive+=e.drift*pp;addRange(0,e.a.d+1,v.d,pp);}
+   if(e.drift<0){negative-=e.drift*pp;addRange(1,v.d+1,e.a.d,pp);}
+   if(v.d!==6*(v.t%2)&&e.wait<=eps*(e.p-1)){
+    nonresetCheapShared-=e.drift*pp;nonresetCheapGain+=(e.p-1)*pp;nonresetCheapDiag-=e.drift*e.n;
+   }
    if(e.wait<=eps*(e.p-1)){cheapSharedGain+=(e.p-1)*pp;cheapSharedDrop-=e.drift*pp;}
    let z=labels.get(e.p);if(!z){z=[];labels.set(e.p,z);}z.push(e);
   }
   ok(sumN===v.n,'incoming mass');
   const b=P(v.n)-inP,x=P(v.n)-P(v.out);
-  birthPairs+=b;expiryPairs+=x;birth+=v.d*b;expiry+=v.d*x;
+  birthPairs+=b;expiryPairs+=x;birth+=v.d*b;expiry+=v.d*x;addRange(2,1,v.d,b);addRange(3,1,v.d,x);
   if(v.d<=m)lowBirth+=v.d*b;else highBirth+=v.d*b;
   if(v.n<=m){thinBirth+=v.d*b;thinPairs+=b;}
   const pot=f(v.n)-sumF;ok(pot>=-1e-9,'truncated convex potential');thinCharge+=pot;
@@ -108,9 +115,21 @@ function audit(X,mode){
   }
   mixedPairs+=b-(Array.from(labels.values()).reduce((s,es)=>s+P(es.reduce((q,e)=>q+e.n,0))-es.reduce((q,e)=>q+P(e.n),0),0));
   entryDown+=entry;entryCheapDrop+=entryCheap;entryCheapGain+=entryGain;
+  const nr=v.d!==6*(v.t%2),extra=nr?entry:0;
+  if(nr){ok(entry<=v.d*b/2,'nonreset entry bounded by birth deficit');nonresetEntry+=entry;nonresetCheapEntry+=entryCheap;nonresetCheapGain+=entryGain;}
+  nonresetBirthCap+=v.d*b+extra;
+  if(v.n<=m||v.d<=m){smallBirthUnion+=v.d*b+extra;smallBirthPairCount+=b;if(v.n<=m&&v.d<=m)smallBirthOverlap+=b;}
+
   birthCap+=v.d*b+entry;allBirthCap+=cap*b;
   if(v.n<=m)thinAll+=v.d*b+entry;
  }
+ let layerChecks=0,layerPos=0,layerNeg=0,layerBirth=0,layerExpiry=0;
+ const sums=[0,0,0,0];for(let l=1;l<=lim;l++){for(let b=0;b<4;b++)sums[b]+=flux[b][l];ok(sums[1]+sums[3]===sums[0]+sums[2],'exact levelwise pair flux');layerChecks++;layerPos+=sums[0];layerNeg+=sums[1];layerBirth+=sums[2];layerExpiry+=sums[3];}
+ ok(layerPos===positive&&layerNeg===negative&&layerBirth===birth&&layerExpiry===expiry,'integrated layer flux');
+ ok(smallBirthUnion<= (12*B+6)*2*m*N+1.5*m*birthPairs,'small-birth union budget');
+ ok(birthPairs<=N*G,'source distance bound');
+ ok((1-2*eps)*nonresetCheapGain<=nonresetCheapShared+nonresetCheapEntry+1e-6,'nonreset cheap gain budget');
+ const nonreset={nonresetEntry,nonresetCheapEntry,nonresetBirthCap,smallBirthUnion,smallBirthPairCount,smallBirthOverlap,nonresetCheapShared,nonresetCheapGain,nonresetCheapDiag,layerChecks,remainingBirthCap:nonresetBirthCap-smallBirthUnion};
  let Epos=0,EposOff=0;for(let j=lo;j<=hi;j++){Epos+=r[j]*posW[j]**2;EposOff+=r[j]*posW[j]**2-posOff[j];}
  const tol=1e-6*Math.max(1,Epos,negative,birth,levelOracle);
  ok(birthPairs===expiryPairs,'pair conservation');
@@ -138,7 +157,7 @@ function audit(X,mode){
    }
   }
  }
- return {X,B,mode,eps,m,N,R,events,literal,nodes:nodes.size,edges,groups,maxMass,fullR,birthPairs,expiryPairs,birth,expiry,positive,negative,diagDown,entryDown,levelOracle,cheapInc,diagCheapGain,cheapSharedGain,cheapSharedDrop,entryCheapGain,entryCheapDrop,cheapLevelOracle,Epos,EposOff,birthCap,allBirthCap,lowBirth,highBirth,thinBirth,thinPairs,thinCharge,thinAll,mixedPairs,sameLabelBirth,pairChecks,pairBirthEntry,pairShared};
+ return {nonreset,X,B,mode,eps,m,N,R,events,literal,nodes:nodes.size,edges,groups,maxMass,fullR,birthPairs,expiryPairs,birth,expiry,positive,negative,diagDown,entryDown,levelOracle,cheapInc,diagCheapGain,cheapSharedGain,cheapSharedDrop,entryCheapGain,entryCheapDrop,cheapLevelOracle,Epos,EposOff,birthCap,allBirthCap,lowBirth,highBirth,thinBirth,thinPairs,thinCharge,thinAll,mixedPairs,sameLabelBirth,pairChecks,pairBirthEntry,pairShared};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
