@@ -21,7 +21,7 @@ function audit(X,mode){
  let syncEnergy=0,diag=0,mergers=0,firstPairs=0,exactProfile=0,exactPair=0,smallRaw=0,largeRawSmallTail=0,allLightLarge=0,heavyBranches=0,lightAttach=0,pot=0,loss=0,rootPot=0,rawMassMax=0,profileCuts=0,tailDrop=0;
  const layers=[...new Set([1,2,4,8,16,32,64,128,256,512,1024,2048,4096,Math.max(1,Math.floor(T/2))])].sort((a,b)=>a-b);
  const layer=layers.map(x=>({x,m:Math.max(1,Math.floor(m0*Math.sqrt((T+B)/x))),birth:0,small:0,delta:0,loss:0,start:0,heavy:0,light:0,largeLight:0,root:0}));
- const upper=1.5*(T+B);let maxTail=0,smallProfileE=0,largeProfileE=0,lateSmallE=0,groupCount=0,layerIntervals=0,capE=0,resE=0;
+ const upper=1.5*(T+B);let maxTail=0,smallProfileE=0,largeProfileE=0,lateSmallE=0,groupCount=0,layerIntervals=0,capE=0,resE=0,sameExtra=0,mixedExtra=0,mixedVertices=0,mixedChecks=0,rawSame=0,rawMixed=0,profileMixed=0,profileSame=0;const cap0=mode==='analytic'?Math.floor(B*u**.75):16;
  const pred=e=>e.prev?e.prev.C+":"+e.prev.t:"root:"+e.M;
  for(const es of vlist){
    const n=es.length;rawMassMax=Math.max(rawMassMax,n);const groups=new Map();for(const e of es){let k=pred(e);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(e);maxTail=Math.max(maxTail,e.tail);}
@@ -42,6 +42,8 @@ function audit(X,mode){
      if(hh){ok(d>=o.m*o.m*(hh-1)+o.m*ss,"profile heavy");o.heavy+=hh-1;o.light+=ss;}else if(nn>=2*o.m){ok(d>=o.m*nn/2,"profile light");o.largeLight+=nn;}
    }
    if(!bb)continue;
+   const il=[...new Set(es.filter(e=>e.prev&&e.prev.p>=Q).map(e=>e.prev.p))];
+   if(il.length>=2){mixedVertices++;const J=es[0].C,t=es[0].t,eps=t%2?6:0;for(let i=0;i<il.length;i++)for(let j=i+1;j<il.length;j++){let p=il[i],q=il[j];ok((2*t-J-eps)%(2*p*q)===0,"mixed incoming congruence");mixedChecks++;}}
    let pair=0;for(let i=0;i<gs.length;i++)for(let j=i+1;j<gs.length;j++)for(const a of gs[i])for(const b of gs[j])pair+=2*Math.min(a.tail,b.tail);
    exactPair+=pair;if(n<=m0)smallRaw+=pair;
    // Integer threshold integration, using constant profile between successive tail breakpoints,
@@ -50,10 +52,19 @@ function audit(X,mode){
    for(const end of cuts){
      const sel=es.filter(e=>e.tail>=end),nn=sel.length,a=new Map();for(const e of sel){let k=pred(e);a.set(k,(a.get(k)||0)+1);}
      const b=nn*nn-[...a.values()].reduce((s,v)=>s+v*v,0),len=end-last;
+     const lab=new Map(),labsq=new Map();
+     for(const e of sel){let p=e.prev?e.prev.p:0;lab.set(p,(lab.get(p)||0)+1);}
+     for(const g of gs){let p=g[0].prev?g[0].prev.p:0,ct=g.filter(e=>e.tail>=end).length;labsq.set(p,(labsq.get(p)||0)+ct*ct);}
+     let bs=0,bh=0,hh=0,hhsq=0;for(const [p,v] of lab){bs+=v*v-labsq.get(p);if(p>=Q){hh+=v;hhsq+=v*v;}}bh=hh*hh-hhsq;
+     profileSame+=len*bs;profileMixed+=len*bh;
+     ok(bs+bh<=b,"label refinement");
      exactProfile+=len*b;layerIntervals++;
      // floor(m0 sqrt((T+B)/x)) >= nn iff x<=m0^2(T+B)/nn^2.
      const stop=Math.min(end,Math.floor(m0*m0*(T+B)/(nn*nn)));
      const good=Math.max(0,stop-last);smallProfileE+=good*b;largeProfileE+=(len-good)*b;
+     const remainingStart=last+good;
+     for(const [p,v] of lab){const ib=v*v-labsq.get(p),cut=Math.min(end,Math.floor(m0*m0*(T+B)/(v*v))),extra=Math.max(0,cut-remainingStart);sameExtra+=extra*ib;}
+     if(bh){const cut=Math.min(end,Math.floor(cap0*cap0*(T+B)/(bh*bh)));mixedExtra+=Math.max(0,cut-remainingStart)*bh;}
      if(n>m0){largeRawSmallTail+=good*b;if(nn<n)lateSmallE+=good*b;}
      last=end;
    }
@@ -61,7 +72,8 @@ function audit(X,mode){
  ok(diag===hiR&&syncEnergy===exactPair&&exactPair===exactProfile&&syncEnergy===smallProfileE+largeProfileE,"exact physical energy");
  ok(pot===loss-rootPot&&pot<=2*m0*N&&heavyBranches*m0*m0+lightAttach*m0<=pot&&allLightLarge*m0/2<=pot,"raw potential telescoping");
  for(const o of layer){ok(o.delta===o.loss-o.start&&o.delta<=2*o.m*o.start&&o.small<=o.delta&&o.heavy*o.m*o.m+o.light*o.m<=o.delta&&o.largeLight*o.m/2<=o.delta,"tail potential telescope");}
+ ok(sameExtra+mixedExtra<=largeProfileE&&smallProfileE+sameExtra<=4*N*m0*Math.sqrt((T+B)*Math.ceil(upper))+1e-6,"hierarchical profile bound");
  ok(smallProfileE<=4*N*m0*Math.sqrt((T+B)*Math.ceil(upper))+1e-6&&maxTail<=upper,"integrated small bound");
- return {mode,X,B,T,Q,m0,N,R,G,events,high,literal,hiR,physicalVertices:vlist.length,mergers,firstPairs,syncEnergy,exactPair,exactProfile,smallRaw,smallProfileE,largeProfileE,largeRawSmallTail,lateSmallE,allLightLarge,heavyBranches,lightAttach,pot,loss,rootPot,rawMassMax,layerIntervals,maxTail,layer};
+ return {mode,X,B,T,Q,m0,N,R,G,events,high,literal,hiR,physicalVertices:vlist.length,mergers,firstPairs,syncEnergy,exactPair,exactProfile,smallRaw,smallProfileE,largeProfileE,largeRawSmallTail,lateSmallE,allLightLarge,heavyBranches,lightAttach,pot,loss,rootPot,rawMassMax,layerIntervals,maxTail,layer,sameExtra,mixedExtra,mixedVertices,mixedChecks,profileMixed,profileSame,cap0,finalResidual:largeProfileE-sameExtra-mixedExtra};
 }
 const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
