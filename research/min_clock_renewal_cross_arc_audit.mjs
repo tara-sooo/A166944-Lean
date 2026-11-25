@@ -70,11 +70,24 @@ function audit(X,mode){
    if(split&&e.p>=17){ok(c-e.t<=3&&n.t-c>=e.p/4&&8*q>=e.p,'virtual boundary clock');phaseChecks++;}
    if(split&&ci+1<cs.length&&cs[ci+1].j===j){ok(cs[ci+1].t===c,'virtual canonical');ci++;}
    e.arc=cs[ci].M;e.end=ci+1<cs.length?cs[ci+1].t:0;
-   e.c=c;e.cut=cut;e.stop=Math.min(cut,path[path.length-1].t);e.qual=e.p>=Y&&split;
+   e.c=c;e.nextTime=n.t;e.cut=cut;e.stop=Math.min(cut,path[path.length-1].t);e.qual=e.p>=Y&&split;
    if(e.non>0&&split)ok(e.arc===e.C/2+1,'post-boundary arc');
    if(e.pre>0){virtualPositive++;ok(e.oldArc!==e.C/2+1,'pre-boundary arc');}
    ok(Math.abs(e.w-e.pre-e.non)<1e-9,'exact split');
   }
+ }
+ // Independently shorten all original prefixes by a common relative cutoff.
+ // This exercises the thin (near-cutoff) boundary class even when late/full
+ // natural windows contain no such instance. No change to original dynamics.
+ const boundaryTests=[];
+ for(let hh=2;hh<=H;hh*=2){
+  let thinInc=0,strongInc=0,maxThin=0,preCost=0,postCost=0,checked=0;
+  for(const [C,row] of at){let thin=0;const q=r[C/2];for(const e of row){
+   if(!e.qual)continue;const cut=e.M+2+hh,pre=Math.max(0,Math.min(cut,e.c)-e.t)/(2*q);if(!pre)continue;
+   const post=Math.max(0,Math.min(cut,e.nextTime)-e.c)/(2*q);checked++;preCost+=q*pre;postCost+=q*post;
+   if(cut<e.c+e.p/4){thin+=pre;thinInc++;}else{strongInc++;ok(pre<=12/e.p*post+1e-9,'shortened prefix boundary ratio');}
+  }ok(thin<=3+1e-9,'shortened prefix uniform thin bound');maxThin=Math.max(maxThin,thin);}
+  boundaryTests.push({hh,thinInc,strongInc,maxThin,preCost,postCost,checked});
  }
  const results=[];
  for(const b of [0,1]){
@@ -125,7 +138,7 @@ function audit(X,mode){
   ok(splitPaid<=24/Y*E+6*Rb+ep&&Math.abs(crossAfter-crossSync-crossAsync)<=ep&&crossAfter<=crossAfterEligible+ep&&crossAfterEligible<=cross+ep&&tail<=crossSync+ep&&good<=2*maxGood*Rb+ep,'sector budgets');
   results.push({sector:b,E,R:Rb,m,splitPaid,splitRaw,cross,crossAfterEligible,crossAfter,crossBoundaryPaid:cross-crossAfterEligible,crossBoundaryUnpaid:crossAfterEligible-crossAfter,crossSync,crossAsync,tail,tailShort,tailPairs,distinctTailPairs:tails.size,unreturned,returnedTail,unreturnedTail,thinMax,good,goodR,oracleChecks,restCross:crossAfterEligible-tail,bands:[...bands.entries()]});
  }
- return {X,B,mode,Y,Qr,Kr,Ds,A0,reverseCap,goodInc,goodPositive,maxGood,N,R,events,literal,canonical,virtual,virtualPositive,phaseChecks,results};
+ return {boundaryTests,X,B,mode,Y,Qr,Kr,Ds,A0,reverseCap,goodInc,goodPositive,maxGood,N,R,events,literal,canonical,virtual,virtualPositive,phaseChecks,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','full'])console.log(JSON.stringify(audit(X,mode)));
