@@ -1,7 +1,7 @@
 // Inherited-level later-origin horizon crossing and overtaking audit.
-function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
+function crossingAudit(pairs,X,B,rr,expected,ok,close,eps=1/4,delay=4){
  const z={total:0,low:0,recent:0,eligible:0,hit:0,hitSame:0,hitDistinct:0,hitGood:0,hitShort:0,skip:0,skipLow:0,skipHigh:0,hitEnergy:0,hitDownEnergy:0,hitDownRatio:0,hitDownKeys:0,hitRatio:0,flip:0,flipStationary:0,flipDouble:0,firstBefore:0,firstAfter:0,checks:0,literal:0,maxGap:0,maxLag:0,maxReuse:0,maxSkip:0,byP:{},byR:{},hitGoodKeys:0,hitAllKeys:0,skipKeys:0,skipCrossMoment:0,skipThinPaid:0,skipResidual:0,skipCap:0,skipVertex:0};
- const hitGroups=new Map(),skips=new Map(),skipPairKeys=new Map(),skipTokenGroups=new Map();
+ const hitGroups=new Map(),skips=new Map(),skipPairKeys=new Map(),skipTokenGroups=new Map(),roughTuples=new Map();const R=Math.ceil(B/16);
  function state(P,t){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].v<=t)a=m+1;else b=m}if(a<P.records.length)return {C:P.records[a].C,k:a};return {C:P.endC,k:a}}
  function lower(P,C){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].C<C)a=m+1;else b=m}return a}
  function getFlips(v){
@@ -84,6 +84,12 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
        z.byP[p]=(z.byP[p]||0)+w;
        let s=skips.get(key);if(!s){s={w:0,p,land,t:event.v,origins:new Set(),tags:new Set()};skips.set(key,s)}
        s.w+=w;s.origins.add(C);s.tags.add(E.M);
+       if(Lwait.r>=R){
+         const tuple=key+'|'+C,side=event.v%2,delta=land-C;
+         ok(delta>=2&&delta<=p-3&&delta%2===0&&(C+delta+2*side)%p===0&&(event.v-2*side)%p===0,"rough skip tuple arithmetic");
+         if(!roughTuples.has(tuple))roughTuples.set(tuple,{p,w:0,C,land,t:event.v});
+         roughTuples.get(tuple).w+=w;
+       }
        const tok=late.P.M+'|'+b.z+'|'+l,opp=early.P.M;
        if(!skipTokenGroups.has(tok))skipTokenGroups.set(tok,new Map());const opps=skipTokenGroups.get(tok);
        ok(!opps.has(opp),"unique skip pair-level");opps.set(opp,{w,key});
@@ -110,7 +116,28 @@ function crossingAudit(pairs,B,expected,ok,close,eps=1/4,delay=4){
  }
  ok(close(z.skip,z.skipThinPaid+z.skipResidual)&&z.skipThinPaid<=z.skipCap+1e-7,"skip token quota");
  ok(close(z.total,expected)&&close(z.total,z.low+z.recent+z.eligible)&&close(z.eligible,z.hit+z.skip)&&close(z.hit,z.hitSame+z.hitDistinct)&&close(z.hit,z.hitGood+z.hitShort)&&close(z.skip,z.skipLow+z.skipHigh),"exact crossing ledger");
- return {...z,epsilon:eps,delay};
+ const roughSupport=new Map(),actualByP=new Map();let roughRaw=0,roughPaid=0,roughRemain=0,fullKeys=0;
+ for(const o of roughTuples.values()){
+   actualByP.set(o.p,(actualByP.get(o.p)||0)+1);
+   roughRaw+=o.w;const pay=Math.min(8,o.w);roughPaid+=pay;roughRemain+=o.w-pay;if(pay===o.w)fullKeys++;
+ }
+ // Enumerate the relaxed support only for realized labels; use all even
+ // horizons in the original O(X) strip, not only sampled origins.
+ for(const [p,n] of actualByP){
+   let count=0;
+   for(let C=2*X-2;C<7*X;C+=2){
+     if(rr(C)<R)continue;
+     for(let side=0;side<2;side++){
+       let delta=((-(C+2*side))%p+p)%p;
+       if(delta<2||delta>p-3||delta%2!==0)continue;
+       let J=C+delta,res=side?p+2:0,lo=J/2,hi=(J+12*B+6)/2;
+       count+=Math.max(0,Math.floor((hi-res)/(2*p))-Math.ceil((lo-res)/(2*p))+1);
+     }
+   }
+   ok(n<=count,"realized rough skip tuple support");roughSupport.set(p,count);
+ }
+ ok(close(roughRaw,roughPaid+roughRemain)&&roughRaw<=z.skip+1e-7,"rough tuple quota ledger");
+ return {...z,epsilon:eps,delay,roughTuple:{R,raw:roughRaw,paid:roughPaid,remaining:roughRemain,keys:roughTuples.size,fullyPaid:fullKeys,actualByP:Object.fromEntries(actualByP),relaxedSupportByP:Object.fromEntries(roughSupport)}};
 }
 // Inherited deficit level excursion forest and near-origin energy comparison.
 function inheritedForest(pairs,X,B,paths,expected,ok,close,base=1,delay=4){
@@ -306,7 +333,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  const inheritedLedger=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,1,4);
  const inheritedWide=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,8,4);
  ok(close(nearMoment,inheritedLedger.near[0]),'independent near-origin ledger');
- return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,B,scaledInherited,ok,close),crossingWide:crossingAudit(inheritedPairs,B,scaledInherited,ok,close,1/4,16),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
+ return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close),crossingWide:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close,1/4,16),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
