@@ -1,5 +1,6 @@
 function lowBlockPairs(pairs,slots,sourcePaths,B,ok,close,L,Y,A=32){
  const out={L,Y,A,raw:0,low:0,roughResetLow:0,high:0,bothNonreset:0,bothResetOrRoot:0,mixed:0,bothLarge:0,oneLarge:0,neitherLarge:0,sameLabel:0,differentLabel:0,root:0,tailBoth:0,entryPairs:0,keys:0,checks:0,disjointOracle:0,maxGain:0,maxClock:0,maxEntryGap:0,details:[]};
+ const canonGroups=new Map(),canonCache=new Map();const canon={raw:0,equal:0,distinct:0,nonroot:0,root:0,keys:0,maxGap:0,paid:0,residual:0,details:[]};
  const groups=new Map(),cache=new Map(),T=Math.max(L+2,(A+L)/2);
  function entry(M,C,b){
   const k=[M,C,b].join(',');if(cache.has(k))return cache.get(k);
@@ -11,6 +12,16 @@ function lowBlockPairs(pairs,slots,sourcePaths,B,ok,close,L,Y,A=32){
   if(q)ok(q>Y&&(J+2*s)%q===0&&(t-2*s)%q===0&&phase%(2*q)===0,"nonLOW entry phase");else ok(t===P.s&&J===2*P.M-2,"root entry");
   const z={M,J,t,d,q,s,phase,gain,clock,prev:j?[P.records[j-1].C,P.records[j-1].b,q]:null,tail:P.records.slice(j,i).map(e=>[e.C,e.b,e.v,e.p])};
   cache.set(k,z);return z;
+ }
+ function canonical(z,C,b){
+  let key=z.M+'|'+z.J+','+z.t+'|'+C+','+b;if(canonCache.has(key))return canonCache.get(key);
+  const P=sourcePaths.get(z.M);let res=null;
+  for(const e of P.records){
+   if(e.C<z.J||e.C>C||e.C%4!==0)continue;const t=e.C/2+3;
+   if(t>=z.t&&t>=e.b&&t<e.v&&t<=b){res={C:e.C,t,m:t-2};break;}
+  }
+  ok(res&&res.t-z.t<=7&&res.C-z.J<=8,"actual canonical bridge before physical contact "+JSON.stringify({z,C,b,res}));
+  canonCache.set(key,res);return res;
  }
  for(const a of pairs.values()){
   const {w,sk,i,j,reset,r}=a,C=slots.get(sk).C;out.raw+=w;
@@ -25,7 +36,7 @@ function lowBlockPairs(pairs,slots,sourcePaths,B,ok,close,L,Y,A=32){
   }
   out.maxEntryGap=Math.max(out.maxEntryGap,Math.abs(x.t-y.t));out.checks++;
   const z0=x.phase===0,z1=y.phase===0;
-  if(z0&&z1)out.bothResetOrRoot+=w;else if(!z0&&!z1)out.bothNonreset+=w;else out.mixed+=w;
+  if(z0&&z1){out.bothResetOrRoot+=w;const c=canonical(x,C,j.b),d=canonical(y,C,j.b),g=Math.abs(c.m-d.m);ok(g<L/2&&c.C>L*Math.floor((C-1)/L)&&d.C>L*Math.floor((C-1)/L),'canonical pair in same block');canon.raw+=w;canon.maxGap=Math.max(canon.maxGap,g);if(g===0){ok(c.t===j.b&&c.C===C,'equal canonical points only at first contact');canon.equal+=w;}else{canon.distinct+=w;let key=[Math.min(c.m,d.m),Math.max(c.m,d.m)].join(',');if(!canonGroups.has(key))canonGroups.set(key,{key,c,d,w:0,pairs:0,src0:new Set(),src1:new Set()});let k=canonGroups.get(key);k.w+=w;k.pairs++;let a0=c.m<d.m?x.M:y.M,a1=c.m<d.m?y.M:x.M;k.src0.add(a0);k.src1.add(a1);if(!x.q||!y.q)canon.root+=w;else canon.nonroot+=w;}}else if(!z0&&!z1)out.bothNonreset+=w;else out.mixed+=w;
   if(x.q>T&&y.q>T){ok(x.q!==y.q,"distinct large RESET entry labels");out.bothLarge+=w;}
   else if(x.q>T||y.q>T)out.oneLarge+=w;else out.neitherLarge+=w;
   if(!x.q||!y.q)out.root+=w;else if(x.q===y.q){out.sameLabel+=w;if(x.s===y.s)ok(x.t!==y.t||x.J!==y.J,"distinct entry states");}else out.differentLabel+=w;
@@ -40,6 +51,7 @@ function lowBlockPairs(pairs,slots,sourcePaths,B,ok,close,L,Y,A=32){
   if(!groups.has(k))groups.set(k,{sk,b0:i.b,b1:j.b,entry0:{...x,M:undefined},entry1:{...y,M:undefined},w:0,pairs:0,early:new Set(),late:new Set()});
   const g=groups.get(k);g.w+=w;g.pairs++;g.early.add(x.M);g.late.add(y.M);
  }
+ canon.keys=canonGroups.size;for(const k of canonGroups.values()){let p=Math.min(k.w,8*B/L);canon.paid+=p;canon.residual+=k.w-p;canon.details.push({key:k.key,c:k.c,d:k.d,w:k.w,pairs:k.pairs,n0:k.src0.size,n1:k.src1.size,paid:p});}canon.details.sort((a,b)=>b.w-a.w);ok(close(canon.raw,canon.equal+canon.distinct)&&close(canon.distinct,canon.root+canon.nonroot)&&close(canon.distinct,canon.paid+canon.residual),'canonical pair ledger');out.canon=canon;
  out.keys=groups.size;out.entryPairs=[...groups.values()].reduce((n,g)=>n+g.pairs,0);
  out.details=[...groups.values()].map(g=>({...g,n0:g.early.size,n1:g.late.size,early:undefined,late:undefined})).sort((a,b)=>b.w-a.w);
  ok(close(out.raw,out.low+out.high)&&close(out.low,out.bothNonreset+out.bothResetOrRoot+out.mixed)&&close(out.low,out.bothLarge+out.oneLarge+out.neitherLarge)&&close(out.low,out.root+out.sameLabel+out.differentLabel),"block entry partition");return out;
