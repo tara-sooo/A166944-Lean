@@ -1,6 +1,7 @@
 // Unified donor ascent/inherited episode exits; bounded per-pair storage.
 function exitAudit(uses,B,expected,ok,close){
  const byPair=new Map(),thin=[new Map(),new Map()],U=27,H=8;
+ let target={raw:0,rMass:0,natural:0,drop:0,pos:0,nonpos:0,zero:0,short:0,keys:0,maxRatio:0},targets=new Set();
  let matched=0,terminal=0,matchedShared=0,matchedInherited=0,terminalShared=0,terminalInherited=0,raw=0,low=0,near=0,checks=0,literal=0,netCap=0,terminalCap=0,maxPairLevel=0,maxEpisodeWeight=0,matchedEdges=0,terminalPairs=0,episodes=0,repeatEpisodes=0,eligible=0,tokenMemberships=0;
  for(const u of uses){
    const key=Math.min(u.a.P.M,u.b.P.M)+','+Math.max(u.a.P.M,u.b.P.M);
@@ -17,6 +18,16 @@ function exitAudit(uses,B,expected,ok,close){
    let checkPair=literal<128;
    for(const u of us){
      const a=u.a,b=u.b,A=a.P.records,Q=b.P.records;
+     const j0=A.findIndex((e,i)=>i>a.k&&e.C===u.recipient),j1=Q.findIndex((e,i)=>i>b.k&&e.C===u.recipient);
+     ok(j0>a.k&&j1>b.k,"actual rough recipient visits");
+     const T=A[j0],T1=Q[j1],r=T.r,wT=T.v-T.b,drop=Math.max(0,T.p-1-2*wT),E=wT*wT/(2*r);
+     ok(T.C===T1.C&&T.b===T1.b&&T.v===T1.v&&T.p===T1.p&&r===T1.r&&r===u.r&&T.v<=stop,"shared recorded target wait");
+     const key=pk+"|"+T.C+","+T.b+","+T.v;ok(!targets.has(key),"pair target counted once");targets.add(key);
+     const x=u.w*B/r,charge=u.w*(u.d-6);ok(x<=1+1e-9&&charge<=12*r*x+1e-7&&r<=18*(E+drop)+1e-7,"direct target coercivity");
+     target.raw+=charge;target.rMass+=r*x;target.natural+=E*x;target.drop+=drop*x;
+     const drift=2*wT-(T.p-1);if(drift>0)target.pos+=charge;else{target.nonpos+=charge;if(!drift)target.zero+=charge;}
+     if(wT<r/4)target.short+=charge;
+     target.maxRatio=Math.max(target.maxRatio,charge/(x*(E+drop)));target.keys++;
      ok(A[a.k].v===Q[b.k].v&&A[a.k].post===Q[b.k].post&&A[a.k].v<=stop,"common actual anchor");
      const dl=new Int32Array(u.d+1);dl.fill(-1);
      let mu=u.d;
@@ -65,8 +76,9 @@ function exitAudit(uses,B,expected,ok,close){
  }
  const quota=m=>{let pay=[0,0],rem=[0,0];for(let i=0;i<2;i++)for(const w of thin[i].values()){if(w<=m+1e-10)pay[i]+=w;else rem[i]+=w}ok(close(eligible,pay[0]+pay[1]+rem[0]+rem[1]),"token quota ledger");return {m,pay,rem,capacity:m*(thin[0].size+thin[1].size)}};
  tokenMemberships=thin[0].size+thin[1].size;
+ ok(close(target.raw,raw)&&raw<=216*(target.natural+target.drop)+1e-7&&close(target.raw,target.pos+target.nonpos),'direct target ledger');
  ok(close(raw,expected)&&close(raw,matched+terminal)&&close(matched,matchedShared+matchedInherited)&&close(terminal,terminalShared+terminalInherited)&&close(raw,low+near+eligible)&&matched<=U*netCap+1e-7&&terminal<=U*terminalCap+1e-7,"global exit ledger");
- return {raw,matched,terminal,matchedShared,matchedInherited,terminalShared,terminalInherited,low,near,eligible,netCap,terminalCap,maxPairLevel,maxEpisodeWeight,matchedEdges,terminalPairs,episodes,repeatEpisodes,checks,literal,pairs:byPair.size,tokenMemberships,thinCounts:thin.map(x=>x.size),quota:[quota(1),quota(8)]};
+ return {target,raw,matched,terminal,matchedShared,matchedInherited,terminalShared,terminalInherited,low,near,eligible,netCap,terminalCap,maxPairLevel,maxEpisodeWeight,matchedEdges,terminalPairs,episodes,repeatEpisodes,checks,literal,pairs:byPair.size,tokenMemberships,thinCounts:thin.map(x=>x.size),quota:[quota(1),quota(8)]};
 }
 // Actual origin-class transport on unbalanced inherited same-slot cores.
 function originTransport(edges,B,ok,close,kappa=1){
@@ -540,7 +552,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
      let sh=d-Math.max(6,mu),inh=D-sh;ok(sh>=0&&inh>=0,"level split");
      const wt=a.x*b.x,pk=Math.min(a.P.M,b.P.M)+','+Math.max(a.P.M,b.P.M);
      pairUses.set(pk,(pairUses.get(pk)||0)+1);maxReuse=Math.max(maxReuse,pairUses.get(pk));pairR.set(pk,(pairR.get(pk)||0)+g.r);
-     exitUses.push({a,b,F,mu,d,w:g.r/B*wt});
+     exitUses.push({a,b,F,mu,d,w:g.r/B*wt,r:g.r,recipient:g.recipient});
      let actual=0;const perWait=new Map();
      if(inh>0){const p=a.P.records[F.i].b===F.t?(F.i?a.P.records[F.i-1].p:0):-1,q=b.P.records[F.j].b===F.t?(F.j?b.P.records[F.j-1].p:0):-1;const d0=2*F.t-F.C;let type=p===0||q===0?0:p===-1||q===-1?1:d0===6*(F.t%2)?3:2;ok(type!==0&&d0>6,'high inherited excludes root and reset');let v=inheritedPairs.get(pk);if(!v){v={a,b,F:{...F,d:d0},type,hi:mu,uses:[]};inheritedPairs.set(pk,v)}else{ok(v.F.t===F.t&&v.F.C===F.C&&v.type===type,'unique inherited first contact');if(mu>v.hi){v.a=a;v.b=b;v.hi=mu}}v.uses.push({hi:mu,w:g.r/B*wt});}
 
