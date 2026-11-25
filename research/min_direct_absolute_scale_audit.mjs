@@ -8,7 +8,7 @@ function audit(N=50000,P=499,rootCap=1000000){
  const pi=new Int32Array(Math.floor(Math.sqrt(cap))+2),A=new Float64Array(pi.length);
  for(let i=1;i<pi.length;i++){pi[i]=pi[i-1];A[i]=A[i-1];if(i>=3&&spf[i]===i){pi[i]++;A[i]+=i-1}}
  const L=[0,2,5,11];
- let s={N,P,rootCap,adaptiveEdges:0,windows:0,dyadicWindows:0,windowChecks:0,weightedChecks:0,recordChecks:0,distinctChecks:0,firstMismatch:0,compositeMismatch:0,primeMismatch:0,roughChecks:0,firstCounterexample:null,explicitCounterexample:null,linearScaleCounterexample:null,windowExamples:[],freshCases:0,freshRootChecks:0,freshUncutFound:0,freshAdaptiveFound:0,freshCommonFound:0,minimumDifferences:0,adaptiveBeforeCommon:0,freshExceptional:0,exceptionTwinChecks:0,evenExceptionChecks:0,freshQuadraticChecks:0,freshCoarseChecks:0,smallestExamples:[],nestedChecks:0,nestedExamples:[],literalChecks:0};
+ let s={N,P,rootCap,adaptiveEdges:0,windows:0,dyadicWindows:0,windowChecks:0,weightedChecks:0,recordChecks:0,distinctChecks:0,firstMismatch:0,compositeMismatch:0,primeMismatch:0,roughChecks:0,firstCounterexample:null,explicitCounterexample:null,linearScaleCounterexample:null,windowExamples:[],freshCases:0,freshRootChecks:0,freshUncutFound:0,freshAdaptiveFound:0,freshCommonFound:0,minimumDifferences:0,adaptiveBeforeCommon:0,freshExceptional:0,twinEquivalenceChecks:0,twinEquivalenceYes:0,exceptionTwinChecks:0,evenExceptionChecks:0,freshQuadraticChecks:0,freshCoarseChecks:0,smallestExamples:[],nestedChecks:0,nestedExamples:[],literalChecks:0};
  function checkRough(H,e,p,w){let q=(H-e)/p;if(!Number.isInteger(q)||q%2!==1)throw Error("cofactor");for(let z of [H-1,H+1]){let fs=factors(z),r=fs[0];if(2*r<w||2*r===w&&r<p)throw Error("rough factor");if((w/2)**3>H+1){let a=z,n=0;while(a>1){a/=spf[a];n++}if(n>2)throw Error("rough triple");s.roughChecks++}}
  if(q>1&&p*p>H+1){let r=spf[q];if(w>=2*r)throw Error("ignored cofactor");if(w>=2*Math.sqrt(q)&&r!==q)throw Error("prime cofactor")}
  return q}
@@ -37,7 +37,7 @@ function audit(N=50000,P=499,rootCap=1000000){
  }
  // Search all odd roots in the necessary fresh-label congruence class, in
  // increasing order, separately in the uncut and adaptive models.
- const seeds=[{T:0,E:0,events:[]},{T:6,E:4,events:[[4,3],[5,3]]}];
+ const seeds=[{T:0,E:0,events:[]},{T:1,E:2,events:[[1,3]]},{T:6,E:4,events:[[4,3],[5,3]]}];
  for(let seed of seeds)for(let p=3;p<=P;p+=2)if(spf[p]===p&&p>2*seed.T+7)for(let e of [1,-1]){
  let {T,E,events}=seed,k=mod(p,4)===mod(1-E,4)?1:3,j=(k*p+E-(e===1?7:1))/2,w=j-T;
  if(!Number.isInteger(j)||w<=0||w>=2*p)throw Error("fresh time");
@@ -55,6 +55,7 @@ function audit(N=50000,P=499,rootCap=1000000){
  if(a&&!firstA){firstA=a;s.freshAdaptiveFound++}
  if(firstU&&firstA&&firstCommon)break;
  }
+ if(p>=53&&e===-1&&((T===0&&p%4===1)||(T===1&&p%4===3))){let lin=(p+1-E)/2,isTwin=spf[p-2]===p-2;if((firstU?.M===lin)!==isTwin||isTwin&&(!firstA||firstA.M<=lin))throw Error('two-family twin equivalence');s.twinEquivalenceChecks++;if(isTwin)s.twinEquivalenceYes++}
  if(firstU&&firstA&&firstU.M!==firstA.M)s.minimumDifferences++;
  if(firstCommon&&firstA&&firstA.M<firstCommon.M)s.adaptiveBeforeCommon++;
  s.freshCases++;if([31,53,101,211,257,421].includes(p))s.smallestExamples.push({T,E,p,e,k,j,w,lower:Math.ceil((p*(Math.floor(w/2)+1)+e+2-E)/2),firstU,firstA,firstCommon})
