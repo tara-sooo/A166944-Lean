@@ -1,6 +1,6 @@
 // Variable reverse Kraft weight and mixed expiry reindex audit.
-function audit(X,focus=false){
- const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,Ps=[6,30,210],L=6,y=3,theta=L*Math.max(2,Math.floor(Math.sqrt(B))),logTheta=Math.log(theta),bmin=3,lim=7*X+B+20,S=new Int32Array(lim);
+function audit(X,focus=false,scale=1){
+ const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,Ps=[6,30,210],L=6,y=3,theta=scale*L*Math.max(2,Math.floor(Math.sqrt(B))),logTheta=Math.log(theta),bmin=3,lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(v,m)=>{if(!v)throw Error(`${X}/${focus}: ${m}`)},eq=(a,b)=>Math.abs(a-b)<1e-7*Math.max(1,Math.abs(a),Math.abs(b)),mod=(a,b)=>(a%b+b)%b, key=(a,b)=>Math.min(a,b)+"|"+Math.max(a,b);
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
  function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
@@ -67,6 +67,7 @@ function audit(X,focus=false){
    ok(w<=cap+1e-7&&cap<=old+1e-7,"expiry lifetime cap");sum+=w;z.expiryCap+=cap;z.oldCap+=old;z.expiryKeys++;if(k===0)z.resetKeys++;
   }ok(eq(sum,z.mixed)&&z.sourceMoving<=z.sourceMovingCap+1e-7,"global mixed conservation");for(let k of Object.keys(z))z[k]=+z[k].toFixed(6)
  }
- return {X,focus,B,T,N:tags.length,events,hit,theta,moving,oldMoving,newOnly,oldOnly,maxMoving,scoreChecks,witnessChecks,kraftChecks,maxKraft,rootWitnesses,ordinaryWitnesses,expiries,reset,sourceCohorts,sourceChecks,lightPairs,bothPairs,mixedPairs,oldPairs,sourceMovingPairs,expiryChecks,mixedSmall,mixedLarge,keys:groups.size,rows}
+ return {X,focus,scale,B,T,N:tags.length,events,hit,theta,moving,oldMoving,newOnly,oldOnly,maxMoving,scoreChecks,witnessChecks,kraftChecks,maxKraft,rootWitnesses,ordinaryWitnesses,expiries,reset,sourceCohorts,sourceChecks,lightPairs,bothPairs,mixedPairs,oldPairs,sourceMovingPairs,expiryChecks,mixedSmall,mixedLarge,keys:groups.size,rows}
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
+console.log(JSON.stringify(audit(65536,false,2)));
