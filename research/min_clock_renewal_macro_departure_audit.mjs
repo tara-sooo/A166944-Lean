@@ -124,8 +124,33 @@ function audit(X,mode){
  let retainedThin=0,retainedThick=0,maxRootThin=0;
  for(let i=0;i<N;i++)if(!deleted[i]){let s=0;for(const g of rootGroups[i]){if(counts.get(g.id)<=m)s+=g.p-1;else retainedThick+=g.p-1;}ok(s<eps0*B,'fixed point');retainedThin+=s;maxRootThin=Math.max(maxRootThin,s);}
  ok(charged<=m*envGain&&charged>=removed*eps0*B-1e-8,'peel budget');
+
+ // Independent prefix reverse-word bound, no regular-degree or reset assumption.
+ // Finite thresholds are diagnostic; the paper chooses a growing slow primorial
+ // and K=floor(log log B/(8 log(20(L+1)))).
+ const Qr=Math.max(y+1,Math.ceil(Math.sqrt(B))),Kr=mode==='analytic'?Math.max(0,Math.floor(ell/(8*Math.log(20*(Lp+1))))):mode==='wide'?3:2,Jr=2;
+ const A0=2*Math.floor(Math.log(7*X+2)/Math.log(Qr)),A1=2*Math.floor(Math.log(7*X+2)/Math.log(Math.max(3,y+1))),Wl=Math.ceil(Lp/2)+1;
+ let wordCap=0;for(let i=0;i<=Kr;i++)for(let j=0;j<=Jr;j++){let choose=1;for(let k=1;k<=j;k++)choose*=((i+k)/k);wordCap+=Wl*choose*(Wl*A0)**i*(Wl*A1)**j;}
+ const goodW=new Float64Array(len),goodM=new Float64Array(len),goodH=new Float64Array(len),goodCount=new Int32Array(len),rootSets=new Map();
+ let goodR=0,goodInc=0,goodPositive=0,lowChecks=0,reverseChecks=0,maxGood=0,goodDiag=0;
+ for(const path of paths){let i=0,j=0,F=path[0].C;
+  for(let k=0;k<path.length;k++){
+   const e=path[k];if(k){const p=e.inc;if(p<=y){ok(e.C-F<Lp,'LOW block gain');lowChecks++;}else{
+     const D=path[k-1].C;ok(D-F<Lp&&(e.C%p===0||(e.C+2)%p===0)&&D===e.C-p+1,'reverse nonLOW step');
+     reverseChecks++;F=e.C;if(p>=Qr)i++;else j++;
+   }}
+   if(i>Kr||j>Jr)continue;
+   goodInc++;const h=e.C/2;goodCount[h]++;maxGood=Math.max(maxGood,goodCount[h]);ok(goodCount[h]<=wordCap,'reverse-word support');
+   if(e.w>0){goodPositive++;goodW[h]+=e.w;goodR+=r[h]*e.w;goodDiag+=r[h]*e.w*e.w;if(e.p>z&&e.p<=T)goodM[h]+=e.w;if(e.p>T)goodH[h]+=e.w;}
+  }
+ }
+ let goodE=0,goodCross=0,goodME=0,goodHE=0,goodRest=0;
+ for(let j=lo;j<=hi;j++){const q=r[j];goodE+=q*goodW[j]**2;goodCross+=2*q*goodW[j]*(W0[j]-goodW[j]);goodRest+=q*(W0[j]-goodW[j])**2;goodME+=q*(2*WM[j]*goodM[j]-goodM[j]**2);goodHE+=q*(2*WH[j]*goodH[j]-goodH[j]**2);}
+ let Etot=0;for(let j=lo;j<=hi;j++)Etot+=r[j]*W0[j]**2;
+ ok(Math.abs(Etot-goodE-goodCross-goodRest)<=1e-6*Math.max(1,Etot)&&goodE+goodCross<=2*maxGood*R+1e-6*Math.max(1,Etot),'good prefix energy partition');
+ const reverse={Qr,Kr,Jr,A0,A1,Wl,wordCap,goodInc,goodPositive,lowChecks,reverseChecks,maxGood,goodR,goodE,goodCross,goodRest,goodME,goodHE,goodDiag,Etot};
  const arcClasses=[0,0,0];for(const x of arcs.values())arcClasses[x]++;
- return {X,B,mode,Y,d0,y,Lp,P,m,eps0,N,R,events,literal,canonical,virtual,env,envGain,maxTimes,checks,inc,rawGain,rawClock,wideInc,wideGain,wideClock,origNarrow,groups:groups.size,multiOrigin,maxOrigins,maxMass,usedGain,thinGain,thinWideGain,thinClock,removed,rounds,charged,retainedThin,retainedThick,maxRootThin,macroInc,lowArcInc,nonMacro,arcClasses,macroGain,macroClock,macroVirtual,maxPre,invKeys,invSources,maxInvKeys,maxInvSources,maxOriginBlock};
+ return {reverse,X,B,mode,Y,d0,y,Lp,P,m,eps0,N,R,events,literal,canonical,virtual,env,envGain,maxTimes,checks,inc,rawGain,rawClock,wideInc,wideGain,wideClock,origNarrow,groups:groups.size,multiOrigin,maxOrigins,maxMass,usedGain,thinGain,thinWideGain,thinClock,removed,rounds,charged,retainedThin,retainedThick,maxRootThin,macroInc,lowArcInc,nonMacro,arcClasses,macroGain,macroClock,macroVirtual,maxPre,invKeys,invSources,maxInvKeys,maxInvSources,maxOriginBlock};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
