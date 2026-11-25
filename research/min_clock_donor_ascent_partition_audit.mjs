@@ -1,6 +1,6 @@
 // Actual donor last-upcross partitions, common-minimum decomposition and upstream positive-energy transfer.
 function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
- const U=6*B+3,R=Math.max(y+1,Math.ceil(B/16)),groups=new Map(),pairUses=new Map(),edgeUses=new Map(),pairMoment=new Map();let raw=0;
+ const U=6*B+3,R=Math.max(y+1,Math.ceil(B/16)),groups=new Map(),pairUses=new Map(),pairR=new Map(),edgeUses=new Map();let raw=0;
  for(const [pk,w] of ledger.pairs){
    const a=ledger.contacts.get(pk);if(a.type!==1||Math.max(a.p,a.q)>y||a.age<=3*L+3||rr(a.J)<R)continue;
    const P=paths.get(a.i),Q=paths.get(a.j),i=P.records.findIndex(e=>e.C===a.J),j=Q.records.findIndex(e=>e.C===a.J);
@@ -20,14 +20,14 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
      i++;j++;
    }throw Error("missing donor internal contact");
  }
- let shared=0,inherited=0,diagonal=0,unweightedShared=0,unweightedInherited=0,weightedKeyEnergy=0,maxReuse=0,checks=0,literal=0,globalBound=0;
+ let shared=0,inherited=0,diagonal=0,unweightedShared=0,unweightedInherited=0,weightedKeyEnergy=0,maxReuse=0,checks=0,literal=0,globalBound=0,scaledShared=0,scaledInherited=0,scaledDiag=0,scaledTotal=0,scaledUnweightedShared=0,scaledUpstream=0,maxReuseR=0;
  const out=[];
  for(const g of groups.values()){
-   const {d}=g,D=d-6,nR=g.receivers.size,vs=[...g.donors.values()];
+   const {d}=g,D=d-6,nR=g.receivers.size,vs=[...g.donors.values()],rowCap=Math.max(...vs.map(a=>a.w));ok(rowCap<=U*nR+1e-8,'actual row cap');
    const lambdaSums=new Float64Array(d+1),lambdaSquares=new Float64Array(d+1);
    let mass=0,diag=0;
    for(const a of vs){
-     a.x=a.w/(U*nR);ok(a.x>0&&a.x<=1+1e-9,"normalized row mass");
+     a.x=a.w/rowCap;ok(a.x>0&&a.x<=1+1e-9,"normalized row mass");
      mass+=a.x;diag+=a.x*a.x;
      const levels=Array(d+1).fill(null);
      for(let i=0;i<=a.k;i++){
@@ -39,7 +39,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
      for(let l=7;l<=d;l++){ok(levels[l],"all high levels reached");}
      a.levels=levels;
    }
-   ok(close(g.w,U*nR*mass),"row normalization");
+   ok(close(g.w,rowCap*mass),"row normalization");
    let s=0,h=0,s0=0,h0=0,minCommon=Infinity,maxCommon=0,earlyPairs=0,highPairs=0,localEnergy=0;
    for(let l=7;l<=d;l++){
      const gs=new Map();for(const a of vs){const k=a.levels[l].z+','+a.levels[l].C;let b=gs.get(k);if(!b){b={x:0,n:0,xx:0};gs.set(k,b)}b.x+=a.x;b.n++;b.xx+=a.x*a.x}
@@ -52,7 +52,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
      for(let k=0;k<=a.k-F.i;k++)ok(A[F.i+k].C===Q[F.j+k].C&&A[F.i+k].v===Q[F.j+k].v,"shared donor suffix");
      let sh=d-Math.max(6,mu),inh=D-sh;ok(sh>=0&&inh>=0,"level split");
      const wt=a.x*b.x,pk=Math.min(a.P.M,b.P.M)+','+Math.max(a.P.M,b.P.M);
-     pairUses.set(pk,(pairUses.get(pk)||0)+1);maxReuse=Math.max(maxReuse,pairUses.get(pk));
+     pairUses.set(pk,(pairUses.get(pk)||0)+1);maxReuse=Math.max(maxReuse,pairUses.get(pk));pairR.set(pk,(pairR.get(pk)||0)+g.r);
      let actual=0;const perWait=new Map();
      for(let l=7;l<=d;l++){
        const x=a.levels[l],y=b.levels[l],same=x.z===y.z&&x.C===y.C;
@@ -63,7 +63,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
      }
      ok(actual===sh,"direct level scan");checks++;
      let pe=0;for(const [k,{n,e,f}] of perWait){const E=(e.v-e.b)*(f.v-f.b)/(2*e.r);ok(n<=12*E+1e-8,"full positive upstream energy payment");pe+=E;
-       const K=pk+'|'+k;let z=edgeUses.get(K);if(!z){z={sum:0,E,uses:0};edgeUses.set(K,z)}ok(close(z.E,E),"same upstream pair wait");z.sum+=wt*n;z.uses++;
+       const K=pk+'|'+k;let z=edgeUses.get(K);if(!z){z={sum:0,E,uses:0,weighted:0,unweighted:0,rsum:0};edgeUses.set(K,z)}ok(close(z.E,E),"same upstream pair wait");z.sum+=wt*n;z.uses++;z.weighted+=g.r/B*wt*n;z.unweighted+=g.r/B*n;z.rsum+=g.r;
      }
      ok(sh<=12*pe+1e-8,"per donor pair transfer");localEnergy+=pe;
      s+=wt*sh;h+=wt*inh;s0+=sh;h0+=inh;
@@ -81,20 +81,20 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
    ok(close(D*mass*mass,D*diag+2*(s+h)),"exact weighted square identity");
    const recEnergy=g.minAge*g.minAge*nR*nR/(4*g.r);
    const sharedFrac=2*s/(D*mass*mass),inheritedFrac=2*h/(D*mass*mass);
-   if(s>0)ok(g.w*g.w<=2*U*U*nR*nR*s/(D*sharedFrac)+1e-6,"conditional shared mass bound");
+   if(s>0)ok(close(g.w*g.w,2*rowCap*rowCap*s/(D*sharedFrac)),"conditional shared mass bound");
    // For every recipient, its actual full wait includes the preceding minAge ticks.
    let recSum=0;for(const M of g.receivers){let e=paths.get(M).records.find(e=>e.C===g.recipient);ok(e&&e.b<=g.arrival-g.minAge,"recipient interval");recSum+=(e.v-e.b)/(2*e.r)}
    ok(g.r*recSum*recSum+1e-8>=recEnergy,"recipient occupation lower bound");
-   shared+=s;inherited+=h;diagonal+=D*diag;unweightedShared+=s0;unweightedInherited+=h0;
-   out.push({J:g.J,t:g.t,q:g.q,d,recipient:g.recipient,r:g.r,arrival:g.arrival,nD:vs.length,nR,w:g.w,minAge:g.minAge,maxAge:g.maxAge,mass,diag:D*diag,shared:s,inherited:h,sharedFrac,inheritedFrac,s0,h0,earlyPairs,highPairs,minCommon:Number.isFinite(minCommon)?minCommon:null,maxCommon,localEnergy,recEnergy,fullRecipientEnergy:g.r*recSum*recSum});
+   shared+=s;inherited+=h;diagonal+=D*diag;unweightedShared+=s0;unweightedInherited+=h0;scaledShared+=g.r/B*s;scaledInherited+=g.r/B*h;scaledDiag+=g.r/B*D*diag;scaledTotal+=g.r/B*D*mass*mass;scaledUnweightedShared+=g.r/B*s0;
+   out.push({J:g.J,t:g.t,q:g.q,d,recipient:g.recipient,r:g.r,arrival:g.arrival,nD:vs.length,nR,w:g.w,minAge:g.minAge,maxAge:g.maxAge,rowCap,mass,diag:D*diag,shared:s,inherited:h,sharedFrac,inheritedFrac,s0,h0,earlyPairs,highPairs,minCommon:Number.isFinite(minCommon)?minCommon:null,maxCommon,localEnergy,recEnergy,fullRecipientEnergy:g.r*recSum*recSum});
  }
  // A donor pair can share at most O(B/R) distinct rough target slots; every such
  // target contributes a completed jump of at least R-1 to BOTH actual gains.
  const maxTargets=Math.ceil((12*B+6)/(R-1));
- for(const [pk,n] of pairUses){ok(n<=maxTargets,"global pair target multiplicity");}
- for(const z of edgeUses.values()){ok(z.uses<=maxTargets&&z.sum<=12*maxTargets*z.E+1e-7,"weighted upstream reuse");weightedKeyEnergy+=z.E;globalBound+=12*maxTargets*z.E}
- ok(shared<=globalBound+1e-7,"global upstream moment");
- return {L,y,R,raw,anchors:groups.size,checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,out};
+ for(const [pk,n] of pairUses){ok(n<=maxTargets,"global pair target multiplicity");const [i,j]=pk.split(',').map(Number),gain=Math.min(...[i,j].map(M=>paths.get(M).records.reduce((s,e)=>s+e.p-1,0)));ok(pairR.get(pk)<=1.5*gain+1e-8,'actual weighted target multiplicity');maxReuseR=Math.max(maxReuseR,pairR.get(pk)/B);}
+ for(const z of edgeUses.values()){ok(z.uses<=maxTargets&&z.sum<=12*maxTargets*z.E+1e-7,"weighted upstream reuse");weightedKeyEnergy+=z.E;globalBound+=12*maxTargets*z.E;ok(z.weighted<=z.unweighted+1e-8&&z.unweighted<=12*z.rsum/B*z.E+1e-7,'scaled upstream reuse');scaledUpstream+=z.unweighted;}
+ ok(shared<=globalBound+1e-7,"global upstream moment");ok(close(scaledTotal,scaledDiag+2*(scaledShared+scaledInherited))&&close(scaledUpstream,scaledUnweightedShared)&&scaledShared<=scaledUnweightedShared+1e-7&&scaledUnweightedShared<=12*maxReuseR*weightedKeyEnergy+1e-7,'global gain-weighted shared moment');
+ return {L,y,R,raw,anchors:groups.size,checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
