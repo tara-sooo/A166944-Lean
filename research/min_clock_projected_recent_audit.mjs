@@ -42,7 +42,7 @@ function audit(X,mode='diagnostic'){
    ok(C<=2*t&&C>=C0&&C-C0<=2*H+B+6,'prefix invariant');
    if(depth<=kg&&d[j]>T)flag=true;
    const recent=!!qHigh&&depth-depHigh<=k;
-   const e={i,M,C,t,inc,depth,good:depth<=kg,recent,regular:recent&&regular,J:recent?J:0,q:recent?qHigh:0,w:0,cost:0,tail:0,end:0};
+   const e={i,M,C,t,inc,depth,good:depth<=kg,recent,recentDepth:recent?depth-depHigh:-1,regular:recent&&regular,J:recent?J:0,q:recent?qHigh:0,w:0,cost:0,tail:0,end:0};
    path.push(e);
    if(t>=s+H)break;
    const [u,p]=hit(t,C,K);
@@ -87,7 +87,7 @@ function audit(X,mode='diagnostic'){
   for(const m of x.groups.values())maxGroupMass=Math.max(maxGroupMass,m);
   ok(x.good<=gBound&&x.groups.size<=kBound,'reverse leaf/key caps');
  }
- const names=['near','shortTail','bothGood','recentGood','recentThin','remaining'],counts=Array(6).fill(0),energy=Array(6).fill(0),sameEnergy=Array(6).fill(0),budget=Array(6).fill(0),ind={short:0,gg:0,rg:0,rt:0,regularBoth:0,deepThin:0,deepThinExtended:0,deepRecentGood:0};
+ const names=['near','shortTail','bothGood','recentGood','recentThin','remaining'],counts=Array(6).fill(0),energy=Array(6).fill(0),sameEnergy=Array(6).fill(0),budget=Array(6).fill(0),ind={short:0,gg:0,rg:0,rt:0,regularBoth:0,deepThin:0,deepThinExtended:0,deepThinNonlow:0,deepRecentGood:0,deepRecentGoodNonlow:0};
  let pairs=0,physicalFirst=0,asyncFirst=0,rootContact=0,nonrootContact=0,laterSync=0,sameKey=0,totalPairVisits=0;
  // Only O(B) active pair records per current original root, not a global pair hash.
  for(const path of paths){
@@ -111,8 +111,8 @@ function audit(X,mode='diagnostic'){
       rt=(e.regular&&x.groups.get(ke)<=tau)||(b.regular&&x.groups.get(kb)<=tau);
       if(e.regular&&b.regular)ind.regularBoth++;
      }
-     if(short)ind.short++;if(gg)ind.gg++;if(rg){ind.rg++;if(!gg)ind.deepRecentGood++;}
-     if(rt){ind.rt++;if(!e.good&&!b.good){ind.deepThin++;if(e.depth>0&&b.depth>0&&(e.C!==e.J||b.C!==b.J))ind.deepThinExtended++;}}
+     if(short)ind.short++;if(gg)ind.gg++;if(rg){ind.rg++;if(!gg){ind.deepRecentGood++;if((e.recentDepth>0&&b.good)||(b.recentDepth>0&&e.good))ind.deepRecentGoodNonlow++;}}
+     if(rt){ind.rt++;if(!e.good&&!b.good){ind.deepThin++;if(e.depth>0&&b.depth>0&&(e.C!==e.J||b.C!==b.J))ind.deepThinExtended++;if(e.recentDepth>0||b.recentDepth>0)ind.deepThinNonlow++;}}
      const cls=dist<=near?0:short?1:gg?2:rg?3:rt?4:5;
      const cap=2*Math.min(e.tail,b.tail,1.5*(e.end-e.C),1.5*(b.end-b.C));
      v={cls,cap,w:0,phys:e.t===b.t,first:e.C};seen.set(b.i,v);counts[cls]++;budget[cls]+=cap;
