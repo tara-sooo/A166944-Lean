@@ -19,17 +19,17 @@ function audit(X,focus=false){
  function prior(tag,i){return i?tag.states[i-1].k:"root:"+tag.M}
  function dest(e,i){let a=e.tag.states,x=a[i];if(i&&a[i-1].C!==x.C)return {e:a[i-1].e,role:"jump"};if(i)return {e:x.e,role:"wait"};return {e:null,role:"root"}}
  const stats=Pset.map(P=>({P,compatible:0,diag:0,smallBirth:0,smallBranches:0,rootPaid:0,nearPaid:0,routed:0,jump:0,wait:0,maxLoad:0,nonzero:0,keys:0}));
- let groups=0,pairChecks=0,branchChecks=0,treeChecks=0,routeChecks=0,relativeChecks=0,rootCases=0;
+ let groups=0,directChecks=0,pairChecks=0,branchChecks=0,treeChecks=0,routeChecks=0,relativeChecks=0,rootCases=0;
  for(let o of proj.values()){
   let classes=new Map();for(let s of o.slots.values()){let c=mod(s.v,6),a=classes.get(c)||[];a.push(s);classes.set(c,a)}
   for(let a of classes.values()){let n=a.reduce((x,s)=>x+s.refs.length,0);
    for(let k=0;k<Pset.length;k++){let P=Pset[k],z=stats[k],nc=Math.ceil((o.C+o.p-1)/P)-Math.ceil(o.C/P);if(!nc)continue;let words=new Map();
-    for(let s of a){let e=s.refs[0],es=e.tag.es,i=e.i+1,seq=[];if(e.tag.end-e.J<lens[k])continue;while(es[i-1].J-e.J<lens[k]){let x=es[i++];seq.push(x.p+":"+x.w)}s.word=seq.join(",");words.set(s.word,(words.get(s.word)||0)+s.refs.filter(e=>e.tag.end-e.J>=lens[k]).length)}
+    for(let s of a){let ready=s.refs.filter(e=>e.tag.end-e.J>=lens[k]);s.word=null;if(!ready.length)continue;let e=ready[0],es=e.tag.es,i=e.i+1,seq=[];while(es[i-1].J-e.J<lens[k]){let x=es[i++];seq.push(x.p+":"+x.w)}s.word=seq.join(",");words.set(s.word,(words.get(s.word)||0)+ready.length)}
     for(let s of a){let b=s.refs.length;if(b<cut||!s.refs.some(e=>e.W[k]&&e.tag.end-e.J>=lens[k]))continue;groups++;let cohort=s.refs,table=new Map();
      // Build the induced reverse merge tree up through the common predeparture tick.
      for(let e of cohort){let a=e.tag.states;for(let i=0;i<a.length&&a[i].t<s.v;i++){let x=a[i],v=table.get(x.k)||{n:0,br:new Map()};v.n++;let p=prior(e.tag,i);v.br.set(p,(v.br.get(p)||0)+1);table.set(x.k,v)}}
      let d=1;for(let v of table.values()){d=Math.max(d,v.br.size);ok([...v.br.values()].reduce((a,b)=>a+b,0)===v.n,"branch partition");treeChecks++}degree=Math.max(degree,d);
-     let smallCounts=new Map(),parentCounts=new Map(),bound=eta*b/d;
+     let expected=cohort.filter(e=>e.tag.end-e.J>=lens[k]).reduce((a,e)=>a+e.W[k]*(words.get(s.word)||0)/n,0),before=z.compatible;let smallCounts=new Map(),parentCounts=new Map(),bound=eta*b/d;
      for(let i=0;i<b;i++)for(let j=i+1;j<b;j++){
       let x=cohort[i],y=cohort[j],f=birth(x,y),v=table.get(f.k);ok(v&&prior(x.tag,f.i)!==prior(y.tag,f.j),"first birth branches");let bx=v.br.get(prior(x.tag,f.i)),by=v.br.get(prior(y.tag,f.j));ok(bx+by<=v.n&&v.n<=b,"branch mass");pairChecks++;
       if(v.n<=eta*b){parentCounts.set(i,(parentCounts.get(i)||0)+1);parentCounts.set(j,(parentCounts.get(j)||0)+1)}
@@ -48,6 +48,7 @@ function audit(X,focus=false){
       }
      }
      for(let i=0;i<b;i++){ok((smallCounts.get(i)||0)<=(d+1)*bound+1e-7,"small branch count");ok((parentCounts.get(i)||0)<=eta*b+1e-7,"small parent count");relativeChecks++;let e=cohort[i];if(e.tag.end-e.J>=lens[k]&&e.W[k]){let c=e.W[k]*(words.get(s.word)||0)/n/b;z.compatible+=c;z.diag+=c}}
+     ok(eq(z.compatible-before,expected),"direct compatible source mass");directChecks++;
     }
    }
   }
@@ -55,6 +56,6 @@ function audit(X,focus=false){
  for(let k=0;k<Pset.length;k++){let z=stats[k],sum=0,keys=new Set();for(let tag of tags)for(let e of tag.es){let x=e.load[k];if(!x)continue;ok(x<=18*(H+Pset[k])+1e-7,"linear birth capacity");z.maxLoad=Math.max(z.maxLoad,x);sum+=x;z.nonzero++;keys.add(e.C+"|"+e.p+"|"+e.v)}
   z.keys=keys.size;ok(eq(sum,z.routed)&&eq(z.compatible,z.diag+z.smallBirth+z.smallBranches+z.rootPaid+z.nearPaid+z.routed)&&eq(z.routed,z.jump+z.wait),"conservation");for(let p of Object.keys(z))if(typeof z[p]==="number")z[p]=+z[p].toFixed(6)
  }
- return {X,focus,B,T,N,events,W,hit,degree,groups,pairChecks,treeChecks,relativeChecks,branchChecks,routeChecks,rootCases,stats};
+ return {X,focus,B,T,N,events,W,hit,degree,groups,directChecks,pairChecks,treeChecks,relativeChecks,branchChecks,routeChecks,rootCases,stats};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
