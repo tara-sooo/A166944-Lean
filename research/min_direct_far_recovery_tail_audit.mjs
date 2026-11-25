@@ -3,7 +3,7 @@ function audit(N=60000,steps=180){
  const cap=4*N+30000,spf=new Int32Array(cap+1);for(let i=2;i<=cap;i++)if(!spf[i]){spf[i]=i;if(i*i<=cap)for(let j=i*i;j<=cap;j+=i)if(!spf[j])spf[j]=i}
  const mod=(a,b)=>(a%b+b)%b;
  function next(t,H){let a=null;for(let e of [1,-1]){let z=H-e;while(z>1){let p=spf[z];if(!p)throw Error("range");while(z%p===0)z/=p;if(p*p>H+1)continue;let w=mod((e===1?0:p+2)-t,2*p)||2*p;if(!a||w<a.w||w===a.w&&p<a.p)a={p,e,w}}}return a}
- let s={roots:0,events:0,a1:0,terminal:0,capped:0,blocks:0,markedBlocks:0,marks:0,nearMarks:0,nearPairChecks:0,intervalChecks:0,allocationChecks:0,denseChecks:0,tailMarks:0,tailSlots:0,tailMatched:0,tailBounds:0,farShareChecks:0,jointChecks:0,lowBandChecks:0,periods:[],witness:[]};
+ let s={nearResetShareChecks:0,combinedRootChecks:0,roundedBlocks:0,roundedSlots:0,roundedMatches:0,roundedExceptions:0,roundedFarChecks:0,roots:0,events:0,a1:0,terminal:0,capped:0,blocks:0,markedBlocks:0,marks:0,nearMarks:0,nearPairChecks:0,intervalChecks:0,allocationChecks:0,denseChecks:0,tailMarks:0,tailSlots:0,tailMatched:0,tailBounds:0,farShareChecks:0,jointChecks:0,lowBandChecks:0,periods:[],witness:[]};
  const tables={};
  for(let R of [5,7,11,13]){
   let ps=[];for(let p=3;p<=R;p+=2)if(spf[p]===p)ps.push(p);
@@ -28,11 +28,11 @@ function audit(N=60000,steps=180){
   const cnt=(tab,x)=>tab.count(Math.floor((x-3*den)/(2*den))+1);
   const nslots=(tab,a,b)=>cnt(tab,b)-cnt(tab,a);
   let pending=[],paid=0,resetPaid=0,farPaid=0,tailSlots=0,tailMatched=0,smallSlots=0,smallPaid=0,smallLost=0;
-  let Dreset=0,Z=0,Dhigh=0,Jhigh=0,F=0,j=0,allFarDrop=0,otherCap=0,otherCount=0;
+  let Dreset=0,Z=0,DnearReset=0,Znear=0,A0far=0,Bhigh=0,Dhigh=0,Jhigh=0,F=0,j=0,allFarDrop=0,otherCap=0,otherCount=0;
   for(let i=lo;i<hi;i++){
    const v=ev[i],g=v.p-1,x=(v.d+3)*den,y=(v.dp+3)*den;
    C=Math.max(C,v.p);G+=g;if(v.near)Nnear++;else Gfar+=g;
-   if(!v.near&&v.p>R&&!(v.a1&&v.p>R)){otherCap+=g;otherCount++}
+   if(!v.near&&v.p>R&&!(v.a1&&v.p>R)){otherCap+=g;otherCount++;if(v.p>=47&&v.p>=5*v.d+15&&v.D===0)A0far++;else Bhigh++}
    if(v.a1&&v.p>R){
     let a=k*v.p,b=(10*k-20)*v.p,tail=v.p>=T;
     if(!(x<=a&&a<b&&b<=y)||pending.some(o=>Math.min(b,o.b)>Math.max(a,o.a)))throw Error("mark interval");
@@ -44,7 +44,7 @@ function audit(N=60000,steps=180){
    }
    if(y>=x)continue;
    let reset=v.D===0,drop=v.d-v.dp;
-   if(reset){Dreset+=drop;Z++}
+   if(reset){Dreset+=drop;Z++;if(v.near){DnearReset+=drop;Znear++}}
    else if(!v.near){
     allFarDrop+=drop;
     if(v.p>R){Dhigh+=drop;Jhigh++}
@@ -76,6 +76,8 @@ function audit(N=60000,steps=180){
   let Nroot=roots.filter(t=>t>ev[lo].t&&t<=ev[hi-1].n).length;
   if(Z>Nroot+1||cnum*W+den*FF>den*(Gfar+Dreset+2*C)||farPaid>den*allFarDrop||resetPaid>den*Dreset)throw Error("far share");
   s.farShareChecks++;
+  if(cnum*W+den*FF>den*(Gfar+DnearReset+2*C)||A0far+Znear>Nroot+1)throw Error("near reset share");
+  s.nearResetShareChecks++;s.combinedRootChecks++;
   // Normalized dense discrepancy and tail upper bound, exact integer arithmetic.
   if(2*rd.P*tailSlots*den<rd.A*cnum*tailW-(2*rd.D+2*rd.A)*tailm*den)throw Error("tail density");
   let tailUpper=(2*rd.D+2*rd.A)*tailm+rd.A*(Dhigh+Dreset+2*C+2)+2*rd.D*(Jhigh+Z+1);
@@ -94,10 +96,48 @@ function audit(N=60000,steps=180){
    }
    if(total!==sum||2*ht.P*nearCap>ht.A*(G-Gfar)+2*ht.D*Nnear||2*ht.P*farA1Cap>ht.A*FF+2*ht.D*mf||2*ht.P*other>ht.A*otherCap+2*ht.D*otherCount)throw Error("H split");
    let right=2*ht.D*(mf+otherCount+Nnear+1)+ht.A*otherCap;
-   if(ht.A*cnum*Gfar>(den+cnum)*right+ht.A*den*(Dreset+2*C))throw Error("joint bound");
+   if(ht.A*cnum*Gfar>(den+cnum)*right+ht.A*den*(DnearReset+2*C))throw Error("joint bound");
    s.jointChecks++;
+   let rootCap=ht.A*C+2*ht.D;
+   let right2=2*ht.D*(mf+Nnear+1)+rootCap*(Nroot+1+Bhigh);
+   if(ht.A*cnum*Gfar>(den+cnum)*right2+ht.A*den*2*C)throw Error("root coupled");
+  
   }
   s.markedBlocks++;s.marks+=m;s.nearMarks+=nearMark;s.tailMarks+=tailm;s.tailSlots+=tailSlots;s.tailMatched+=tailMatched;
+  // Exact rounded geometric deficit levels for the far-only part of marks.
+  // S small and mark lower cutoff T0 large enough to guarantee five slots.
+  let Bgap=2*Math.ceil(sd.D/sd.A)+4,T0=Math.max(47,200*Bgap);
+  // Smaller finite A0 may make the interval ratio less than (1.5)^5.
+  if(k>=40&&C>T0){
+   let a=BigInt(T0),b=5n,num=3n*BigInt(T0)+20n*BigInt(Bgap),dd=2n*BigInt(T0),levels=[];
+   while(a<=2n*BigInt(C)*b){
+    // find first shifted deficit barrier >= a/b by integer search.
+    let z=Number((a+ b-1n)/b);if(z%2===0)z++;
+    while(sd.count((z-3)/2+1)===sd.count((z-3)/2))z+=2;
+    if(BigInt(z)*b<a||BigInt(z)*b>=a+BigInt(Bgap)*b||levels.length&&2*z<3*levels.at(-1).z)throw Error("rounded geometry");
+    levels.push({a,b,z,p:null});a*=num;b*=dd;
+   }
+   let slots=0,matched=0,lost=0,seen=new Set();
+   for(let i=lo;i<hi;i++){
+    let v=ev[i],x=v.d+3,y=v.dp+3;
+    if(v.a1&&v.p>T0){
+     let refs=levels.filter(l=>5n*l.a>BigInt(v.p)*l.b&&BigInt(k)*l.a<=BigInt((2*k-4)*v.p-k*Bgap)*l.b);
+     // At k=40 and Bgap/T0<=.005, the ratio >=8.975>1.55^5? 1.55^5=8.9466.
+     if(refs.length<5||refs.length>6)throw Error("rounded slots");
+     for(let l of refs){if(l.p!==null||x>=l.z||y<l.z)throw Error("rounded up");l.p=v.p;slots++}
+    }
+    if(y>=x)continue;
+    for(let l of levels)if(l.p!==null&&y<l.z&&l.z<=x){
+     if(v.D===0)lost++;else{
+      if(v.near||v.p<=S||v.p>=l.p||seen.has(i))throw Error("rounded far");
+      seen.add(i);matched++;s.roundedFarChecks++;
+     }l.p=null;
+    }
+   }
+   lost+=levels.filter(l=>l.p!==null).length;
+   if(matched+lost!==slots||lost>(Nroot+2)*levels.length)throw Error("rounded exceptions");
+   s.roundedBlocks++;s.roundedSlots+=slots;s.roundedMatches+=matched;s.roundedExceptions+=lost;
+  }
   if(asWitness)s.witness.push({R,S,k,c:cnum/den,m,W,tailm,tailW,tailSlots,tailMatched,actualFarDrop:allFarDrop,Dreset,smallPaid,smallLost,F,j,paid:paid/den,pending:pendingLen/den});
  }
  for(let M=5;M<=N;M+=2){
