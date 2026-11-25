@@ -62,18 +62,18 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
      for(const e of edges)for(const k of [e.edge.i,e.edge.j]){if(!inc.has(k))inc.set(k,[]);inc.get(k).push(e);d.set(k,(d.get(k)||0)+e.w)}
      const queue=[...d.keys()].filter(k=>d.get(k)<=m+1e-10);
      for(let j=0;j<queue.length;j++){const k=queue[j];if(d.get(k)>m+1e-10)continue;for(const e of inc.get(k)){if(!alive.delete(e))continue;lev.paid+=e.w;for(const v of [e.edge.i,e.edge.j]){let old=d.get(v);d.set(v,old-e.w);if(old>m+1e-10&&d.get(v)<=m+1e-10)queue.push(v)}}}
-     if(!alive.size){lev.fully++;continue}
+     if(!alive.size){lev.fully++;}
      const a=new Set(),b=new Set();let weight=0;
      for(const e of alive){a.add(e.edge.i);b.add(e.edge.j);weight+=e.w;ok(d.get(e.edge.i)>m-1e-8&&d.get(e.edge.j)>m-1e-8,"level both-role core")}
-     let ratio=b.size/a.size;lev.maxRatio=Math.max(lev.maxRatio,ratio);
+     let ratio=a.size?b.size/a.size:0;lev.maxRatio=Math.max(lev.maxRatio,ratio);
      localSquare+=a.size*a.size;lev.positiveSquare+=a.size*a.size;lev.remaining+=weight;
-     if(ratio<=1){lev.balanced+=weight;lev.balancedSquare+=a.size*a.size;lev.maxBalancedRatio=Math.max(lev.maxBalancedRatio,ratio);ok(weight<=27*a.size*a.size+1e-7,"balanced level bound")}
-     else lev.unbalanced+=weight;
+     if(alive.size&&ratio<=1){lev.balanced+=weight;lev.balancedSquare+=a.size*a.size;lev.maxBalancedRatio=Math.max(lev.maxBalancedRatio,ratio);ok(weight<=27*a.size*a.size+1e-7,"balanced level bound")}
+     else if(alive.size)lev.unbalanced+=weight;
      if(lev.oracle<64){const aa=new Set(edges);let changed=true;while(changed){changed=false;const ds=new Map();for(const e of aa)for(const k of [e.edge.i,e.edge.j])ds.set(k,(ds.get(k)||0)+e.w);for(const e of aa)if(ds.get(e.edge.i)<=m+1e-10||ds.get(e.edge.j)<=m+1e-10){aa.delete(e);changed=true}}ok(aa.size===alive.size&&[...aa].every(e=>alive.has(e)),"independent level core");lev.oracle++}
    }
    ok(localMembership<=4*s.r*allFull.length&&localSquare<=fullSq,"level membership and square envelope");
    let wp=posFull.reduce((a,e)=>a+(e.v-e.b)/(2*s.r),0);
-   ok(fullSq<=12*s.r*wp*wp+1e-7,"full ascent-square occupation transport");
+   ok(fullSq<=6*s.r*wp*wp+1e-7,"full ascent-square occupation transport");
    tot.keys++;tot.rawPositiveSquares+=s.r*P*P;tot.rawNonpositiveSquares+=s.r*N*N;
    const mixed=es.filter(e=>e.dE<=0).reduce((v,e)=>v+e.w,0);
    if(N<=P){tot.balancedRaw+=mixed;tot.balancedBound+=648*s.r*P*P;ok(mixed<=648*s.r*P*P+1e-7,"balanced mixed mass")}
@@ -430,7 +430,7 @@ function ascentAudit(ledger,X,B,L,y,paths,rr,ok,close){
  const inheritedLedger=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,1,4);
  const inheritedWide=inheritedForest(inheritedPairs,X,B,paths,scaledInherited,ok,close,8,4);
  ok(close(nearMoment,inheritedLedger.near[0]),'independent near-origin ledger');
- return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close),crossingWide:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close,1/4,16),slotHit:slotAudit(inheritedPairs,B,scaledInherited,ok,close,4,8),slotHitWide:slotAudit(inheritedPairs,B,scaledInherited,ok,close,16,32),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
+ return {L,y,R,raw,anchors:groups.size,inheritedLedger,inheritedWide,crossing:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close),crossingWide:crossingAudit(inheritedPairs,X,B,rr,scaledInherited,ok,close,1/4,16),slotHit:slotAudit(inheritedPairs,B,scaledInherited,ok,close,4,8),slotHitWide:slotAudit(inheritedPairs,B,scaledInherited,ok,close,16,32),slotHitLight:slotAudit(inheritedPairs,B,scaledInherited,ok,close,4,0.25),nearOrigin:{moment:nearMoment,bound:nearBound},checks,literal,maxReuse,maxTargets,upstreamPairWaits:edgeUses.size,weightedKeyEnergy,globalBound,shared,inherited,diagonal,unweightedShared,unweightedInherited,scaledShared,scaledInherited,scaledDiag,scaledTotal,scaledUnweightedShared,maxReuseR,out};
 }
 // Long-age low-jump donor cones and weighted stationary recipient slot cores.
 function recipientAudit(ledger,X,B,L,y,f,paths,rr,fac,base,ok,close){
