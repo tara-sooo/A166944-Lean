@@ -110,7 +110,7 @@ function audit(X, mode="diagnostic"){
  const ys=[3,5,7,11],Ps=[6,30,210,2310],phaseEnergy=ys.map(()=>0),phaseAsync=ys.map(()=>0),phaseFar=ys.map(()=>0),phasePairs=ys.map(()=>0),phaseNoDefect=ys.map(()=>0),phaseDefectSame=ys.map(()=>0),phaseDefectSplit=ys.map(()=>0),phaseSmallDiamond=ys.map(()=>0),phaseSmallAfterDefect=ys.map(()=>0),phaseTranslatedSteps=ys.map(()=>0),phaseHighDivisorChecks=ys.map(()=>0),phaseMaxGain=ys.map(()=>0),phaseMinGap=ys.map(()=>Infinity);
  let translationChecks=0,firstDefectChecks=0,diamondChecks=0,broadDiamond=0,broadMediumOnly=0,broadWholeGain=0,broadNearHigh=0,allSmallDiamond=0,farAfter=0,postHaloProxy=0,haloRetainedProxy=0,haloRetainedHits=0,nonzeroConstantLags=0,divisorHighChecks=0;
  const samples=[],virtualChecks=ys.map(()=>0),virtualBothSmall=ys.map(()=>0),virtualDefect=ys.map(()=>0);
- let broadStrictMedium=0,equalLabelSmallBackground=0,haloStrictMediumActual=0;
+ let broadStrictMedium=0,equalLabelSmallBackground=0,haloStrictMediumActual=0,equalPositiveGap=0,equalSamples=[];
  for(const a of roots)for(const e of a)if(e.halo&&e.p>=Y&&e.p<Q)haloStrictMediumActual+=e.w;
  // Independent shifted-time one-step controls on actual horizons; these are NOT extra root tags.
  for(const a of roots.slice(0,128))for(const e of a)if(e.p)for(let k=0;k<ys.length;k++){
@@ -172,7 +172,17 @@ function audit(X, mode="diagnostic"){
            broadDiamond++;broadWholeGain+=2*L;if(!aa.some(e=>e.high)&&!bb.some(e=>e.high))broadMediumOnly++;if(aa.every(e=>e.p<Q)&&bb.every(e=>e.p<Q))broadStrictMedium++;
            if(a[i0].halo&&b[j0].halo)broadNearHigh++;
            if(samples.length<8)samples.push({C,A,D:a[i].C,p:e.p,q:f.p,ga,gb,mediumOnly:!aa.some(e=>e.high)&&!bb.some(e=>e.high),strictMedium:aa.every(e=>e.p<Q)&&bb.every(e=>e.p<Q)});
-         }else{equalLabelSmallBackground++;ok(Math.abs(e.C-f.C)===2,"same-label close background opposite sides");}
+         }else{
+           equalLabelSmallBackground++;ok(Math.abs(e.C-f.C)===2,"same-label close background opposite sides");
+           const p=e.p,ret=b[j].t-a[i].t,z=f.s-e.s,ea=a[i].t-e.s,eb=b[j].t-f.s;
+           ok(Math.abs(eb-ea)<=3*J0&&ea>=0&&eb>=0&&ea<=3*ga&&eb<=3*gb,"equal-label actual postclock background");
+           ok(mod(z-(p+2),2*p)===0||mod(z+(p+2),2*p)===0,"equal-label opposite parity exit residue");
+           const dist=Math.min(mod(ret,2*p),mod(-ret,2*p)),lb=p-2-3*J0;
+           ok(dist>=lb,"equal-label return lag separated from lattice");if(lb>0){ok(ret!==0,"equal-label nonphysical return");equalPositiveGap++;}
+           const at=b[m].t-a[l].t;
+           if(at%(2*p)===0&&aa.concat(bb).every(e=>at%(2*e.p)===0))throw Error("periodic complete equal-label diamond");
+           if(equalSamples.length<4)equalSamples.push({C,A,D:a[i].C,p,centres:[e.C,f.C],ga,gb,ret,dist,lb,ea,eb});
+         }
        }
      }
      if(a[i].t===b[j].t)break;
@@ -218,6 +228,6 @@ function audit(X, mode="diagnostic"){
    ok(phaseFar[k]===phaseNoDefect[k]+phaseDefectSame[k]+phaseDefectSplit[k],"exact first-defect partition");
    ok(phaseSmallDiamond[k]===phaseSmallAfterDefect[k],"all-small diamond provenance");
  }
- return {X,mode,B,T,Q,delta,Y,J0,kappa,centerCount:cs.length,virtualChecks,virtualBothSmall,virtualDefect,broadStrictMedium,equalLabelSmallBackground,haloStrictMediumActual,conflicts,conflictWeight,badCenters:bad.size,badWeight,badTagWeight,lowBad,highBad,primePairs,arithmeticPairs,arithmeticWeight,crtChecks,haloGain,haloActual,haloProxy,haloHits,haloHighActual,haloMediumActual,haloLowActual,haloBound,haloHighHits,postHaloProxy,haloRetainedProxy,haloRetainedHits,farAfter,ys,Ps,phaseEnergy,phaseAsync,phaseFar,phasePairs,phaseNoDefect,phaseDefectSame,phaseDefectSplit,phaseSmallDiamond,phaseSmallAfterDefect,phaseTranslatedSteps,phaseHighDivisorChecks,phaseMaxGain,phaseMinGap,translationChecks,firstDefectChecks,diamondChecks,broadDiamond,broadMediumOnly,broadWholeGain,broadNearHigh,allSmallDiamond,nonzeroConstantLags,divisorHighChecks,samples,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
+ return {X,mode,B,T,Q,delta,Y,J0,kappa,centerCount:cs.length,virtualChecks,virtualBothSmall,virtualDefect,broadStrictMedium,equalLabelSmallBackground,equalPositiveGap,equalSamples,haloStrictMediumActual,conflicts,conflictWeight,badCenters:bad.size,badWeight,badTagWeight,lowBad,highBad,primePairs,arithmeticPairs,arithmeticWeight,crtChecks,haloGain,haloActual,haloProxy,haloHits,haloHighActual,haloMediumActual,haloLowActual,haloBound,haloHighHits,postHaloProxy,haloRetainedProxy,haloRetainedHits,farAfter,ys,Ps,phaseEnergy,phaseAsync,phaseFar,phasePairs,phaseNoDefect,phaseDefectSame,phaseDefectSplit,phaseSmallDiamond,phaseSmallAfterDefect,phaseTranslatedSteps,phaseHighDivisorChecks,phaseMaxGain,phaseMinGap,translationChecks,firstDefectChecks,diamondChecks,broadDiamond,broadMediumOnly,broadWholeGain,broadNearHigh,allSmallDiamond,nonzeroConstantLags,divisorHighChecks,samples,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
 }
 const argv=process.argv.slice(2),mode=argv[0]||'diagnostic',xs=argv.slice(1).map(Number);for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
