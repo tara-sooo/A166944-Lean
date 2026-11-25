@@ -8,7 +8,7 @@ function audit(N=50000,P=499,rootCap=1000000){
  const pi=new Int32Array(Math.floor(Math.sqrt(cap))+2),A=new Float64Array(pi.length);
  for(let i=1;i<pi.length;i++){pi[i]=pi[i-1];A[i]=A[i-1];if(i>=3&&spf[i]===i){pi[i]++;A[i]+=i-1}}
  const L=[0,2,5,11];
- let s={N,P,rootCap,adaptiveEdges:0,windows:0,dyadicWindows:0,windowChecks:0,weightedChecks:0,recordChecks:0,distinctChecks:0,firstMismatch:0,compositeMismatch:0,primeMismatch:0,roughChecks:0,firstCounterexample:null,explicitCounterexample:null,linearScaleCounterexample:null,windowExamples:[],freshCases:0,freshRootChecks:0,freshUncutFound:0,freshAdaptiveFound:0,freshCommonFound:0,minimumDifferences:0,adaptiveBeforeCommon:0,freshExceptional:0,freshQuadraticChecks:0,freshCoarseChecks:0,smallestExamples:[],nestedChecks:0,nestedExamples:[],literalChecks:0};
+ let s={N,P,rootCap,adaptiveEdges:0,windows:0,dyadicWindows:0,windowChecks:0,weightedChecks:0,recordChecks:0,distinctChecks:0,firstMismatch:0,compositeMismatch:0,primeMismatch:0,roughChecks:0,firstCounterexample:null,explicitCounterexample:null,linearScaleCounterexample:null,windowExamples:[],freshCases:0,freshRootChecks:0,freshUncutFound:0,freshAdaptiveFound:0,freshCommonFound:0,minimumDifferences:0,adaptiveBeforeCommon:0,freshExceptional:0,exceptionTwinChecks:0,evenExceptionChecks:0,freshQuadraticChecks:0,freshCoarseChecks:0,smallestExamples:[],nestedChecks:0,nestedExamples:[],literalChecks:0};
  function checkRough(H,e,p,w){let q=(H-e)/p;if(!Number.isInteger(q)||q%2!==1)throw Error("cofactor");for(let z of [H-1,H+1]){let fs=factors(z),r=fs[0];if(2*r<w||2*r===w&&r<p)throw Error("rough factor");if((w/2)**3>H+1){let a=z,n=0;while(a>1){a/=spf[a];n++}if(n>2)throw Error("rough triple");s.roughChecks++}}
  if(q>1&&p*p>H+1){let r=spf[q];if(w>=2*r)throw Error("ignored cofactor");if(w>=2*Math.sqrt(q)&&r!==q)throw Error("prime cofactor")}
  return q}
@@ -41,12 +41,13 @@ function audit(N=50000,P=499,rootCap=1000000){
  for(let seed of seeds)for(let p=3;p<=P;p+=2)if(spf[p]===p&&p>2*seed.T+7)for(let e of [1,-1]){
  let {T,E,events}=seed,k=mod(p,4)===mod(1-E,4)?1:3,j=(k*p+E-(e===1?7:1))/2,w=j-T;
  if(!Number.isInteger(j)||w<=0||w>=2*p)throw Error("fresh time");
+ if(e===1){let U=(p+3-E)/2;if(Number.isInteger(U)&&U>=5&&U%2===1){let H=p+1,t=U+2+T,v=next(t,H,false);if(v?.p===p&&v.w===w)throw Error('even exception');s.evenExceptionChecks++}}
  let c=mod(2-E+e,p);if(c%2)c+=p;c/=2;let M=c;if(M%2===0)M+=p;while(M<5)M+=2*p;
  let firstU=null,firstA=null,firstCommon=null;
  function match(M,adaptive){let H=2*M-2,t=M+2;for(let [tick,label] of events){let v=next(t,H,adaptive);if(v?.p!==label||t+v.w!==M+2+tick)return null;t+=v.w;H+=v.p-1}
  let v=next(t,H,adaptive);if(v?.p!==p||v.e!==e||t+v.w!==M+2+j)return null;return {M,q:(H-e)/p,H}}
  for(;M<=rootCap;M+=2*p){s.freshRootChecks++;let u=match(M,false),a=match(M,true);
- if(u){let {H,q}=u,r=Math.floor(w/2)+1;if(q===1){s.freshExceptional++;if(e===1?k!==3:k!==1)throw Error("exception parity")}else{if(q<r||2*M<p*r+e+2-E)throw Error("quadratic lower bound");s.freshQuadraticChecks++}
+ if(u){let {H,q}=u,r=Math.floor(w/2)+1;if(q===1){s.freshExceptional++;if(e===1||k!==1)throw Error("exception orientation");if(w>2*Math.sqrt(p+2)){if(spf[p-2]!==p-2||next(M+2+j-w,H,true)!==null)throw Error("exception twins");s.exceptionTwinChecks++}}else{if(q<r||2*M<p*r+e+2-E)throw Error("quadratic lower bound");s.freshQuadraticChecks++}
  if((w/2)**3>H+1){if(q>1&&spf[q]!==q)throw Error("rough cofactor");s.freshCoarseChecks++}
  if(!firstU){firstU=u;s.freshUncutFound++}
  if(a&&!firstCommon){firstCommon=a;s.freshCommonFound++}
