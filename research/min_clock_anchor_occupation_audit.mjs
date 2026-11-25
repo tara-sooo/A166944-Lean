@@ -9,14 +9,14 @@ function audit(X,mode='diagnostic'){
   spf[p]=p;if(p*p<spf.length)for(let j=p*p;j<spf.length;j+=p)if(!spf[j])spf[j]=p;
  }
  let L=2,y=2;for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>6*S**.25)break;L*=p;y=p;}
- const T=mode==='degree'?4:(mode==='diagnostic'||mode==='wide')?6:Math.ceil(20*ell),g=Math.max(2,T*L),
+ const T=mode==='degree'?4:(mode==='diagnostic'||(mode==='wide'||mode==='clock'))?6:Math.ceil(20*ell),g=Math.max(2,T*L),
   kg=mode==='analytic'?Math.floor(1.5*ell/Math.log(g)):5,
   k=mode==='analytic'?Math.floor(ell/(8*Math.log(g))):3,
-  P=mode==='analytic'?Math.ceil(B/Math.log(B)**.125):Math.ceil(B/(mode==='wide'?8:4)),
+  P=mode==='analytic'?Math.ceil(B/Math.log(B)**.125):Math.ceil(B/((mode==='wide'||mode==='clock')?8:4)),
   tau=mode==='analytic'?Math.log(B)**1.5:12,
   Z=mode==='analytic'?Math.log(B)**1.5:12,
   near=mode==='analytic'?Math.floor(4*Math.log(B)):Math.max(2,Math.floor(B/64));
- const A=mode==='analytic'?Math.floor(Math.log(B)**.125):Math.max(2,Math.floor(P/(mode==='wide'?2:8))), capDiff=mode==='analytic'?Math.log(B)**3.5:256,capSame=mode==='analytic'?Math.log(B)**2.5:144;
+ const A=mode==='analytic'?Math.floor(Math.log(B)**.125):Math.max(2,Math.floor(P/((mode==='wide'||mode==='clock')?2:8))), capDiff=mode==='analytic'?Math.log(B)**3.5:256,capSame=mode==='analytic'?Math.log(B)**2.5:144;
  const lo=X,hi=7*X/2-1,len=hi+1,r=new Int32Array(len),d=new Uint8Array(len),paths=[],horizons=new Map();
  const gBound=(L/2)*Array.from({length:kg+1},(_,i)=>(T*L/2)**i).reduce((s,v)=>s+v,0),
   kBound=(L/2)*Array.from({length:k+1},(_,i)=>(T*L/2)**i).reduce((s,v)=>s+v,0)*Math.floor(2*Math.log(U)/Math.log(P));
@@ -175,7 +175,7 @@ function audit(X,mode='diagnostic'){
   return dist<=near||short||gg||rg||pt||ac||layer;
  }
 
- const Y=mode==='analytic'?Math.log(B)**.125:mode==='wide'?Math.ceil(P/4):12;
+ const Y=mode==='clock'?B:mode==='analytic'?Math.log(B)**.125:(mode==='wide'||mode==='clock')?Math.ceil(P/4):12;
  const merges=new Map();
  function makeMerge(e,b){
   if(!e.anchor||e.anchor!==b.anchor)return null;
@@ -279,4 +279,4 @@ function audit(X,mode='diagnostic'){
  return {X,B,mode,P,A,D,h,Y,merge:{anchors:merges.size,pairs:mergePairs,actual:mergeActual,direct:mergeDirect,maxDegree:mergeMaxDegree,maxRegular:mergeMaxRegular,short:mergeShort,energy:mergeEnergy,visits:mergeVisits},anchors:aa.length,edges,removed,kept,events,literal,RK,EK,diag,occupationR,occupationE,maxActualH,pairs,physPairs,physicalSameAnchor,physicalOldNoEdge,positive,physicalNew,filterImproved,energy:Object.fromEntries(names.map((n,i)=>[n,energy[i]])),visits:Object.fromEntries(names.map((n,i)=>[n,visits[i]])),reports};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree','wide'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','degree','wide','clock'])console.log(JSON.stringify(audit(X,mode)));
