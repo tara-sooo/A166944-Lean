@@ -7,6 +7,7 @@ function audit(X,mode){
  const rc=new Uint16Array(lim),hs=[];for(let C=lo;C<=hi;C+=2){const f=[...fs(C-1),...fs(C+1)];if(f.length)rc[C]=Math.min(...f);if(rc[C]>=rmin)hs.push(C);}
  let support2=0,support4=0;for(let i=0;i<hs.length;i++)for(let j=i+1;j<hs.length&&hs[j]-hs[i]<=A;j++){if(hs[j]-hs[i]===2)support2++;else support4++;}
  // Verify the residue count of three/four forms independently, with the quotient substitution.
+ if(rmin>3){ok(support2===0&&hs.every(C=>C%6===0),"high clock primorial-six spacing");}
  let residueChecks=0;for(let h=2;h<=A;h+=2)for(const q of [5,7,11,13,17,19,23,29,31]){if(q>=B||h%q===0||(h-2)%q===0&&h!==2||(h+2)%q===0)continue;for(const s of [-1,1]){const p=B%q===0?B+1:B;let count=0;for(let n=0;n<q;n++){let D=p*(2*n+1)-s;if([D-1,D+1,D+h-1,D+h+1].some(v=>mod(v,q)===0))count++;}ok(count===(h===2?3:4),"quotient residue rank");residueChecks++;}}
  const byC=new Map(),roots=new Map(),add=e=>{if(!byC.has(e.C))byC.set(e.C,[]);byC.get(e.C).push(e);};
  let N=0,R=0,G=0,events=0,visits=0,literal=0,cross=0,twins=0,other=0,Ihits=0,IR=0,Jhits=0,JR=0,maxBandCount=0;
