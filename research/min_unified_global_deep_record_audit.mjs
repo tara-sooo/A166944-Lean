@@ -4,6 +4,7 @@ function audit(X,focus=false){
  const ok=(x,msg)=>{if(!x)throw Error(`${X}/${focus} ${msg}`)},eq=(x,y)=>Math.abs(x-y)<=1e-7*Math.max(1,Math.abs(x),Math.abs(y)),mod=(x,y)=>(x%y+y)%y;
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)if(!S[n])S[n]=p}
  function fac(n){let f=[];while(n>1){let p=S[n];if(p>2&&p<=B)f.push(p);while(n%p===0)n/=p}return f}
+ const z0=focus?Math.max(1,Math.floor(T/2)):B;
  const nodes=new Map(),paths=[],slots=new Map();let N=0,events=0,full=0,virtual=0;
  function node(t,C){let z=t*lim+C,o=nodes.get(z);if(!o){o={t,C,d:2*t-C,next:null};nodes.set(z,o)}return o}
  for(let M=X;M<2*X;M++)if(S[M]===M){
@@ -59,7 +60,7 @@ function audit(X,focus=false){
     ok(c<=bound+1e-7&&e.post.m>D0&&e.r>(e.p-1)/4&&e.s.post.sink.C>=term.C,"weighted endpoint and global persistence");weightChecks++;
     if(hit){ok(e.s.post.sink.C>=C0+T,"reached continuation");fullSuffixChecks++;}
     let g=groups.get(e.s)||{charge:0,near:0,nearBound:0,n:0,farReached:0};g.charge+=c;g.n++;
-    if(y<=B){g.near+=c;g.nearBound+=bound;}else if(hit)g.farReached++;
+    if(y<=z0){g.near+=c;g.nearBound+=bound;}else if(hit)g.farReached++;
     groups.set(e.s,g);
    }
   }
@@ -70,11 +71,11 @@ function audit(X,focus=false){
  for(let [s,g] of groups){ok(g.n<=s.n&&g.near<=g.nearBound+1e-7&&g.charge<=4*s.p*g.n+1e-7,"slot accounting");nearPaid+=g.near;
   let cap=(focus?.02:1)*B/Math.max(1,s.post.d);
   if(g.charge<=4*s.p*cap)thin++;else{heavy++;if(s.maxReached){heavyFullReach++;ok(s.post.sink.C>=s.maxReached,"full slot future");maxForward=Math.max(maxForward,s.post.sink.C-s.C);}
-    if(g.farReached){heavyFar++;ok(s.post.sink.C>s.C+B,"far common suffix");}
+    if(g.farReached){heavyFar++;ok(s.post.sink.C>s.C+z0,"far common suffix");}
   }
  }
  ok(eq(clippedEx,recordTotal)&&globalEx<=localEx+1e-7&&lowEx<=N*(D0-6)+1e-7,"total");
  const rd=x=>+x.toFixed(6);
- return {X,focus,B,T,a,D0,N,events,full,nodes:nodes.size,sinks,virtual,extended,lowered,targets,reached,complete,strict,rawLocal:rd(rawLocal),rawGlobal:rd(rawGlobal),localEx:rd(localEx),globalEx:rd(globalEx),clippedEx:rd(clippedEx),lowEx:rd(lowEx),lowPhaseCharge:rd(lowPhaseCharge),phaseExcluded,layerTotal,lowLayer,recordTotal:rd(recordTotal),recordInc,highInc,weightChecks,fullSuffixChecks,groups:groups.size,thin,heavy,heavyFar,heavyFullReach,nearPaid:rd(nearPaid),maxForward};
+ return {X,focus,B,T,a,D0,z0,N,events,full,nodes:nodes.size,sinks,virtual,extended,lowered,targets,reached,complete,strict,rawLocal:rd(rawLocal),rawGlobal:rd(rawGlobal),localEx:rd(localEx),globalEx:rd(globalEx),clippedEx:rd(clippedEx),lowEx:rd(lowEx),lowPhaseCharge:rd(lowPhaseCharge),phaseExcluded,layerTotal,lowLayer,recordTotal:rd(recordTotal),recordInc,highInc,weightChecks,fullSuffixChecks,groups:groups.size,thin,heavy,heavyFar,heavyFullReach,nearPaid:rd(nearPaid),maxForward};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[256,1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
