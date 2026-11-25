@@ -57,6 +57,7 @@ function audit(X,mode="analytic"){
    const byLabel=new Map();for(let i=0;i<n;i++){const p=a[i].p;if(!byLabel.has(p))byLabel.set(p,[]);byLabel.get(p).push(i);}
    function dilate(s){const d=s.slice();for(const is of byLabel.values())for(let j=0;j<is.length;j++)if(s[is[j]])for(let h=Math.max(0,j-labelRad);h<=Math.min(is.length-1,j+labelRad);h++)d[is[h]]=1;return d;}
    const seedD=dilate(seed), final=dilate(outer);const v3=weight(final);
+   for(const is of byLabel.values()){let expected=0,j=0;while(j<is.length){if(outer[is[j]]){j++;continue;}let end=j+1;while(end<is.length&&!outer[is[end]])end++;ok(j>0,"first hit already marked");expected+=Math.max(0,end-j-labelRad*(end===is.length?1:2));j=end;}ok(expected===is.filter(i=>!final[i]).length,"exact eroded label runs");}
    ok(v3<=(2*labelRad+1)*v2&&weight(seedD)<=(2*labelRad+1)*v0,"same-label dilation weight");labelWeight+=v3;seedLabelExtra+=weight(seedD)-v0;
    for(const is of byLabel.values())for(let j=0;j<is.length;j++){const i=is[j];if(final[i]){if(!outer[i]){labelNewCount++;labelNewClock+=a[i].r;if(a[i].p>=Q)labelNewHighClock+=a[i].r;}continue;}
      labelResidualCount++;if(a[i].p>=Q){labelResidualHigh+=a[i].r;finalEnergy.set(a[i].C,(finalEnergy.get(a[i].C)||0)+1);}
