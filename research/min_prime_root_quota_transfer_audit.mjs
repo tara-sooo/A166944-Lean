@@ -16,7 +16,7 @@ function audit(X,mode){
   let gain=C-(2*M-2);R+=cost;G+=gain;ok(gain<T+B&&2*cost<=3*gain,"gain");
   let tail=0;for(let i=a.length-1;i>=0;i--){tail+=a[i].w;a[i].tail=tail;a[i].next=a[i+1]||null;}roots.set(M,a);
  }
- const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:1,scale=analytic?u**1.5:0.125;
+ const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:mode==="phase"?3:1,scale=analytic?u**1.5:mode==="phase"?0.5:0.125;
  const pr=[];for(let p=3;p<Qm&&p<=B;p+=2)if(spf[p]===p)pr.push(p);
  const wt=r=>r+1.5*L,A=r=>Math.ceil(wt(r)**2*scale),blk=(r,C)=>Math.floor(C/A(r)),cap=r=>analytic?Math.max(1,Math.floor(Math.log(r)**6)):mode==="wide"?4:2;
  let initialLow=0,highLow=0,mediumClock=0,mediumLow=0,lowBlocks=0,lowMax=0,mediumTags=0,lowTotal=0,quotientChecks=0;
@@ -65,7 +65,7 @@ function audit(X,mode){
      }ok(near(paid,a.amount),"normalized focal quota");phaseChecks++;
    }}
  }
- let endpointBound=0,syncBound=0,asyncBound=0,maxMult=0,rankSmall=0,rankLarge=0,smallPairCount=0,tailBound=0,maxTail=0,tailChecks=0;
+ let endpointBound=0,syncBound=0,asyncBound=0,maxMult=0,rankSmall=0,rankLarge=0,cellSmall=0,cellExtra=0,cellLarge=0,cellSmallCount=0,smallPairCount=0,tailBound=0,maxTail=0,tailChecks=0;
  const massCap=mode==="analytic"?Math.max(1,Math.floor(u**6/ell0**4)):mode==="short"?4:8;
  const potf=(n,m)=>n<=m?n*n:2*m*n-m*m;
  const tails=new Map();for(const [M,ar] of roots){let t=0,aa=new Float64Array(ar.length);const em=byRoot.get(M);for(let i=ar.length-1;i>=0;i--){let e=em?.get(ar[i].C);if(e)t+=wt(e.r)/mcell(e.r);aa[i]=t;}tails.set(M,aa);maxTail=Math.max(maxTail,t);}
@@ -74,13 +74,25 @@ function audit(X,mode){
  }
  for(const [ky,w] of syncPair){const [M,Mp]=ky.split(":").map(Number),a=roots.get(M),b=roots.get(Mp);let i=0,j=0;while(i<a.length&&j<b.length){if(a[i].C<b[j].C)i++;else if(a[i].C>b[j].C)j++;else if(a[i].t===b[j].t)break;else{i++;j++;}}
    ok(i<a.length&&j<b.length,"first physical meeting");let n=vertices.get(a[i].C+":"+a[i].t).length;const bound=2*Math.min(tails.get(M)[i],tails.get(Mp)[j]);ok(w<=bound+1e-6,"synchronous tail bound");tailBound+=bound;tailChecks++;if(n<=massCap){rankSmall+=w;smallPairCount++;}else rankLarge+=w;
+   ok(sourceCell(M)===sourceCell(Mp),"same fixed source cell");
+   const local=vertices.get(a[i].C+":"+a[i].t).filter(e=>sourceCell(e.M)===sourceCell(M)).length;
+   if(local<=massCap){cellSmall+=w;cellSmallCount++;if(n>massCap)cellExtra+=w;}else cellLarge+=w;
  }
  let pot=0,loss=0,start=0,smallFirst=0;for(const es of vertices.values()){let n=es.length,ends=0;const g=new Map();for(const e of es){let ky=e.prev?e.prev.C+":"+e.prev.t:"root:"+e.M;g.set(ky,(g.get(ky)||0)+1);if(!e.next)ends++;if(!e.prev)start++;}
    const ss=[...g.values()],dd=potf(n,massCap)-ss.reduce((a,b)=>a+potf(b,massCap),0);pot+=dd;loss+=potf(n,massCap)-potf(n-ends,massCap);if(n<=massCap)smallFirst+=(n*n-ss.reduce((a,b)=>a+b*b,0))/2;
  }
  ok(pot===loss-start&&pot<=2*massCap*N&&smallFirst<=massCap*N&&smallPairCount<=smallFirst,"small merger potential");
+ let cellPot=0,cellLoss=0,cellStart=0,cellSmallFirst=0;
+ for(const es of vertices.values()){const cc=new Map();for(const e of es){const c=sourceCell(e.M);if(!cc.has(c))cc.set(c,[]);cc.get(c).push(e);}
+   for(const ar of cc.values()){const n=ar.length,g=new Map();let ends=0;for(const e of ar){const ky=e.prev?e.prev.C+":"+e.prev.t:"root:"+e.M;g.set(ky,(g.get(ky)||0)+1);if(!e.next)ends++;if(!e.prev)cellStart++;}
+     const ss=[...g.values()];cellPot+=potf(n,massCap)-ss.reduce((s,v)=>s+potf(v,massCap),0);cellLoss+=potf(n,massCap)-potf(n-ends,massCap);
+     if(n<=massCap)cellSmallFirst+=(n*n-ss.reduce((s,v)=>s+v*v,0))/2;
+   }
+ }
+ ok(cellPot===cellLoss-cellStart&&cellPot<=2*massCap*N&&cellSmallCount<=cellSmallFirst&&cellSmallFirst<=massCap*N,"restricted cell potential");
+ ok(near(cellSmall,rankSmall+cellExtra)&&near(cellSmall+cellLarge,early+newSync)&&cellSmall<=2*massCap*N*maxTail+1e-6,"restricted tail transfer");
  ok(near(long,band+cellCost+res)&&near(res,early+newSync+async)&&near(early+newSync,rankSmall+rankLarge)&&res<=endpointBound+1e-6&&rankSmall<=2*massCap*N*maxTail+1e-6,"global transfer partition");
- return {mode,X,B,T,Qm,N,events,literal,medium,first,short,long,edges,shortEdges,fullPairs,selectedPairs,maxK,band,cellCost,res,early,newSync,async,phaseChecks,cellChecks,finalKeys,partnerEdges,maxMult,endpointBound,syncBound,asyncBound,rankSmall,rankLarge,smallPairCount,smallFirst,pot,loss,start,massCap,maxTail,tailChecks,tailBound};
+ return {mode,X,B,T,Qm,N,events,literal,medium,first,short,long,edges,shortEdges,fullPairs,selectedPairs,maxK,band,cellCost,res,early,newSync,async,phaseChecks,cellChecks,finalKeys,partnerEdges,maxMult,endpointBound,syncBound,asyncBound,rankSmall,rankLarge,smallPairCount,smallFirst,pot,loss,start,massCap,maxTail,tailChecks,tailBound,cellSmall,cellExtra,cellLarge,cellSmallCount,cellPot,cellLoss,cellStart,cellSmallFirst};
 }
 
-const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
+const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
