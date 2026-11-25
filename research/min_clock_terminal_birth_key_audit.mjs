@@ -382,4 +382,4 @@ let futureE=0,futureDown=0,endpointMax=0,twinRoots=[0,0];
  }
  return {X,B,D,rough,coreCap,birthCap,Y,Ptop,m,eta,L,y,factor,stress,W,Wmult,futureE,futureDown,stepOracle,edgeCount,endpointMax,twinRoots,roots,roughSlots:roughSlots.size,horizons,arithmetic,weighted,weightedExact,refR,selectedGain,rawDown,out};
 }
-for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[4096,16384]))for(const [W,cap,bc] of [[1/8,2,32],[1,8,128]])console.log(JSON.stringify(audit(X,true,W,cap,bc)));
+for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[4096,16384]))for(const [W,cap,bc] of [[1/8,2,32],[1,8,128],...(X===16384?[[1/8,.25,4]]:[])])console.log(JSON.stringify(audit(X,true,W,cap,bc)));
