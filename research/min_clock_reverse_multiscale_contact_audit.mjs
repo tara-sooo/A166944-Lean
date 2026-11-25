@@ -1,5 +1,5 @@
 // Multiscale actual first-contact cuts and summable opposite-cohort peeling.
-function multiscale(g,live,z,edges,L,y,B,X,f,m,ok,close,fac){
+function multiscale(g,live,z,edges,L,y,B,X,f,m,ok,close,fac,ledger){
  const base=L*Math.floor((g.C-1)/L),cuts=[],levels=[],minRoot=Math.min(...live.map(e=>2*e.P.M-2));
  for(let j=0;;j++){let K=base-L*(2**j-1);cuts.push(K);if(K<minRoot)break}
  const entries=new Map(live.map(e=>[e.P.M,e]));
@@ -35,6 +35,17 @@ function multiscale(g,live,z,edges,L,y,B,X,f,m,ok,close,fac){
    for(let k=0;k<cuts.length;k++)ok((levels[k].get(e.i).key===levels[k].get(e.j).key)===(F.J<=cuts[k]),"exact contact-cut equivalence");
    const upper=j?cuts[j-1]:g.C;ok(cuts[j]<F.J&&F.J<=upper,"first contact shell");
    const parent=j?levels[j-1].get(e.i).key:"TOP";if(j)ok(parent===levels[j-1].get(e.j).key,"common upper cohort");
+   const pmax=Math.max(F.p,F.q),Q=Math.max(5,Math.ceil(B/4));
+   const pk=Math.min(e.i,e.j)+','+Math.max(e.i,e.j),pl=pk+','+(2*z-g.C);
+   ok(!ledger.seen.has(pl),"no duplicate old pair-level across sampled origins");ledger.seen.add(pl);
+   ledger.pairs.set(pk,(ledger.pairs.get(pk)||0)+e.w);
+   if(pmax>=Q){
+     const s=F.t%2,d=2*F.t-F.J-6*s;
+     ok(d>=0&&d%(2*pmax)===0&&(F.J+2*s)%pmax===0,"large first-contact phase");
+     const key=F.t+','+F.J+','+pmax;let c=ledger.keys.get(key);
+     if(!c){c={w:0,reset:d===0,pairs:new Set()};ledger.keys.set(key,c)}
+     c.w+=e.w;c.pairs.add(pk);
+   }
    e.shell=j;e.first=F;e.parent=parent;shellRaw[j]+=e.w;shellPairs[j]++;types[F.type]+=e.w;
    const k=j+"|"+parent;let p=parents.get(k);if(!p){p={j,parent,groups:[new Set(),new Set(),new Set()]};parents.set(k,p)}
    for(const v of [e.i,e.j]){
@@ -214,6 +225,7 @@ function audit(X,stress=true,scaleCap=4){
  const sorted=[...slots.values()].sort((a,b)=>b.entries.length-a.entries.length||a.C-b.C||a.v-b.v);
  const pick=new Map();for(const g of sorted.slice(0,6))pick.set(g.C+','+g.v,g);
  for(let j=1;j<=6;j++){const g=sorted[Math.floor((sorted.length-1)*j/7)];if(g)pick.set(g.C+','+g.v,g)}
+ const ledgers=[0,1].map(()=>({seen:new Set(),pairs:new Map(),keys:new Map()}));
  const out=[];let checks=0,maxRoots=0,totalQuery=0,totalEdges=0,totalStationary=0;
  for(const g of pick.values()){
    const z=Math.min(g.v-1,Math.max(...g.entries.map(e=>e.b))+1);
@@ -268,12 +280,29 @@ function audit(X,stress=true,scaleCap=4){
      const vertices=new Map();for(const e of edges){vertices.set(e.i,groups.get(e.i));vertices.set(e.j,groups.get(e.j))}
      let c=capGroup(edges,vertices);
      ok(close(raw,inside+c.paid+c.remaining)&&close(same+cross,c.paid+c.remaining),"sample origin energy ledger");
-     const ms=multiscale(g,live,z,allEdges,L,y,B,X,f,stress?scaleCap:u**2.75,ok,close,fac);
+     const ms=multiscale(g,live,z,allEdges,L,y,B,X,f,stress?scaleCap:u**2.75,ok,close,fac,ledgers[mode]);
      ok(close(raw,ms.shellRaw.reduce((a,b)=>a+b,0)),"all original charges assigned once");
      modes.push({mode:mode?"full-positive":"late-high",raw,inside,same,cross,...c,multiscale:ms});
    }
    out.push({C:g.C,v:g.v,z,lambda:lam,r:g.r,roots:expected.size,exact:ex.stats,partial,entryGroups:counts.size,largestGroup,rootsInside,actualComp:actualComp.size,compEnvelope,modes});
  }
- return {X,B,L,y,rmin,f,m,scaleCap,clock,roughVisits,slots:slots.size,checks,maxRoots,totalQuery,totalEdges,totalStationary,out};
+ const Q=Math.max(5,Math.ceil(B/4)),support=[0,0];
+ for(let p=Q;p<=B;p++)if(sp[p]===p)for(let s=0;s<2;s++)for(let k=0;6*s+2*p*k<=12*B+6;k++){
+   const d=6*s+2*p*k;
+   const j0=2*p*Math.ceil((2*X-2+2*s)/(2*p))-2*s;
+   for(let J=j0;J<7*X;J+=2*p){
+     let t=(J+d)/2;
+     if(t%2!==s||(t-2*s)%p)continue;
+     support[k===0?0:1]++;
+   }
+ }
+ const firstContact=ledgers.map(g=>{
+   let stats=[0,1].map(ty=>({keys:0,weight:0,quotaPaid:0,remaining:0,maxPairs:0}));
+   for(const v of g.pairs.values())ok(v<=6*B+3+1e-6,"aggregate original terminal pair budget");
+   for(const c of g.keys.values()){const i=c.reset?0:1,z=stats[i],cap=i===0?32:8;z.keys++;z.weight+=c.w;z.quotaPaid+=Math.min(c.w,cap);z.remaining+=Math.max(0,c.w-cap);z.maxPairs=Math.max(z.maxPairs,c.pairs.size)}
+   for(let i=0;i<2;i++)ok(stats[i].keys<=support[i],"large first-contact key arithmetic envelope");
+   return {Q,support,pairLevels:g.seen.size,distinctPairs:g.pairs.size,stats};
+ });
+ return {X,B,L,y,rmin,f,m,scaleCap,firstContact,clock,roughVisits,slots:slots.size,checks,maxRoots,totalQuery,totalEdges,totalStationary,out};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[4096,16384,65536]))for(const m of [4,16])console.log(JSON.stringify(audit(X,true,m)));
