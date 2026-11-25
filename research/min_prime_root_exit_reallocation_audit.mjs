@@ -16,7 +16,7 @@ function audit(X,mode){
   let gain=C-(2*M-2);R+=cost;G+=gain;ok(gain<T+B&&2*cost<=3*gain,"gain");
   let tail=0;for(let i=a.length-1;i>=0;i--){tail+=a[i].w;a[i].tail=tail;a[i].next=a[i+1]||null;}roots.set(M,a);
  }
- const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:mode==="phase"?3:1,scale=analytic?u**1.5:mode==="phase"?0.5:0.125;
+ const H=T+B,y=3,L=6,analytic=mode==="analytic",Qm=analytic?Q:Math.max(7,Math.ceil(B/(mode==="wide"?4:8))),k=analytic?Math.max(1,Math.floor(u**.25)):mode==="wide"?2:(mode==="phase"||mode==="stress")?3:1,scale=analytic?u**1.5:(mode==="phase"||mode==="stress")?0.5:0.125;
  const pr=[];for(let p=3;p<Qm&&p<=B;p+=2)if(spf[p]===p)pr.push(p);
  const wt=r=>r+1.5*L,A=r=>Math.ceil(wt(r)**2*scale),blk=(r,C)=>Math.floor(C/A(r)),cap=r=>analytic?Math.max(1,Math.floor(Math.log(r)**6)):mode==="wide"?4:2;
  let initialLow=0,highLow=0,mediumClock=0,mediumLow=0,lowBlocks=0,lowMax=0,mediumTags=0,lowTotal=0,quotientChecks=0;
@@ -31,7 +31,7 @@ function audit(X,mode){
  const D=r=>Math.max(1,Math.floor(analytic?r*u**1.5*Math.log(2+Math.min(r,u))**2/ell**1.5:r*(mode==="wide"?6:3)));
  const c=r=>Math.max(1,Math.floor(cap(r)/lambda(r)));
  const cellWidths=analytic?[Math.ceil(H),Math.ceil(H/Math.max(1,u**.125)),Math.ceil(H/Math.max(1,u**.25))]:[Math.ceil(H),Math.ceil(H/2),Math.ceil(H/4)];
- const bcap=r=>{const p=P(r),lp=Math.log(2*p),ep=1+Math.log(lp);return Math.max(1,Math.floor(analytic?(B/p)**2/u**1.5*Math.sqrt(p/Qm)*(p>=u*u?lp**6/ep**4:lp**2/(1+L/p)**2):c(r)*2*Math.sqrt(Qm/p)));};
+ const bcap=r=>{const p=P(r),lp=Math.log(2*p),ep=1+Math.log(lp);return Math.max(1,Math.floor(analytic?(B/p)**2/u**1.5*Math.sqrt(p/Qm)*(p>=u*u?lp**6/ep**4:lp**2/(1+L/p)**2):mode==="stress"?2:c(r)*2*Math.sqrt(Qm/p)));};
  const subcap=(r,d)=>Math.max(1,Math.floor(bcap(r)/(Math.ceil(H/(2*d))+2)));
  const ell0=1+Math.log(u),quota=r=>analytic?Math.max(1,Math.ceil(u**1.5/ell0**1.25+u**1.5*Math.log(2*P(r))*(1+L/P(r))*(P(r)/Qm)**.25/ell0)):k;
  const d=cellWidths.at(-1),sourceCell=M=>Math.floor((M-X)/d),mcell=r=>subcap(r,d);
@@ -49,9 +49,9 @@ function audit(X,mode){
  const near=(x,y)=>Math.abs(x-y)<=1e-6*Math.max(1,Math.abs(x),Math.abs(y));
  ok(near(medium,first+short+long)&&medium===mediumClock+mediumLow&&selectedPairs+shortEdges===edges&&edges<=fullPairs,"quota partition");
  let band=0,cellCost=0,res=0,tiny=0,close=0,far=0,heavy=0,already=0,immediate=0,heavyFocal=0,smallFocal=0,tinyFocal=0,groups=0,cellChecks=0,degreeChecks=0,partnerChecks=0,maxDegree=0,maxRatio=0,maxMult=0,keys=0,maxKappa=0;
- const kappa=r=>analytic?Math.ceil(u**.125*u/Math.log(2*P(r))):mode==="short"?3:4;
- const eta=r=>analytic?u**(1/32):2;
- const gap=r=>analytic?Math.floor(P(r)*u**(1/16)):mode==="short"?1:Math.max(1,Math.floor(P(r)/2));
+ const kappa=r=>analytic?Math.ceil(u**.125*u/Math.log(2*P(r))):mode==="stress"?2:mode==="short"?3:4;
+ const eta=r=>analytic?u**(1/32):mode==="stress"?4:2;
+ const gap=r=>analytic?Math.floor(P(r)*u**(1/16)):mode==="short"||mode==="stress"?1:Math.max(1,Math.floor(P(r)/2));
  const outKey=a=>a.out+":"+a.J;
  const endpoints=new Map(),pairCharges=new Map();
  for(const [key,ar] of pairMap){const [r,C,E]=key.split(":").map(Number),v=ar.length;
@@ -105,4 +105,4 @@ function audit(X,mode){
  return {mode,X,B,T,Qm,N,literal,medium,first,short,long,edges,fullPairs,band,cellCost,res,tiny,close,far,heavy,already,immediate,smallAlready,smallImmediate,largeAlready,largeImmediate,final:far+largeAlready+largeImmediate,heavyFocal,smallFocal,tinyFocal,groups,keys,cellChecks,degreeChecks,partnerChecks,maxDegree,maxRatio,maxMult,maxKappa,endpointBound,tailChecks,immediateChecks,alreadyPairs,immediatePairs,pa,pb};
 }
 
-const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
+const xs=process.argv.slice(2).map(Number);for(const mode of ['short','wide','analytic','phase','stress'])for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
