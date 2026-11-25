@@ -1,0 +1,80 @@
+# Lifetime-layer induced founder budget and coarser maturity cut
+
+2026-11-26 JST. Continues [96656afaa7c2](https://github.com/tara-sooo/A166944-Lean/blob/96656afaa7c25e44cfc8278d663c053b356e7129/research/2026-11-26-min-unified-historical-founder-forest.md), [78700a08336c](https://github.com/tara-sooo/A166944-Lean/blob/78700a08336cdf9d6660f698833b58ab0ce2824e/research/2026-11-26-min-unified-hysteretic-attachment-residence.md), [03de6f70aa10](https://github.com/tara-sooo/A166944-Lean/blob/03de6f70aa1092dea36944b679725a360153cc79/research/2026-11-26-min-unified-truncated-potential-physical-maturity.md). New: apply founder accounting to the actual eligible surviving members at each original source boundary; integrate the exact founder/attachment/merge budget over the original grids; dynamic maturity keys coarsen the old physical first-large partition (unlike historical keys), after a negligible small-small payment. New lifetime-weighted thin-key cutoff and terminal quantile/prime-origin restrictions on its support. No global constant-margin contraction or Lean proof.
+
+## 1. Frozen ensemble
+
+X dyadic, B=ceil(sqrt(7X)), u=log B, ell=1+log u, N=Theta(X/u), T=floor(X/u^.25), H=T+B. Original prime-root tags M in [X,2X), C0=2M-2, actual deterministic true-state MIN prefixes, completed gain p-1, total gain <H, waits <=2p<=3(p-1). Include original terminal states. No extension of stopped trajectories. Under finitely many twins, eventually NT/2-o(NT)<=B_old+(3+o(1))(D_l,old+D_h,old). Original grids P_j, common averaging denominator, P_max<=B^.25, c_a=3(1+2/u^.25), original positive backward slot size b>=b_min=H/[512 L0 B u ell³ sqrt(tau)], ordered pair clock <=c_a P/b, joint row and column caps c_a P. All old masks through 96656af frozen, including original physical first meeting, original incoming branch labels, old historical founder/attachment classification, bad-tag sets, and final weighted and physical maturity/terminal strips. Forward energy unchanged.
+
+Use epsilon=ell^(-1/2), eta=ell^(-1/4), h=eta H, previous physical threshold L=floor(B^(1-epsilon/4)), actual incoming-degree bound d=O(u/ell) a sufficiently large integer. Set s=floor(eta b_min/d), eventually s>=2, s/L->infinity, d s/b_min<=eta. This is a new threshold on induced surviving branch counts; it is NOT a new denominator or physical-population threshold. For original tags satisfying old domain conditions (non-Bad, terminal nonmoving, first physical-large exists), let M_i^+=max(J_i,A_i^+) and F_i be old maturity and terminal horizons. Keep R_plus=sum_i (F_i-M_i^+-2h)_+ as before.
+
+## 2. Source-layer forest without retirements
+
+At each original strict boundary atom K (a multiple of grid P) and original positive backward physical slot G, of full size b, take its subset E=E(G,K) of original tags satisfying old maturity domain and M_i^++h<=K<=F_i-h. Let n=|E|<=b. One may include further independently tagwise masks but do not recompute eligibility of any old pair or denominator. Every remaining backward pair at G has both members in E. Form the induced tree of their original physical histories from their own root injections to the common actual predeparture state of G. All leaves are root tags of E; there are no retirements within this induced tree, because every member really reaches G. Incoming counts a_j(V;G,K) are the original distinct incoming groups restricted to E; include singleton injection. A node of induced mass a=sum_j a_j has that exact mass, and each member's induced mass is nondecreasing on its own original path. Ignore nodes with zero induced count. Compressed edges of a single continued group do not change the mass. No actual original path is altered. Source G need not have all original members eligible.
+
+Define k(V)=#incoming groups with a_j>=s, t(V)=sum_{a_j<s} a_j, z(V)=sum_{a_j>=s} a_j. As in the previous historical forest, if k=0 and a>=s then this node is a founder; if k>=1, its small incoming memberships are attachments. Let S_G be sum of founder masses, A_G=sum_{V:k>=1} t(V), J_G=sum_V (k(V)-1)_+. If n<s then all three zero. If n>=s then all induced members cross the threshold exactly once, and the final tree has exactly one large component. Consequently
+    S_G+A_G=n,  J_G=F_G-1
+where F_G is the number of founders (only in n>=s case). In all cases
+    A_G+s J_G<=n.                                  (1)
+More precisely for n>=s the difference n-A_G-s J_G=s+sum_founder(a-s). This exact budget uses ONLY the induced surviving tags, not stopped members of the old historical forest. Across layers, a tag can attach at different vertices; no global uniqueness across different K is assumed.
+
+## 3. Small-small payment and coarser maturity key
+
+At a fixed G,K the ordered pair count at first meetings having both induced incoming groups <s is sum_V [t(V)^2-sum_{a_j<s} a_j^2]. As t(V)<=d s, it is <=the total gain of f_(ds) truncated quadratic potential (03de6f7). With no internal retirements its exact telescope is f_(ds)(n)-n<=2ds n. Each ordered pair atom clock <=c_a P/b. Thus pay all such exact old surviving pairs at this layer, at cost <=2 c_a P ds n/b_min. The grid-averaged total is O(eta (R_plus+NP_max))=o(NT). The previous induced small-branch masks may already pay part or all of this region; count only surviving charges, and retain every old mask. In particular this calculation is not a claim of a new positive asymptotic mass deletion.
+
+For n>=s, partition E by the true vertex of FIRST induced mass >=s for each member, with group sizes c_w. If n<s put all members in one group. A pair has the same such key if and only if both its induced branches at its first meeting have mass <s: in that case either they cross threshold together at meeting or share their common history until crossing (or never cross); conversely if one incoming branch >=s then its member already crossed strictly before the birth while the other first crossed at birth or on a different prior history. Therefore the entire relaxed ordered count after the small-small exclusion is exactly
+    n² - sum_w c_w².                               (2)
+The old physical first-large keys (threshold L) partition the SAME E into groups of sizes a_v. Since s>=L, a member cannot cross induced threshold before its actual physical first-large state. Two source members having the same actual physical first-large key share their true continuation from there through G; neither can have crossed induced s before that state, so their first induced key is also identical (or both absent when n<s). Hence the induced partition COARSENS the physical one:
+    sum_w c_w² >= sum_v a_v².
+Unlike the previous historical-first-key construction, this time the new normalized cut may be strictly smaller. Define
+    U_ind=mean_P sum_{K,G positive} (P/b)(n²-sum_w c_w²).
+Every remaining exact backward clock <=c_a U_ind, and pointwise
+    U_ind<=U_phys<=mean_P sum_{K,G}P n<=R_plus+NP_max.   (3)
+The first comparison is with the old physical-key cut on identical eligibility, not with the earlier exact weighted birth measure. Old extra birth/phase/moving/root-separation masks can only reduce the actual charge. The sharper induced cut and exact weighted tree estimates are alternatives; take minima rather than add them. The potential bound implies that the relaxed difference between the physical and induced cuts on this same domain is itself at most O(ds/b_min)(R_plus+NP_max)=o(NT); no constant-margin improvement follows from the coarsening alone.
+
+## 4. Integrated founder reserve and lifetime-dependent exact thinning
+
+The induced layer after small-small payment has two exact residual types: both incoming induced branches >=s (merge); one >=s, other <s (attachment). Preserve original birth keys and the old historical classification; this is a new partition of the remaining nonnegative fractions. A historical-heavy pair may now be an induced attachment. For fixed V and K, every member in E visiting V before its source must belong to the SAME G if they really cross K, by deterministic shared continuation to its unique crossing. Thus the following sum over G at fixed K does not duplicate the same physical birth vertex's induced count. Define
+    A_area=mean_P sum_{K,G} P A_G,
+    S_area=mean_P sum_{K,G} P S_G,
+    Lambda_V=mean_P sum_{K,G} P (k(V;G,K)-1)_+,
+    Lambda=sum_V Lambda_V.
+By (1) and the actual lifetime strips,
+    A_area+s Lambda<=R_eligible:=mean_P sum_{K,G}P n
+                     <=R_plus+NP_max,              (4)
+    A_area+S_area<=R_eligible,   s Lambda<=S_area.
+Each induced attachment membership contributes actual pair clock at most 2 c_a P z(V)/b. This is an upper bound even with arbitrary old pair masks. Pay all attachments at layers with z(V)<=eta b; cost <=2 c_a eta A_area. This is a fresh one-layer induced attachment rule; it can cover old historical-large pairs whose surviving side has fallen below s. Do not count the same member as a globally unique attachment across different K. The correct global count is A_area, a lifetime-weighted incidence sum. Further, the full attachment candidate clock at the layer is <=2 c_a P sum_{V:k>=1} t(V) z(V)/b, with no summation over relaxed histories. Use (2)-(3) as a simultaneous cap on both types.
+
+Let B_merge(V) be the exact grid-averaged induced-merge clock after old payments and section 3, at physical birth vertex V. Pay each V with
+    B_merge(V)<=eta c_a s Lambda_V.                 (5)
+The additional total <=eta c_a s Lambda. Together with the attachment share payment the cost is <=2 c_a eta R_eligible by (4), not independent budgets for these two rules. A layer-specific version pays V,K,G if its exact induced-merge clock <=eta c_a P s(k-1), with same total bound; keep old global eta H L cutoff on its original historical domain. The new threshold (5) depends on actual surviving time support rather than H times the number of all historical vertices. It can exceed the old per-vertex scale eta H L on an overlapping key when Lambda_V is comparable to H since s/L->infinity, but is not uniformly larger, and the two domains differ. It is a new exact allowed mask, not a claim of dominance over the old mask. In particular no estimate of the total clock above (5) has been derived.
+
+## 5. Arithmetic restriction on the actual supported lifetimes
+
+For each V and original incoming group j define F_{j,s} as the s-th largest ORIGINAL terminal horizon among its original tags, or minus infinity if <s members. At a layer supporting an induced merge, k(V)>=2; each of those k branches has at least s members with terminal F_i>=K+h and maturity M_i^++h<=K. Hence
+    k(V;G,K)<= # {j:F_{j,s}>=K+h}.
+All actual K in that layer have K>=C_V. Sort the finite F_{j,s} in descending order, F_(1),F_(2),... . Then the uniform layer support estimate
+    Lambda_V <= sum_{j>=2} (F_(j)-h-C_V+P_max)_+
+holds (count inclusive multiples of P and average; do not replace lower maturity endpoints by full lifetimes in exact counts). Actual maturity strips and old birth-age constraints may shrink support further. This bound uses terminal order statistics of each original actual incoming branch, not the historical component's retired mass. The summed bound s Lambda<=R_eligible still applies to the actual Lambda_V, not to an independently summed relaxed terminal bound.
+
+There is an additional arithmetic age constraint: any of the k s distinct roots supporting these large groups has origin C0_i<=C_V and F_i<C0_i+H, so C0_i>K+h-H. All lie in a single horizon interval of length D=C_V+H-h-K. The earlier prime-interval upper sieve gives #roots<=C(1+D/log(2+D)) with absolute C. Since s=B^(1-o(1)), k>=2, it follows D>=c k s log(2+k s) for absolute c>0 and sufficiently large X. Thus
+    K <= C_V+H-h-c k s log(2+k s).
+No consumed gain assigned to historical retired members. This constraint is valid for the actual alive tags at each supported layer and can further restrict (5)'s support. It does not give a constant H-fraction shortening uniformly, since s log s=o(H). It is a necessary local support condition, not a prime density hypothesis.
+
+## 6. Updated sufficient route and limits
+
+The induced small-small deletion and (5)/small-share additions cost O(eta NT) (plus harmless NP_max), retaining all earlier masks; forward unchanged. Under finitely many twins NT/2-o(NT)<=B_new+(3+o(1))(D_l,old+D_h,old). Sufficient scalar route:
+    liminf (U_ind+D_l,old+D_h,old)/(NT) < 1/6.
+This uses c_a->3. Since U_ind<=R_plus+NP_max, the previous residence test implies it. The induced cut is itself a raw normalized upper bound, not the exact new residual; old finer tree/mask envelopes may still be smaller. Equations (4)-(5) give an integrated joint budget and a per-birth lifetime-dependent thinning rule, with no duplication from old historical memberships. The remaining exact backward and forward charges have not been bounded by the required strict constant margin. Main and independent branches not modified; no Lean compilation.
+
+## 7. Numerical audit
+
+[Final standalone audit](https://github.com/tara-sooo/A166944-Lean/blob/129695cf8d76059a662c231afe36ed5b8bdbe0f9/research/min_unified_lifetime_layer_forest_audit.mjs), exact remote readback verified. Eleven final-source runs passed in ECMAScript runtime: four ordinary X1024,4096,16384,65536, three reach-focused X4096,16384,65536, two X65536 gainFactor2 with scale .5,1, two coarsening tests X65536 (gainFactor2 scale .5 and gainFactor8 scale1). Reproduce node research/min_unified_lifetime_layer_forest_audit.mjs 1024 4096 16384 65536. Actual finite MIN trajectory generator from a130f11, grids6,30,210, physical large L=2m, m=max(2,floor(scale sqrt(B)/3)); baseline induced s=max(2,floor(scale sqrt(B)/4)) intentionally smaller than L, coarsening tests s=L (analytic s>>L is asymptotic). Finite h=.02H, physical first-large and terminal strips only; no full weighted-final or bad-tag masks. Computes each actual positive original slot and strict grid boundary, then independently induces original true histories of eligible tags, checks unique attachment per layer, founder reserve and ordered small-small pair count, terminal survival and elementary prime-origin spacing condition, old raw pair envelope after both-physical-small mask, pair classification conservation, induced cut identity, coarsening when s>=L. Tests exact finite normalized unit-clock thin-key and share inequalities (thin-key deletion zero at finite eta=.25, positive small-share and small-small cases exercised). First attempted script had duplicate eta declaration and was corrected before running. No empirical validation of asymptotic s, prime interval sieve or full analytic masks. No gcd oracle or Lean proof.
+
+Largest extra coarsening X65536 gainFactor2 scale .5: N5709,129305 completed events,564 reaches, finite L=s=8. Units of P times tag count for area, unit-cap normalized clock for pair cuts:
+| P | eligible area | attachment area | s times merge support | physical cut | induced cut | strict comparisons |
+|---:|---:|---:|---:|---:|---:|---:|
+|6|1251186|388854|47424|587576.236852|549925.126367|2355|
+|30|1260870|391350|47760|591580.712246|553271.865423|477|
+|210|1256220|385770|47040|581428.391877|543735.599104|68|
+19226 nonempty boundary/slot cut checks in this test. Induced-small-small clock 33563.443818/34103.334002/33258.562004, small-share attachment clock1835.273985/1950.546166/1276.683047, thin-merge zero. P6 founder area856098, sum of founder+attachment1244952<=eligible1251186 (some cohorts below s). P6 candidate merge/attachment clocks60213.545886/489711.580481. Baseline largest ordinary s6<L16 has 3791/750/107 nonempty layers; P6 area536598, attachment256086, merge budget121032, 3362 elementary origin spacing checks; no cut dominance asserted at that smaller finite s. Coarsening ordinary s=L16 gives equal physical/induced cuts 188142.315985/185480.535958/184177.534326. Focus runs have no qualifying large finite source. The empirical reductions are finite raw capacity comparisons, not evidence of a constant asymptotic saving.
