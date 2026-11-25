@@ -47,7 +47,7 @@ function audit(X,mode){
 
 
  const m=mode==='analytic'?u**2.5:mode==='wide'?64:8,Y=mode==='analytic'?Math.max(17,Math.ceil(B**.125)):mode==='wide'?7:17;
- const lim=12*B+6,ell0=1+Math.log(u),nodes=new Map(),key=e=>e.t+':'+e.C,def=e=>2*e.t-e.C;
+ const lim=12*B+6,ell0=1+Math.log(u),lagCut=mode==='analytic'?Math.ceil(B**.125):mode==='wide'?7:17,nodes=new Map(),key=e=>e.t+':'+e.C,def=e=>2*e.t-e.C;
  for(const path of paths){const stop=path[path.length-1].t;let a=null;
   for(const e of path){let v=nodes.get(key(e));if(!v){v={id:key(e),t:e.t,C:e.C,d:def(e),children:new Map(),next:null,tags:[]};nodes.set(v.id,v);}
    v.tags.push({i:e.i,M:e.M,stop,child:a?a.id:'root',p:e.inc,pre:a});if(a){let g=v.children.get(a.id);if(!g){g={p:e.inc,n:0};v.children.set(a.id,g);}g.n++;ok(g.p===e.inc&&(!a.next||a.next===v),'deterministic successor');a.next=v;}v.incByTag??=new Map();v.incByTag.set(e.i,e.inc);a=v;
@@ -57,7 +57,7 @@ function audit(X,mode){
  function cap(d,q,rough){const j=band(d),D=lim/2**j;return B*m*q*(rough?u*u:1/ell0)/(D*D*(j+1)**2);}
  let pairs=0,oldI=0,oldEntry=0,trueI=0,trueD=0,trueA=0,trueL=0,oldL=0,firstMatched=0,firstRise=0,firstDrop=0,entrySaving=0,oldDebit=0,newDebit=0,oldSmall=0,newSmall=0,rootLate=0,rootEarly=0,earlySame=0,earlyMixed=0,sameIncoming=0,sameIncomingLarge=0,longLag=0,shortLag=0,smallTrue=0,smallTrueDebit=0,localCredit=0,maxLag=0,maxNew=0,oracle=0;
  let oldHeavy=0,trueHeavy=0,oldAfter=0,newAfter=0,roughAfter=0,plainAfter=0,roughRaw=0,plainRaw=0;
- const pairData=[];
+ const pairData=[]; const improved=new Map();let improvedOld=0,credit=0,creditEnergy=0,lowTruePaid=0,impRoughPaid=0,impPlainPaid=0,impRawRough=0,impRawPlain=0,impDirect=0,impSame=0,impLongSmall=0,impMixedPaid=0;
  for(const v of nodes.values()){
   const cs=[...v.children.values()],b=P(v.tags.length)-cs.reduce((s,e)=>s+P(e.n),0);if(!b)continue;
   const suffix=new Map();let cur=v,mi=v.d,A=0,D=0;
@@ -95,6 +95,30 @@ function audit(X,mode){
    if(same&&q&&d>6&&d!==6*(t%2)&&rn>0){
     const id=C+':'+t+':'+q+':'+(rough?1:0);let g=groups.get(id);if(!g){g={C,t,q,d,rough,mass:0,rest:0};groups.set(id,g);}g.mass+=2;g.rest+=2*rn;
    }
+   // Maintain the OLD actual debit and prior small/source/mixed payments.
+   // Move only the genuinely matched first-rise part to a separate upstream
+   // ledger. New low-true-birth and arrival quotas act on its remainder.
+   let rem=ro;
+   if(!same&&x.p>0&&y.p>0&&x.p!==y.p&&v.d>6&&v.d!==6*(v.t%2)&&rem>0){
+    // Defer mixed quota to its exact aggregate label cross product.
+    const np=v.tags.filter(a=>a.p===x.p).length,nq=v.tags.filter(a=>a.p===y.p).length;
+    const j1=band(v.d),D1=lim/2**j1,Y0=Math.max(3,Math.ceil(B**.125)),h0=x.p>=Y0&&y.p>=Y0?1:ell0**2;
+    const f=Math.min(1,B*m*x.p*y.p/(D1*D1*(j1+1)**2*h0*2*np*nq));
+    impMixedPaid+=2*f*rem;rem*=1-f;
+   }
+   improvedOld+=2*rem;
+   const moved=Math.min(rem,extra);credit+=2*moved;rem-=moved;
+   ok(rem<=It+1e-8,'remaining old debit dominated by true drawdown');
+   if(moved){const a=x.pre.t<y.pre.t?x:y,b=x.pre.t<y.pre.t?y:x,r0=r[C/2];creditEnergy+=2*r0*((v.t-a.pre.t)/(2*r0))*((v.t-b.pre.t)/(2*r0));}
+   if(same&&d<=m){lowTruePaid+=2*rem;rem=0;}
+   if(rem>0){
+    if(same&&q&&d>6&&d!==6*(t%2)){
+     const rr=(q>=Y&&lag>=q)||lag>=lagCut;
+     if(rr)ok(2*r[C/2]>Math.min(lagCut,q),'large-lag roughness');
+     const id=C+':'+t+':'+q+':'+(+rr),g=improved.get(id)||{C,t,q,d,rough:rr,mass:0,rest:0};
+     g.mass+=2;g.rest+=2*rem;improved.set(id,g);if(rr&&q<Y)impLongSmall+=2*rem;
+    }else if(same)impSame+=2*rem;else impDirect+=2*rem;
+   }
    // Independent true first-meeting check on a deterministic pair sample:
    // intersect actual half-open waiting intervals at common horizons.
    if((x.i*131+y.i*17)%4093===0){
@@ -114,13 +138,31 @@ function audit(X,mode){
   if(g.rough){roughPaid+=paid;roughRaw+=g.rest;roughKeys++;roughMass+=g.mass;}else{plainPaid+=paid;plainRaw+=g.rest;plainKeys++;plainMass+=g.mass;}
  }
  let supportChecks=0,envelope=0;
+ const impTypes=new Map();let impEnvelope=0,impChecks=0;
+ for(const g of improved.values()){
+  const j=band(g.d),D=lim/2**j,h0=g.q>=Y?1:ell0;
+  const c=B*m*g.q*(g.rough?u*u:1)/(D*D*(j+1)**2*h0),paid=g.rest*Math.min(1,c/g.mass);
+  if(g.rough){impRoughPaid+=paid;impRawRough+=g.rest;}else{impPlainPaid+=paid;impRawPlain+=g.rest;}
+  const id=j+':'+g.q+':'+(+g.rough),v=impTypes.get(id)||{j,q:g.q,rough:g.rough,n:0};v.n++;impTypes.set(id,v);
+ }
+ for(const {j,q,rough,n} of impTypes.values()){
+  const D=lim/2**j;let cnt=0;
+  for(const s of [0,1])for(let k=1;6*s+2*q*k<=D;k++){const d=6*s+2*q*k;if(d<=D/2)continue;
+   let C=2*X+(((-2*s-2*X)%q+q)%q);if(C%2)C+=q;if(((C+d)/2)%2!==s)C+=2*q;
+   for(;C<7*X;C+=4*q)if(!rough||2*r[C/2]>Math.min(lagCut,q))cnt++;
+  }ok(n<=cnt,'improved long-lag envelope');impEnvelope+=cnt;impChecks++;
+ }
+ const impRest=impRawRough+impRawPlain-impRoughPaid-impPlainPaid+impSame+impDirect;
+ ok(Math.abs(oldAfter-impMixedPaid-improvedOld)<1e-6*Math.max(1,oldAfter)&&Math.abs(improvedOld-credit-lowTruePaid-impRoughPaid-impPlainPaid-impRest)<1e-6*Math.max(1,oldAfter),'old debit priority partition');
+ ok(credit<=24*creditEnergy+1e-6,'conditional first rise credit');
+ const improvement={lagCut,improvedOld,credit,creditEnergy,lowTruePaid,impRoughPaid,impPlainPaid,impRawRough,impRawPlain,impDirect,impSame,impLongSmall,impMixedPaid,impRest,impChecks,impEnvelope,keys:improved.size};
  for(const s0 of types.values()){const {j,q,rough,n}=s0,D=lim/2**j;let cnt=0;
   for(const s of [0,1])for(let k=1;6*s+2*q*k<=D;k++){const d=6*s+2*q*k;if(d<=D/2)continue;
    let C=2*X+(((-2*s-2*X)%q+q)%q);if(C%2)C+=q;if(((C+d)/2)%2!==s)C+=2*q;
    for(;C<7*X;C+=4*q)if(!rough||2*r[C/2]>q)cnt++;
   }ok(n<=cnt,'later arrival envelope');envelope+=cnt;supportChecks++;
  }
- return {X,B,mode,m,Y,N,R,events,literal,pairs,oldI,oldEntry,oldDebit,newDebit,trueL,oldL,firstMatched,firstRise,firstDrop,entrySaving,trueA,trueD,rootLate,rootEarly,sameIncoming,sameIncomingLarge,earlyMixed,longLag,shortLag,maxLag,smallTrue,newSmall,oldSmall,oldAfter,newAfter,roughPaid,plainPaid,rest:newAfter-roughPaid-plainPaid,roughRaw,plainRaw,roughKeys,plainKeys,roughMass,plainMass,supportChecks,envelope,oracle,localCredit,maxNew};
+ return {improvement,X,B,mode,m,Y,N,R,events,literal,pairs,oldI,oldEntry,oldDebit,newDebit,trueL,oldL,firstMatched,firstRise,firstDrop,entrySaving,trueA,trueD,rootLate,rootEarly,sameIncoming,sameIncomingLarge,earlyMixed,longLag,shortLag,maxLag,smallTrue,newSmall,oldSmall,oldAfter,newAfter,roughPaid,plainPaid,rest:newAfter-roughPaid-plainPaid,roughRaw,plainRaw,roughKeys,plainKeys,roughMass,plainMass,supportChecks,envelope,oracle,localCredit,maxNew};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
