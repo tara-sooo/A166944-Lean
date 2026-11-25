@@ -39,7 +39,7 @@ function audit(X,focus=false,scale=1,gainFactor=8){
   for(let i=0;i<b;i++)for(let j=i+1;j<b;j++){let f=a[i],g=a[j],[u,v,t]=meet(f,g),U=verts.get(u.C+"|"+t),i0=branch(u,t),j0=branch(v,t);ok(U&&i0!==j0&&U.groups.has(i0)&&U.groups.has(j0),"actual birth groups");
    let x=U.groups.get(i0).length,y=U.groups.get(j0).length,type=x<m&&y<m?0:x>=m&&y>=m?2:1,thin=false;
    if(type===2){heavyBirthKeys.add(U);ok(U.h>=2,"heavy node")}
-   if(type===1){let large=x>=m?i0:j0,n=a.filter(k=>{let z=k.tag.byC.get(U.C);return z&&z.i<=k.i&&z.t<=t&&t<=z.end&&branch(z,t)===large}).length;thin=n<=eta*b;attachmentChecks++}
+   if(type===1){let n=a.filter(k=>{let z=k.tag.byC.get(U.C);return z&&z.i<=k.i&&z.t<=t&&t<=z.end&&U.groups.get(branch(z,t)).length>=m}).length;thin=n<=eta*b;attachmentChecks++}
    for(let jj=0;jj<Ps.length;jj++){let P=Ps[jj],z=rows[jj],nk=Math.ceil(e.J/P)-Math.ceil(e.C/P),w=2*P*nk/b;z.raw+=w;z[["smallSmall","mixed","heavyHeavy"][type]]+=w;if(type===2)U.loads[jj]+=w;if(thin)z.thinAttachment+=w;
     for(let K=P*Math.ceil(e.C/P);K<e.J;K+=P){if(K<Math.max(f.tag.firstHeavy.C,g.tag.firstHeavy.C)+hAge)z.maturityStrip+=2*P/b;else z.postMaturity+=2*P/b;}
    }pairChecks++;
