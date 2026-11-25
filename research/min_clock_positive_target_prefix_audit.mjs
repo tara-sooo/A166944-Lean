@@ -98,11 +98,10 @@ function allocateStrips(I,ok){
  }
  return {sum,union,max};
 }
-function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
- const z={eta,raw:0,positive:0,low:0,old:0,recent:0,oldNatural:0,oldDrop:0,oldPositiveGain:0,oldNonpositiveGain:0,oldSmallGain:0,oldLargeGain:0,oldMass:0,recentBirth:0,recentNonTop:0,recentTop:0,recentNonTopBirth:0,recentTopBirth:0,checks:0,oldCount:0,recentCount:0,lowCount:0,maxBirthGain:0,maxBandOverlap:0,maxOverlap:0,maxRecentSum:0,maxNonTopSum:0,stripLength:0,keys:0,topCut:B/2,lowNatural:0,oldKeys:0,earliestBirths:0};
+function adaptiveAudit(uses,B,expected,ok,close){
+ const z={raw:0,positive:0,low:0,old:0,recent:0,oldNatural:0,oldDrop:0,oldPositiveGain:0,oldNonpositiveGain:0,oldSmallGain:0,oldLargeGain:0,oldMass:0,recentBirth:0,recentNonTop:0,recentTop:0,recentNonTopBirth:0,recentTopBirth:0,checks:0,oldCount:0,recentCount:0,lowCount:0,maxBirthGain:0,maxBandOverlap:0,maxOverlap:0,maxRecentSum:0,maxNonTopSum:0,stripLength:0,keys:0,topCut:B/2,lowNatural:0,oldKeys:0,earliestBirths:0};
  const pairs=new Map(),strips=new Map(),upstream=new Map(),slots=new Map();let packed=0,union=0,maxAllocated=0,allocationCharge=0,allocPositive=0,allocNonpositive=0,allocSmall=0,allocLarge=0,allocNatural=0,allocDrop=0;
- // Use integer strip length h=ceil(eta*r/16); with rounding,
- // the exact recent high-birth comparison includes +5 and is checked below.
+ // Adaptive strip length ceil(min(r/2,D/10)); a recent birth has D<2*d_birth.
  for(const u of uses){
    const A=u.a.P.records,Q=u.b.P.records,idx=A.findIndex((e,i)=>i>u.a.k&&e.C===u.recipient),jdx=Q.findIndex((e,i)=>i>u.b.k&&e.C===u.recipient),T=A[idx],V=Q[jdx];
    ok(idx>u.a.k&&jdx>u.b.k&&T.C===V.C&&T.b===V.b&&T.v===V.v,"actual target");
@@ -130,7 +129,7 @@ function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
      const anchor=A[u.a.k].C+A[u.a.k].p-1;
      ok(anchor>=J&&anchor<=T.C&&u.d-db<=5*(anchor-J)&&D>0,"recent common birth deficit");
      ok(D<=db+5*G&&db>D/2,'adaptive recent high birth');
-     // G<h and G integer imply G<eta*r/16 (ceil); so no rounding loss.
+     // Integer G<h implies G<min(r/2,D/10), so no rounding loss.
      ok(D<=2*db+1e-7,'adaptive birth-relative charge');
      z.recent+=c;s.recent+=c;z.recentCount++;a.charge+=c;
      if(r<=B/2){a.nontop+=r/B;a.nonTopCharge+=c;z.recentNonTop+=c}
@@ -139,7 +138,7 @@ function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
    }
    z.old+=c;s.old+=c;z.oldCount++;z.stripLength+=h;
    const lo=T.C-h,hi=T.C,band=Math.floor(Math.log2(r)),coeff=c/h;
-   ok(lo>=J&&coeff<=48+1e-7,"old backward strip density");
+   ok(lo>=J&&coeff<=24+1e-7,"old backward strip density");
    a.intervals.push({lo,hi,band,r,c,coeff,A,i,idx,pk});
    let covered=0;for(let k=i;k<idx;k++){
      const E=A[k],F=Q[j+k-i],g=E.p-1,H=E.C+g;
@@ -158,7 +157,7 @@ function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
  for(const a of pairs.values()){
    z.maxRecentSum=Math.max(z.maxRecentSum,a.top+a.nontop);z.maxNonTopSum=Math.max(z.maxNonTopSum,a.nontop);
    ok(a.charge<=2*a.db*(a.top+a.nontop)+1e-6&&a.nonTopCharge<=2*a.db*a.nontop+1e-6,"recent birth total");
-   // All recent target starts lie in [J,J+eta B/16). Their outgoing gains
+   // All recent target starts lie in [J,J+B/2). Their outgoing gains
    // are disjoint; except last, they are inside that interval.
    ok(a.top+a.nontop<=1.75+1e-7,"recent gain packing");
    ok(a.nontop<=.875+1e-7,"non-top recent gain packing");
@@ -175,7 +174,7 @@ function adaptiveAudit(uses,B,expected,ok,close,eta=1/4){
  }
  z.keys=slots.size;z.oldKeys=upstream.size;
  ok(close(z.raw,expected)&&close(z.positive,z.low+z.old+z.recent)&&close(z.old,z.oldMass)&&close(z.old,z.oldPositiveGain+z.oldNonpositiveGain)&&close(z.old,z.oldSmallGain+z.oldLargeGain)&&close(z.recent,z.recentNonTop+z.recentTop),"complete prefix ledger");
- ok(close(allocationCharge,z.old)&&close(allocPositive+allocNonpositive,z.old)&&close(allocSmall+allocLarge,z.old)&&z.old<=96*(12*allocNatural+2*allocDrop)+1e-6,'constant old upstream transport');
+ ok(close(allocationCharge,z.old)&&close(allocPositive+allocNonpositive,z.old)&&close(allocSmall+allocLarge,z.old)&&z.old<=48*(12*allocNatural+2*allocDrop)+1e-6,'constant old upstream transport');
  return {...z,packed,union,maxAllocated,allocationCharge,allocPositive,allocNonpositive,allocSmall,allocLarge,allocNatural,allocDrop,details:[...slots.values()]};
 }
 // Rough target RESET/nonreset and near-neutral entry phase audit.
