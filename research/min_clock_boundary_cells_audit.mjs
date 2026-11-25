@@ -43,6 +43,25 @@ function audit(X,mode){
 
 
  const eta=u**(-.25),rho=mode==='analytic'?Math.min(.125,u**(-.25)):mode==='wide'?.125:.0625;
+ const P=mode==='analytic'?Math.max(17,Math.ceil(B/u**.125)):Math.max(17,Math.ceil(B/4));
+ let nonreset=0,reset=0,firstLow=0,repeatedLow=0,charged=0,repeatGain=0,subGain=0,minimumRatio=Infinity,nonresetChecks=0;
+ for(const path of paths){
+  let prev=null;
+  for(let j=1;j<path.length;j++){
+   const e=path[j-1],v=path[j],p=v.inc,d0=2*e.t-e.C,d1=2*v.t-v.C,s=v.t%2;
+   if(d1===6*s){prev=null;if(p>=P)reset++;continue;}
+   if(p<P){subGain+=p-1;continue;}
+   ok(d1>=2*p&&d1===6*s+2*p*Math.floor((d1-6*s)/(2*p)),'nonreset high deficit');nonreset++;nonresetChecks++;
+   if(d0<=P){
+    ok(v.t-e.t>=p&&2*r[e.C/2]>=p,'low-deficit nonreset long wait');
+    if(prev){const gain=e.C-prev.C;ok(gain>=2*prev.inc-P&&gain>=P,'repeat low deficit charge');charged+=gain;repeatGain+=p-1;repeatedLow++;minimumRatio=Math.min(minimumRatio,gain/P);}
+    else firstLow++;
+   }
+   prev=v;
+  }
+ }
+ ok(charged<=subGain&&repeatGain<=(B/P)*charged,'disjoint intermediate gain charges');
+ const excursions={P,nonreset,reset,firstLow,repeatedLow,charged,repeatGain,subGain,minimumRatio:Number.isFinite(minimumRatio)?minimumRatio:null,nonresetChecks};
  const results=[],overlap=(l,h,x,y)=>Math.max(0,Math.min(h,y)-Math.max(l,x));
  for(const path of paths)for(let j=0;j+1<path.length;j++){const e=path[j],v=path[j+1];e.l=Math.max(e.t,e.M+2+a);e.h=Math.min(v.t,e.M+2+H);e.v=v.t;e.cut=e.M+2+H;e.start=e.M+2+a;}
  for(const b of [0,1]){
@@ -94,7 +113,7 @@ function audit(X,mode){
   ok(Rx<=N*E0/2+eps&&Ex<=3*E0*Rx+eps&&lowPaid<=8*rho*E+2*Math.sqrt(E*Ex)+eps&&lowPaid<=(8*rho+eta)*E+Ex/eta+eps,'low-strip absorption');
   results.push({sector:b,D,E0,E,R:Rb,Ec,Et,Rt,paid,allTail,sync,nearAsync,farAsync,cutPaid,startPaid,oracleChecks,maxTail,cellChecks,nearPairs,allSync,allAsync,low,lowStrong,lowExc,Ex,Rx,maxExc,lowPaid,lowGain,exceptions,strongInc,lowAndTail});
  }
- return {X,B,mode,a,H,eta,rho,N,R,events,literal,results};
+ return {excursions,X,B,mode,a,H,eta,rho,N,R,events,literal,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
 for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','full'])console.log(JSON.stringify(audit(X,mode)));
