@@ -59,3 +59,21 @@ function audit(Xs=[4096,16384,65536]){
  return {results,turnover:ratios,abstract};
 }
 console.log(JSON.stringify(audit(process.argv.length>2?process.argv.slice(2).map(Number):undefined),null,2));
+
+function retirementAudit(X=16384){
+ const cap=7*X+100,spf=new Int32Array(cap+1);for(let p=2;p<=cap;p++)if(!spf[p])for(let k=p;k<=cap;k+=p)spf[k]=p;
+ const mod=(x,m)=>(x%m+m)%m,ok=(x,m)=>{if(!x)throw Error(m)};
+ const B=Math.ceil(Math.sqrt(7*X)),T=Math.floor(B/2),tags=[],slots=new Map();let events=0,reaches=0;
+ for(let M=X|1;M<2*X;M+=2)if(spf[M]===M){let C0=2*M-2,C=C0,t=M+2,path=[],id=tags.length;
+  while(C-C0<T){let p=0,w=Infinity;for(let I=0;I<2;I++){let z=C-1+2*I;while(z>1){let q=spf[z];while(z%q===0)z/=q;if(q*q>C+1)continue;let v=mod((I?q+2:0)-t,2*q)||2*q;if(v<w||v===w&&q<p){w=v;p=q}}}if(!p)break;let n=t+w,key=C+"/"+n+"/"+p;if(!slots.has(key))slots.set(key,{C,n,p,set:new Set(),next:null});let s=slots.get(key);s.set.add(id);path.push(s);C+=p-1;t=n;events++}
+  if(C-C0>=T)reaches++;tags.push(path)
+ }
+ for(let path of tags)for(let i=1;i<path.length;i++){let a=path[i-1],b=path[i];ok(!a.next||a.next===b,"successor");a.next=b}
+ let retire=0,retirementEdges=0,negative=0,positive=tags.reduce((v,path)=>v+(path.length?Math.log(path[0].set.size):0),0),sameSizeTurnover=0,removed=0,joined=0;
+ for(let a of slots.values())if(a.next){let b=a.next,r=[...a.set].filter(i=>b.set.has(i)).length,loss=a.set.size-r,add=b.set.size-r;ok(r>0,"survive");retire+=loss;if(loss)retirementEdges++;negative+=r*Math.log(a.set.size/r);positive+=r*Math.log(b.set.size/r);removed+=loss;joined+=add;if(loss&&a.set.size===b.set.size)sameSizeTurnover++}
+ let totalLast=tags.reduce((v,path)=>v+(path.length?Math.log(path.at(-1).set.size):0),0);ok(negative<=retire+1e-7&&retire<=tags.length&&Math.abs(positive-negative-totalLast)<1e-6&&positive<=tags.length*Math.log(tags.length)+negative+1e-6,"entropy and retirement");
+ let comparisons=0,changes=0;for(let path of tags){for(let i=0;i<path.length;i++){let v=0;for(let j=i+1;j<Math.min(i+12,path.length);j++){let a=path[j-1].set,b=path[j].set,r=[...a].filter(k=>b.has(k)).length;v+=Math.log(a.size/r)+Math.log(b.size/r);let A=path[i].set,R=[...A].filter(k=>b.has(k)).length,d=A.size+b.size-2*R;ok(d<=Math.min(A.size,b.size)*Math.exp(v)*v+1e-7,"turnover");comparisons++;if(d)changes++}}}
+ ok(retirementEdges>0&&negative>0,"retirement coverage");
+ return {X,B,T,N:tags.length,events,reaches,slots:slots.size,retire,retirementEdges,negative,positive,totalLast,sameSizeTurnover,removed,joined,comparisons,changes}
+}
+console.log(JSON.stringify({retirementControls:[retirementAudit(16384),retirementAudit(65536)]},null,2));

@@ -4,7 +4,7 @@
 
 ## 1. Frozen setup and completed physical slots
 
-Keep dyadic X, B=ceil(sqrt(7X)), u=log B, ell=1+log u, T=floor(X/u^.25), H=T+B, N=Theta(X/u), original prime roots, original completed MIN histories stopped at gain T or twin. No extrapolation. Keep old grids and common average, c_a=3(1+2/u^.25), original joint row/column clock cap c_a P, original A1 transport and every old mask. A1 marks p>=Y=ceil(B^.5) with pre x=d+3<=p/5 and adjusted post D=2p. Exact mark clock q_i(P)<=kappa p, density lambda_i(P)=5q_i/(4p)<=Lambda. Each cut level y in (p/5,p] goes to first actual later downward event; c8cdf7e leaves direct high providers or short-low-run relay precursors and age a<C_mark_post+p u² (in distance notation C_destination-J_mark<p u²). Retain old thin projected cuts. All destinations below are these actual events on the same original tag.
+Keep dyadic X, B=ceil(sqrt(7X)), u=log B, ell=1+log u, T=floor(X/u^.25), H=T+B, N=Theta(X/u), original prime roots, original completed MIN histories stopped at gain T or twin. No extrapolation. Keep old grids and common average, c_a=3(1+2/u^.25), original joint row/column clock cap c_a P, original A1 transport and every old mask. A1 marks p>=Y=ceil(B^.5) with pre x=d+3<=p/5 and adjusted post D=2p. Exact mark clock q_i(P)<=kappa p, density lambda_i(P)=5q_i/(4p)<=Lambda. Each cut level y in (p/5,p] goes to first actual later downward event; c8cdf7e leaves direct high providers or short-low-run relay precursors and age C_destination-J_mark<p u². Retain old thin projected cuts. All destinations below are these actual events on the same original tag.
 
 A physical exit slot V=(C,p,n) is a completed event including true winning tick n and selected p. Let S_V be ALL original tags executing that slot, b_V=|S_V|. After V the next completed exit is unique for every member that continues (determinism of post state); those members stopping at V are retired forever. The successor may also receive members from other earlier slots or injected roots. Define for an edge V->W, r=|S_V intersect S_W|>0. This intersection is exactly the continuing members of V, since any member at V which continues must have this next completed exit. No tag is counted as continuing if retired. Thus r<=b_V,b_W. Distinct predecessor exit slots have disjoint continuing sets at W. A root with first exit W belongs to a new singleton entering W; roots with no exit do not enter. All claims refer to the original completed paths, not histories extended after terminal.
 
@@ -324,4 +324,50 @@ Run node research/min_unified_a1_cohort_cut_audit.mjs 4096 16384 65536. Exact au
   ],
   "abstract": 5071
 }
+```
+
+## 9. Supplemental actual retirement controls
+
+The ordinary controls in Section 8 had zero negative variation and zero retained short-low relay cases. To exercise actual retirement (not only the abstract turnover example), add independent prime-root controls with T=floor(B/2). These deliberately differ from the analytic gain target and test the same exit-cohort identities, with all negative increments including the loss of some but not all members of an exit. Check exact signed telescoping summed over tags and the symmetric-difference bound for every chain of up to 11 successor edges. Executed exact function in ECMAScript runtime. Both pass with strictly positive retirement and negative log variation. This is not an asymptotic claim or a new short relay diagnostic. Results:
+```json
+[
+  {
+    "X": 16384,
+    "B": 339,
+    "T": 169,
+    "N": 1612,
+    "events": 15668,
+    "reaches": 841,
+    "slots": 9313,
+    "retire": 409,
+    "retirementEdges": 295,
+    "negative": 296.02663168851484,
+    "positive": 1813.2519973896717,
+    "totalLast": 1517.2253657011736,
+    "sameSizeTurnover": 15,
+    "removed": 409,
+    "joined": 2776,
+    "comparisons": 86503,
+    "changes": 43820
+  },
+  {
+    "X": 65536,
+    "B": 678,
+    "T": 339,
+    "N": 5709,
+    "events": 75430,
+    "reaches": 2870,
+    "slots": 38730,
+    "retire": 1556,
+    "retirementEdges": 859,
+    "negative": 1085.308031298792,
+    "positive": 7844.888816615683,
+    "totalLast": 6759.58078531669,
+    "sameSizeTurnover": 46,
+    "removed": 1556,
+    "joined": 13060,
+    "comparisons": 509058,
+    "changes": 259060
+  }
+]
 ```
