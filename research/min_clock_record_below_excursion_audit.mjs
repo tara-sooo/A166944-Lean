@@ -1,10 +1,44 @@
+function treeAudit(trees,sourcePaths,ok,close,m=8){
+ const H={raw:0,cap:0,paid:0,rem:0,balanced:0,unbalanced:0,nodes:0,branch:0,maxDepth:0,maxN:0,maxBirthChildren:0,checks:0,m,resetBirth:0,lowBirth:0,highBirth:0,treeDetails:[]};
+ for(const tree of trees.values()){
+   let serial=0;function node(key){return {id:serial++,key,n:0,children:new Map()}}
+   const root=node(tree.e.C+','+tree.e.b),paths=new Map();
+   for(const M of tree.ids){
+     const P=sourcePaths.get(M),k=P.records.findIndex(e=>e.C===tree.e.C&&e.b===tree.e.b&&e.v===tree.e.v);ok(k>=0,"actual tree target");
+     let v=root;v.n++;const chain=[v];
+     for(let j=k-1;j>=0;j--){let e=P.records[j],key=e.C+','+e.b;if(!v.children.has(key))v.children.set(key,node(key));v=v.children.get(key);v.n++;chain.push(v)}
+     const leaf=node("source:"+M);leaf.n=1;v.children.set(leaf.key,leaf);chain.push(leaf);paths.set(M,chain);H.maxDepth=Math.max(H.maxDepth,chain.length);
+   }
+   function scan(v){H.nodes++;if(v.children.size>1){H.branch++;H.maxBirthChildren=Math.max(H.maxBirthChildren,v.children.size)}for(const c of v.children.values())scan(c)}scan(root);
+   H.maxN=Math.max(H.maxN,root.n);let treeRaw=0,treePaid=0;
+   for(const [l,es] of tree.levels){
+     const cs=new Map(),inc=new Map(),alive=new Set(es),membership=new Set();
+     function add(M,v,c,e){const key=M+'|'+v.id+'|'+c.id,cap=m*c.n/v.n;let a=cs.get(key);if(!a){a={M,cap,d:0,es:[]};cs.set(key,a)}a.d+=e.w;a.es.push(e);if(!inc.has(e))inc.set(e,[]);inc.get(e).push(a)}
+     for(const e of es){
+       const [i,j]=e.ids,a=paths.get(i),b=paths.get(j);let k=0;while(k+1<a.length&&k+1<b.length&&a[k+1]===b[k+1])k++;
+       const v=a[k],p=a[k+1],q=b[k+1];ok(v.key===e.bk&&p!==q,"exact recorded birth tree LCA");
+       add(i,v,q,e);add(j,v,p,e);membership.add(i);membership.add(j);
+       H.raw+=e.w;treeRaw+=e.w;H.checks++;
+       const [J,t]=v.key.split(',').map(Number),d=2*t-J;
+       if(d<=6)H.resetBirth+=e.w;else if(d<l/2)H.lowBirth+=e.w;else H.highBirth+=e.w;
+       e.ratio=Math.min(p.n,q.n)/v.n;
+     }
+     const cc=new Map();for(const c of cs.values()){H.cap+=c.cap;cc.set(c.M,(cc.get(c.M)||0)+c.cap)}for(const M of membership)ok(cc.get(M)<=m*Math.log(root.n)+1e-7,"entropy capacity per membership");
+     let queue=[...cs.values()].filter(c=>c.d<=c.cap+1e-9);
+     for(let j=0;j<queue.length;j++){let c=queue[j];if(c.d>c.cap+1e-9)continue;for(const e of c.es){if(!alive.delete(e))continue;H.paid+=e.w;treePaid+=e.w;for(const a of inc.get(e)){let old=a.d;a.d-=e.w;if(old>a.cap+1e-9&&a.d<=a.cap+1e-9)queue.push(a)}}}
+     for(const e of alive){H.rem+=e.w;for(const a of inc.get(e))ok(a.d>a.cap-1e-7,"entropy opposite-child core");if(e.ratio>=1/4)H.balanced+=e.w;else H.unbalanced+=e.w}
+   }
+   H.treeDetails.push({key:root.key,n:root.n,raw:treeRaw,paid:treePaid});
+ }
+ ok(close(H.raw,H.paid+H.rem)&&H.paid<=H.cap+1e-5&&close(H.rem,H.balanced+H.unbalanced)&&close(H.raw,H.resetBirth+H.lowBirth+H.highBirth),"entropy tree ledger");return H;
+}
 // First common recorded high-deficit attainment transport.
 function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
  const pairs=new Map(),keys=new Map(),mem=new Map(),births=new Map(),stats={Q,Y,factor,raw:0,pos:0,small:0,smallEnergy:0,recent:0,old:0,lift:0,birth:0,birthStock:0,oldEnergy:0,maxPairBoundary:0,maxPairBirth:0,minPost:Infinity,minBirth:Infinity,maxLag:0,maxDensity:0,keys:0,vertices:0,labels:{},paid:0,residual:0,vertexPaid:0,vertexResidual:0,oracle:0,checks:0,detail:[]};
  const R={lower,upper,eligible:0,unsafe:0,initial:0,record:0,birthLevels:0,recordLevels:0,recordEnergy:0,recordCapacity:0,birthStock:0,maxPairLevel:0,maxTheta:0,recordEdges:0,recordKeys:0,labels:{},birthPairs:0,recordPairs:0,strict:0,atEntry:0,minLevel:null,maxLevel:0,earliestClock:null,latestClock:0,paid1:0,paid8:0,res1:0,res8:0,tokens:0,maxBirth:0,birthTypes:{},pairBirthMin:null,pairBirthMax:0};
  const role=new Map(),rkeys=new Set(),sourcePaths=new Map(),physical=new Map();let literal=0;
  const E={virgin:0,mixed:0,distinct:0,sameExit:0,lateExitAtBirth:0,earlyExitBeforeBirth:0,birthWeight:0,birthLabels:{},birthKeys:0,birthPairs:0,exitKeys:0,exitTokens:0,exitPaid1:0,exitPaid8:0,exitRem1:0,exitRem8:0,oracle:0,checks:0,sharedExitDropCap:0,sharedExitWeight:0,birthDetail:[]};
- const birthMap=new Map(),exitMap=new Map(),exitRole=new Map(),histCache=new Map();
+ const birthMap=new Map(),exitMap=new Map(),exitRole=new Map(),histCache=new Map(),trees=new Map();
  function history(M,C,v,l){
    const k=M+'|'+C+'|'+v+'|'+l;if(histCache.has(k))return histCache.get(k);
    const P=sourcePaths.get(M);let exit=null,ever=false,high=false,record=null;
@@ -102,6 +136,9 @@ function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
     if(!birthMap.has(bk))birthMap.set(bk,{J,t,d:a.d,w:0,pairs:new Set(),src:new Set()});
     const bg=birthMap.get(bk);bg.w+=w;bg.pairs.add(pk);for(const M of a.ids)bg.src.add(M);
     E.birthWeight+=w;E.checks++;
+    const tkey=e.C+','+e.b+','+e.v;
+    if(!trees.has(tkey))trees.set(tkey,{e,levels:new Map(),ids:new Set()});
+    const tree=trees.get(tkey);if(!tree.levels.has(l))tree.levels.set(l,[]);tree.levels.get(l).push({ids:a.ids,w,bk});for(const M of a.ids)tree.ids.add(M);
     if(E.oracle<128){
       for(let j=0;j<2;j++){const P=sourcePaths.get(a.ids[j]),idx=P.records.findIndex(z=>z.C===e.C&&z.v===e.v);let k=idx-1;while(k>=0&&P.records[k].post<l)k--;let z=xs[j];
        // If a prior post >=l, its next completed edge is the last downcross.
@@ -150,7 +187,7 @@ function recordLift(uses,B,L,expected,ok,close,Q,Y,factor,lower=1/8,upper=1/4){
  R.tokens=role.size;R.recordKeys=rkeys.size;R.literal=literal;R.physical=[...physical.values()].map(g=>({key:g.key,w:g.w,n:g.src.size,pairLevels:g.pairLevels})).sort((a,b)=>b.w-a.w);
  ok(close(R.eligible,R.initial+R.record)&&close(stats.lift,R.eligible+R.unsafe)&&close(R.record,R.strict+R.atEntry)&&close(R.record,R.paid1+R.res1)&&close(R.record,R.paid8+R.res8)&&R.initial<=432*R.birthStock+1e-6&&R.record<=1296*R.recordEnergy+1e-6,"record ledger");
  for(const [k,w] of exitRole){if(w<=1+1e-9)E.exitPaid1+=w;else E.exitRem1+=w;if(w<=8+1e-9)E.exitPaid8+=w;else E.exitRem8+=w}
- E.exitTokens=exitRole.size;E.exitKeys=exitMap.size;E.birthKeys=birthMap.size;
+ E.H=treeAudit(trees,sourcePaths,ok,close,8);ok(close(E.H.raw,R.record),'tree raw ledger');E.exitTokens=exitRole.size;E.exitKeys=exitMap.size;E.birthKeys=birthMap.size;
  E.birthDetail=[...birthMap.values()].map(g=>({J:g.J,t:g.t,d:g.d,w:g.w,pairs:g.pairs.size,n:g.src.size})).sort((a,b)=>b.w-a.w);
  const bs=new Set();for(const g of birthMap.values())for(const pk of g.pairs){ok(!bs.has(pk),"one common recorded birth per pair");bs.add(pk)}E.birthPairs=bs.size;
  ok(close(R.record,E.virgin+E.mixed+E.distinct+E.sameExit)&&close(R.record,E.birthWeight)&&close(E.mixed+E.distinct+E.sameExit,E.lateExitAtBirth+E.earlyExitBeforeBirth)&&close(E.mixed+E.distinct+E.sameExit,E.exitPaid8+E.exitRem8)&&close(E.sharedExitWeight,E.sameExit),"below-level provenance ledger");
