@@ -1,6 +1,6 @@
 // Dense future high-clock witness and persistence obstruction diagnostics.
 function audit(X,focus=false,short=false){
- const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(16*B,Math.floor(X/2)),H=T+B,L=short?8:Math.max(32,Math.floor(B*2)),block=Math.max(2,Math.floor(L/2)),Y=Math.max(5,Math.ceil(B**.25)),eta=.08,cheap=.25,L0=6,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
+ const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(16*B,Math.floor(X/2)),H=T+B,L=short?8:focus?Math.max(8,Math.floor(B/8)):Math.max(32,Math.floor(B*2)),block=Math.max(2,Math.floor(L/2)),Y=Math.max(5,Math.ceil(B**.25)),eta=.08,cheap=.25,L0=6,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
  const ok=(x,s)=>{if(!x)throw Error(`${X}/${focus}/${short} ${s}`)},mod=(a,b)=>(a%b+b)%b,eq=(a,b)=>Math.abs(a-b)<=1e-7*Math.max(1,Math.abs(a),Math.abs(b));
  for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
  function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
