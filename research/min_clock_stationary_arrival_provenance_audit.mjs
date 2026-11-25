@@ -1,5 +1,5 @@
 function arrivalAudit(trees,sourcePaths,B,ok,close){
- const out={raw:0,reset:0,nonreset:0,lowBoth:0,lateNonreset:0,lateReset:0,lateRoot:0,sameIncoming:0,differentIncoming:0,rootIncoming:0,resetDecrease:0,resetLargeInput:0,shortGap:0,shortGapSame:0,pairs:0,checks:0,slots:0,arrivalKeys:0,rootPairs:0,firstContactOracle:0,keys:[],labels:{},highLabelCount:0};
+ const out={contactCanonical:0,contactCanonicalPairs:0,contactCanonicalNonreset:0,contactTailCap:0,contactTailMaxRatio:0,contactShort:0,contactShortPairs:0,raw:0,reset:0,nonreset:0,lowBoth:0,lateNonreset:0,lateReset:0,lateRoot:0,sameIncoming:0,differentIncoming:0,rootIncoming:0,resetDecrease:0,resetLargeInput:0,shortGap:0,shortGapSame:0,pairs:0,checks:0,slots:0,arrivalKeys:0,rootPairs:0,firstContactOracle:0,keys:[],labels:{},highLabelCount:0};
  const pairs=new Map(),slots=new Map(),cache=new Map(),arrivals=new Set(),roughKeys=new Map();const R=Math.ceil(B/16),Amax=32;
  function get(M,J,t){const k=M+'|'+J+','+t;if(cache.has(k))return cache.get(k);const P=sourcePaths.get(M),i=P.records.findIndex(e=>e.C===J&&e.b===t);ok(i>=0,"recorded birth");let z=i?{e:P.records[i-1],prev:i>1?P.records[i-2]:null,P}:null;cache.set(k,z);return z}
  function state(P,t){let a=0,b=P.records.length;while(a<b){let m=(a+b)>>1;if(P.records[m].v<=t)a=m+1;else b=m}return a<P.records.length?P.records[a].C:P.endC}
@@ -28,20 +28,23 @@ function arrivalAudit(trees,sourcePaths,B,ok,close){
     ok(i.s===j.s&&gap%(2*i.q)===0&&gap>=2*i.q,"same incoming label clock separation");
     ok(A.prev.C===D.prev.C&&A.prev.v<=D.prev.b,"disjoint actual predecessor waits");
   }
-  if(reset&&i.phase===0&&j.phase===0)ok(gap===3&&C%4===0,"two phase-zero arrivals");
+  if(j.phase===0)ok(i.phase===0&&i.d===0&&i.s===0&&j.d===6&&j.s===1&&gap===3&&C%4===0,'late phase zero forces exact canonical physical contact');
   if(out.firstContactOracle<128){
     const start=Math.max(A.P.s,D.P.s);let first=null;for(let z=start;z<=b1;z++)if(state(A.P,z)===state(D.P,z)){first=z;break;}
     ok(first===b1,"literal first physical contact");out.firstContactOracle++;
   }
   const sk=[C,v,p].join(',');if(!slots.has(sk))slots.set(sk,{C,v,p,r,dv,reset,w:0,pairs:0,arrivals:new Map(),qPairs:{},gapMax:0,ageMin:Infinity});
   let sl=slots.get(sk);for(let k=0;k<2;k++){const z=incoming[k],key=z.b+','+z.q+','+(z.prev?z.prev[1]:'root');if(!sl.arrivals.has(key))sl.arrivals.set(key,{...z,src:new Set()});sl.arrivals.get(key).src.add(x[k].P.M);arrivals.add(sk+'|'+z.b);}
-  pairs.set(pk,{w:e.w,sk,reset,i,j,gap,age:w,p,r,ids:e.ids});out.checks++;
+  pairs.set(pk,{w:e.w,sk,reset,i,j,gap,age:w,p,r,ids:e.ids,tail:Math.min(A.P.end,D.P.end)-b1});out.checks++;
  }
  // A pair not in the same-label class is never inserted. Repeated record levels aggregate only inserted pairs.
  for(const a of pairs.values()){
    const {w,sk,reset,i,j,gap,age,p,r}=a,sl=slots.get(sk);sl.w+=w;sl.pairs++;sl.gapMax=Math.max(sl.gapMax,gap);sl.ageMin=Math.min(sl.ageMin,age);
    let key=i.q+','+j.q;sl.qPairs[key]=(sl.qPairs[key]||0)+w;out.labels[key]=(out.labels[key]||0)+w;
    out.raw+=w;out.pairs++;if(reset)out.reset+=w;else out.nonreset+=w;
+   const z=a.tail,cap=1.5*(j.d+2*z)*(Math.max(0,j.d-6)+2*z)/B;ok(z>=0&&w<=cap+1e-6,'physical birth deficit and remaining clock envelope');out.contactTailCap+=cap;out.contactTailMaxRatio=Math.max(out.contactTailMaxRatio,w/cap);
+   if(j.phase===0){out.contactCanonical+=w;out.contactCanonicalPairs++;if(!reset)out.contactCanonicalNonreset+=w;ok(w<=(6*z*z+18*z)/B+1e-6,'canonical physical birth cap');}
+   if(j.d<=32&&z<=Math.ceil(2*Math.sqrt(B))){out.contactShort+=w;out.contactShortPairs++;}
    if(i.d<=32&&j.d<=32)out.lowBoth+=w;
    if(!j.q)out.lateRoot+=w;else if(j.phase===0)out.lateReset+=w;else out.lateNonreset+=w;
    if(!i.q||!j.q)out.rootIncoming+=w;else if(i.q===j.q)out.sameIncoming+=w;else out.differentIncoming+=w;
@@ -89,6 +92,7 @@ function arrivalAudit(trees,sourcePaths,B,ok,close){
  out.quota=Q;
  out.slots=slots.size;out.arrivalKeys=arrivals.size;
  out.keys=[...slots.values()].map(s=>({...s,arrivals:[...s.arrivals.values()].map(a=>({...a,n:a.src.size,src:undefined})).sort((a,b)=>a.b-b.b)})).sort((a,b)=>b.w-a.w);
+ ok(close(out.contactCanonical,out.lateRoot+out.lateReset),'canonical contact partition');
  ok(close(out.raw,out.reset+out.nonreset)&&close(out.raw,out.lateRoot+out.lateReset+out.lateNonreset)&&close(out.raw,out.rootIncoming+out.sameIncoming+out.differentIncoming),"arrival partition");
  return out;
 }
