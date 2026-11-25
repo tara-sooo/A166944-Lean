@@ -4,7 +4,7 @@ function audit(N=150000,steps=180){
  const mod=(x,m)=>(x%m+m)%m,gcd=(a,b)=>{while(b)[a,b]=[b,a%b];return Math.abs(a)};
  function next(t,H){let best=null;for(let e of [1,-1]){let z=H-e;while(z>1){let p=spf[z];if(!p)throw Error("range");while(z%p===0)z/=p;if(p*p>H+1)continue;let w=mod((e===1?0:p+2)-t,2*p)||2*p;if(!best||w<best.w||w===best.w&&p<best.p)best={p,e,w}}}return best}
  function literal(t,H){for(let w=1;w<=2*Math.floor(Math.sqrt(H+1));w++){let n=t+w,e=n%2?-1:1,g=gcd(n%2?n-2:n,H-e);if(g>1&&spf[g]**2<=H+1)return {p:spf[g],e,w}}return null}
- let s={N,steps,events:0,paths:0,rangeTruncated:0,near:[0,0,0],pairs:[0,0,0],packing:[0,0,0],filteredPairs:0,filterChecks:0,filteredGainChecks:0,phaseChecks:0,phaseRepeated:0,phaseLowVariationChecks:0,primorialChecks:0,primorialIntervals:0,primorialFarBoundChecks:0,literalChecks:0,largestNear:null,example:null,farGainExample:null};
+ let s={N,steps,events:0,paths:0,rangeTruncated:0,near:[0,0,0],pairs:[0,0,0],packing:[0,0,0],filteredPairs:0,filterChecks:0,filteredGainChecks:0,phaseChecks:0,phaseRepeated:0,phaseLowVariationChecks:0,primorialChecks:0,primorialIntervals:0,primorialFarBoundChecks:0,linearPackingFarChecks:0,literalChecks:0,largestNear:null,example:null,farGainExample:null};
  const eps=[[1,4],[1,2],[3,4]];
  for(let M=5;M<=N;M+=2){
   let H=2*M-2,t=M+2,ev=[];
@@ -50,6 +50,11 @@ function audit(N=150000,steps=180){
    }
    if((R-1)*low>K*high+K*(R-1))throw Error("primorial global");
    s.primorialIntervals++;
+   // Stronger linear-loss bound from at most one near event per square center.
+   const lo=Math.ceil(Math.sqrt(ev[0].H-1)),hi=Math.floor((0.75+Math.sqrt(0.75**2+4*(H+1)))/2);
+   const count=Math.max(0,hi-lo+1),sum=count*(lo+hi)/2,G0=H-ev[0].H;
+   if(near>sum||nearList.length>count||(R-1+K)*far<(R-1)*(G0-sum-K*(count+1)))throw Error("linear-loss far bound");
+   s.linearPackingFarChecks++;
    if(nearList.every(v=>v.p>=8*(K+1))){
     const C=Math.floor(Math.sqrt(H+1)),A=R-1,B=R-1+K;
     // F >= (A/(8B)) (N-C), and U <= K((N+F)/A+1).
