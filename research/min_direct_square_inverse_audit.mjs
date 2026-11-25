@@ -16,7 +16,7 @@ function audit(P=2000,budget=500000){
  let gate=[];for(let t=edge.lo;t<=edge.hi;t++){if(root(t,C)){gate.push({root:true,t});stats.rootsAtTarget++}for(let e of inverse(t,C))gate.push({t,l:e.p,side:e.s,Cprev:e.C,lo:e.lo,hi:e.hi})}
  if(s===1){stats.oddTargets++;if(gate.length){stats.oddAllowed++;throw Error("odd gate "+p)}}
  if(r===3&&s===-1){stats.r3Even++;if(gate.length)stats.r3EvenAllowed++;if((gate.length>0)!==(p%204===145)||gate.some(e=>e.root||e.l!==17||e.t!==n-1))throw Error("r3 gate");if(gate.length)stats.r3Examples.push({p,C,n,gate})}
- if(r===5&&s===-1){stats.r5Even++;if(gate.length)stats.r5EvenAllowed++;if(gate.some(e=>e.root||!((e.l===3&&e.t===n-2)||(e.l===17&&e.t===n-1&&p%17===9))))throw Error("r5 even");if(gate.some(e=>e.l!==3))stats.r5OtherExamples.push({p,s,r,gate})}
+ if(r===5&&s===-1){stats.r5Even++;if(gate.length)stats.r5EvenAllowed++;if((gate.length>0)!==(p%41!==8||p%17===9))throw Error('exact r5 gate');if(gate.some(e=>e.root||!((e.l===3&&e.t===n-2)||(e.l===17&&e.t===n-1&&p%17===9))))throw Error("r5 even");if(gate.some(e=>e.l!==3))stats.r5OtherExamples.push({p,s,r,gate})}
  const key=(t,H)=>t*(max+1)+H, seen=new Map(),stack=[],roots=new Map();let unknown=false;
  function push(t,H,succ){let k=key(t,H);if(!seen.has(k)){seen.set(k,succ);stack.push({t,H,k})}}
  for(let t=edge.lo;t<=edge.hi;t++)push(t,C,{t:n,H:Z,p});
@@ -32,7 +32,14 @@ function audit(P=2000,budget=500000){
  let smallP=Math.min(P,97),Hmax=(smallP+1)**2+smallP+10,forward=new Map([...reverseSets.keys()].map(p=>[p,new Set()]));
  for(let M=5;2*M-2<=Hmax;M+=2){stats.smallForwardRoots++;let t=M+2,C=2*M-2;while(C<=Hmax){let e=next(t,C);if(!e)break;let n=t+e.w,Z=C+e.p-1,p=e.p,s=p%4===1?-1:1;if(forward.has(p)&&e.s===s&&C===(p+1)**2+(s===1?-2:0)&&2*n-Z===(s===1?6:0))forward.get(p).add(M);stats.smallForwardEdges++;t=n;C=Z;}}
  for(let [p,a] of reverseSets){let b=forward.get(p);if(a.size!==b.size||[...a].some(x=>!b.has(x)))throw Error("forward set mismatch "+p);stats.smallForwardMatches++}
- return stats
+ // Larger independent local-gate test without a sieve of size p^2.
+ const localMax=20000,pr=[];for(let z=2;z<=localMax+10;z++){if(pr.every(a=>a*a>z||z%a))pr.push(z)}
+ function lfactor(z){let a=[];for(let p of pr){if(p*p>z)break;if(z%p===0){a.push(p);while(z%p===0)z/=p}}if(z>1)a.push(z);return a}
+ function tick(n,H){let s=n%2?1:-1,g=gcd(n%2?n-2:n,H+s);if(g===1)return 1;let l=lfactor(g)[0];return l*l<=H+1?l:1}
+ let local={max:localMax,r3:0,r3Allowed:0,r5:0,r5Allowed:0,r5Blocked:0,r5BlockedExamples:[],r5Rescue:0,r5RescueExamples:[]};
+ for(let p of pr){if(p<13||p>localMax||p%4!==1)continue;let r=lfactor(p+2)[0];if(r!==3&&r!==5)continue;let x=p+1,C=x*x,n=p*(p+3)/2,gate=[];for(let w=1;w<r;w++){let t=n-w,good=tick(n,C)===p;for(let k=t+1;k<n;k++)if(tick(k,C)!==1)good=false;if(!good)continue;let s=t%2?1:-1;for(let l of lfactor(gcd(t%2?t-2:t,C+(s===1?2:0)))){if(l<3)continue;let Cp=C-l+1;if(l*l>Cp+1||2*(t-1)<Cp||tick(t,Cp)!==l)continue;gate.push({w,l})}}
+ let k=r===3?'r3':'r5';local[k]++;if(gate.length)local[k+'Allowed']++;let expected=r===3?p%204===145:p%41!==8||p%17===9;if((gate.length>0)!==expected)throw Error('large local exact gate '+p);if(r===5&&!gate.length){local.r5Blocked++;if(local.r5BlockedExamples.length<5)local.r5BlockedExamples.push(p)}if(r===5&&p%41===8&&gate.length){local.r5Rescue++;if(local.r5RescueExamples.length<5)local.r5RescueExamples.push({p,gate})}
+ }stats.largeLocal=local;return stats
 }
 
 console.log(JSON.stringify(audit(Number(process.argv[2] || 2000),Number(process.argv[3] || 500000)),null,2));
