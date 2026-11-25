@@ -1,6 +1,6 @@
 // Sharp same-slot inherited hit caps and positive/nonpositive occupation transfer.
 function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
- const S=new Map(),pairsSeen=new Set(),tot={same:0,distinct:0,skip:0,low:0,recent:0,small:0,smallDrift:0,smallAge:0,smallEnd:0,smallR:0,pos:0,nonpos:0,zero:0,negative:0,short:0,longNonpos:0,posMoment:0,mixedMoment:0,mixedNatural:0,mixedDrop:0,distinctPos:0,distinctNonpos:0,quota:0,quotaResidual:0,quotaCap:0,keys:0,fully:0,oracle:0,maxPairRatio:0,heavyEvents:0,heavyRaw:0,balancedRaw:0,balancedBound:0,unbalancedRaw:0,rawPositiveSquares:0,rawNonpositiveSquares:0,slotRolePaid:0,slotRoleResidual:0,slotRoleCap:0,slotRoleKeys:0,maxRoles:0};
+ const S=new Map(),pairsSeen=new Set(),tot={same:0,distinct:0,skip:0,low:0,recent:0,small:0,smallDrift:0,smallAge:0,smallEnd:0,smallR:0,pos:0,nonpos:0,zero:0,negative:0,short:0,longNonpos:0,posMoment:0,mixedMoment:0,mixedNatural:0,mixedDrop:0,distinctPos:0,distinctNonpos:0,keys:0,fully:0,oracle:0,maxPairRatio:0,heavyEvents:0,heavyRaw:0,balancedRaw:0,balancedBound:0,unbalancedRaw:0,rawPositiveSquares:0,rawNonpositiveSquares:0,slotRolePaid:0,slotRoleResidual:0,slotRoleCap:0,slotRoleKeys:0,maxRoles:0};
  function lower(P,C){let a=0,b=P.records.length;while(a<b){let k=(a+b)>>1;if(P.records[k].C<C)a=k+1;else b=k}return a}
  for(const [pk,v] of pairs){
    let a=v.a,b=v.b;
@@ -15,20 +15,22 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
      if(H.v!==A.v){tot.distinct+=w;if(dE>0)tot.distinctPos+=w;else tot.distinctNonpos+=w;continue}
      tot.same+=w;
      ok(H.b===v.F.t&&A.b<Z.z&&Z.z<H.b&&H.p===A.p&&H.r===A.r,"same-slot geometry");
-     let p=H.p,r=H.r,wL=A.v-A.b,wE=H.v-H.b,dL=2*wL-(p-1),dV=2*H.v-C,age=H.b-A.b,pre=2*A.b-C;
+     let p=H.p,r=H.r,wL=A.v-A.b,wE=H.v-H.b,dL=2*wL-(p-1),dV=2*H.v-(C+p-1),age=H.b-A.b,pre=2*A.b-C;
      ok(l>pre&&l<=dV&&l<=2*(H.b-1)-C&&dL>0&&dL-dE===2*age,"surviving inherited level interval");
-     const key=C+','+H.v;let s=S.get(key);if(!s){s={C,v:H.v,p,r,edges:new Map(),rec:new Map()};S.set(key,s)}
+     const key=C+','+H.v;let s=S.get(key);if(!s){s={C,v:H.v,p,r,edges:new Map(),rec:new Map(),levels:new Map()};S.set(key,s)}
      for(const [M,e] of [[E.P.M,H],[L.P.M,A]]){let old=s.rec.get(M);ok(!old||old===e,"unique actual slot membership");s.rec.set(M,e)}
      let edge=s.edges.get(pk);if(!edge){ok(!pairsSeen.has(pk),"same-slot hit unique per pair");pairsSeen.add(pk);edge={i:L.P.M,j:E.P.M,w:0,n:0,wL,wE,dL,dE,dV,age,pre};s.edges.set(pk,edge)}
-     ok(edge.i===L.P.M&&edge.j===E.P.M,"fixed role");edge.w+=w;edge.n++;
+     ok(edge.i===L.P.M&&edge.j===E.P.M,"fixed role");edge.w+=w;edge.n++;if(!s.levels.has(l))s.levels.set(l,[]);s.levels.get(l).push({edge,w});
    }
  }
+ const lev={raw:0,paid:0,remaining:0,balanced:0,unbalanced:0,positiveSquare:0,balancedSquare:0,fullPositiveSquare:0,membership:0,capacity:0,keys:0,fully:0,maxRatio:0,maxBalancedRatio:0,oracle:0};
  for(const s of S.values()){
    let raw=0,paid=0,remain=0,es=[],gains=new Map(),P=0,N=0;
    for(const [M,e] of s.rec){let w=e.v-e.b,d=2*w-(e.p-1);gains.set(M,{w,d});if(d>0)P+=w/(2*s.r);else N+=(s.p-1)/(4*s.r)}
    for(const e of s.edges.values()){
      ok(e.n<=Math.min(e.dL,2*e.age-2,Math.max(0,e.dV-6))&&e.w<=27*e.n+1e-7,"sharp same-slot pair-level cap");
      let small=e.dL<=ell||e.age<=ell||e.dV<=6+ell||s.r<=ell/4;
+     e.small=small;
      if(small){tot.small+=e.w;if(e.dL<=ell)tot.smallDrift+=e.w;else if(e.age<=ell)tot.smallAge+=e.w;else if(e.dV<=6+ell)tot.smallEnd+=e.w;else tot.smallR+=e.w;continue}
      raw+=e.w;es.push(e);
      if(e.dE>0){let a=e.wL*e.wE/(2*s.r);ok(e.w<=324*a+1e-7,"positive-positive same-slot bound");tot.pos+=e.w;tot.posMoment+=a;tot.maxPairRatio=Math.max(tot.maxPairRatio,e.w/a)}
@@ -40,7 +42,39 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
        if(e.wE<s.r/4)tot.short+=e.w;else tot.longNonpos+=e.w;
      }
    }
-   if(!es.length)continue;tot.keys++;tot.rawPositiveSquares+=s.r*P*P;tot.rawNonpositiveSquares+=s.r*N*N;
+   if(!es.length)continue;
+   const posFull=[...s.rec.values()].filter(e=>2*(e.v-e.b)>e.p-1);
+   const allFull=[...s.rec.values()];
+   const lo=Math.min(...posFull.map(e=>2*e.b-s.C))+1,hi=2*s.v-(s.C+s.p-1);
+   ok(hi-lo+1<=4*s.r,"positive surviving level window");
+   let fullSq=0;for(let l=Math.max(7,lo);l<=hi;l++){let n=posFull.filter(e=>2*e.b-s.C<l).length;fullSq+=n*n;}
+   lev.fullPositiveSquare+=fullSq;
+   let localMembership=0,localSquare=0;
+   for(const [l,arr] of s.levels){
+     const edges=arr.filter(a=>!a.edge.small);if(!edges.length)continue;
+     const left=new Set(edges.map(a=>a.edge.i)),right=new Set(edges.map(a=>a.edge.j));
+     const z=Math.ceil((s.C+l)/2);
+     for(const M of left){const e=s.rec.get(M);ok(e.b<z&&z<e.v&&2*e.b-s.C<l&&l<=hi,"actual surviving stationary class")}
+     for(const M of right){const e=s.rec.get(M);ok(e.b>=z+ell,"late independent arrival");ok(!left.has(M),"disjoint level roles")}
+     const nv=left.size+right.size;localMembership+=nv;lev.membership+=nv;lev.keys++;
+     lev.capacity+=m*nv;lev.raw+=edges.reduce((a,e)=>a+e.w,0);
+     const inc=new Map(),d=new Map(),alive=new Set(edges);
+     for(const e of edges)for(const k of [e.edge.i,e.edge.j]){if(!inc.has(k))inc.set(k,[]);inc.get(k).push(e);d.set(k,(d.get(k)||0)+e.w)}
+     const queue=[...d.keys()].filter(k=>d.get(k)<=m+1e-10);
+     for(let j=0;j<queue.length;j++){const k=queue[j];if(d.get(k)>m+1e-10)continue;for(const e of inc.get(k)){if(!alive.delete(e))continue;lev.paid+=e.w;for(const v of [e.edge.i,e.edge.j]){let old=d.get(v);d.set(v,old-e.w);if(old>m+1e-10&&d.get(v)<=m+1e-10)queue.push(v)}}}
+     if(!alive.size){lev.fully++;continue}
+     const a=new Set(),b=new Set();let weight=0;
+     for(const e of alive){a.add(e.edge.i);b.add(e.edge.j);weight+=e.w;ok(d.get(e.edge.i)>m-1e-8&&d.get(e.edge.j)>m-1e-8,"level both-role core")}
+     let ratio=b.size/a.size;lev.maxRatio=Math.max(lev.maxRatio,ratio);
+     localSquare+=a.size*a.size;lev.positiveSquare+=a.size*a.size;lev.remaining+=weight;
+     if(ratio<=1){lev.balanced+=weight;lev.balancedSquare+=a.size*a.size;lev.maxBalancedRatio=Math.max(lev.maxBalancedRatio,ratio);ok(weight<=27*a.size*a.size+1e-7,"balanced level bound")}
+     else lev.unbalanced+=weight;
+     if(lev.oracle<64){const aa=new Set(edges);let changed=true;while(changed){changed=false;const ds=new Map();for(const e of aa)for(const k of [e.edge.i,e.edge.j])ds.set(k,(ds.get(k)||0)+e.w);for(const e of aa)if(ds.get(e.edge.i)<=m+1e-10||ds.get(e.edge.j)<=m+1e-10){aa.delete(e);changed=true}}ok(aa.size===alive.size&&[...aa].every(e=>alive.has(e)),"independent level core");lev.oracle++}
+   }
+   ok(localMembership<=4*s.r*allFull.length&&localSquare<=fullSq,"level membership and square envelope");
+   let wp=posFull.reduce((a,e)=>a+(e.v-e.b)/(2*s.r),0);
+   ok(fullSq<=12*s.r*wp*wp+1e-7,"full ascent-square occupation transport");
+   tot.keys++;tot.rawPositiveSquares+=s.r*P*P;tot.rawNonpositiveSquares+=s.r*N*N;
    const mixed=es.filter(e=>e.dE<=0).reduce((v,e)=>v+e.w,0);
    if(N<=P){tot.balancedRaw+=mixed;tot.balancedBound+=648*s.r*P*P;ok(mixed<=648*s.r*P*P+1e-7,"balanced mixed mass")}
    else{tot.unbalancedRaw+=mixed;tot.heavyEvents++;tot.heavyRaw+=raw}
@@ -58,7 +92,8 @@ function slotAudit(pairs,B,expected,ok,close,ell=4,m=8){
    if(tot.oracle<64){let a=new Set(es),change=true;while(change){change=false;let d=new Map();for(const e of a)for(const c of inc.get(e))d.set(c,(d.get(c)||0)+e.w);let del=[...a].filter(e=>inc.get(e).some(c=>d.get(c)<=c.cap+1e-10));for(const e of del){a.delete(e);change=true}}ok(a.size===alive.size&&[...a].every(e=>alive.has(e)),"independent slot core");tot.oracle++}
  }
  ok(close(expected,tot.low+tot.recent+tot.same+tot.distinct+tot.skip)&&close(tot.same,tot.small+tot.pos+tot.nonpos)&&close(tot.same,tot.small+tot.slotRolePaid+tot.slotRoleResidual)&&close(tot.nonpos,tot.balancedRaw+tot.unbalancedRaw),"complete same-slot ledger");
- return {...tot,ell,m,distinctPairs:pairsSeen.size,actualSlots:S.size};
+ ok(close(lev.raw,tot.pos+tot.nonpos)&&close(lev.raw,lev.paid+lev.remaining)&&close(lev.remaining,lev.balanced+lev.unbalanced)&&lev.paid<=lev.capacity+1e-7&&lev.positiveSquare<=lev.fullPositiveSquare+1e-7,'global level ledger');
+ return {...tot,level:lev,ell,m,distinctPairs:pairsSeen.size,actualSlots:S.size};
 }
 // Inherited-level later-origin horizon crossing and overtaking audit.
 function crossingAudit(pairs,X,B,rr,expected,ok,close,eps=1/4,delay=4){
