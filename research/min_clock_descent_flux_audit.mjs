@@ -52,7 +52,7 @@ function audit(X,mode){
  for(const path of paths){let a=null;for(let j=0;j<path.length;j++){
    const e=path[j],id=key(e);let v=nodes.get(id);
    if(!v){v={id,C:e.C,t:e.t,d:d(e),n:0,out:0,children:new Map(),next:null,root:0};nodes.set(id,v);}
-   v.n++;if(a){let k=v.children.get(a.id);if(!k){k={a,n:0,p:e.inc,wait:v.t-a.t,drift:v.d-a.d};v.children.set(a.id,k);edges++;}k.n++;ok(k.p===e.inc&&k.wait>0&&k.drift===2*k.wait-(k.p-1),'edge identity');
+   v.n++;if(a){let k=v.children.get(a.id);if(!k){k={a,n:0,p:e.inc,wait:v.t-a.t,drift:v.d-a.d,W:0,W2:0};v.children.set(a.id,k);edges++;}k.n++;k.W+=path[j-1].w;k.W2+=path[j-1].w**2;ok(k.p===e.inc&&k.wait>0&&k.drift===2*k.wait-(k.p-1),'edge identity');
     a.out++;ok(!a.next||a.next===v,'deterministic successor');a.next=v;
     fullR+=k.wait/2;
     if(k.drift>0){const q=r[a.C/2],w=k.wait/(2*q);ok(k.drift<=24*q*w*w+1e-9,'positive drift credit');posW[a.C/2]+=w;posOff[a.C/2]+=q*w*w;}
@@ -62,7 +62,7 @@ function audit(X,mode){
    a=v;
  }}
  let birth=0,expiry=0,birthPairs=0,expiryPairs=0,positive=0,negative=0,cheapSharedGain=0,cheapSharedDrop=0,entryDown=0,entryCheapGain=0,entryCheapDrop=0,birthCap=0,allBirthCap=0,lowBirth=0,highBirth=0,thinBirth=0,thinPairs=0,thinCharge=0,thinAll=0,diag=0,groups=0,mixedPairs=0,sameLabelBirth=0,levelOracle=0,levelFormula=0,cheapLevelOracle=0,cheapLevelFormula=0,maxMass=0;
- let allBirthByLabel=0;const out=[];
+ let allBirthByLabel=0;const out=[];let lateCheap=0,lateCheapAll=0,lateCheapBySector=[0,0],lateCheapMixed=0,lateCheapIncident=0,latePostEnergy=0;
  const lim=12*B+6,flux=Array.from({length:4},()=>new Float64Array(lim+3));
  const addRange=(b,l,h,n)=>{if(l<=h&&n){ok(l>=1&&h<=lim,'level flux bounds');flux[b][l]+=n;flux[b][h+1]-=n;}};
  let nonresetEntry=0,nonresetCheapEntry=0,nonresetBirthCap=0,smallBirthUnion=0,smallBirthPairCount=0,smallBirthOverlap=0,nonresetCheapShared=0,nonresetCheapGain=0,nonresetCheapDiag=0,sourceClosePairs=0;
@@ -92,6 +92,15 @@ function audit(X,mode){
   if(v.n<=m)ok(pot===b,'small birth potential');
   for(const [p,es] of labels){
    groups++;
+   if(v.d!==6*(v.t%2)){
+    const r0=r[es[0].a.C/2],W=es.reduce((s,e)=>s+e.W,0),W2=es.reduce((s,e)=>s+e.W2,0);
+    const cheap=es.filter(e=>e.wait<=eps*(p-1)),cW=cheap.reduce((s,e)=>s+e.W,0),cW2=cheap.reduce((s,e)=>s+e.W2,0),cn=cheap.reduce((s,e)=>s+e.n,0);
+    const E=r0*Math.max(0,cW*cW-cW2),inc=r0*Math.max(0,2*W*cW-cW*cW-cW2),mix=2*r0*cW*(W-cW);
+    ok(E<=eps*(p-1)*P(cn)/2+1e-6,'actual cheap late post-key energy');
+    ok(Math.abs(inc-E-mix)<=1e-6*Math.max(1,inc),'cheap incident split');
+    lateCheap+=E;lateCheapAll+=r0*cW*cW;lateCheapMixed+=mix;lateCheapIncident+=inc;latePostEnergy+=r0*W*W;
+    if(p>z)lateCheapBySector[+(p>T)]+=E;
+   }
    let n=0,sp=0;for(const e of es){n+=e.n;sp+=P(e.n);}
    sameLabelBirth+=P(n)-sp;
    // Cross-child pairs in the same selected label: each common downward
@@ -129,7 +138,8 @@ function audit(X,mode){
  ok(smallBirthUnion<= (12*B+6)*2*m*N+1.5*m*birthPairs,'small-birth union budget');
  ok(birthPairs<=N*G,'source distance bound');
  ok((1-2*eps)*nonresetCheapGain<=nonresetCheapShared+nonresetCheapEntry+1e-6,'nonreset cheap gain budget');
- const nonreset={nonresetEntry,nonresetCheapEntry,nonresetBirthCap,smallBirthUnion,smallBirthPairCount,smallBirthOverlap,nonresetCheapShared,nonresetCheapGain,nonresetCheapDiag,layerChecks,remainingBirthCap:nonresetBirthCap-smallBirthUnion};
+ ok(lateCheap<=eps*nonresetCheapGain/2+1e-5,'global actual late energy transfer');
+ const nonreset={lateCheap,lateCheapAll,lateCheapBySector,lateCheapMixed,lateCheapIncident,latePostEnergy,nonresetEntry,nonresetCheapEntry,nonresetBirthCap,smallBirthUnion,smallBirthPairCount,smallBirthOverlap,nonresetCheapShared,nonresetCheapGain,nonresetCheapDiag,layerChecks,remainingBirthCap:nonresetBirthCap-smallBirthUnion};
  let Epos=0,EposOff=0;for(let j=lo;j<=hi;j++){Epos+=r[j]*posW[j]**2;EposOff+=r[j]*posW[j]**2-posOff[j];}
  const tol=1e-6*Math.max(1,Epos,negative,birth,levelOracle);
  ok(birthPairs===expiryPairs,'pair conservation');
