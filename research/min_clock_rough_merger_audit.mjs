@@ -10,8 +10,8 @@ function audit(X,mode){
  if(mode==='analytic'){for(let p=3;p<=B;p+=2)if(spf[p]===p){if(L*p>B**(1/16))break;L*=p;z=p;}}
  else {z=3;L=6;}
  const T=mode==='analytic'?Math.max(z+1,Math.ceil(B**.25)):Math.ceil(Math.sqrt(B));
- const mH=mode==='analytic'?Math.max(1,Math.floor(u**2.75)):mode==='diagnostic'?8:16;
- const mM=mode==='analytic'?Math.max(1,Math.floor(B**.625)):mode==='diagnostic'?12:24;
+ const mH=mode==='analytic'?Math.max(1,Math.floor(u**2.75)):mode==='diagnostic'||mode==='stress'?8:16;
+ const mM=mode==='analytic'?Math.max(1,Math.floor(B**.625)):mode==='diagnostic'||mode==='stress'?12:24;
  const D0=mode==='analytic'?Math.ceil(40*ell)+1:4;
  const lo=X,hi=7*X/2-1,len=hi+1,r=new Int32Array(len),degrees=new Uint8Array(len);
  function fac(n,cb){while(n>1){const p=spf[n];if(p>B)break;if(p>2)cb(p);while(n%p===0)n/=p;}}
@@ -37,8 +37,8 @@ function audit(X,mode){
  }
 
 
- const P=Math.ceil(B/(mode==='analytic'?u**.125:mode==='wide'?8:4)),ratio=mode==='analytic'?u**.125:2,
- caps=mode==='analytic'?[u**4.75,u**6.5,u**7.5,u**5.75]:mode==='wide'?[4,8,16,12]:[2,4,8,6];
+ const P=Math.ceil(B/(mode==='analytic'?u**.125:mode==='stress'?32:mode==='wide'?8:4)),ratio=mode==='analytic'?u**.125:mode==='stress'?4:2,
+ caps=mode==='analytic'?[u**4.75,u**6.75,u**7.75,u**5.75]:mode==='wide'?[4,8,16,12]:[2,4,8,6];
  const exp=(J,p)=>r[(J-p+1)/2]>=p/ratio;
  const envelope=Array.from({length:4},()=>new Set()),stateKey=(t,J)=>t+':'+J;
  let residueTests=0,mixedLabelPairs=0,oneExpPairs=0,bothExpPairs=0,prevHorizonCount=0,sameCandidateKeys=0;
@@ -84,7 +84,7 @@ function audit(X,mode){
   const levels=mode==='analytic'?(sector===0?Math.floor(Math.log2(B)/8):Math.floor(Math.log2(u)/4)):2;
   const scales=Array.from({length:levels+1},(_,j)=>Math.max(1,Math.floor(B/2**j)));
   const schemes=[{name:'global',type:'global'},...scales.flatMap(d=>scales.map(D=>({name:'local '+d+'/'+D,type:'local',d,D}))),...scales.map(d=>({name:'incoming '+d,type:'incoming',d}))];
-  const arith=Array.from({length:4},(_,i)=>({cap:caps[i],raw:0,residualBefore:0,extra:0,rest:0,incidences:0,residualInc:0,vertices:new Set(),suffix:new Map(),maxProduct:0}));let nonreset=0,nonresetResidual=0,arithExtra=0,priorQuotaRest=0;
+  const arith=Array.from({length:4},(_,i)=>({cap:caps[i],raw:0,rawCapEnergy:0,rawCapRest:0,maxRawProduct:0,residualBefore:0,extra:0,rest:0,incidences:0,residualInc:0,vertices:new Set(),suffix:new Map(),maxProduct:0}));let nonreset=0,nonresetResidual=0,arithExtra=0,priorQuotaRest=0;
   let E=0,R1=0,diag=0,prior=0,priorProj=0,priorPhys=0,priorOverlap=0,globalExtra=0,localExtra=0,incomingExtra=0,reverseExtra=0,rest=0,lightLightAfter=0,residualInc=0,rankCertificate=0,asyncRest=0,syncRest=0,rawPairInc=0,physPairInc=0,prefixChecks=0,cohorts=0,maxMass=0,maxResidualPairRank=0,projectedEarlier=0,lightHeavyBefore=0,lightHeavyAfter=0,heavyHeavyBefore=0,heavyHeavyAfter=0;
   const info=schemes.map(s=>({...s,projEnergy:0,physEnergy:0,unionEnergy:0,projBudget:0,physBudget:0,maxUsed:0,partial:0,projPairs:0,physPairs:0}));
   for(const [C,row] of at){
@@ -191,11 +191,11 @@ function audit(X,mode){
     if(cl<0)continue;const key=stateKey(p.ft,p.F);
     ok(envelope[cl].has(key),'actual merger in independent arithmetic envelope');
     const a=arith[cl];a.raw+=p.e;a.incidences++;a.vertices.add(key);
-    const id=cl+':'+key;let row=batches.get(id);if(!row){row={cl,key,list:[],mass:0};batches.set(id,row);}
-    row.list.push(p);row.mass+=(1-coverage[p.id])*p.e/q;
+    const id=cl+':'+key;let row=batches.get(id);if(!row){row={cl,key,list:[],mass:0,rawMass:0};batches.set(id,row);}
+    row.list.push(p);row.rawMass+=p.e/q;row.mass+=(1-coverage[p.id])*p.e/q;
    }
    for(const row of batches.values()){
-    const a=arith[row.cl];a.maxProduct=Math.max(a.maxProduct,row.mass);
+    const a=arith[row.cl];a.maxProduct=Math.max(a.maxProduct,row.mass);a.maxRawProduct=Math.max(a.maxRawProduct,row.rawMass);a.rawCapEnergy+=q*Math.min(a.cap,row.rawMass);a.rawCapRest+=q*Math.max(0,row.rawMass-a.cap);
     a.residualBefore+=q*row.mass;
     const old=a.suffix.get(row.key)||0;a.suffix.set(row.key,old+q);
     const frac=row.mass>0?Math.min(1,a.cap/row.mass):0;
@@ -210,11 +210,11 @@ function audit(X,mode){
   for(const s of info)ok(s.projEnergy<=s.projBudget+eps&&s.physEnergy<=s.physBudget+eps&&s.unionEnergy<=s.projEnergy+s.physEnergy+eps,'direct quota energy');
   ok(Math.abs(E-diag-prior-globalExtra-localExtra-incomingExtra-reverseExtra-arithExtra-rest)<=eps,'disjoint energy identity');
   ok(Math.abs(rest-syncRest-asyncRest)<=eps&&Math.abs(rest-lightLightAfter-lightHeavyAfter-heavyHeavyAfter)<=eps,'residual types');
-  for(const a of arith){for(const s of a.suffix.values())ok(s<=1.5*G,'physical suffix sum r bound');ok(a.extra<=a.cap*[...a.suffix.values()].reduce((x,y)=>x+y,0)+eps,'arithmetic vertex cap');}
+  for(const a of arith){for(const s of a.suffix.values())ok(s<=1.5*G,'physical suffix sum r bound');ok(a.extra<=a.cap*[...a.suffix.values()].reduce((x,y)=>x+y,0)+eps&&a.rawCapEnergy<=a.cap*[...a.suffix.values()].reduce((x,y)=>x+y,0)+eps,'arithmetic vertex cap');ok(Math.abs(a.raw-a.rawCapEnergy-a.rawCapRest)<=eps,'independent raw cap partition');}
   ok(Math.abs(priorQuotaRest-arithExtra-rest)<=eps,'additional rare merger partition');
   results.push({sector,m,mLL,scales,priorQuotaRest,arithExtra,nonreset,nonresetResidual,arith:arith.map(({vertices,suffix,...a})=>({...a,vertices:vertices.size,maxSuffix:Math.max(0,...suffix.values())})),E,R:R1,diag,prior,priorProj,priorPhys,priorOverlap,globalExtra,localExtra,incomingExtra,reverseExtra,rest,residualInc,rankCertificate,lightLightAfter,syncRest,asyncRest,rawPairInc,physPairInc,prefixChecks,cohorts,maxMass,projectedEarlier,lightHeavyBefore,lightHeavyAfter,heavyHeavyBefore,heavyHeavyAfter,info});
  }
  return {X,B,mode,z,L,T,mH,mM,P,ratio,caps,envelope:envelope.map(x=>x.size),residueTests,mixedLabelPairs,oneExpPairs,bothExpPairs,prevHorizonCount,sameCandidateKeys,N,events,literal,twins,R,RM,RH,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','stress'])console.log(JSON.stringify(audit(X,mode)));
