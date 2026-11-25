@@ -109,7 +109,22 @@ function audit(X, mode="diagnostic"){
  ok(stableHigh===foreignCost+retainedHigh&&stableActual===foreignActual+retainedActual&&stableHits===foreignHits+retainedHits,"priority partition");
  const ys=[3,5,7,11],Ps=[6,30,210,2310],phaseEnergy=ys.map(()=>0),phaseAsync=ys.map(()=>0),phaseFar=ys.map(()=>0),phasePairs=ys.map(()=>0),phaseNoDefect=ys.map(()=>0),phaseDefectSame=ys.map(()=>0),phaseDefectSplit=ys.map(()=>0),phaseSmallDiamond=ys.map(()=>0),phaseSmallAfterDefect=ys.map(()=>0),phaseTranslatedSteps=ys.map(()=>0),phaseHighDivisorChecks=ys.map(()=>0),phaseMaxGain=ys.map(()=>0),phaseMinGap=ys.map(()=>Infinity);
  let translationChecks=0,firstDefectChecks=0,diamondChecks=0,broadDiamond=0,broadMediumOnly=0,broadWholeGain=0,broadNearHigh=0,allSmallDiamond=0,farAfter=0,postHaloProxy=0,haloRetainedProxy=0,haloRetainedHits=0,nonzeroConstantLags=0,divisorHighChecks=0;
- const samples=[];
+ const samples=[],virtualChecks=ys.map(()=>0),virtualBothSmall=ys.map(()=>0),virtualDefect=ys.map(()=>0);
+ let broadStrictMedium=0,equalLabelSmallBackground=0,haloStrictMediumActual=0;
+ for(const a of roots)for(const e of a)if(e.halo&&e.p>=Y&&e.p<Q)haloStrictMediumActual+=e.w;
+ // Independent shifted-time one-step controls on actual horizons; these are NOT extra root tags.
+ for(const a of roots.slice(0,128))for(const e of a)if(e.p)for(let k=0;k<ys.length;k++){
+   const P=Ps[k],t=e.t+P;let best=Infinity,q=Infinity;
+   for(const [sig,ff] of [[-1,fs(e.C-1)],[1,fs(e.C+1)]])for(const p of ff){
+     const z=t+1+mod((sig===-1?0:p+2)-(t+1),2*p);if(z<best||(z===best&&p<q)){best=z;q=p;}
+   }
+   ok(Number.isFinite(best),"shifted clock exists");virtualChecks[k]++;
+   if(e.p<=ys[k]&&q<=ys[k]){
+     ok(e.p===q&&best-e.s===P,"independent positive small phase translation");virtualBothSmall[k]++;
+   }
+   if(P%(2*e.p)===0&&P%(2*q)===0)ok(e.p===q&&best-e.s===P,"independent general translation");
+   else{virtualDefect[k]++;ok(e.p!==q||best-e.s!==P,"independent first-step defect");}
+ }
  function scan(x,y,C,w){
    const a=rootMap.get(x.rep),b=rootMap.get(y.rep),i0=a.findIndex(e=>e.C===C),j0=b.findIndex(e=>e.C===C),D=y.s-x.s;
    let i=i0+1,j=j0+1,steps=0,defect=null;const seen=new Set([x.p]);
@@ -154,10 +169,10 @@ function audit(X, mode="diagnostic"){
          // Without roughness, equal labels at distance 2 can occur; only distinct-label diamonds are covered.
          if(e.p!==f.p){
            ok(Math.abs(e.p-f.p)<=J0&&Math.abs(e.C-f.C)<=J0&&aa.every(e=>e.halo)&&bb.every(e=>e.halo),"broad one-large distinct-label whole diamond");
-           broadDiamond++;broadWholeGain+=2*L;if(!aa.some(e=>e.high)&&!bb.some(e=>e.high))broadMediumOnly++;
+           broadDiamond++;broadWholeGain+=2*L;if(!aa.some(e=>e.high)&&!bb.some(e=>e.high))broadMediumOnly++;if(aa.every(e=>e.p<Q)&&bb.every(e=>e.p<Q))broadStrictMedium++;
            if(a[i0].halo&&b[j0].halo)broadNearHigh++;
-           if(samples.length<8)samples.push({C,A,D:a[i].C,p:e.p,q:f.p,ga,gb,mediumOnly:!aa.some(e=>e.high)&&!bb.some(e=>e.high)});
-         }
+           if(samples.length<8)samples.push({C,A,D:a[i].C,p:e.p,q:f.p,ga,gb,mediumOnly:!aa.some(e=>e.high)&&!bb.some(e=>e.high),strictMedium:aa.every(e=>e.p<Q)&&bb.every(e=>e.p<Q)});
+         }else{equalLabelSmallBackground++;ok(Math.abs(e.C-f.C)===2,"same-label close background opposite sides");}
        }
      }
      if(a[i].t===b[j].t)break;
@@ -203,6 +218,6 @@ function audit(X, mode="diagnostic"){
    ok(phaseFar[k]===phaseNoDefect[k]+phaseDefectSame[k]+phaseDefectSplit[k],"exact first-defect partition");
    ok(phaseSmallDiamond[k]===phaseSmallAfterDefect[k],"all-small diamond provenance");
  }
- return {X,mode,B,T,Q,delta,Y,J0,kappa,centerCount:cs.length,conflicts,conflictWeight,badCenters:bad.size,badWeight,badTagWeight,lowBad,highBad,primePairs,arithmeticPairs,arithmeticWeight,crtChecks,haloGain,haloActual,haloProxy,haloHits,haloHighActual,haloMediumActual,haloLowActual,haloBound,haloHighHits,postHaloProxy,haloRetainedProxy,haloRetainedHits,farAfter,ys,Ps,phaseEnergy,phaseAsync,phaseFar,phasePairs,phaseNoDefect,phaseDefectSame,phaseDefectSplit,phaseSmallDiamond,phaseSmallAfterDefect,phaseTranslatedSteps,phaseHighDivisorChecks,phaseMaxGain,phaseMinGap,translationChecks,firstDefectChecks,diamondChecks,broadDiamond,broadMediumOnly,broadWholeGain,broadNearHigh,allSmallDiamond,nonzeroConstantLags,divisorHighChecks,samples,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
+ return {X,mode,B,T,Q,delta,Y,J0,kappa,centerCount:cs.length,virtualChecks,virtualBothSmall,virtualDefect,broadStrictMedium,equalLabelSmallBackground,haloStrictMediumActual,conflicts,conflictWeight,badCenters:bad.size,badWeight,badTagWeight,lowBad,highBad,primePairs,arithmeticPairs,arithmeticWeight,crtChecks,haloGain,haloActual,haloProxy,haloHits,haloHighActual,haloMediumActual,haloLowActual,haloBound,haloHighHits,postHaloProxy,haloRetainedProxy,haloRetainedHits,farAfter,ys,Ps,phaseEnergy,phaseAsync,phaseFar,phasePairs,phaseNoDefect,phaseDefectSame,phaseDefectSplit,phaseSmallDiamond,phaseSmallAfterDefect,phaseTranslatedSteps,phaseHighDivisorChecks,phaseMaxGain,phaseMinGap,translationChecks,firstDefectChecks,diamondChecks,broadDiamond,broadMediumOnly,broadWholeGain,broadNearHigh,allSmallDiamond,nonzeroConstantLags,divisorHighChecks,samples,N,G,R,events,literal,rankChecks,rankLog,rawHits,rawHigh,rawActual,rankMarked,rankCost,rankActual,stableHits,stableHigh,stableActual,foreignHits,foreignCost,foreignActual,foreignBound,foreignGroups,maxForeign,groupChecks,terminalMixed,arrivalPairsBefore,arrivalWeightBefore,arrivalPairsStable,arrivalWeightStable,retainedHits,retainedHigh,retainedActual,E,diag,sync,same,cross,byLabelEnergy,maxLabels,exitPairChecks,exitCongruences,actualLagChecks,Ks,closeCounts,nearSame,nearAll,farSame};
 }
 const argv=process.argv.slice(2),mode=argv[0]||'diagnostic',xs=argv.slice(1).map(Number);for(const X of (xs.length?xs:[256,1024,4096,16384,65536,262144]))console.log(JSON.stringify(audit(X,mode)));
