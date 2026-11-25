@@ -38,11 +38,11 @@ function audit(X,mode){
 
  const results=[];
  for(const sector of [0,1]){
-  const m=sector===0?mM:mH,accept=e=>sector===0?e.p>z&&e.p<=T:e.p>T;
+  const m=sector===0?mM:mH,mLL=sector===1&&mode==='analytic'?Math.floor(u**2):m,accept=e=>sector===0?e.p>z&&e.p<=T:e.p>T;
   const levels=mode==='analytic'?(sector===0?Math.floor(Math.log2(B)/8):Math.floor(Math.log2(u)/4)):2;
   const scales=Array.from({length:levels+1},(_,j)=>Math.max(1,Math.floor(B/2**j)));
   const schemes=[{name:'global',type:'global'},...scales.flatMap(d=>scales.map(D=>({name:'local '+d+'/'+D,type:'local',d,D}))),...scales.map(d=>({name:'incoming '+d,type:'incoming',d}))];
-  let E=0,R1=0,diag=0,prior=0,priorProj=0,priorPhys=0,priorOverlap=0,globalExtra=0,localExtra=0,incomingExtra=0,rest=0,asyncRest=0,syncRest=0,rawPairInc=0,physPairInc=0,prefixChecks=0,cohorts=0,maxMass=0,maxResidualPairRank=0,projectedEarlier=0,lightHeavyBefore=0,lightHeavyAfter=0,heavyHeavyBefore=0,heavyHeavyAfter=0;
+  let E=0,R1=0,diag=0,prior=0,priorProj=0,priorPhys=0,priorOverlap=0,globalExtra=0,localExtra=0,incomingExtra=0,reverseExtra=0,rest=0,lightLightAfter=0,residualInc=0,rankCertificate=0,asyncRest=0,syncRest=0,rawPairInc=0,physPairInc=0,prefixChecks=0,cohorts=0,maxMass=0,maxResidualPairRank=0,projectedEarlier=0,lightHeavyBefore=0,lightHeavyAfter=0,heavyHeavyBefore=0,heavyHeavyAfter=0;
   const info=schemes.map(s=>({...s,projEnergy:0,physEnergy:0,unionEnergy:0,projBudget:0,physBudget:0,maxUsed:0,partial:0,projPairs:0,physPairs:0}));
   for(const [C,row] of at){
    const q=r[C/2],tags=row.filter(e=>e.w>0&&accept(e)),n=tags.length;if(!n)continue;
@@ -88,22 +88,22 @@ function audit(X,mode){
      for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++){
       const b=a[i],c=a[j],ll=mass[b]<m&&mass[c]<m;
       for(const x of members[b])for(const y of members[c]){
-       const id=idx(x,y);if(!phys){ok(form[id]===0,'unique projected allocation');form[id]=ll?1:mass[b]>=m&&mass[c]>=m?3:2;if(ll)prevP[id]=1;}
+       const id=idx(x,y);if(!phys){ok(form[id]===0,'unique projected allocation');form[id]=ll?1:mass[b]>=m&&mass[c]>=m?3:2;if(s<=m||mass[b]<mLL&&mass[c]<mLL)prevP[id]=1;}
        else{ok(tags[x].t===tags[y].t,'physical common final time');if(s<=m||cs.get(b)===cs.get(c)&&label.get(cs.get(b))<=m)prevS[id]=1;}
       }
      }
      const k=a.reduce((x,y)=>mass[x]>=mass[y]?x:y);for(const j of a)if(j!==k){par[j]=k;members[k].push(...members[j]);}mass[k]=s;
     }
    }
-   const coverage=new Float64Array(n*n);
+   const coverage=new Float64Array(n*n),beforeCertificate=new Uint16Array(n*n),afterCertificate=new Uint16Array(n*n);
    for(const p of pairs){ok(form[p.id]>0,'projected forest covers pair');if(prevP[p.id])priorProj+=p.e;if(prevS[p.id])priorPhys+=p.e;if(prevP[p.id]&&prevS[p.id])priorOverlap+=p.e;if(prevP[p.id]||prevS[p.id]){coverage[p.id]=1;prior+=p.e;}if(form[p.id]===2)lightHeavyBefore+=p.e;if(form[p.id]===3)heavyHeavyBefore+=p.e;}
-   for(const [ix,scheme] of schemes.entries()){
+   for(const reverse of [false,true])for(const [ix,scheme] of schemes.entries()){
     const stat=info[ix],local=scheme.type==='local',incoming=scheme.type==='incoming';
     const pc=new Float64Array(n*n),sc=new Float64Array(n*n);
     for(const phys of [false,true]){
      const ls=phys?physLists:lists,cover=phys?sc:pc;
      for(let i=0;i<n;i++){
-      const order=ls[i].sort((a,b)=>a.J-b.J||tags[a.j].M-tags[b.j].M),used=new Map(),limits=new Map();
+      const order=ls[i].sort((a,b)=>(reverse?-1:1)*(a.J-b.J||tags[a.j].M-tags[b.j].M)),used=new Map(),limits=new Map();
       let s=0;
       for(const v of order){
        const cell=scheme.d?Math.floor((tags[v.j].M-X)/scheme.d):0;
@@ -125,17 +125,18 @@ function audit(X,mode){
     for(const p of pairs){
      const fp=pc[p.id],fs=sc[p.id],f=Math.max(fp,fs),before=coverage[p.id],extra=Math.max(0,f-before)*p.e;
      stat.projEnergy+=fp*p.e;stat.physEnergy+=fs*p.e;stat.unionEnergy+=f*p.e;stat.projPairs+=+(fp>0);stat.physPairs+=+(fs>0);
-     if(scheme.type==='global')globalExtra+=extra;else if(local)localExtra+=extra;else incomingExtra+=extra;
+     if(reverse)reverseExtra+=extra;else if(scheme.type==='global')globalExtra+=extra;else if(local)localExtra+=extra;else incomingExtra+=extra;
+     if(f<1-1e-10)(reverse?afterCertificate:beforeCertificate)[p.id]++;
      coverage[p.id]=Math.max(before,f);
     }
    }
-   for(const p of pairs){const v=(1-coverage[p.id])*p.e;rest+=v;if(p.sync)syncRest+=v;else asyncRest+=v;if(form[p.id]===2)lightHeavyAfter+=v;if(form[p.id]===3)heavyHeavyAfter+=v;}
+   for(const p of pairs){const v=(1-coverage[p.id])*p.e;rest+=v;if(v>1e-8){residualInc++;ok(beforeCertificate[p.id]===schemes.length&&afterCertificate[p.id]===schemes.length,'both orders all schemes residual certificate');rankCertificate+=2*schemes.length;}if(form[p.id]===1)lightLightAfter+=v;if(p.sync)syncRest+=v;else asyncRest+=v;if(form[p.id]===2)lightHeavyAfter+=v;if(form[p.id]===3)heavyHeavyAfter+=v;}
   }
   const eps=1e-6*Math.max(1,E);
   for(const s of info)ok(s.projEnergy<=s.projBudget+eps&&s.physEnergy<=s.physBudget+eps&&s.unionEnergy<=s.projEnergy+s.physEnergy+eps,'direct quota energy');
-  ok(Math.abs(E-diag-prior-globalExtra-localExtra-incomingExtra-rest)<=eps,'disjoint energy identity');
-  ok(Math.abs(rest-syncRest-asyncRest)<=eps&&Math.abs(rest-lightHeavyAfter-heavyHeavyAfter)<=eps,'residual types');
-  results.push({sector,m,scales,E,R:R1,diag,prior,priorProj,priorPhys,priorOverlap,globalExtra,localExtra,incomingExtra,rest,syncRest,asyncRest,rawPairInc,physPairInc,prefixChecks,cohorts,maxMass,projectedEarlier,lightHeavyBefore,lightHeavyAfter,heavyHeavyBefore,heavyHeavyAfter,info});
+  ok(Math.abs(E-diag-prior-globalExtra-localExtra-incomingExtra-reverseExtra-rest)<=eps,'disjoint energy identity');
+  ok(Math.abs(rest-syncRest-asyncRest)<=eps&&Math.abs(rest-lightLightAfter-lightHeavyAfter-heavyHeavyAfter)<=eps,'residual types');
+  results.push({sector,m,mLL,scales,E,R:R1,diag,prior,priorProj,priorPhys,priorOverlap,globalExtra,localExtra,incomingExtra,reverseExtra,rest,residualInc,rankCertificate,lightLightAfter,syncRest,asyncRest,rawPairInc,physPairInc,prefixChecks,cohorts,maxMass,projectedEarlier,lightHeavyBefore,lightHeavyAfter,heavyHeavyBefore,heavyHeavyAfter,info});
  }
  return {X,B,mode,z,L,T,mH,mM,N,events,literal,twins,R,RM,RH,results};
 }
