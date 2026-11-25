@@ -1,6 +1,6 @@
 // Phase-conditioned first-defect transport and radical persistence envelope.
-function audit(X,focus=false){
-const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,L=Math.max(8,Math.floor(B/8)),L0=6,theta=.5,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
+function audit(X,focus=false,short=false){
+const B=Math.ceil(Math.sqrt(7*X)),T=focus?Math.floor(B/2):Math.min(8*B,Math.floor(X/2)),H=T+B,L=short?2:Math.max(8,Math.floor(B/8)),L0=6,theta=.5,Ps=[6,30,210],lim=7*X+B+20,S=new Int32Array(lim);
 const ok=(x,s)=>{if(!x)throw Error(`${X}/${focus} ${s}`)},eq=(a,b)=>Math.abs(a-b)<=1e-7*Math.max(1,Math.abs(a),Math.abs(b)),mod=(a,b)=>(a%b+b)%b;
 for(let p=2;p<lim;p++)if(!S[p]){S[p]=p;if(p*p<lim)for(let n=p*p;n<lim;n+=p)S[n]=S[n]||p}
 function fac(n){let a=[];while(n>1){let p=S[n];if(p>2&&p<=B)a.push(p);while(n%p===0)n/=p}return a}
@@ -69,6 +69,8 @@ for(let z of gs){
  ok(eq(sum,z.defect)&&eq(z.source,z.persistent+z.defect)&&z.persistent<=z.upper+1e-7,"global transport");z.keys=z.map.size;delete z.map;
  for(let k of ["source","persistent","defect","upper","maxLoad","paid"])z[k]=+z[k].toFixed(6)
 }
-return {X,focus,B,T,H,L,L0,N,hit,G,W,events,slots,readySlots,radChecks,zeroRad,grids:gs};
+return {X,focus,short,B,T,H,L,L0,N,hit,G,W,events,slots,readySlots,radChecks,zeroRad,grids:gs};
 }
 for(const X of (process.argv.length>2?process.argv.slice(2).map(Number):[1024,4096,16384,65536]))console.log(JSON.stringify(audit(X)));for(const X of [4096,16384,65536])console.log(JSON.stringify(audit(X,true)));
+
+console.log(JSON.stringify(audit(65536,false,true)));
