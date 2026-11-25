@@ -1,8 +1,8 @@
 // Rare high-factor exposure of shallow canonical MIN histories.
 // Run: node research/min_clock_shallow_high_audit.mjs 1024 4096 16384 65536 262144
-function audit(X){
+function audit(X,variant='analytic'){
  const B=Math.ceil(Math.sqrt(7*X)),H=4*B,a=2*B,N=X/2,len=7*X/2+1;
- const ell=Math.log(Math.log(B)),S=Math.max(1,Math.log(ell)),Q=Math.ceil(B/Math.exp(Math.sqrt(ell))),P=Math.floor(B**.25);
+ const ell=Math.log(Math.log(B)),S=Math.max(1,Math.log(ell)),Q=variant==='narrow'?Math.ceil(.95*B):Math.ceil(B/Math.exp(Math.sqrt(ell))),P=Math.floor(B**.25);
  const check=(x,m)=>{if(!x)throw Error(m)};
  check(H+2*B<=Math.floor((7*(X+1)-1)/4)-(X+3),'prefix gate');
  const spf=new Int32Array(7*X+4),primes=[];
@@ -168,7 +168,7 @@ function audit(X){
  let E=0,EK=0;
  for(let C=2*X;C<7*X;C+=2){E+=r[C/2]*W[C/2]**2;EK+=r[C/2]*WK[C/2]**2;}
  check(EK<=E+1e-6*Math.max(1,E),'energy monotone');
- return {X,B,Q,P,L,y,candidates,highByShift:[...highByShift],tupleCounts,crtUpper,tuples,consistent,smallVisits:seenTuple.size,mixedCandidateVisits,maxMixed,maxMixedK,mixedCap,maxD,roots,smallRoots,mixedRoots,firstHighRoots,reverseOnly,selectedShallowHigh,firstMeet,markedMeet,events,literal,R,RK,shallowKeptCost,keptRoots,finished,keptFinished,shallowMaxAge,costByDepth,E,EK,S0};
+ return {X,B,Q,P,variant,L,y,candidates,highByShift:[...highByShift],tupleCounts,crtUpper,tuples,consistent,smallVisits:seenTuple.size,mixedCandidateVisits,maxMixed,maxMixedK,mixedCap,maxD,roots,smallRoots,mixedRoots,firstHighRoots,reverseOnly,selectedShallowHigh,firstMeet,markedMeet,events,literal,R,RK,shallowKeptCost,keptRoots,finished,keptFinished,shallowMaxAge,costByDepth,E,EK,S0};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536,262144])console.log(JSON.stringify(audit(X)));
+for(const X of args.length?args:[1024,4096,16384,65536,262144]){console.log(JSON.stringify(audit(X)));console.log(JSON.stringify(audit(X,'narrow')));}
