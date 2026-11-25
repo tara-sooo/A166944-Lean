@@ -143,6 +143,44 @@ function audit(N=60000,steps=180){
    inspect(ev,roots,0,ev.length,tab,T);if(ev.length>=4)inspect(ev,roots,Math.floor(ev.length/2),ev.length,tab,T);
   }
  }
+
+ // Exact two-event CRT witness: large A1 then a short low-label recovery.
+ let p=1001;while(spf[p]!==p||p%4!==3||p%3!==1||p%7!==5||(2*p-3)%49===0)p+=2;
+ let H=0n,P=4n;
+ for(let s of primes(3*p+6)){
+  let r=0;
+  if(s===p)r=1;
+  else if(s===7)r=mod(-p,s);
+  else {while(r===1||r===s-1||((2*p-3)%s===0&&(r+p)%s===0))r++;if(r>=s)throw Error("CRT residues")}
+  let L=BigInt(s),a=Number(P%L),b=s,u=1,v=0;
+  while(b){let q=Math.floor(a/b);[a,b]=[b,a-q*b];[u,v]=[v,u-q*v]}
+  if(a!==1)throw Error("CRT inverse");
+  H+=P*BigInt(mod(u*mod(r-Number(H%L),s),s));P*=L;
+ }
+ if(H<4000000000000000n)H+=P;
+ let H0=H,t=H/2n+3n,relative=0,actual=[];
+ function literal(w,label){
+  let d=Number(2n*t-H),n=t+BigInt(w);
+  for(let j=1;j<=w;j++){let tick=t+BigInt(j),e=tick%2n?-1n:1n,a=e===1n?tick:tick-2n,b=H-e;while(b)[a,b]=[b,a%b];if(a!==(j===w?BigInt(label):1n))throw Error("literal CRT");}
+  let Z=H+BigInt(label-1),dp=Number(2n*n-Z),I=Number(n%2n),D=dp-6*I;
+  if(BigInt(label)**2n>H+1n)throw Error("eligibility");
+  actual.push({p:label,w,H,Z,t:relative,n:relative+w,d,dp,I,D,a1:label>=47&&label>=5*d+15&&D===2*label,near:false});
+  H=Z;t=n;relative+=w;
+ }
+ literal((3*p-7)/2,p);literal(1,7);
+ if(!actual[0].a1||actual[1].dp!==2*p-4||actual[1].D<=0)throw Error("witness recovery");
+ let before={shortPaid:st.shortPaidRuns,shortA:st.shortPrecedingA1,bounds:st.tailBounds,long:st.longRuns};
+ for(let tab of tables.filter(t=>t.R<=13&&t.l<=4)){
+  let M=2n*BigInt(tab.P),base=4000000000000000n+((H0-4000000000000000n)%M+M)%M;
+  if(base>H0||Math.floor(Math.sqrt(Math.sqrt(Number(base)-1)))<=4*p)throw Error("conservative lower horizon");
+  // Translation preserves H-barrier residues, and lowers the horizon for the
+  // conservative far-only recovery interval. Actual ticks verified above.
+  let ev=actual.map(v=>({...v,H:Number(base+v.H-H0),Z:Number(base+v.Z-H0)}));
+  inspect(ev,[],0,ev.length,tab,601,true);
+ }
+ st.witness={p,labels:[p,7],rootDigits:(H0/2n+1n).toString().length,ticks:relative,ordinaryDrop:4,shortPaid:st.shortPaidRuns-before.shortPaid,shortPrecedingA1:st.shortPrecedingA1-before.shortA,tailBounds:st.tailBounds-before.bounds,longRuns:st.longRuns-before.long};
+ if(st.witness.shortPaid===0||st.witness.shortPrecedingA1===0||st.witness.longRuns===0)throw Error("witness coverage");
+
  return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||60000),Number(process.argv[3]||180)),null,2));
