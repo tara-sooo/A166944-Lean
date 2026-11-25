@@ -44,7 +44,7 @@ function audit(X,mode){
 
  const Y=mode==='analytic'?Math.max(17,Math.ceil(Math.sqrt(u))):17;
  const Qr=Math.ceil(Math.sqrt(B)),Kr=mode==='analytic'?Math.floor(Math.sqrt(ell)):mode==='wide'?4:2;
- const budget=mode==='analytic'?u**2.5:mode==='wide'?64:16;
+ const budget=mode==='analytic'?u**2.5:mode==='wide'||mode==='full'?64:16;
  const Ds=Array.from({length:Kr+1},(_,k)=>Math.floor(budget**(1/(k+1))));
  const A0=2*Math.floor(Math.log(7*X+2)/Math.log(Qr));
  function choose(n,k){let a=1;for(let i=1;i<=k;i++)a*=((n-k+i)/i);return a;}
@@ -70,7 +70,7 @@ function audit(X,mode){
    if(split&&e.p>=17){ok(c-e.t<=3&&n.t-c>=e.p/4&&8*q>=e.p,'virtual boundary clock');phaseChecks++;}
    if(split&&ci+1<cs.length&&cs[ci+1].j===j){ok(cs[ci+1].t===c,'virtual canonical');ci++;}
    e.arc=cs[ci].M;e.end=ci+1<cs.length?cs[ci+1].t:0;
-   e.c=c;e.cut=cut;e.qual=e.p>=Y&&split;
+   e.c=c;e.cut=cut;e.stop=Math.min(cut,path[path.length-1].t);e.qual=e.p>=Y&&split;
    if(e.non>0&&split)ok(e.arc===e.C/2+1,'post-boundary arc');
    if(e.pre>0){virtualPositive++;ok(e.oldArc!==e.C/2+1,'pre-boundary arc');}
    ok(Math.abs(e.w-e.pre-e.non)<1e-9,'exact split');
@@ -79,8 +79,8 @@ function audit(X,mode){
  const results=[];
  for(const b of [0,1]){
   const f=e=>b===0?e.p>z&&e.p<=T:e.p>T;
-  const m=mode==='analytic'?u**2.5*(b===0?B**.625:1):mode==='wide'?32:4;
-  let E=0,Rb=0,splitPaid=0,splitRaw=0,cross=0,crossAfter=0,crossAfterEligible=0,crossSync=0,crossAsync=0,tail=0,tailShort=0,tailPairs=0,unreturned=0,thinMax=0,good=0,goodR=0,oracleChecks=0;
+  const m=mode==='analytic'?u**2.5*(b===0?B**.625:1):mode==='wide'||mode==='full'?32:4;
+  let E=0,Rb=0,splitPaid=0,splitRaw=0,cross=0,crossAfter=0,crossAfterEligible=0,crossSync=0,crossAsync=0,tail=0,tailShort=0,tailPairs=0,unreturned=0,returnedTail=0,unreturnedTail=0,thinMax=0,good=0,goodR=0,oracleChecks=0;
   const tails=new Map(),bands=new Map();
   const crossMap=(a)=>{let u0=0,s=0;for(const v of a.values()){u0+=v;s+=v*v;}return u0*u0-s;};
   const add=(a,k,v)=>{if(v)a.set(k,(a.get(k)||0)+v);};
@@ -103,13 +103,15 @@ function audit(X,mode){
     if(x.t!==y.t){crossAsync+=val;continue;}
     crossSync+=val;oracleChecks++;
     if(x.end&&y.end)ok(x.end===y.end,'common next canonical endpoint');
-    const end=x.end||y.end;if(!end){unreturned+=val;continue;}
-    ok(x.h<=end&&y.h<=end,'common arc before endpoint');
+    const known=x.end||y.end,shorter=x.stop<=y.stop?x:y;
+    const end=known?Math.min(known,x.stop,y.stop):Math.min(x.stop,y.stop);
+    if(!known||known>Math.min(x.stop,y.stop))unreturned+=val;
+    ok(shorter.h<=end,'shorter arc before endpoint');
     const d=Math.abs(x.M-y.M),d0=8*B,j0=Math.floor(Math.log2(d0/d)),db=d0/2**j0,lim=B*m/(db*(j0+1)**2);
     ok(j0>=0&&d<=db&&d>db/2,'source distance band');
     const wx=overlap(x.l,x.h,end-lim,end)/(2*q),wy=overlap(y.l,y.h,end-lim,end)/(2*q);
     const v=2*q*(x.non*y.non-(x.non-wx)*(y.non-wy));ok(v>=-1e-8&&v<=val+1e-8,'tail charge');
-    if(v<=1e-10)continue;tail+=v;tailPairs++;
+    if(v<=1e-10)continue;tail+=v;tailPairs++;if(known&&known<=Math.min(x.stop,y.stop))returnedTail+=v;else unreturnedTail+=v;
     if(end-x.t<=lim)tailShort+=val;
     const id=Math.min(x.i,y.i)+':'+Math.max(x.i,y.i),s=tails.get(id)||{end,lim,cost:0,d};
     ok(s.end===end&&s.lim===lim,'one common endpoint for distinct arcs');s.cost+=v;tails.set(id,s);
@@ -121,9 +123,9 @@ function audit(X,mode){
   for(const s of bands.values())ok(s.energy<=2*N*(s.db+2)*s.lim+1e-6,'distance band budget');
   const ep=1e-6*Math.max(1,E);
   ok(splitPaid<=24/Y*E+6*Rb+ep&&Math.abs(crossAfter-crossSync-crossAsync)<=ep&&crossAfter<=crossAfterEligible+ep&&crossAfterEligible<=cross+ep&&tail<=crossSync+ep&&good<=2*maxGood*Rb+ep,'sector budgets');
-  results.push({sector:b,E,R:Rb,m,splitPaid,splitRaw,cross,crossAfterEligible,crossAfter,crossBoundaryPaid:cross-crossAfterEligible,crossBoundaryUnpaid:crossAfterEligible-crossAfter,crossSync,crossAsync,tail,tailShort,tailPairs,distinctTailPairs:tails.size,unreturned,thinMax,good,goodR,oracleChecks,restCross:crossAfterEligible-tail,bands:[...bands.entries()]});
+  results.push({sector:b,E,R:Rb,m,splitPaid,splitRaw,cross,crossAfterEligible,crossAfter,crossBoundaryPaid:cross-crossAfterEligible,crossBoundaryUnpaid:crossAfterEligible-crossAfter,crossSync,crossAsync,tail,tailShort,tailPairs,distinctTailPairs:tails.size,unreturned,returnedTail,unreturnedTail,thinMax,good,goodR,oracleChecks,restCross:crossAfterEligible-tail,bands:[...bands.entries()]});
  }
  return {X,B,mode,Y,Qr,Kr,Ds,A0,reverseCap,goodInc,goodPositive,maxGood,N,R,events,literal,canonical,virtual,virtualPositive,phaseChecks,results};
 }
 const args=typeof process!=='undefined'?process.argv.slice(2).map(Number):[];
-for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide'])console.log(JSON.stringify(audit(X,mode)));
+for(const X of args.length?args:[1024,4096,16384,65536])for(const mode of ['analytic','diagnostic','wide','full'])console.log(JSON.stringify(audit(X,mode)));
