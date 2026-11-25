@@ -54,7 +54,7 @@ function audit(X,stress=false){
   if(C-C0>=T){hit++;rootBound+=T-P-6*cstar;fullScore+=ff+tg;ok(ff+tg>=T-P-6*cstar,"reached certificate")}
  }
  let thin=0,heavy=0,paid=0,maxMass=0;
- for(let g of groups.values()){let n=g.charge/(5*cstar*g.p),cap=stress?2*B/g.p:B/g.p;ok(n<=g.n+1e-9,"effective mass");maxMass=Math.max(maxMass,n);if(n<=cap){thin++;paid+=g.charge}else heavy++}
+ for(let g of groups.values()){let n=g.charge/(5*cstar*g.p),cap=stress ? .02*B/g.p : B/g.p;ok(n<=g.n+1e-9,"effective mass");maxMass=Math.max(maxMass,n);if(n<=cap){thin++;paid+=g.charge}else heavy++}
  ok(target+initial+F<=grid+1e-7&&eq(target+initial+F,grid)&&shallow+disparate+shortPair<=target+1e-7&&fullScore>=rootBound,"global");
  let rnd=x=>+x.toFixed(6);
  return {X,stress,B,T,P,L,top,N,hit,events,F,grid,badFlux,initial:rnd(initial),target:rnd(target),recycled,shallow:rnd(shallow),disparate:rnd(disparate),shortPair:rnd(shortPair),paid:rnd(paid),remain:rnd(target-shallow-disparate-paid),groups:groups.size,thin,heavy,maxMass:rnd(maxMass),shortInc,matchChecks,stackChecks,phaseChecks,badSinks,shallowChecks,disparateChecks,persistChecks,rootBound,fullScore:rnd(fullScore)};
