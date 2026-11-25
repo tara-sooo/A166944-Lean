@@ -11,9 +11,10 @@ function audit(N=60000,steps=180){
   for(let j=0;j<P;j++)pre[j+1]=pre[j]+(ps.every(p=>allowed(2*j,p))?1:0);
   if(pre[P]!==A)throw Error("CRT count");
   const count=d=>{let n=Math.floor(d/2)+1;return Math.floor(n/P)*A+pre[n%P]-1};
+  if(!ps.every(p=>allowed(P+5,p)))throw Error("half primorial");
   tabs.push({S,P,K:2*P,A,count});
  }
- let s={roots:0,events:0,a1:0,terminal:0,capped:0,decreases:0,nonresets:0,resets:0,localChecks:0,barrierChecks:0,levelChecks:0,crossingPairs:0,repeatChecks:0,capacityChecks:0,roundedBlocks:0,roundedSlots:0,roundedMatches:0,roundedHighMatches:0,roundedLoss:0,weightedBlocks:0,weightedMarks:0,weightedPaid:0,periods:tabs.map(({S,P,A})=>({S,P,A})),witness:[]};
+ let s={halfPrimorialChecks:0,tailChecks:0,tailMarked:0,tailMatched:0,roots:0,events:0,a1:0,terminal:0,capped:0,decreases:0,nonresets:0,resets:0,localChecks:0,barrierChecks:0,levelChecks:0,crossingPairs:0,repeatChecks:0,capacityChecks:0,roundedBlocks:0,roundedSlots:0,roundedMatches:0,roundedHighMatches:0,roundedLoss:0,weightedBlocks:0,weightedMarks:0,weightedPaid:0,periods:tabs.map(({S,P,A})=>({S,P,A})),witness:[]};
  function inspect(ev,lo,hi,R,S,phaseA=1,phaseB=1){
   const {K,P,A,count}=tabs.find(t=>t.S===S);
   let marks=[];for(let i=lo;i<hi;i++)if(ev[i].a1&&ev[i].p>R)marks.push(i);
@@ -41,9 +42,33 @@ function audit(N=60000,steps=180){
   let F=ev.slice(lo,hi).filter(v=>v.dp<v.d&&v.D!==0&&v.p>S&&v.p<=R).reduce((z,v)=>z+v.d-v.dp,0);
   if(2*low>F)throw Error("ordinary total");
   s.weightedBlocks++;s.weightedMarks+=marks.length;s.weightedPaid+=low;
+  // Tail matching; skip the first doubled level for the small diagnostic P=15.
+  const tailLevels=[P+8];for(let z=(P>=18?2:4)*P+3;z<=2*C;z=2*(z-3)+3)tailLevels.push(z);
+  for(let k=0;k<tailLevels.length;k++){
+   let y=tailLevels[k];if(!primes(S).every(p=>allowed(y-3,p))||k>0&&(2*y<3*tailLevels[k-1]||y>3*tailLevels[k-1]))throw Error("tail geometry");
+   s.halfPrimorialChecks++;
+  }
+  let pendingTail=new Map(),tails=0,matched=0,losses=0,highDec=0,resetDec=0,usedTail=new Set();
+  for(let i=lo;i<hi;i++){
+   let v=ev[i],x=v.d+3,y=v.dp+3;
+   if(v.a1&&v.p>R&&2*v.p>=P+8){
+    let a=tailLevels.find(z=>5*z>v.p&&z<=2*v.p);
+    if(a===undefined||pendingTail.has(a)||!(x<a&&a<=y))throw Error("tail up");
+    pendingTail.set(a,i);tails++;
+   }
+   if(y>=x)continue;
+   if(v.D===0)resetDec++;else if(v.p>S)highDec++;
+   for(let z of pendingTail.keys())if(y<z&&z<=x){
+    pendingTail.delete(z);
+    if(v.D===0)losses++;else{if(v.p<=S||usedTail.has(i))throw Error("tail match");usedTail.add(i);matched++}
+   }
+  }
+  losses+=pendingTail.size;
+  if(matched>highDec||losses>(resetDec+1)*tailLevels.length||tails!==matched+losses)throw Error("tail bound");
+  s.tailChecks++;s.tailMarked+=tails;s.tailMatched+=matched;
   if(K*200>R)return;
   let a=BigInt(R*phaseA),b=BigInt(5*phaseB),num=3n*BigInt(R)+20n*BigInt(K),den=2n*BigInt(R),L=[];
-  if(a*den>=BigInt(R)*b*5n*num/5n){/* phase checked by caller */}
+  if(BigInt(phaseA)<BigInt(phaseB)||BigInt(phaseA)*den>=BigInt(phaseB)*num)throw Error("phase");
   while(a<=BigInt(2*C)*b){
    let z=3n+BigInt(K)*((a-3n*b+BigInt(K)*b-1n)/(BigInt(K)*b));
    if(z*b<a||z*b>=a+BigInt(K)*b||z%BigInt(K)!==3n%BigInt(K))throw Error("round");
@@ -80,7 +105,7 @@ function audit(N=60000,steps=180){
    if(dp<d){s.decreases++;
     for(let {S,K,P,A,count} of tabs){let c=count(d)-count(dp);
      if(c<0||2*P*c>A*(d-dp+K)||2*c>d-dp)throw Error("cut bound");
-     if(a.p<=S&&D!==0&&c)throw Error("barrier");
+     if(a.p<=S&&c)throw Error("barrier");
      if(a.p<=S&&D===0&&d>a.p+3)throw Error("reset pre");
      s.barrierChecks++;
     }
