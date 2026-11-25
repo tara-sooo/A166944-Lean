@@ -59,6 +59,19 @@ function audit(){
    }
   }
  }
+ // Isolate both sides of every reset/nonreset type using a complete
+ // CRT lift through the largest defect reached before the intended event.
+ for(let p of [29,31,41,43,101,103])for(let h4 of [0,2])for(let e of [1,-1]){
+  let d=6,k=p%4===mod(1-h4,4)?1:3,w=(k*p-d+(e===1?-1:5))/2;
+  let H=BigInt(h4),P=4n;
+  for(let l of primes(3*p+6)){let f=BigInt(l),r=BigInt(l===p?mod(e,p):0);while(H%f!==r)H+=P;P*=f}
+  let min=BigInt(p*p+100);if(H<min)H+=P*((min-H+P-1n)/P);
+  let t=(H+BigInt(d))/2n;
+  for(let j=1;j<=w;j++){let n=t+BigInt(j),ee=n%2n?-1:1,A=ee===1?n:n-2n,B=H-BigInt(ee);while(B)[A,B]=[B,A%B];s.actualTickChecks++;
+   if(j<w?A!==1n:A!==BigInt(p)||ee!==e)throw Error("isolated literal event");}
+  let D=2n*(t+BigInt(w))-(H+BigInt(p-1))-BigInt(3*(1-e));
+  if(D!==BigInt((k-1)*p))throw Error("isolated D");s.actualPaths++;if(k===1)s.resetChecks++;else s.nonresetChecks++;
+ }
  return s;
 }
 console.log(JSON.stringify(audit(),null,2));
