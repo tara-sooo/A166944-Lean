@@ -1,5 +1,5 @@
 // Run: node research/infinite-orbit/stitched_survivor_audit.mjs
-function audit(){
+function audit(alternating=false){
 function ok(b,m){if(!b)throw Error(m)}
 function gcd(a,b){while(b)[a,b]=[b,a%b];return Math.abs(a)}
 function mod(a,b){return (a%b+b)%b}
@@ -24,10 +24,17 @@ scalar(p,w);cum+=g;paid+=w;totals.repairs++;totals.repairGain+=g;
 ok(Math.abs(t-(startT+W*(H-startH)/E))<1.0000001,"balanced clock");
 }ok(H===H1&&t===t1,"connector end");
 }
-for(let X of [4096,65536,1048576]){
+for(let X of (alternating?[65536,1048576]:[4096,65536,1048576])){
 let T=Math.sqrt(X),S=Math.floor(T**.25),ps=pr.filter(p=>p>=T/2&&p<=T),before={...totals},anchors=[],width=15*X/S,cap=Math.max(3,Math.floor(T/8));
 ok(ps.length>=S,"labels");
+if(alternating){
+let left=ps.filter(p=>p<=5*T/8),right=ps.filter(p=>p>=7*T/8);ok(left.length>=S&&right.length>=S,"alternating labels");
+function slot(p,lo,hi,j){let q=Math.ceil((lo-1)/p);if(q%2===0)q++;let a=null;for(;p*q+1<=hi;q+=2){let k=Math.floor(Math.sqrt(2)*q/2);if(gcd(q,k)!==1)continue;totals.goodQ++;if(!a)a={H:p*q+1,n:2*p*k,p,q,k,j};else totals.skippedQ++;}return a;}
 for(let j=0;j<S;j++){
+let p=left[Math.floor(j*left.length/S)],r=right[Math.floor(j*right.length/S)],lo=Math.ceil(X+j*width+16*T),hi=Math.floor(X+(j+1)*width-16*T),kept=0;
+for(let start=lo;start+512*T<=hi;start+=512*T){let a=slot(p,start+8*T,start+248*T,j),b=slot(r,start+264*T,start+504*T,j);if(a&&b){anchors.push(a,b);kept+=2;}}
+ok(kept>0,"alternating segment");totals.segments++;}
+}else for(let j=0;j<S;j++){
 let p=ps[Math.floor(j*ps.length/S)],lo=Math.ceil(X+j*width+16*T),hi=Math.floor(X+(j+1)*width-16*T),good=0,kept=0;
 let q=Math.ceil((lo-1)/p);if(q%2===0)q++;
 for(;p*q+1<=hi;q+=2){let k=Math.floor(Math.sqrt(2)*q/2);if(gcd(q,k)!==1)continue;good++;totals.goodQ++;
@@ -35,7 +42,7 @@ let h=p*q+1,n=2*p*k;if(anchors.length&&h-anchors[anchors.length-1].H<16*T){total
 anchors.push({H:h,n,p,q,k,j});kept++}
 ok(kept>0,"segment occupied");totals.segments++;
 }
-let blockBridge=0,blockBfs=0;let minGap=Infinity,maxGap=0,minProjection=Infinity,maxProjection=0;
+if(alternating)for(let i=1;i<anchors.length;i++)ok(Math.abs(anchors[i].p-anchors[i-1].p)>=T/4,"alternating large gap");let blockBridge=0,blockBfs=0;let minGap=Infinity,maxGap=0,minProjection=Infinity,maxProjection=0;
 for(let z of anchors){let {H:h,n,p,q,k}=z;
 let oldH=H,E=h-H,W=n-1-t;
 if(totals.anchors) {minGap=Math.min(minGap,E);maxGap=Math.max(maxGap,E)}
@@ -68,4 +75,4 @@ blocks.push({X,T,S,distinct:new Set(anchors.map(z=>z.p)).size,minGap,maxGap,minP
 }
 return {totals,blocks,example,firstFailure}
 }
-console.log(JSON.stringify(audit(),null,2));
+console.log(JSON.stringify({tracks:audit(),alternating:audit(true)},null,2));
