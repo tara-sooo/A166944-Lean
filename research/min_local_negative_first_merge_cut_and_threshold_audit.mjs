@@ -4,9 +4,9 @@ function audit(){
  const N=1000000,spf=new Uint32Array(N+3);for(let p=2;p*p<=N+2;p++)if(!spf[p])for(let x=p*p;x<=N+2;x+=p)if(!spf[x])spf[x]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
  function next(a,n){let p=Infinity,w=Infinity,q=Infinity;for(let [d,e] of [[a+1,0],[a-1,2]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((e===0?0:r+2)-n,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t}}return {p,w,q}}
- let out={roots:0,events:0,intervals:0,arrivalGroups:0,incomingDivisibilityChecks:0,doubleJumpChecks:0,resetChecks:0,slowSourceChecks:0,energyBalanceChecks:0,independentPairChecks:0,thresholdChecks:0,overlapChecks:0,gridChecks:0,rows:[]};
+ let out={roots:0,events:0,intervals:0,arrivalGroups:0,incomingDivisibilityChecks:0,doubleJumpChecks:0,resetChecks:0,slowSourceChecks:0,energyBalanceChecks:0,independentPairChecks:0,thresholdChecks:0,overlapChecks:0,gridChecks:0,idleAgeChecks:0,resetIdleChecks:0,shortLagDivisibilityChecks:0,shortLagResetChecks:0,thresholdCounterexamples:[],rows:[]};
  for(let R of [3000,12000,48000,192000,480000]){
-  let T=Math.ceil(8*Math.sqrt(2*R+1)),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),byPos=new Map(),byEvent=new Map(),keep=R===3000,paths=[],row={R,T,roots:0,mean:0,pairs:0,birthPairs:0,idleJumpPairs:0,jumpJumpPairs:0,ssPairs:0,oneSlowPairs:0,fastFastPairs:0,highHighPairs:0,highHighResetPairs:0,topSlowSlowPairs:0,topSlowIdlePairs:0,topSlowBirthPairs:0,topSlowJumpPairs:0,retiredPairs:0,maxPresent:0,uniqueDoubleKeys:0,uniqueTopSSKeys:0,thresholds:[],bands:[]};
+  let T=Math.ceil(8*Math.sqrt(2*R+1)),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),byPos=new Map(),byEvent=new Map(),keep=R===3000,paths=[],row={R,T,roots:0,mean:0,pairs:0,birthPairs:0,idleJumpPairs:0,jumpJumpPairs:0,ssPairs:0,oneSlowPairs:0,fastFastPairs:0,highHighPairs:0,highHighResetPairs:0,topSlowSlowPairs:0,topSlowIdlePairs:0,topSlowBirthPairs:0,topSlowJumpPairs:0,retiredPairs:0,maxPresent:0,uniqueDoubleKeys:0,uniqueTopSSKeys:0,topLongIdlePairs:0,topShortIdleBirthPairs:0,topShortIdleSmallPairs:0,topShortIdleLargePairs:0,topShortLagResetPairs:0,topShortLagNonresetPairs:0,topShortLagKeys:0,topLongIdleKeys:0,thresholds:[],bands:[]};
   function put(b,s,e,p,slow,A,path){ck(s<=e,"interval");let ar=byPos.get(b)||[];ar.push({s,e,p,slow,A});byPos.set(b,ar);if(keep)path.push({b,s,e});out.intervals++}
   for(let A=lo;A<=hi;A+=6){
    let a=A,n=3-A/2,end=n+T,p=0,slow=false,path=[];
@@ -25,18 +25,18 @@ function audit(){
    }
    if(keep)paths.push(path);row.roots++;row.mean+=A-a;out.roots++;
   }
-  let cutoff=Math.floor(Math.sqrt(T+3))+1,top=Math.ceil(T/16);
+  let cutoff=Math.floor(Math.sqrt(T+3))+1,top=Math.ceil(T/16),K=Math.floor(Math.sqrt(T));ck(K+3<top,'short lag cutoff');
   for(let [b,ar] of byPos){
    ar.sort((x,y)=>x.s-y.s||x.p-y.p);
    let ends=ar.map(x=>x.e).sort((x,y)=>x-y),retire=ar.filter(x=>x.e===3-x.A/2+T).map(x=>x.e).sort((x,y)=>x-y);
    // sweep only starts and retirement times, removing intervals
    // whose final occupied tick precedes the sweep tick.
-   let i=0,j=0,k=0,active=0;
+   let i=0,j=0,k=0,active=0;const lagKeys=new Set(),longKeys=new Set();
    while(i<ar.length||k<retire.length){
     let n=Math.min(i<ar.length?ar[i].s:Infinity,k<retire.length?retire[k]:Infinity);
     while(j<ends.length&&ends[j]<n){active--;j++}
     ck(active>=0,"active nonnegative");
-    let idle=active,birth=0,groups=new Map();
+    let idle=active,birth=0,groups=new Map(),startIndex=i;
     while(i<ar.length&&ar[i].s===n){let e=ar[i++];active++;if(!e.p){birth++;continue}
      let g=groups.get(e.p)||{m:0,s:0};g.m++;g.s+=+e.slow;groups.set(e.p,g)}
     ck(birth<=1,"birth uniqueness");row.maxPresent=Math.max(row.maxPresent,active);
@@ -45,7 +45,28 @@ function audit(){
     let arr=[...groups],h=n+b/2;
     if(groups.size>=2)row.uniqueDoubleKeys++;
     let topSS=false;
-    for(let [p,g] of arr){row.topSlowIdlePairs+=p>=top?g.s*idle:0;row.topSlowBirthPairs+=p>=top?g.s*birth:0}
+    if(n%2===0&&h===0){ck(idle===0&&birth===0,'minus reset cannot have idle or birth');out.resetIdleChecks++}
+    if(n%2!==0&&h===3&&idle>0){
+     let count=0;for(let u=0;u<startIndex;u++){let r=ar[u];if(r.e<n)continue;count++;ck(r.p>0&&r.s+b/2===0&&r.s%2===0,'plus reset idle must be minus reset h0');out.resetIdleChecks++}
+     ck(count===idle,'idle group count')
+    }
+    for(let [p,g] of arr){row.topSlowIdlePairs+=p>=top?g.s*idle:0;row.topSlowBirthPairs+=p>=top?g.s*birth:0;
+     if(p<top||!g.s||!idle)continue;
+     let count=0,hasLong=false;
+     for(let u=0;u<startIndex;u++){let r=ar[u];if(r.e<n)continue;count++;let age=n-r.s;ck(age>=1,'idle positive age');out.idleAgeChecks++;
+      if(age>=K){let q=Math.min(...fs(b-1),...fs(b+1));ck(2*q>age,'destination rough by idle age');row.topLongIdlePairs+=g.s;hasLong=true;continue}
+      if(!r.p){row.topShortIdleBirthPairs+=g.s;continue}
+      if(r.p<top){row.topShortIdleSmallPairs+=g.s;continue}
+      row.topShortIdleLargePairs+=g.s;
+      let c1=n%2===0?0:3,c2=r.s%2===0?0:3,H2=r.s+b/2;
+      ck((h-c1)%p===0&&(H2-c2)%r.p===0&&p!==r.p,'lagged divisibility');out.shortLagDivisibilityChecks++;
+      let i1=(h-c1)/p,i2=(H2-c2)/r.p;
+      ck(Math.abs(i1*p-i2*r.p)<=K+3,'linear lag constraint');
+      if(!i1||!i2){ck(i1===0&&i2===0&&age===3&&c1===3&&c2===0,'only staggered reset exception');row.topShortLagResetPairs+=g.s;out.shortLagResetChecks++}
+      else{ck(i1>=1&&i2>=1,'positive multipliers');row.topShortLagNonresetPairs+=g.s}
+      lagKeys.add(n+':'+p+':'+r.s+':'+r.p);
+     }ck(count===idle,'idle scan exact');if(hasLong)longKeys.add(n+':'+p)
+    }
     for(let x=0;x<arr.length;x++)for(let y=x+1;y<arr.length;y++){
      let [p,g]=arr[x],[r,f]=arr[y],pairs=g.m*f.m,ss=g.s*f.s,ff=(g.m-g.s)*(f.m-f.s);
      row.jumpJumpPairs+=pairs;row.ssPairs+=ss;row.fastFastPairs+=ff;row.oneSlowPairs+=pairs-ss-ff;out.doubleJumpChecks++;
@@ -63,11 +84,25 @@ function audit(){
     if(k<retire.length&&retire[k]===n){row.retiredPairs+=active-1;k++;ck(k===retire.length||retire[k]!==n,"unique retirement");}
     out.arrivalGroups++;
    }
+  row.topShortLagKeys+=lagKeys.size;row.topLongIdleKeys+=longKeys.size;
   }
   row.pairs=row.birthPairs+row.idleJumpPairs+row.jumpJumpPairs;
   ck(row.pairs===row.retiredPairs,{R,pairs:row.pairs,retire:row.retiredPairs});out.energyBalanceChecks++;
-  ck(row.jumpJumpPairs===row.ssPairs+row.oneSlowPairs+row.fastFastPairs,"jump pair decomposition");
-  if(keep){let c=0;for(let i=0;i<paths.length;i++)for(let j=i+1;j<paths.length;j++){
+  ck(row.jumpJumpPairs===row.ssPairs+row.oneSlowPairs+row.fastFastPairs,"jump pair decomposition");ck(row.topSlowIdlePairs===row.topLongIdlePairs+row.topShortIdleBirthPairs+row.topShortIdleSmallPairs+row.topShortIdleLargePairs,'idle partition');ck(row.topShortIdleLargePairs===row.topShortLagResetPairs+row.topShortLagNonresetPairs,'large lag partition');
+  if(keep){
+   // Check that gain-threshold partitions need not be nested, even
+   // when both roots cross both thresholds by T.
+   const keysByA=new Map();
+   for(let [key,E] of byEvent)for(let j=0;j<E.as.length;j++){let A=E.as[j],G=E.g[j],ar=keysByA.get(A)||[];ar.push({key,G,p:E.p});keysByA.set(A,ar)}
+   for(let ar of keysByA.values())ar.sort((x,y)=>x.G-y.G);
+   for(let J of [6,12,24,48,96]){
+    let low=new Map(),high=new Map(),example=null;
+    for(let [A,ar] of keysByA){let x=ar.find(e=>e.G<=J&&J<e.G+e.p-1),y=ar.find(e=>e.G<=2*J&&2*J<e.G+e.p-1);if(!x||!y)continue;
+     if(low.has(x.key)&&low.get(x.key).high!==y.key&&!example)example={J,A1:low.get(x.key).A,A2:A,same:x.key,later1:low.get(x.key).high,later2:y.key};
+     low.set(x.key,{A,high:y.key});
+    }if(example)out.thresholdCounterexamples.push(example);
+   }
+   let c=0;for(let i=0;i<paths.length;i++)for(let j=i+1;j<paths.length;j++){
     let a=paths[i],b=paths[j],u=0,v=0,found=false;
     while(u<a.length&&v<b.length){let x=a[u],y=b[v];if(x.b===y.b&&Math.max(x.s,y.s)<=Math.min(x.e,y.e)){found=true;break}if(x.e<y.e)u++;else v++}
     c+=+found;out.independentPairChecks++;
