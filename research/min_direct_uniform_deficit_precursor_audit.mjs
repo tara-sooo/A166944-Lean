@@ -5,7 +5,7 @@ function audit(N=60000){
  function factors(x){ok(x>0&&x<lim,"range");let a=[];while(x>1){let p=spf[x];a.push(p);while(x%p===0)x/=p}return a}
  function inv(a,b){let c=b,x=1,y=0;a=mod(a,b);while(c){let q=Math.floor(a/c);[a,c]=[c,a-q*c];[x,y]=[y,x-q*y]}ok(a===1,"inverse");return mod(x,b)}
  function next(H,t){let z=null;for(let I=0;I<2;I++)for(let p of factors(H-1+2*I)){if(p===2||p*p>H+1)continue;let w=mod((I?p+2:0)-t,2*p)||2*p;if(!z||w<z.w||w===z.w&&p<z.p){let d=2*t-H,g=p-1,dp=d+2*w-g,D=dp-6*I,e=1-2*I;z={H,p,w,I,e,d,dp,D,x:D/2,g,q:(H-e)/p}}}return z}
- const st={roots:0,events:0,cap:0,blocks:0,selected:0,pairs:0,close:0,zeroDisplacement:0,linearCap:0,subquadraticCap:0,nearOrigin:0,awayOrigin:0,bandChecks:0,divisorChecks:0,horizonChecks:0,tupleChecks:0,budgetChecks:0,rangeChecks:0,positiveSupplyChecks:0,actualPrecursorChecks:0,actualHighUpChecks:0,syntheticGeometricControls:0,syntheticPrecursorWindows:0,translatedPrimeIntervals:0,weightedCandidateControls:0,weightedCandidateHits:0,examples:[]};
+ const st={roots:0,events:0,cap:0,blocks:0,selected:0,pairs:0,close:0,zeroDisplacement:0,linearCap:0,subquadraticCap:0,nearOrigin:0,awayOrigin:0,bandChecks:0,divisorChecks:0,horizonChecks:0,tupleChecks:0,budgetChecks:0,rangeChecks:0,positiveSupplyChecks:0,actualPrecursorChecks:0,actualHighUpChecks:0,syntheticGeometricControls:0,syntheticPrecursorWindows:0,syntheticEnvelopeChecks:0,geometricSumChecks:0,translatedPrimeIntervals:0,weightedCandidateControls:0,weightedCandidateHits:0,examples:[]};
  function inspect(rows,T){
   if(!rows.length)return;let G=rows.reduce((a,z)=>a+z.g,0),V=rows.reduce((a,z)=>a+Math.abs(z.dp-z.d),0),P=rows.reduce((a,z)=>a+Math.max(z.dp-z.d,0),0),C=Math.floor(Math.sqrt(rows.at(-1).H+1)),Fup=0,Ulow=0;
   for(let z of rows){if(z.p<T)Ulow+=z.g;else if(8*(z.dp-z.d)>z.g){Fup+=z.g;ok(z.w*2>z.g,"up long");if(z.g>48)ok(z.D>0,"large up nonreset");st.actualHighUpChecks++}}
@@ -45,11 +45,12 @@ function audit(N=60000){
  }
  // Scalar geometric-window controls for the precursor lemma (not MIN trajectories).
  for(let j=4;j<=10;j++)for(let q of [2,4,8,16,32,64]){let X=16**j,d=X/q,L=1;while(5*16**(j-L)>d/4)L++;if(j-L<0)continue;
-  let horizons=Array.from({length:L+1},(_,i)=>16**(j-L+i)),ds=[Math.floor(d/8)],P=[];
-  for(let k=0;k<L;k++){let v=k===L-1?d:ds.at(-1);P.push(Math.max(0,v-ds.at(-1)));ds.push(v);ok(v<=5*horizons[k+1],"synthetic envelope")}
+  let horizons=Array.from({length:L+1},(_,i)=>16**(j-L+i)),ds=[Math.min(Math.floor(d/8),5*horizons[0])],P=[];
+  for(let k=0;k<L;k++){let v=k===L-1?d:ds.at(-1);P.push(Math.max(0,v-ds.at(-1)));ds.push(v);ok(v<=5*horizons[k+1]&&Math.abs(v-ds[k])<=5*(horizons[k+1]-horizons[k]),"synthetic envelope and drift");st.syntheticEnvelopeChecks++}
   ok(ds[0]<=d/4&&P.reduce((a,b)=>a+b,0)>=3*d/4,"geometric precursor");
   ok(P.some((v,k)=>v>= (d/X)*horizons[k]),"relative precursor");st.syntheticGeometricControls++;st.syntheticPrecursorWindows+=L;
  }
+ for(let j=1;j<=100;j++){let s=0;for(let k=0;k<=j;k++)s+=4**(k-j);ok(s<=4/3+1e-12,"geometric accumulation");st.geometricSumChecks++}
  ok(st.close&&st.zeroDisplacement&&st.linearCap&&st.subquadraticCap&&st.actualPrecursorChecks&&st.weightedCandidateHits,"coverage");return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||60000)),null,2));
