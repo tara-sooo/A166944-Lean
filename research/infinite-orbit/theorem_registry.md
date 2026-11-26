@@ -119,3 +119,19 @@ No full all-constraint infinite survivor, arbitrary uncapped run bound, or finit
 | A05 | 45,334,999 local arrival candidates, 1,849,266 feasible incidences, 40 distinct-label collision state incidences (all deep), 482 actual forward mixed pairs reverse-checked; 64,512 canonical roots show substantial equal-label merges | COMPUTATION; no Lean verification or asymptotic proof from finite data |
 
 Uncapped arbitrary mixed-run bound, full all-constraint infinite survivor and finite-twin contradiction remain open. 
+
+## Checkpoint VIII — gain-charged reverse graph and narrow-band unit cohorts
+
+[Charged reverse paper](https://github.com/tara-sooo/A166944-Lean/blob/0e18d3da82d16963a18e2c562a3f0f99aa680171/research/infinite-orbit/charged_reverse.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L21 | Exact reverse compressed good graph with arbitrary non-good relays: for fixed even relay gain E, prior time lies in [n-u-3E,n-l], enumerate prior clocks and verify full deterministic MIN | PAPER; all good p in [T,B], w>=p-2, square-root band; exact local feasible states, not ancestry |
+| D21 | Fixed-E reverse degree <=C(1+E/T), C=8(1+B/T); relay E<=M_R+c_m U_m+c_h U_h | PAPER; c_m=1+M_R/(r_R-1), c_h=1+M_R/(T-1); includes short and out-of-band highs |
+| U08 | Depth j reverse path capacity A_j(S)=C^j binom(floor(S/2)+j,j)(1+S/(jT))^j, S=M_R j+c_m U_m+c_h U_h | PAPER; actual total relay budget, no independence; overcount allowed |
+| U09 | First unit entry at displacement <=D0, <=k good visits, total post-entry interruption gain U: source count <=(floor(D0/4)+1)(1+sum_{j=1}^{k-1} A_j(M_R j+cU)); logarithmic cost-depth bound | PAPER; explicit history class, not general unified multiplicity |
+| D22 | From first good post to later good post, c_m U_m+c_h U_h>=d'_1-d'_k+sum_{i=2}^k(p_i-3-M_R); unit return in B<2T-M_R-9 and T>M_R+3 pays tau=2T-B-M_R-9 | PAPER; arbitrary intermediate multipliers/interruptions, disjoint consecutive unit visits sum without repeated endpoint charge |
+| U10 | Unit target cohort m with first designated good displacement <=D0: tagged bad cost >=tau(m-floor(D0/4)-1)_+ | PAPER; no bound on depth or first multiplier; per-target, not additive across overlapping targets, not omitted measure |
+| A06 | 64512 canonical roots,4608 targeted starts,1503465 actual events; 283 reverse checks,20 independent full integer-time enumerations,46948 cost-depth capacity checks; canonical narrow-band 15-source unit cohort, 9 first arrivals and 6 paid returns | COMPUTATION; all pass; no exhaustive asymptotic verification |
+
+Uncapped high-deficit regime and weak/short high population remain; no all-constraint infinite model, Lean verification or finite-twin contradiction.
