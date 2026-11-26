@@ -5,13 +5,26 @@ function audit(){
  for(let p=2;p*p<=N+2;p++)if(!spf[p])for(let x=p*p;x<=N+2;x+=p)spf[x]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;if(p>2)a.push(p);while(n%p===0)n/=p}return a}
  function next(a,v){let p=Infinity,w=Infinity,e=0,q=Infinity;for(let [b,s] of [[a+1,-1],[a-1,1]])for(let r of fs(b)){q=Math.min(q,r);let t=mod((s===-1?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;e=s}}return {p,w,e,q}}
- let s={roots:0,events:0,blocks:0,negativeBlocks:0,positivePhaseBlocks:0,bandControls:0,groups:0,repeatedGroups:0,groupsWithPositiveCost:0,distinctPairs:0,samePairs:0,crtChecks:0,capacityChecks:0,energyChecks:0,weightedChecks:0,globalChecks:0,syntheticChecks:0,syntheticNontrivial:0,maxGroup:0,maxExcess:0,positiveExcessControls:0,rows:[]};
+ let s={roots:0,events:0,blocks:0,negativeBlocks:0,positivePhaseBlocks:0,bandControls:0,groups:0,repeatedGroups:0,groupsWithPositiveCost:0,distinctPairs:0,samePairs:0,crtChecks:0,capacityChecks:0,energyChecks:0,weightedChecks:0,globalChecks:0,syntheticChecks:0,syntheticNontrivial:0,maxGroup:0,maxExcess:0,positiveExcessControls:0,localPositivePacking:0,localPositiveEnergy:0,localPositiveObservedWait:0,localChecks:0,syntheticCRTChecks:0,syntheticPositiveExcess:0,rows:[]};
  // Exact packing lower bound, tested separately from actual trajectories.
  for(let c=1;c<=40;c++)for(let n=0;n<=240;n++){
   let E=0;for(let i=0;i<n;i++)E+=2*Math.floor(i/c);
   let m=Math.floor(n/c),r=n%c;
   ck(E===c*m*(m-1)+2*m*r,"packing exact");ck(E+1e-9>=n*n/c-n,"packing lower");
   s.syntheticChecks++;if(n>c)s.syntheticNontrivial++;
+ }
+ // Construct admissible CRT source records for distinct relay values.
+ // These are combinatorial controls, not asserted to be actual MIN paths.
+ for(let [p,r] of [[11,13],[17,19],[23,29]])for(let c of [1,2,5])for(let e of [-1,1])for(let f of [-1,1]){
+   let D=2*p*r*c,arr=[],J=Math.min(5,r);
+   for(let j=0;j<J;j++){
+    let E=2*j,a=0;while(mod(a-e,p)!==0||mod(a-(p-1+E+f),r)!==0)a+=2;
+    for(let i=0;i<c;i++)arr.push({a:a+i*2*p*r,E,w:2*p});
+   }
+   let n=arr.length,G=arr.reduce((s,x)=>s+x.E,0),W=2*p*n;
+   ck(new Set(arr.map(x=>x.a)).size===n&&arr.every(x=>x.a>=0&&x.a<D),"synthetic CRT distinct");
+   ck(G===c*J*(J-1)&&G>=(W-2*p*c)**2/(4*p*p*c),"synthetic nontrivial");
+   s.syntheticCRTChecks++;if(W>2*p*c)s.syntheticPositiveExcess++;
  }
  function check(arr,R,T,U,row){
   if(!arr.length)return;
@@ -41,6 +54,13 @@ function audit(){
    for(let a of cnt.values()){ck(a.length<=c,"capacity");s.capacityChecks++}
    let m=Math.floor(n/c),r0=n%c,packing=c*m*(m-1)+2*m*r0;
    ck(E>=packing&&E+1e-9>=n*n/c-n,"energy lower");s.energyChecks++;
+   let span=list[0].a-list[list.length-1].a,cl=Math.floor(span/(2*p*r))+1,tl=Math.max(...list.map(x=>x.w))/2;
+   ck(cl>=1&&cl<=c,"local span capacity");
+   for(let a of cnt.values())ck(a.length<=cl,"local CRT capacity");
+   let ml=Math.floor(n/cl),rl=n%cl,pl=cl*ml*(ml-1)+2*ml*rl;
+   let el=Math.max(0,W-2*t*cl)**2/(4*t*t*cl),eo=Math.max(0,W-2*tl*cl)**2/(4*tl*tl*cl);
+   ck(E>=pl&&el<=E+1e-7&&eo<=E+1e-7,"local energy");s.localChecks++;
+   if(pl>0)s.localPositivePacking++;if(el>0)s.localPositiveEnergy++;if(eo>0)s.localPositiveObservedWait++;
    let cost=Math.max(0,W-2*t*c)**2/(4*t*t*c);
    ck(cost<=E+1e-7&&W<=2*t*(c+Math.sqrt(c*E))+1e-7,"weighted energy");s.weightedChecks++;
    A+=t*c;B+=t*t*c;energy+=cost;exact+=2*t*(c+Math.sqrt(c*E));
