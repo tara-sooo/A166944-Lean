@@ -25,3 +25,20 @@ Pinned baseline main bd180e3de0fe6e12cc3c3ea25d65a985445344eb; direct 3e19d7e945
 Primary sources: [direct basic](https://github.com/tara-sooo/A166944-Lean/blob/425a4b9a32e8a4a808582eb75d06cfecb7c56f0a/research/2026-11-25-min-direct-arithmetic.md), [direct chains](https://github.com/tara-sooo/A166944-Lean/blob/3793617fd82ac3fa0b68679a57529fce233b3660/research/2026-11-26-min-direct-deficit-chain-sieve-and-global-log-obstruction.md), [direct corridors](https://github.com/tara-sooo/A166944-Lean/blob/3e19d7e945788d39b12a17744c2139970e90da8d/research/2026-11-26-min-direct-thickened-cut-recovery-and-local-supply.md), [unified XIX](https://github.com/tara-sooo/A166944-Lean/blob/6ec6ce3cc11afb8efa86611cc8c6eabf0aa872fa/research/2026-11-26-min-unified-radical-fan-lifetime-sieve.md), [main README](https://github.com/tara-sooo/A166944-Lean/blob/bd180e3de0fe6e12cc3c3ea25d65a985445344eb/README.md).
 
 Next registry expansion: extract exact statements and dependency graph from all applicable MIN research notes and formal modules; identify fixed cutoff vs adaptive transfer conditions; separate actual source density from arbitrary finite ensemble. No constraint may be promoted just because a finite audit passed.
+
+## Checkpoint II — scope separation
+
+[Scale and tomography note](https://github.com/tara-sooo/A166944-Lean/blob/3343213ef21d2d4fc5836283e0b9664cd92f6fce/research/infinite-orbit/scale_and_tomography.md). Latest direct cut source [2a47be1](https://github.com/tara-sooo/A166944-Lean/blob/2a47be177db12d7fdcdc99daf9dfe7be0403da34/research/2026-11-26-min-direct-grouped-cut-sieve-and-all-label-corridors.md).
+
+| ID | Constraint | Residue ensemble I | Scalar clock model II-B |
+|---|---|---|---|
+| L08 | common-root positive event congruence / finite CRT bound; all-prime tomography | exact; proves bare indexed ensemble has no standard common base | not imposed on multiple roots |
+| L09 | absolute adaptive magnitude p²<=H+1 | finite lift only | exact |
+| L10 | selected side time congruence | exact | exact |
+| L11 | selected side neighbor divisibility; earliest competition | exact relative rule | not imposed; finite audit reports failures |
+| D02 | global U+TV logarithmic lower bound (aggregate numerical condition) | not transferable | satisfied numerically with TV=Theta(X), not an application of actual-ray theorem |
+| D04 | all-label endpoint corridor demand, exact anchor negligible mass, eroded deep-bypass bound (source (5),(7),(8)) | not transferable | all endpoints safe, zero anchor/endpoint demand, bypass mass G+o(X) by arithmetic cut distribution |
+| D01 | high-band sublinear deficit-cap chain theorem | not imposed | hypotheses not met |
+| U01–U05 | dense actual source allocation / collision and missing supply | not imposed | not imposed |
+
+These columns refer to DIFFERENT structures; their intersection remains open. The finite common-root obstruction uses only positive event congruences, not artificial factors. The scalar construction does not license an inference from selected time clocks to actual first-hit recurrence. No full theorem inventory or Lean verification yet.
