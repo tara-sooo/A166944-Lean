@@ -296,3 +296,20 @@ General nonparallel, two-nonzero-ell, unrestricted label ratios remain; polylog 
 | A16 | 20739 all-distinct inverse controls,20206 unique middle CRT,103695 projection identities,20739 deficit identities;10 independent exact candidate sets,142 candidate incidences (105 degenerate),12 actual local MIN (8 degenerate), no slope 1/2 degeneracy | COMPUTATION; final pass; largest X uses smaller cutoffs; overlapping configurations, no asymptotic test or new ancestry claim |
 
 General nonparallel outer pairs outside thin rational projection strips, larger relay/elapsed budgets and localization remain. No full survivor, general uncapped bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XIX — fixed-length projection words and strip return toll
+
+[Projection word paper](https://github.com/tara-sooo/A166944-Lean/blob/e9968e605fabbc943cc2caf469f2929fb1a8018e/research/infinite-orbit/projection_word.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L30 | For x_i=p_i h_i, exact x_j-x_i=N(n_j-n_i)-M(J_j-J_i)-2(N+M)(s_j-s_i); return to abs(h)<=A costs N elapsed>=M total gain-2BA-2(N+M) | PAPER; arbitrary intermediate shifts; sum only disjoint return intervals |
+| D74 | Cheap shifts b<=MT/2 force strictly decreasing x, at most 4BA/(MT) steps between strip visits; slope 1/2 needs only initial h<=A and gives 2BA/T bound | PAPER; actual elapsed/gain, no independent resource credit |
+| D75 | Fixed m-word with polylog total relay L, elapsed W and one abs(h)<=A anywhere has all abs(h)=O(A+1), all labels distinct; degenerate edge exactly h_prev=0,h_next=-M,b=0, none if even N, at most one otherwise | PAPER; no cofactor primality or label-gap condition |
+| D76 | Nondegenerate word gives m rational affine prime label forms in first label; exact congruence extension multiplies modulus k by abs(d)/gcd(abs(d),abs(Ha)), with new integral slope magnitude abs(Ha)/gcd | PAPER; pairwise proportional forms cannot give distinct large primes; fixed m |
+| D77 | Sum inverse final moduli over projection tuples O_(m,eps)((A+1)^(1+eps)); weighted capacity O_(m,eps)(X (PQ)^(m-1) (A+1)^(1+eps) (loglog X)^m/log^m X), P=L+4,Q=W+2 | PAPER; arbitrary fixed dimension m, near-linear width cost; fixed cutoffs O(X/log^m X); absolute full-window count |
+| D78 | Degenerate one-cut words have all projections O(1); longer segment has >=ceil(m/2) prime forms, capacity O(X (PQ)^(m-2) min(P,Q) (loglog X)^ceil(m/2)/log^ceil(m/2) X) | PAPER; odd N only, fixed m>=3; no A factor, no targeted odd-cut test |
+| D79 | Macro disjoint m-word population with U=O(T log^alpha X), Vtot=O(T log^beta X), summed minimum projection O(T log^gamma X) excluded for even N if (m-1)(alpha+beta)+gamma<m; odd N additionally (m-2)(alpha+beta)+min(alpha,beta)<ceil(m/2) | PAPER; for alpha+beta<1 any fixed gamma handled by sufficiently large fixed m if that macro word population exists; not m growing with X |
+| A17 | 20379 length4..6 actual word incidences,292604 transport checks,693656 endpoint/return checks,1152000 synthetic lattice comparisons,40 independent candidate set comparisons incl4 nonempty actual local length4 words | COMPUTATION; standard sample had no stringent short words, extra244919 feasible local starts yielded11 short words,4 small-coefficient affine incidences; no canonical ancestry for targeted starts |
+
+Larger relay/elapsed budgets, arbitrary long words with no narrow projection, full all-constraint model and Lean/twin contradiction remain open.
