@@ -9,7 +9,7 @@ function audit(){
  function ok(x,m){if(!x)throw Error(m)}
  function gcd(a,b){while(b)[a,b]=[b,a%b];return a}
  function literal(H,t){let B=Math.floor(Math.sqrt(H+1));for(let w=1;w<=2*B;w++){let n=t+w,g=gcd(n%2?n-2:n,n%2?H+1:H-1),p=fac(g).find(q=>q<=B);if(p)return {p,w,s:n%2}}return {p:0,w:Infinity,s:0}}
- let results=[],localChecks=0,entryChecks=0,wordChecks=0;
+ let results=[],localChecks=0,entryChecks=0,wordChecks=0,roughChecks=0,semiprimeChecks=0,primeFormChecks=0;
  for(let X of [4096,16384,65536,262144]){
  let Y=16*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(X)),K=210,V=12,safe=H=>Math.min(H%K,K-H%K)>V;
  const good=(H,p,w)=>p>=T&&p<=B&&w>=p-2&&safe(H)&&safe(H+p-1);
@@ -21,6 +21,10 @@ function audit(){
  canonical.events++;E=H-H0;
  if(a.p>=T&&a.p<=B&&a.w>=a.p-2){kind="good";canonical.found++;if(pr)canonical.primeFound++;let d=2*t-H;
  ok(d>=0&&d<=6+5*E,"canonical prefix deficit");
+ let e=1-2*a.s,q=(H-e)/a.p;
+ ok(Number.isInteger(q)&&H===a.p*q+e&&2*M===a.p*q+e-E+2,"entry forms");
+ for(let r of fac(H-1).concat(fac(H+1))){ok(r>=(a.p-1)/2,"roughness");roughChecks++;}
+ if(a.p*((a.p-1)/2)**2>H+1){ok(prime(q),"prime cofactor");semiprimeChecks++;if(pr){ok(2*M===a.p*q+e-E+2&&H+e===a.p*q+2*e,"three forms");primeFormChecks++;}}
  if(a.p>Math.max(9,d+1)){canonical.applicable++;let post=2*(t+a.w)-(H+a.p-1);ok(post===2*a.p+6*a.s,"unit entry");canonical.unit++;if(pr&&!canonical.example)canonical.example={M,H0,H,t,p:a.p,w:a.w,E,d,post,s:a.s}}
  break}
  H+=a.p-1;t+=a.w;
@@ -53,6 +57,6 @@ function audit(){
  for(let z of unitRuns){for(let w of [z.maxGainExample,z.maxHighExample])if(w)for(let [h,t,p,v] of w){let a=literal(h,t);ok(a.p===p&&a.w===v,"literal word");wordChecks++}}
  results.push({X,T,B,canonical,unitRuns});
  }
- return {localChecks,entryChecks,wordChecks,results}
+ return {localChecks,entryChecks,wordChecks,roughChecks,semiprimeChecks,primeFormChecks,results}
 }
 console.log(JSON.stringify(audit(),null,2));
