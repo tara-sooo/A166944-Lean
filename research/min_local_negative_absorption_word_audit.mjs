@@ -21,7 +21,35 @@ function audit(){
   }
   return {G,T,pins:[...pins],marks,steps,lowEvents,endpointResidue:mod(a,6*data.Q)}
  }
- let z={periodControls:0,periodRoots:0,periodTranslationChecks:0,periodMassChecks:0,periods:[],roots:0,events:0,successes:0,badSuccesses:0,classificationChecks:0,coveredRoots:0,coveredBadRoots:0,decodeChecks:0,markChecks:0,pinChecks:0,absorbingSourceChecks:0,lowGainChecks:0,repeatWordChecks:0,freeGapChecks:0,rows:[]};
+ // Decode a sequence of DISTINCT newly discovered labels. All previously
+ // discovered labels are allowed without any repeat-count restriction.
+ // Work in relative displacement and elapsed time; no giant CRT integer.
+ function decodeFresh(j0,word,data,L){
+  const parity=mod(3*j0,2),pins=new Map(data.P.map(p=>[p,mod(6*j0,p)])),path=[];
+  let G=0,T=0,repeat=0;
+  function xmod(r,p){let x=mod(r*((p+1)/2),p);if(mod(x,2)!==parity)x+=p;return x}
+  function wait(p,c,r){return mod((c===0?0:p+2)-(3-xmod(r,p)+T),2*p)||2*p}
+  function event(p,c,w){path.push({p,c,w,G,T});G+=p-1;T+=w;return G<=L}
+  function absorbKnown(){
+   while(true){let p0=Infinity,w0=Infinity,c0=0;
+    for(let [p,r] of pins)for(let c of [0,2]){
+     if(mod(r-G+(c===0?1:-1),p)!==0)continue;
+     let w=wait(p,c,r);if(w<w0||w===w0&&p<p0){p0=p;w0=w;c0=c}
+    }
+    if(p0===Infinity)return true;
+    if(!data.P.includes(p0))repeat++;
+    if(!event(p0,c0,w0))return false;
+   }
+  }
+  for(let [p,c] of word){
+   if(!absorbKnown()||pins.has(p))return null;
+   let r=mod(G+(c===0?-1:1),p),w=wait(p,c,r);
+   pins.set(p,r);if(!event(p,c,w))return null;
+  }
+  if(!absorbKnown())return null;
+  return {G,T,path,pins:[...pins],repeat}
+ }
+ let z={periodControls:0,periodRoots:0,periodTranslationChecks:0,periodMassChecks:0,periods:[],roots:0,events:0,successes:0,badSuccesses:0,classificationChecks:0,coveredRoots:0,coveredBadRoots:0,decodeChecks:0,markChecks:0,pinChecks:0,absorbingSourceChecks:0,lowGainChecks:0,repeatWordChecks:0,freeGapChecks:0,freshCovered:0,freshBadCovered:0,freshReplayChecks:0,freshEventChecks:0,freshRepeatIncidences:0,freshSlowSeparationChecks:0,freshNonroughEndpoint:0,rows:[]};
  let PD=[[3],[3,5],[3,5,7],[3,5,7,11],[3,5,7,11,13]].map(setup);
  for(let data of PD){let {P,Q}=data,m=new Map(),maxG=0,maxT=0,events=0;
   for(let j=0;j<Q;j++){
@@ -36,7 +64,7 @@ function audit(){
   z.periodControls++;z.periods.push({P,Q,wall:data.wall,rough,mean:Q/rough,meanSq:[...m.values()].reduce((a,b)=>a+b*b,0)/rough,maxMass:Math.max(...m.values()),maxG,maxT,events})
  }
  for(let R of [3000,12000,48000,192000,480000,1000000]){
-  const H=4*Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R))),L=Math.floor(H/4),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),row={R,H,L,roots:0,success:0,bad:0,classes:PD.map(data=>({P:data.P,covered:0,bad:0,byK:{},maxLowGap:0,maxHigh:0,fastAtRough:0,repeat:0}))};
+  const H=4*Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R))),L=Math.floor(H/4),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),row={R,H,L,roots:0,success:0,bad:0,classes:PD.map(data=>({P:data.P,covered:0,bad:0,byK:{},maxLowGap:0,maxHigh:0,fastAtRough:0,repeat:0,freshCovered:0,freshBad:0,freshRepeated:0,freshByK:{}}))};
   for(let A=lo;A<=hi;A+=6){let a=A,v=3-A/2,h=3,path=[];
    while(true){let e=next(a,v);if(h+e.w>H){row.success++;z.successes++;let bad=!twin(a);if(bad){row.bad++;z.badSuccesses++}
     for(let [idx,data] of PD.entries()){
@@ -47,7 +75,29 @@ function audit(){
       if(!rough){valid=false;break}
       word.push([f.p,f.c]);marks.push(f);largestGap=Math.max(largestGap,loG);loG=0;
      }
-     z.classificationChecks++;if(!valid)continue;
+     z.classificationChecks++;
+     // Separate adaptive-innovation test; only new labels must occur
+     // at a position absorbing for every previously known label.
+     let known=new Set(data.P),fresh=[],fv=true,repeats=0;
+     for(let f of path){
+      if(known.has(f.p)){if(!data.P.includes(f.p))repeats++;continue;}
+      let rough=[...known].every(p=>mod(f.a-1,p)!==0&&mod(f.a+1,p)!==0);
+      if(f.w>=f.p/4&&f.p>8*Math.max(...known)){ck(rough,"slow separated innovation");z.freshSlowSeparationChecks++}
+      if(!rough){fv=false;break}known.add(f.p);fresh.push([f.p,f.c]);
+     }
+     if(fv&&!Array.from(known).every(p=>mod(a-1,p)!==0&&mod(a+1,p)!==0)){fv=false;z.freshNonroughEndpoint++}
+     if(fv){
+      const f=decodeFresh(mod(A/6,data.Q),fresh,data,L);
+      ck(f&&f.G===A-a&&f.T===v-(3-A/2)&&f.path.length===path.length&&f.repeat===repeats,"fresh replay");
+      for(let i=0;i<path.length;i++){
+       let e=f.path[i],g=path[i];ck(e.G===A-g.a&&e.T===g.v-(3-A/2)&&e.p===g.p&&e.c===g.c&&e.w===g.w,"fresh exact event");z.freshEventChecks++;
+      }
+      for(let [p,r] of f.pins)ck(mod(A,p)===r,"fresh residue");
+      z.freshCovered++;z.freshReplayChecks++;if(bad)z.freshBadCovered++;
+      z.freshRepeatIncidences+=repeats;c.freshRepeated+=repeats;c.freshCovered++;if(bad)c.freshBad++;
+      let kk=c.freshByK[fresh.length]||[0,0];kk[bad?1:0]++;c.freshByK[fresh.length]=kk;
+     }
+     if(!valid)continue;
      largestGap=Math.max(largestGap,loG);ck(largestGap<=2*(data.wall-1),"arbitrary gap wall");z.freeGapChecks++;
      let j0=mod(A/6,data.Q),d=decode(j0,word,data,L);ck(d&&d.G===A-a&&d.T===v-(3-A/2)&&d.endpointResidue===mod(a,6*data.Q),"exact word replay");z.decodeChecks++;
      for(let i=0;i<marks.length;i++){let f=marks[i],m=d.marks[i];ck(m.G===A-f.a&&m.T===f.v-(3-A/2)&&m.p===f.p&&m.c===f.c&&m.w===f.w,"mark timing");z.markChecks++;if(f.w<f.p/4)c.fastAtRough++}
