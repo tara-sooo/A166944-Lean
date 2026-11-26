@@ -41,7 +41,7 @@ for(let X of [4096,16384,65536]){
  for(let x of rows){ok(d1*x.j===x.d*j1&&d1*x.R===x.d*R1,"rank");let C=x.R+x.d*(x.i+x.j),calc=C-rows.slice(0,x.i).reduce((s,y)=>s+y.d-1,0)-e+list[x.i].e;ok(calc===x.E,"reconstructed offset");totals.offsetChecks++;if(seen.has(x.d)){ok(mod(x.i-seen.get(x.d),2)===0,"repeat parity");totals.repeatParity++;}seen.set(x.d,x.i);}
  for(let d of labels)for(let b of cof){ok(R1+d1*b+j1*d!==0,"cross determinant");totals.formChecks++;}
  if(!examples.rank)examples.rank={X,can,list,rows};if(primeQ&&!examples.rankPrime&&labels.size>=3)examples.rankPrime={X,can,list,rows};
- if(crank){totals.bothRankWords++;if(!examples.clock)examples.clock={X,can,list,rows};}
+ if(crank){ok(labels.size===rows.length,"joint rank no repeats");totals.bothRankWords++;if(!examples.clock)examples.clock={X,can,list,rows};}
  }else if(!examples.nonrank)examples.nonrank={X,can,list,rows};
  }
  function scan(H,t,can){let list=[];
