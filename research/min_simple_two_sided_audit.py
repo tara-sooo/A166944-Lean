@@ -68,6 +68,41 @@ def audit(R):
         assert growth_mass<=M
         assert allsmall-growth_wait<=H*(R+3)*rough_count
         print(f'all_history T={T} H={H} rough_count={rough_count} small_wait={allsmall} growth_mass={growth_mass} growth_wait={growth_wait}')
+    # Mass/phase-width tradeoff; the center may be chosen after the graph is known.
+    Hmax=(isqrt(R)+1)*L*L; groups=defaultdict(list)
+    for s,z in nodes.items():
+        if not z[7] and z[0]<=Hmax:
+            b=z[0]; H=1<<(b-1).bit_length(); groups[H].append(s)
+    centers={u:(min(2*s[1]-u for s in ss)+max(2*s[1]-u for s in ss))//2
+             for u,ss in rows.items()}
+    for mode in ('zero','midpoint'):
+        result=0; exceptional=0; capacity=0; selected=0
+        for H,ss in groups.items():
+            D=2*R//(H*L*L); byslot=defaultdict(lambda:[0,0]); cross=0; cw=0; wait=0
+            for s in ss:
+                u,v=s; z=nodes[s]; b=z[0]; d=2*v-u
+                c=0 if mode=='zero' else centers[u]
+                if b*abs(d-c)*L*L>R:continue
+                assert abs(d-c)<=D
+                selected+=1; wait+=b*z[5]; y=dest[s]
+                m=nodes[y][0] if y in nodes else exitmass[y]
+                if m>H:cross+=b;cw+=b*z[5]
+                else:
+                    slot=byslot[u,y[1]];slot[0]+=b;slot[1]=max(slot[1],z[5])
+            ints=defaultdict(list)
+            for (u,n),(m,w) in byslot.items():
+                assert m<=H;ints[u].append((n-w,n))
+            cap=0
+            for u,iv in ints.items():
+                iv.sort();assert all(x[1]<=y[0] for x,y in zip(iv,iv[1:]))
+                q=nodes[rows[u][0]][6]
+                length=D+2*q # |d-c|<=D gives v-band width D.
+                assert sum(n-v for v,n in iv)<=length
+                cap+=H*length
+            assert cross<=M and cw<=2*isqrt(2*R+1)*cross
+            assert wait-cw<=cap
+            result+=wait;exceptional+=cw;capacity+=cap
+        print(f'product {mode} Hmax={Hmax} mass_defect_limit={R/L**2:.3f} states={selected} wait={result} threshold_wait={exceptional} slot_cap={capacity}')
     # Previous marked state along a heavy chain, and next marked state along successor.
     prev={}; nxt={}
     for u in sorted(rows):
