@@ -74,3 +74,17 @@ II-B's uninterrupted all-high long safe scalar model fails in all four tested wi
 | A02 | Compressed mixed DAG and exact bounded-phase audit with low relays; canonical first exit | COMPUTATION; R3,5,7 mixed and R3,5,7,11 first exit. Actual intermediate-state four-high word, canonical ancestry not checked; 5,222,400 first-exit source incidences, 84,643 applicable unit-multiplier checks pass. |
 
 No all-constraint infinite survivor or final contradiction. Medium relays, bad high events, eventual rather than initial entry, and dense transport remain open. No new Lean verification.
+
+## Checkpoint V — semiprime entry sieve and frozen unit-state continuation
+
+[Entry cost paper](https://github.com/tara-sooo/A166944-Lean/blob/d66016a0d154c17acab78cddcb5e97e2c9bae077/research/infinite-orbit/entry_cost.md). Analytic sieve imported from direct 3793617; latest sibling references direct bc3b10b and unified f1f6e1c.
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D11 | Good high p>=eta sqrt X,w>=p-2 at displacement E<=D<=X from canonical H0 in [X,lambda X] forces H=pq+e with q prime, opposite neighbor rough; count odd roots O((D+1)X/log^3 X) | PAPER; standard fixed-dimensional upper sieve, sufficiently large X, arbitrary prior labels |
+| D12 | Prime-root refinement O((D+1)X/log^4 X), averaged exceptional factors via bounded second moment of J_3 | PAPER; three nonproportional forms in q for fixed p,E,e; no relative-density claim for sparse prime subsets |
+| D13 | Dense odd or prime-root families: early-good fraction o(1) at D=o(log^3 X); under finite twins positive fraction need Omega(log^3 X) actual pre-entry bad gain and waits for fixed R | PAPER; tagged resource Omega(N log^3 X), not automatically omitted Mhat, not macroscopic |
+| L18 | Any shallow good event with p>max(9,d+1) has frozen post state (H+p-1,(H+p-1+2p+6s)/2), injective in H,p,s; shallow entry multiplicity <=floor(D/4)+1 | PAPER; no restriction to prior low labels, not later merging |
+| A03 | Exact unit-stratum mixed continuation with frozen arrival, and canonical first-good prefix scan | COMPUTATION; 261120 distinct roots incl43081 prime; 29026 unit cases pass; 6514 feasible arbitrary-state unit triples; max high count <=3 in four finite windows; ancestry of maxima not checked |
+
+Uniform later mixed-run bound L_R remains OPEN. No Lean verification, full all-constraint model, or finite-twin contradiction.
