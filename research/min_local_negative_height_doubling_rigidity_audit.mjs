@@ -4,10 +4,10 @@ function audit(){
  for(let p=2;p*p<=N+2;p++)if(!spf[p])for(let n=p*p;n<=N+2;n+=p)spf[n]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
  function ev(a,v){let p=Infinity,w=Infinity,e=0,q=Infinity;for(let [d,s] of [[a+1,-1],[a-1,1]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((s===-1?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;e=s}}return {p,w,e,q}}
- let z={roots:0,events:0,eventThresholdChecks:0,largeLabelCases:0,smallLabelCases:0,firstPassages:0,goodPassages:0,stageControls:0,distinctGoodChecks:0,lossChecks:0,survivalChecks:0,rootTransitions:0,rigidTransitions:0,rigidChecks:0,fixedBudgetChecks:0,roughnessChecks:0,newGoodRoots:0,budgetStops:0,rows:[]};
+ let z={roots:0,events:0,eventThresholdChecks:0,largeLabelCases:0,smallLabelCases:0,firstPassages:0,goodPassages:0,stageControls:0,distinctGoodChecks:0,lossChecks:0,survivalChecks:0,rootTransitions:0,wideBudgetTransitions:0,exactFilterChecks:0,exactFilterRootChecks:0,exactFilterMassChecks:0,rigidChecks:0,fixedBudgetChecks:0,roughnessChecks:0,newGoodRoots:0,budgetStops:0,rows:[]};
  for(let R of [12000,48000,192000,480000,1000000]){
   const Hmax=Math.ceil(4*Math.sqrt(2*R+1)),H0=Math.max(64,Math.floor(R**.24)),hs=[H0];while(hs.at(-1)*2<=Hmax)hs.push(hs.at(-1)*2);if(hs.at(-1)<Hmax)hs.push(Hmax);
-  const L=Math.floor(Hmax/4),maps=hs.map(H=>new Map()),pass=hs.map(H=>0),good=hs.map(H=>0),newGood=hs.map(H=>0),allGoodTransitions=hs.map(H=>0),rigid=hs.map(H=>0);
+  const L=Math.floor(Hmax/4),maps=hs.map(H=>new Map()),wide=hs.map(H=>new Map()),pass=hs.map(H=>0),good=hs.map(H=>0),newGood=hs.map(H=>0),allGoodTransitions=hs.map(H=>0),rigid=hs.map(H=>0);
   for(let A=6*Math.ceil(R/6);A<=2*R;A+=6){
    let a=A,v=3-A/2,h=3,G=0,W=0,k=0,prev=null;
    while(k<hs.length){
@@ -19,8 +19,10 @@ function audit(){
      if(yes){
       ck(I>=H-7*G/4-11-1e-8,"idle bound");let m=maps[k].get(a)||{m:0,minG:Infinity};m.m++;m.minG=Math.min(m.minG,G);maps[k].set(a,m);good[k]++;z.goodPassages++;
      }
+     if(k+1<hs.length&&4*G<=hs[k+1]){let m=wide[k].get(a)||0;wide[k].set(a,m+1);}
      if(prev){
       z.rootTransitions++;
+      if(yes&&H/4<18*(prev.H+1)/35-10){ck(a===prev.a&&G===prev.G,'wide-budget rigidity');z.wideBudgetTransitions++;}
       if(prev.G<=L&&G<=L&&L<18*(prev.H+1)/35-10){ck(a===prev.a&&G===prev.G,"fixed-budget rigidity");z.fixedBudgetChecks++}
       if(prev.yes&&yes){allGoodTransitions[k]++;if(H/4<18*(prev.H+1)/35-10){ck(a===prev.a&&G===prev.G,"dyadic rigidity");rigid[k]++;z.rigidChecks++}}
       if(yes&&!prev.yes){newGood[k]++;z.newGoodRoots++}
@@ -54,6 +56,8 @@ function audit(){
     ck(M2.size>=M.size-lost&&kept+lost===M.size,"distinct recurrence");z.stageControls++;
     row.loss=lost;row.kept=kept;row.lostRootMass=massLost;row.lossBandLabels=groups.size;
     row.normalizedLoss=lost*Math.log(H)**3/R;
+    if(J/4<18*(H+1)/35-10){let K=0,mass=0;for(let [a,m] of wide[i]){let x=ev(a,H-a/2);if(x.w>J-H){ck(M2.has(a)&&M2.get(a).m===m,'exact filtered mass');K++;mass+=m;z.exactFilterMassChecks++;}z.exactFilterRootChecks+=m;}
+    ck(K===M2.size&&mass===good[i+1],'exact filtered support');z.exactFilterChecks++;row.wideD=wide[i].size;row.filteredD=K;}
    }stages.push(row)
   }
   z.rows.push({R,Hmax,L,stages})
