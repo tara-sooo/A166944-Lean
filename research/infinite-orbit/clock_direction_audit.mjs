@@ -1,7 +1,7 @@
 // Run: node research/infinite-orbit/clock_direction_audit.mjs
 function audit(){
-const max=4*65536+4096,spf=new Int32Array(max+1);for(let p=2;p*p<=max;p++)if(!spf[p])for(let n=p*p;n<=max;n+=p)spf[n]=p;
-function fac(n){let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
+const max=12*65536+4096,spf=new Int32Array(max+1);for(let p=2;p*p<=max;p++)if(!spf[p])for(let n=p*p;n<=max;n+=p)spf[n]=p;
+function fac(n){if(!Number.isInteger(n)||n<1||n>max)throw Error('factor domain '+n);let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
 function prime(n){return Number.isInteger(n)&&n>=2&&n<=max&&!spf[n]}
 function mod(a,b){return (a%b+b)%b}
 function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b)[a,b]=[b,a%b];return a}
@@ -10,7 +10,7 @@ function elig(H){let B=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let z=1+mod((i?q+2:0)-t-1,2*q);if(z<w||(z===w&&q<p)){p=q;w=z;s=i}}return {p,w,s}}
 function gap(n,p,f){let W=2*p;for(let i=0;i<2;i++)for(let q of f[i])if(q!==p){let z=mod(n-(i?q+2:0),2*q);if(!z&&q<p)return 0;W=Math.min(W,z||2*q)}return W}
 function ok(v,m){if(!v)throw Error(m)}
-let totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,triples:0,distinct:0,aligned:0,alignedShort:0,alignedLargeGap:0,alignedCanonical:0,alignedFast:0,zero:0,nonparallel:0,coupled:0,zeroAffine:0,shortTriple:0,shortNonparallel:0,shortZero:0,literal:0,censuses:0,shiftConfigs:0,candidates:0,alignedActualCandidates:0},results=[],examples={aligned:null,alignedShort:null,largeGap:null,nonparallel:null,zero:null};
+let totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,triples:0,distinct:0,aligned:0,alignedShort:0,alignedLargeGap:0,alignedCanonical:0,alignedFast:0,zero:0,nonparallel:0,coupled:0,zeroAffine:0,shortTriple:0,shortNonparallel:0,shortZero:0,literal:0,censuses:0,shiftConfigs:0,candidates:0,alignedActualCandidates:0,localAlignedChecks:0,localLargeGap:0,localPositiveSource:0,localPrimeSource:0,localCanonicalPhase:0,ratioChecks:0,ratioAffine:0,ratioZero:0},results=[],examples={aligned:null,alignedShort:null,largeGap:null,nonparallel:null,zero:null,localAligned:null,localLargeGap:null,ratio:null};
 for(let X of [4096,16384,65536]){
 let Y=4*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1)),before={...totals};
 function clock(p,s){return s?p+2:0}
@@ -29,6 +29,10 @@ ok(Q*x.C1===y.d*(a.p*x.m-x.d)-x.d*c.p*y.m&&Q*x.A1===y.D*(a.p*x.m-x.d)-x.D*c.p*y.
 ok(mod(b.p*(c.p*y.m+y.d)+Q,a.p)===0||x.d%a.p===0,"first coupled");
 ok(mod(b.p*(a.p*x.m-x.d)+Q,c.p)===0||y.d%c.p===0,"second coupled");
 if(x.d%a.p!==0&&y.d%c.p!==0)totals.coupled++;
+for(let [M,N] of [[1,1],[2,1],[3,1],[3,2],[2,3],[1,2]]){let h=N*b.p-M*a.p;if(!h||Math.abs(h)>16||x.E+y.E>16||x.V+y.V>16)continue;
+let C=h*y.d+N*Q;ok(mod(h*y.m*c.p+C,a.p)===0||x.d%a.p===0,"ratio congruence");
+if(x.d%a.p!==0){totals.ratioChecks++;if(y.m&&Math.abs(h*y.m)<a.p&&Math.abs(C)<a.p){ok(C!==0,"ratio nonzero constant");totals.ratioAffine++;if(!examples.ratio)examples.ratio={X,can,a,b,c,M,N,h,C,Q,m:y.m};}if(!y.m&&Math.abs(C)<a.p){ok(C===0,"ratio zero");totals.ratioZero++;}}
+}
 if(Q===0){totals.aligned++;
 let g=gcd(x.D,x.d),D=x.D/g,d=x.d/g;if(D<0){D=-D;d=-d}
 let m0=(D*x.C-d*x.A)/b.p,m1=(D*y.C-d*y.A)/c.p;
@@ -94,7 +98,7 @@ ok(brute.size===affine.size&&[...brute].every(k=>affine.has(k)),"aligned exact c
 totals.censuses++;totals.candidates+=brute.size;
 let real=0;for(let key of brute){let [H,p,r,v,n,E,F,V,W,s,t,u]=key.split(",").map(Number),ff=elig(H),l=Math.max(1,n-(3*H+3)),hi=Math.min(gap(n,p,ff),n-H/2);if(l>hi)continue;let aa=first(n-l,ff);if(aa.p!==p||aa.w!==l||aa.s!==s)continue;
 let h=H+p-1,nn=n,got=[];for(let it=0;it<Wmax&&nn<n+V+W&&h<Y;it++){let z=first(nn,elig(h));if(!z.p||nn+z.w>n+V+W)break;nn+=z.w;if(z.p>=T)got.push([h,z.p,nn,z.s]);h+=z.p-1;if(got.length===2)break;}
-let H1=H+p-1+E,H2=H1+r-1+F;if(got.length===2&&got[0].join(",")===[H1,r,n+V,t].join(",")&&got[1].join(",")===[H2,v,n+V+W,u].join(",")){real++;totals.alignedActualCandidates++}
+let H1=H+p-1+E,H2=H1+r-1+F;if(got.length===2&&got[0].join(",")===[H1,r,n+V,t].join(",")&&got[1].join(",")===[H2,v,n+V+W,u].join(",")){real++;totals.alignedActualCandidates++;let e=1-2*s,f=1-2*t,g=1-2*u,A=(H-e)/p+1,C=(n-2*s)/p,A1=(H1-f)/r+1,C1=(n+V-2*t)/r,D1=E-1+2*(t-s),d1=V-2*(t-s),D2=F-1+2*(u-t),d2=W-2*(u-t),gg=gcd(D1,d1),D=D1/gg,d=d1/gg;if(D<0){D=-D;d=-d}let m0=(D*C-d*A)/r,m1=(D*C1-d*A1)/v;ok(Number.isInteger(m0)&&Number.isInteger(m1)&&m0*m1>0&&m1*v===m0*p-d&&D1*d2===D2*d1,'local aligned recurrence');totals.localAlignedChecks++;let data={X,H,p,r,v,n,E,F,V,W,s,t,u,D,d,m0,m1,sourceWait:l,q:A-1,cofactor1:A1-1,cofactor2:(H2-g)/v};if(!examples.localAligned)examples.localAligned=data;if(Math.abs(v-p)>=T/2){totals.localLargeGap++;if(!examples.localLargeGap)examples.localLargeGap=data;}if(2*l>p-1)totals.localPositiveSource++;if(prime(A-1))totals.localPrimeSource++;if((H+6)/2===n-l&&H%4===0)totals.localCanonicalPhase++;}
 }
 counts.push({L,W:Wmax,configs,candidates:brute.size,real});
 }
