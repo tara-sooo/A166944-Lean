@@ -215,3 +215,19 @@ Large label jumps, O(T) relays, arbitrary composite-cofactor sources, and bounde
 | A11 | 39205 actual words lengths3..5,140745 exact rows,191 fully horizon-rank words incl8 with 3 distinct labels,2 joint-rank;27 independent product/affine set comparisons | COMPUTATION; all final tests pass, conservative uniform sufficient criterion not triggered at these finite scales |
 
 Unrestricted label jumps and low relays larger than polylogarithmic remain. No full all-constraint model, general uncapped bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XIV — primitive relay toll and polynomial rank escape
+
+[Rank escape paper](https://github.com/tara-sooo/A166944-Lean/blob/7c9aadd5afecccc32976986cfca339383f50f090/research/infinite-orbit/rank_escape.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D46 | Nonzero horizon rank determinant is even; exact elimination magnitude >=2p, so K(K²+L+1)>=cT for nonrank bounded words with L=o(T) | PAPER; fixed length, comparable square-root labels, no prime-cofactor assumption |
+| D47 | Rank-one primitive coordinates (D,J,R), ell_i: relay L_i-1+e_i-e_(i+1)=h_i b_i, h_i=ell_(i+1)-ell_i, b_i=R+D(i+1)+DJ(ell_(i+1)+ell_i), both odd nonzero; b_(i+1)-b_i=D[1+J(ell_(i+2)-ell_i)] | PAPER; exact, arbitrary waits/cofactors |
+| D48 | For each rank triple, abs(D) and min(adjacent label jumps) <=L_i+L_(i+1)+6; word width K<=(L+6)(L+3(m-1)). Distinct triple endpoints require abs(D)(2abs(J)-1)<=local L+6 | PAPER; length>=3 |
+| D49 | Polylog L and >=3 distinct labels: abs(J)>=abs(D)+1, abs(D)(2abs(D)+1)<=L+6, K<=sqrt((L+6)/2)(L+3(m-1)); no rank-one zero-relay word with >=3 distinct labels at large scale | PAPER; intermediate label scale between relay width and T^(1/3) excluded by D46 |
+| D50 | Relay-only rank-one localized capacity O(Hspan (L+1)^a_d log(2+L) (loglog X)^(d+v)/log^(d+v) X), a_2=2,a_d=d-1/2 for d>=3 | PAPER; polylog L, Hspan>=T^(1+eps), fixed length, actual d distinct labels and v prime cofactor shifts |
+| D51 | Macro disjoint word weight with U=O((Hspan/T) log^alpha X), alpha<(d+v)/a_d, must be F-o(Hspan) nonrank with K>=cT^(1/3); sum K=Omega(Hspan/T^(2/3)), i.e. Omega(X^(2/3)) at full top scale | PAPER; quantitative relay budget, original tag transfer with disjoint actual charges |
+| A12 | 39205 actual words,61128 nonzero determinant rows,382 rank relay factorizations,191 triple/width checks,8 distinct-label rank triples,238688 synthetic integer triples | COMPUTATION; all pass, synthetic not actual MIN, no macro/asymptotic sieve test |
+
+Large nonrank jumps and larger relay budgets remain. No full survivor, general uncapped run bound, Lean verification or finite-twin contradiction.
