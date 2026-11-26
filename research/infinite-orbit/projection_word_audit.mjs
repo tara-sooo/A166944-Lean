@@ -10,7 +10,7 @@ function elig(H){let B=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let z=1+mod((i?q+2:0)-t-1,2*q);if(z<w||(z===w&&q<p)){p=q;w=z;s=i}}return {p,w,s}}
 function gap(n,p,f){let W=2*p;for(let i=0;i<2;i++)for(let q of f[i])if(q!==p){let z=mod(n-(i?q+2:0),2*q);if(!z&&q<p)return 0;W=Math.min(W,z||2*q)}return W}
 function ok(v,m){if(!v)throw Error(m)}
-const totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,literal:0,words:0,identities:0,spanChecks:0,short:0,shortDistinct:0,shortAnchor:0,affineWords:0,affineChecks:0,residence:0,oddCut:0,smallDeficit:0,censuses:0,necessary:0,local:0,latticeChecks:0,latticeCandidates:0,localStarts:0,localShortWords:0,localShortAnchor:0,localEvents:0};let results=[],examples={actual:null,local:null,localShort:null};
+const totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,literal:0,words:0,identities:0,spanChecks:0,short:0,shortDistinct:0,shortAnchor:0,affineWords:0,affineChecks:0,residence:0,oddCut:0,smallDeficit:0,censuses:0,necessary:0,local:0,latticeChecks:0,latticeCandidates:0,localStarts:0,localShortWords:0,localShortAnchor:0,localEvents:0,endpointChecks:0,stripReturnChecks:0,divisorChecks:0};let results=[],examples={actual:null,local:null,localShort:null};
 const slopes=[[1,2],[1,1],[3,2],[2,3]];
 function clock(p,s){return s?p+2:0}
 function state(H,t,z){let {p,w,s}=z;return {H,t,p,w,s,e:1-2*s,q:(H-1+2*s)/p,J:H+p-1,n:t+w}}
@@ -36,6 +36,11 @@ if(short){totals.short++;ok(distinct,"short word repeats");totals.shortDistinct+
 for(let [M,N] of slopes){
 let hs=list.map(x=>proj(x,M,N)),bs=list.slice(1).map((x,i)=>shifts(list[i],x,M,N).b),xs=hs.map((h,i)=>h*list[i].p),sum=0,gain=0;
 for(let i=1;i<m;i++){ok(list[i].p*(hs[i]+M)===list[i-1].p*hs[i-1]+bs[i-1],"projection row");sum+=bs[i-1];gain+=list[i].p;ok(xs[i]-xs[0]===sum-M*gain,"telescoping");totals.identities++;}
+for(let i=0;i<m;i++)for(let j=i+1;j<m;j++){
+let V=list[j].n-list[i].n,G=list[j].J-list[i].J,ds=list[j].s-list[i].s;
+ok(xs[j]-xs[i]===N*V-M*G-2*(N+M)*ds,"physical endpoint identity");totals.endpointChecks++;
+let A=Math.max(Math.abs(hs[i]),Math.abs(hs[j]));ok(N*V>=M*G-2*B*A-2*(N+M),"strip return clock toll");totals.stripReturnChecks++;
+}
 let anchor=Math.min(...hs.map(Math.abs));ok(hs.every(h=>Math.abs(h)*T<=B*(anchor+M*(m-1))+bs.reduce((s,x)=>s+Math.abs(x),0)),"anchor spread");totals.spanChecks++;
 if(bs.every(b=>2*b<M*T)){let z=0;for(let i=1;i<m;i++){ok(2*(xs[i-1]-xs[i])>=M*T,"monotone");if(hs[i-1]===0&&hs[i]===-M)z++;}ok(z<=1,"single cut");totals.oddCut++;
 ok(M*T*(m-1)<=2*(xs[0]-xs[m-1]),"residence");totals.residence++;
@@ -120,6 +125,7 @@ for(let test=0;test<12000;test++){let m=3+rand(5),M=1+rand(3),hs=Array.from({len
 for(let i=1;i<m&&st;i++)st=extend(st,hs[i-1],hs[i]+M,bs[i-1]);
 for(let p=1;p<=96;p++){let q=BigInt(p),real=true;for(let i=1;i<m;i++){let n=BigInt(hs[i-1])*q+BigInt(bs[i-1]),d=BigInt(hs[i]+M);if(n%d){real=false;break}q=n/d;}let got=!!st&&modB(BigInt(p)-st.u,st.k)===0n;ok(real===got,"lattice exact");if(got){ok(st.a*((BigInt(p)-st.u)/st.k)+st.c===q,"lattice endpoint");totals.latticeCandidates++;}totals.latticeChecks++;}
 }
+for(let a=1;a<=512;a++)for(let H of [1,4,16,64,128]){let s=0,tau=0,harm=0;for(let d=1;d<=H;d++){s+=gcd(a,d)/d;harm+=1/d;}for(let d=1;d<=a;d++)if(a%d===0)tau++;ok(s<=tau*harm+1e-9,"divisor weighted extension");totals.divisorChecks++;}
 return {totals,results,examples};
 }
 console.log(JSON.stringify(audit(),null,2));
