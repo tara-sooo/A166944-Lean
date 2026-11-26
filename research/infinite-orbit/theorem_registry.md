@@ -199,3 +199,19 @@ Four-distinct-factor close transitions, composite cofactor fast events and gener
 | A10 | 64512 canonical roots,9959 targeted starts,1616573 events,43275 joint pair checks,42529 affine determinant checks,1693 close pairs including83 source-prime/composite-target;36 independent candidate set comparisons | COMPUTATION; all pass, no zero determinant observed in close sample; no asymptotic sieve test |
 
 Large label jumps, O(T) relays, arbitrary composite-cofactor sources, and bounded recovery words of the sibling lanes remain. No full survivor, general uncapped run bound, Lean verification, or finite-twin contradiction.
+
+## Checkpoint XIII — rank-one bounded high words
+
+[Bounded affine word paper](https://github.com/tara-sooo/A166944-Lean/blob/4c3c3781da4c4d1296dc4c3f054c3ea088f94ef3/research/infinite-orbit/bounded_affine_word.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L26 | Bounded word p_i=p+d_i,q_i=q+i+j_i,c_i=c+k_i: d_i q+j_i p=R_i, d_i c+k_i p=S_i with actual cumulative relay and arrival differences | PAPER; arbitrary cofactors, waits and sides |
+| D41 | Anchor elimination p(d1 j_i-d_i j1)=d1 R_i-d_i R1; when K(K²+L+1)=o(T), L=o(T), all horizon rows proportional; primitive (d_i,j_i,R_i)=ell_i(D,J,R), ell_i parity i | PAPER; fixed word length, comparable sqrt-scale labels, same label only equal index parity |
+| D42 | Rank-one word reconstructs every cumulative relay E_i from anchor data and label offsets/sides; d distinct labels and v distinct prime cofactor shifts give d+v nonproportional affine prime forms | PAPER; no prime assumption on other cofactors, odd cross determinants |
+| D43 | Localized weighted word capacity O(Hspan (L+1) K^(d-1) log(2K) (loglog X)^(d+v)/log^(d+v) X) for polylog K,L and Hspan>=T^(1+eps) | PAPER; one independent low offset, fixed bounded word length, no long CRT product requirement |
+| D44 | Macro disjoint word collection excludes simultaneous total low gain O((Hspan/T) log^alpha X) and summed maximum label displacement O((Hspan/T) log^beta X) if alpha+(d-1) beta<d+v | PAPER; actual disjoint relay charges, fixed d,v |
+| D45 | Clock rank collapse under K(V+K²+1)=o(T); simultaneous horizon/clock rank implies all labels distinct even in exact-rank cases of longer elapsed time | PAPER; no prime cofactor assumption |
+| A11 | 39205 actual words lengths3..5,140745 exact rows,191 fully horizon-rank words incl8 with 3 distinct labels,2 joint-rank;27 independent product/affine set comparisons | COMPUTATION; all final tests pass, conservative uniform sufficient criterion not triggered at these finite scales |
+
+Unrestricted label jumps and low relays larger than polylogarithmic remain. No full all-constraint model, general uncapped bound, Lean verification or finite-twin contradiction.
