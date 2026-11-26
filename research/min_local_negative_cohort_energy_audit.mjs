@@ -4,7 +4,7 @@ function audit(){
  for(let p=2;p*p<=N+2;p++)if(!spf[p])for(let n=p*p;n<=N+2;n+=p)spf[n]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;if(p>2)a.push(p);while(n%p===0)n/=p}return a}
  function ev(a,v){let p=Infinity,w=Infinity,e=0,q=Infinity;for(let [d,s] of [[a+1,-1],[a-1,1]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((s===-1?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;e=s}}return {p,w,e,q}}
- let z={slabs:[],roots:0,events:0,commonEvents:0,terminalChecks:0,energyChecks:0,eventMassChecks:0,roughChecks:0,capacityChecks:0,cauchyChecks:0,starChecks:0,starRoots:0,starCenters:0,starRows:[],syntheticStarControls:0};
+ let z={slabs:[],roots:0,events:0,commonEvents:0,terminalChecks:0,energyChecks:0,eventMassChecks:0,roughChecks:0,capacityChecks:0,cauchyChecks:0,starChecks:0,starRoots:0,starCenters:0,starRows:[],syntheticStarControls:0,sweepEvents:0,sweepRetirements:0,sweepMergeChecks:0,sweepBirthMerges:0,sweepEventMerges:0,sweepEnergyChecks:0,fixedStarTicks:0,fixedStarPrimeChecks:0,fixedStarRows:[]};
  for(let R of [3000,12000,48000,192000,480000]){
   let T=Math.floor(R/8),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),nEnd=3-lo/2+T,roots=[],events=new Map(),end=new Map(),twins=new Map(),sumG=0,sumW=0,sumIdle=0,sumTwinG=0,S=Math.sqrt(2*R+1),B=0;
   for(let A=lo;A<=hi;A+=6){
@@ -52,6 +52,29 @@ function audit(){
   }
   z.slabs.push(row)
  }
+ // Independent common-clock mass transport sweep with active-cohort
+ // retirement and persistent full-cohort DSU, no per-root event list.
+ for(let row of z.slabs){
+  let R=row.R,T=row.T,lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),n0=3-hi/2,n1=3-lo/2+T,N=(hi-lo)/6+1;
+  let par=Array.from({length:N},(_,i)=>i),size=new Int32Array(N),act=new Int32Array(N),pos=new Int32Array(N),state=new Map(),buckets=Array.from({length:n1-n0+1},()=>[]);
+  let C=0,gain=0,retGain=0,retCount=0,moved=0,birthMerge=0,eventMerge=0;
+  function find(x){while(par[x]!==x){par[x]=par[par[x]];x=par[x]}return x}
+  function insert(a,id,n,birth){
+   let old=state.get(a);if(old!==undefined){old=find(old);id=find(id);ck(old!==id,"different clusters");
+    C+=2*size[id]*size[old];par[id]=old;size[old]+=size[id];act[old]+=act[id];pos[old]=a;if(birth)birthMerge++;else eventMerge++;z.sweepMergeChecks++;return old;
+   }
+   state.set(a,id);pos[id]=a;let e=ev(a,n),due=n+e.w;if(due<=n1)buckets[due-n0].push({a,p:e.p});return id;
+  }
+  for(let n=n0;n<=n1;n++){
+   let arr=[];for(let e of buckets[n-n0]){let id=state.get(e.a);ck(id!==undefined,"occupied firing");id=find(id);ck(pos[id]===e.a,"source");state.delete(e.a);gain+=act[id]*(e.p-1);arr.push({a:e.a-e.p+1,id});moved++;z.sweepEvents++}
+   for(let e of arr)insert(e.a,e.id,n,false);
+   let A=6-2*n;if(A>=lo&&A<=hi&&A%6===0){let id=(A-lo)/6;size[id]=1;act[id]=1;C++;insert(A,id,n,true)}
+   let B=6-2*(n-T);if(B>=lo&&B<=hi&&B%6===0){let id=find((B-lo)/6);retGain+=B-pos[id];act[id]--;ck(act[id]>=0,"retire");retCount++;z.sweepRetirements++}
+  }
+  ck(retCount===N&&gain===retGain&&Math.abs(retGain/N-row.meanG)<1e-10,"mass gain ledger");
+  let c0=[...state.values()].reduce((a,id)=>a+size[find(id)]**2,0);ck(C===c0&&C===Math.round(N*row.energyPerRoot),"energy identity");ck([...state.values()].every(id=>act[find(id)]===0),"retired");
+  z.sweepBirthMerges+=birthMerge;z.sweepEventMerges+=eventMerge;z.sweepEnergyChecks++;row.sweep={moved,birthMerge,eventMerge,finalGroups:state.size};
+ }
  // Independent direct canonical star search: a target B divisible by12,
  // parents B+p-1 for p|B-2, p=1 mod6. Arrival at its canonical time.
  for(let R of [12000,48000,192000,480000]){
@@ -62,6 +85,27 @@ function audit(){
    }row.centers++;z.starCenters++;row.parents+=parents.length;z.starRoots+=parents.length;row.hist[parents.length]=(row.hist[parents.length]||0)+1;
    if(parents.length){row.stars++;row.maxParents=Math.max(row.maxParents,parents.length);if(parents.length>=2&&row.examples.length<4)row.examples.push({B,parents})}
   }z.starRows.push(row)
+ }
+ // Formal residue environments for stars with target idle tail.
+ // All fixed primes pin B=0; selected labels pin B=2. Other primes
+ // avoid both neighbors of every parent and target.
+ let primeList=[];for(let p=5;p<=N;p+=2)if(!spf[p])primeList.push(p);
+ for(let r of [1,2,3,4]){
+  let small=primeList.filter(p=>p<=2*(r+1)),L=12*small.reduce((a,b)=>a*b,1),Y=r<=2?1000:r===3?10000:20000;
+  let P=primeList.filter(p=>p>=Y&&p<2*Y&&p%L===1).slice(0,r);ck(P.length===r,"band");
+  let H=Math.max(...P),K=2*H,zmax=2*K+7,C=new Map(small.map(p=>[p,0]));
+  for(let p of P)C.set(p,2);
+  let offsets=[0,...P.map(p=>p-1)];
+  for(let q of primeList){if(q>zmax)break;let B=new Set(offsets.flatMap(g=>[mod(-g-1,q),mod(-g+1,q)]));if(C.has(q)){let v=C.get(q);for(let g of offsets){let eligible=mod(v+g,q)===1||mod(v+g,q)===q-1;ck(eligible===(P.includes(q)&&g===q-1),"pinned star");z.fixedStarPrimeChecks++}}else{let v=0;while(B.has(v))v++;ck(v<q,"free star");C.set(q,v);z.fixedStarPrimeChecks++}}
+  function inv6(q){return q%6===1?(5*q+1)/6:(q+1)/6}
+  for(let g of offsets){let jpar=mod(g/6,2),h=3,G=0,fire=[],limit=g===0?K:g/2+K;
+   for(let t=1;t<=limit;t++){let b=h+1,e=mod(3-3*jpar+t,2)===0?-1:1,p=0;
+    for(let q of fs(Math.abs(e===-1?2*b+1:2*b-5))){let c=e===-1?0:q+2,yes=q===3?mod(3+t-c,3)===0:mod(3+t-c-3*mod((C.get(q)+g)*inv6(q),q),q)===0;if(yes){p=q;break}}
+    h=b-(p?(p-1)/2:0);if(p){G+=p-1;fire.push([t,p,e]);}ck(h===3+t-G/2&&h>=0,"star height");z.fixedStarTicks++
+   }
+   ck(JSON.stringify(fire)===JSON.stringify(g===0?[]:[[g/2,g+1,1]]),"star trajectory");
+  }
+  z.syntheticStarControls++;z.fixedStarRows.push({r,P,K,zmax,roots:r+1})
  }
  return z
 }
