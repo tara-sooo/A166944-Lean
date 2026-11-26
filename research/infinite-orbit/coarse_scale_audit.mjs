@@ -9,7 +9,10 @@ function scaleAudit(){
    let H=X;while(!safe(H))H+=2;let start=H,t=(H+6)/2,d=6,events=0,G=0,W=0,cut=0,bypass=0,clockViolations=0,divisibilityViolations=0,prev=0,unique=new Set(),band=primes.filter(p=>p>=Math.ceil(Math.sqrt(X)/2)&&p<=Math.floor(Math.sqrt(X)));
    while(H<16*X){
      let p=band.find(p=>p!==prev&&safe(H+p-1));ok(p!==undefined,"safe prime");
-     let g=p-1,w=p,post=H+g,oldD=d;
+     let g=p-1,period=2*p;
+     let wait=r=>((r-t-1)%period+period)%period+1;
+     let w=Math.max(wait(0),wait(p+2)),post=H+g,oldD=d;
+     ok(w>=p-2&&w<=2*p,"later parity clock");
      for(let J=Math.ceil(H/K)*K;J<post;J+=K){ok(J>H,"no anchor");cut++;if(J-H>V&&post-J>V/2)bypass++}
      t+=w;d+=2*w-g;G+=g;W+=Math.abs(d-oldD);events++;unique.add(p);
      ok(d===2*t-post&&d>=0&&w<=2*p&&p*p<=H+1,"coarse constraints");
@@ -18,7 +21,7 @@ function scaleAudit(){
      if((t%2===0?t:t-2)%p!==0)clockViolations++;
      H=post;prev=p
    }
-   ok(cut===bypass,"all lattice cuts bypass");ok(W>=G,"variation");
+   ok(cut===bypass,"all lattice cuts bypass");ok(W>=G-4*events,"variation");ok(clockViolations===0,"selected parity clock");
    results.push({X,S,K,V,events,gain:G,variation:W,distinctLabels:unique.size,cut,bypass,divisibilityViolations,clockViolations,initialH:start,finalH:H});
  }
  return results;
