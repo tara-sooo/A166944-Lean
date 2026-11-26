@@ -8,7 +8,7 @@ for(let p=2;p<=lim;p++)if(!sieve[p]){pr.push(p);if(p*p<=lim)for(let n=p*p;n<=lim
 function factors(n){let a=[];for(let p of pr){if(p*p>n)break;if(n%p===0){a.push(p);while(n%p===0)n/=p}}if(n>1)a.push(n);return a}
 function minEvent(H,t){let b=Math.floor(Math.sqrt(H+1)),p0=0,w0=Infinity,s0=0;for(let s of [0,1])for(let p of factors(H-1+2*s)){if(p>b)continue;let w=1+mod((s?p+2:0)-t-1,2*p);if(w<w0||(w===w0&&p<p0)){p0=p;w0=w;s0=s}}return [p0,w0,s0]}
 function largestPrime(n){let lo=0,hi=pr.length;while(lo<hi){let m=(lo+hi)>>1;if(pr[m]<=n)lo=m+1;else hi=m}return pr[lo-1]}
-let H=256,t=131,totals={anchors:0,repairs:0,gain:0,highGain:0,repairGain:0,repairHorizonFail:0,repairClockFail:0,repairBothFail:0,repairEligibleFail:0,repairFull:0,repairCompetitionFail:0,scalar:0,projection:0,segments:0,goodQ:0,skippedQ:0,lowCutViolations:0,clockRange:0},blocks=[],example=null,firstFailure=null;
+let H=256,t=131,totals={anchors:0,repairs:0,gain:0,highGain:0,repairGain:0,repairHorizonFail:0,repairClockFail:0,repairBothFail:0,repairEligibleFail:0,repairFull:0,repairCompetitionFail:0,scalar:0,projection:0,segments:0,goodQ:0,skippedQ:0,lowCutViolations:0,clockRange:0,exactBridgeTests:0,exactBridgeSuccess:0,exactBridgeStopped:0,exactBridgeHigh:0,exactBridgeOvershoot:0,exactBridgeClock:0,exactBridgeCap:0,exactBridgeEvents:0,horizonTests:0,horizonSuccess:0,horizonVisited:0},blocks=[],example=null,firstFailure=null;
 function scalar(p,w){ok(p>=3&&p<=Math.floor(Math.sqrt(H+1))&&p<=lim&&!sieve[p]&&w>=1&&w<=2*p,"scalar event");let d=2*t-H,HH=H+p-1,tt=t+w,dd=2*tt-HH;ok(d>=0&&dd>=0&&tt<=3*HH+3&&t<=3*H+3&&dd-d===2*w-(p-1)&&dd-d>=-(p-1)&&dd-d<=5*(p-1),"scalar envelope");H=HH;t=tt;totals.scalar++;totals.gain+=p-1}
 function connect(H1,t1,cap){
 let E=H1-H,W=t1-t;ok(E>=0&&E%2===0&&W>=E&&W<=2*E,"connector slope");
@@ -35,12 +35,27 @@ let h=p*q+1,n=2*p*k;if(anchors.length&&h-anchors[anchors.length-1].H<16*T){total
 anchors.push({H:h,n,p,q,k,j});kept++}
 ok(kept>0,"segment occupied");totals.segments++;
 }
-let minGap=Infinity,maxGap=0,minProjection=Infinity,maxProjection=0;
+let blockBridge=0,blockBfs=0;let minGap=Infinity,maxGap=0,minProjection=Infinity,maxProjection=0;
 for(let z of anchors){let {H:h,n,p,q,k}=z;
 let oldH=H,E=h-H,W=n-1-t;
 if(totals.anchors) {minGap=Math.min(minGap,E);maxGap=Math.max(maxGap,E)}
 // First connector spans a scale boundary; cap additionally limited by current eligibility.
-connect(h,n-1,Math.min(cap,Math.floor(Math.sqrt(H+1))));
+let cc=Math.min(cap,Math.floor(Math.sqrt(H+1)));
+if(totals.anchors){
+totals.exactBridgeTests++;let hh=H,tt=t,outcome=null;
+for(let step=0;step<2000;step++){
+if(hh===h){outcome=tt===n-1?"exactBridgeSuccess":"exactBridgeClock";break}
+if(hh>h){outcome="exactBridgeOvershoot";break}
+let [p0,w0]=minEvent(hh,tt);if(!p0){outcome="exactBridgeStopped";break}if(p0>cc){outcome="exactBridgeHigh";break}
+hh+=p0-1;tt+=w0;totals.exactBridgeEvents++;
+}totals[outcome||"exactBridgeCap"]++;blockBridge++;
+// Relax the clock and earliest rule but retain actual eligible neighbor divisibility.
+// This finite DAG tests existence of ANY low-only horizon bridge.
+if(blockBfs<24){blockBfs++;totals.horizonTests++;let reach=new Uint8Array(E/2+1);reach[0]=1;
+for(let i=0;i<reach.length;i++)if(reach[i]){totals.horizonVisited++;let hh=H+2*i;for(let p0 of pr){if(p0<3)continue;if(p0>cc||p0*p0>hh+1)break;if((hh-1)%p0&&(hh+1)%p0)continue;let j=i+(p0-1)/2;if(j<reach.length)reach[j]=1;}}
+if(reach[reach.length-1])totals.horizonSuccess++;
+}}
+connect(h,n-1,cc);
 ok(H===h&&t===n-1&&gcd(n,H-1)===p&&n%2===0,"anchor gcd");
 let actual=minEvent(H,t);ok(actual[0]===p&&actual[1]===1&&actual[2]===0,"anchor exact MIN");
 let proj=2*(n/p)-(q+1);ok(proj>=0&&2*n-(H+p-1)===p*proj,"anchor deficit");
