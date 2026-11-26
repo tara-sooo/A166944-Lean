@@ -231,3 +231,18 @@ Unrestricted label jumps and low relays larger than polylogarithmic remain. No f
 | A12 | 39205 actual words,61128 nonzero determinant rows,382 rank relay factorizations,191 triple/width checks,8 distinct-label rank triples,238688 synthetic integer triples | COMPUTATION; all pass, synthetic not actual MIN, no macro/asymptotic sieve test |
 
 Large nonrank jumps and larger relay budgets remain. No full survivor, general uncapped run bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XV — nonrank determinant lattice capacity
+
+[Nonrank capacity paper](https://github.com/tara-sooo/A166944-Lean/blob/bf315e1a72700bf93f7cd30a746df7f8c05dd555/research/infinite-orbit/nonrank_capacity.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D52 | Nonrank triple with gaps a,b, cofactor offsets j,k and Delta=a k-b j nonzero reconstructs p=(a R2-b R1)/Delta, q=(k R1-j R2)/Delta | PAPER; determines physical horizon candidates, not time phase; all cofactors |
+| D53 | For abs(a),abs(b)<=K, cumulative relay L<T-1, abs(Delta)<=M=O(K(K²+L+1)/T); gcd(a,b) divides Delta, O(g) coefficient pairs per Delta, O(M) nonzero pairs per (a,b) | PAPER; no additive term for zero determinant, no prime sieve |
+| D54 | Every nonrank bounded word with distinct adjacent labels contains a consecutive nonrank triple in the same fixed selected list; weight F_nonrank(K,L)=O((L+1)² K³(K²+L+1)) | PAPER; bounded length, bounded weights O(T), same-list local witness, square-root scale |
+| D55 | Macro nonrank weight with total disjoint relay U=O(T log^alpha X) needs almost all weight at K>T^(2/5-eps); sum K=Omega(X^(7/10)/log^(2alpha/5) X); mixed rank/nonrank same if XIV alpha<(d+v)/a_d | PAPER; improved from X^(2/3), actual relay budgets |
+| D56 | Absolute count also on short source spans Hspan; macro weight and relay O((Hspan/T)log^alpha X) give sum K=Omega(Hspan^(6/5)/(T log^(2alpha/5) X)), tagged version with actual disjoint charges | PAPER; Hspan polynomial, rank part needs XIV span condition |
+| A13 | 21921 actual triples,21722 Cramer reconstructions (2752 composite source),37559 local-rank word checks,12 independent exact censuses yielding678 nonrank candidates,12571440 lattice tuples | COMPUTATION; final pass, first broader run timed out; candidates not actual MIN |
+
+Unrestricted order-T jumps and larger relay budgets remain. No full model, general uncapped run bound, Lean verification or finite-twin contradiction.
