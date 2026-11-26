@@ -151,3 +151,20 @@ Uncapped high-deficit regime and weak/short high population remain; no all-const
 | A07 | 532803 start incidences incl27648 canonical,13484128 events; 3053230 alignment checks,763 strict diagonal crossings,1347 literal GCD controls | COMPUTATION; all assertions pass, no locked-scale switches or low-Q canonical nonreset entries observed |
 
 Large-denominator high states, strong complementary gain, positive-drift resonant trajectories and diagonal zeros remain. No full all-constraint infinite model, uncapped mixed-run bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint X — cofactor transition capacity and large-denominator diversity
+
+[Cofactor support paper](https://github.com/tara-sooo/A166944-Lean/blob/0dd23c6dc881fe1a1201f132a11714a6761ad2b1/research/infinite-orbit/cofactor_support.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L23 | Even corrected cofactor a=(J+2s)/p=(H-e)/p+1>=p+1; a=b m with reduced denominator b and m=gcd(J+2s,n-2s)/p | PAPER; square-root band a=Theta(sqrt X), no wait/deficit cap |
+| D27 | Consecutive selected pair (a,b0), p,r, sides s,t: (b0-1)r-a p=E-1+2(t-s) odd nonzero; fixed cofactor pair with E<=K occurs <=C_lambda(K+1), C_lambda=12(1+2lambda) | PAPER; gcd divides nonzero shift, affine lattice count, arbitrary relays/waits on one ray |
+| D28 | n consecutive selected pairs, P actual ordered cofactor pair support, S distinct cofactors, U complementary gain: n²<=2C_lambda P(U+n)<=2C_lambda S²(U+n) | PAPER; integrated ordered-cost count, macro high gain and bounded S force macro U |
+| D29 | S<=sum_(actual reduced b) floor(Lmax/b); for b>=beta T bounded denominator support forces macro complement if selected gain macro, U=O(sqrt X polylog) forces polynomial diversity | PAPER; not small-denom locking or a bound on all support |
+| D30 | Repeated same cofactor has strictly increasing labels; adjacent same-cofactor selected pair pays E>=2a-r-1>=2T-B+1 | PAPER; narrow band implies Omega(T), disjoint adjacent relays only |
+| D31 | Positive ordinary drift at square-root-scale p forces prime cofactor q=a-1 asymptotically; fixed q and varying p two-form sieve gives total F_up=O(X S_up/log² X) | PAPER; actual cofactor support, no small complement hypothesis |
+| U12 | Weighted original-tag extension sum w_i n_i <=sqrt(2C_lambda (sum w_i P_i)(sum w_i(U_i+n_i))) | PAPER; full actual lists, no automatic omitted-mass conclusion |
+| A08 | 64512 canonical roots,16702 targeted starts,1761174 events,122013 pair identities,67888 moment checks,120 integer-lattice censuses,152 upward cofactor repeats | COMPUTATION; all final tests pass, no repeated ordered pair within a tested list, no asymptotic constant inference |
+
+Large cofactor and denominator supports remain compatible. No full all-constraint infinite model, general uncapped bound, Lean verification, or finite-twin contradiction.
