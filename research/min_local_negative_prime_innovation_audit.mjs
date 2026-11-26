@@ -47,6 +47,27 @@ function audit(){
   }
   ck(rstat.lost===rstat.monoresidue,"aggregate");stats.periodChecks.push(rstat)
  }
+ // Restricted inverse paths: a nonrough target cannot survive beyond 3Q+2q.
+ stats.restrictedControls=[];
+ for(let A of [[3],[3,5],[3,5,7],[3,5,7,11]]){
+  let Q=2*A.reduce((x,p)=>x*p,1),row={A,Q,targets:0,rough:0,nonrough:0,maxDeath:0,maxWidth:0,reverseTicks:0,wallChecks:0,gapChecks:0};
+  function rs(a,k){let d=k%2?k+2:k,p=A.find(p=>d%p===0&&mod(a-e(k),p)===0);return p?a-p+1:a}
+  for(let b=0;b<Q;b+=2){
+   row.targets++;let q=A.find(p=>mod(b-1,p)===0||mod(b+1,p)===0);
+   if(!q){row.rough++;continue}
+   row.nonrough++;let S=new Set([b]),wall=(Math.floor(b/Q)+1)*Q,dead=0;
+   for(let k=1;k<=3*Q+2*q;k++){
+    let V=new Set();for(let x of S){if(rs(x,k)===x)V.add(x);for(let p of A){let y=x+p-1;if(rs(y,k)===x)V.add(y)}}
+    row.reverseTicks++;
+    for(let x of V){ck(x>=b&&x<wall,"restricted wall");row.wallChecks++}
+    if(!V.size){dead=k;break}S=V;row.maxWidth=Math.max(row.maxWidth,S.size);
+    // A surviving prefix starts at time -k-1 and ends at -1,
+    // with gain x-b. All event waits <=3gain and final idle <2q.
+    for(let x of V){ck(k<=3*(x-b)+2*q-1,"restricted time/gain");row.gapChecks++}
+   }
+   ck(dead>0,"restricted extinction");row.maxDeath=Math.max(row.maxDeath,dead);
+  }stats.restrictedControls.push(row);
+ }
  return stats
 }
 console.log(JSON.stringify(audit(),null,2));
