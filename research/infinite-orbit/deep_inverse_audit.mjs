@@ -14,7 +14,7 @@ let offsets=new Set();for(let h=0;h<K;h+=2)for(let t=0;t<K;t++){let H=h,u=t;whil
 let relays=[...offsets].map(s=>s.split(",").map(Number)),results=[],literalChecks=0,reverseChecks=0,reverseEdges=0,relayChecks=0;
 function literal(H,t){let B=Math.floor(Math.sqrt(H+1));for(let w=1;w<=2*B;w++){let n=t+w,g=gcd(n%2?n-2:n,n%2?H+1:H-1),p=fac(g).find(q=>q<=B);if(p)return {p,w,s:n%2}}return {p:0,w:Infinity,s:0}}
 for(let X of [4096,16384,65536]){
-let Y=4*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1)),candidate=0,arrivals=0,feasible=0,deep=0,roughPairs=0,ambiguity=new Map(),seenPairs=new Set(),maxIncoming=0,primePairChecks=0,collisionExamples=[],gcdChecks=0,possibleRational=0,cofactorExceptions=0;
+let Y=4*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1)),candidate=0,arrivals=0,feasible=0,deep=0,ambiguity=new Map(),seenPairs=new Set(),maxIncoming=0,primePairChecks=0,collisionExamples=[],gcdChecks=0,possibleRational=0,cofactorExceptions=0;
 function inverse(H2,n){let s=n%2,A=H2+2*s,C=n-2*s,G=gcd(A,C),out=[];
 for(let p of fac(A)){if(p<T||p>B||C%p)continue;let H=H2-p+1;if(H<X||H>=Y||p*p>H+1)continue;let f=elig(H);if(!f[s].includes(p))continue;
 let W=gap(n,p,s,f),l=Math.max(p-2,n-(3*H+3)),u=Math.min(W,n-H/2);
@@ -32,13 +32,13 @@ if(!valid||h!==H||u!==t+C)continue;
 let a=first(u,elig(h));if(a.p!==cur.p||a.w<cur.p-2||u+a.w!==n)continue;
 result.add(`${J},${t}`);relayChecks++;
 }}}}
-return result}
+ok(result.size<=8*relays.length*(1+Math.floor(B/T)),"bounded reverse degree");return result}
 let prevExamples=[],sampled=0,maxBack=0,backAmbiguous=0;
 for(let H=X;H<Y;H+=2){let f=elig(H);for(let s=0;s<2;s++)for(let p of f[s]){if(p<T||p>B)continue;candidate++;
 let H2=H+p-1,lo=H/2+p-2,hi=3*H+3+2*p,r=s?p+2:0;
 for(let n=lo+mod(r-lo,2*p);n<=hi;n+=2*p){arrivals++;let W=gap(n,p,s,f),l=Math.max(p-2,n-(3*H+3)),u=Math.min(W,n-H/2);if(l>u)continue;
 feasible++;let d=2*n-H2,h=(d-6*s)/(2*p);ok(h>=1&&Number.isInteger(h),"high adjusted");if(d>=X/4)deep++;
-let A=H2+2*s,C=n-2*s,G=gcd(A,C);ok(G%p===0,"gcd");gcdChecks++;let factors=fac(A).filter(q=>q>=T&&q<=B&&C%q===0);
+let A=H2+2*s,C=n-2*s,G=gcd(A,C);ok(G%p===0,"gcd");gcdChecks++;let factors=fac(A).filter(q=>q>=T&&q<=B&&C%q===0);ok(factors.length<=2,"high inverse degree");
 if(factors.length>1){possibleRational++;let key=`${H2},${n}`;if(!ambiguity.has(key))ambiguity.set(key,new Set());ambiguity.get(key).add(p)}
 if(feasible%997===0){let v=inverse(H2,n);ok(v.some(a=>a.p===p&&a.l===l&&a.u===u),"exact inverse");let a=literal(H,n-l);ok(a.p===p&&a.w===l,"literal");literalChecks++;
 let bk=backMixed(H2,n);maxBack=Math.max(maxBack,bk.size);if(bk.size>1)backAmbiguous++;reverseChecks++;
