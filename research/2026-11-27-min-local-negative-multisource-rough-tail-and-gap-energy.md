@@ -267,10 +267,10 @@ d<=kappa loglog R/logloglog R, with fixed
 eta,kappa>=0. Substituting (3)-(5) gives
 
     N_bad <= R log^(k eta + kappa
-                      -(3+2s)(1-1/t)+o(1)) R,
+                      -(3+2s)(1-1/t)+o(1)),
 
     C_bad <= R log^(2k eta + 2kappa
-                      -(3+2s)(1-2/t)+o(1)) R.
+                      -(3+2s)(1-2/t)+o(1)).
 
 Here the notation log^v R means (log R)^v;
 the factors denoted loglog powers in (3)
@@ -428,7 +428,7 @@ finite scales, but selecting more terminal
 marks decreases the covered population.
 For the last non-{3,5} event without a
 band requirement, the R=1000000 control
-has 36932 slow, 13108 fast, and 10551
+has 37937 slow, 12103 fast, and 10551
 with no such event (total 60591).
 Among the 4425 bad successes, these
 counts are respectively 2899,778,748.
