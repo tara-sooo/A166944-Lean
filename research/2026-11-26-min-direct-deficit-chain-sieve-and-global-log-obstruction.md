@@ -4,7 +4,7 @@ Continuation of [59b68e7](https://github.com/tara-sooo/A166944-Lean/blob/59b68e7
 
 ## 1. Close-chain reduction and distinct coordinates
 
-Fix lambda>1, Y=lambda X, C=floor sqrt(Y+1), a physical contiguous event block with pre-horizons in [X,Y] on a fixed canonical ray. Fix eta>0, and a label band [T,2T), where eta sqrt X<=T<=C (the band may vary between blocks). Choose an arbitrary subset of nonreset events p in the band and p<=C. At each event with side I, e=1-2I, wait w and ordinary post deficit d', write x=(d'-6I)/2=hp>0. Assume for the local counting theorem
+Fix lambda>1, Y=lambda X, C=floor sqrt(Y+1), a physical contiguous event block with pre-horizons in [X,Y] on a fixed canonical ray. Fix eta>0, and an integer lower threshold T defining a label band [T,2T), where eta sqrt X<=T<=C (the band may vary between blocks). Choose an arbitrary subset of nonreset events p in the band and p<=C. At each event with side I, e=1-2I, wait w and ordinary post deficit d', write x=(d'-6I)/2=hp>0. Assume for the local counting theorem
     x <= K X^(1/2+delta0),    0<delta0<1/10,             (1)
 with fixed K, delta0. This is enough to have x<T^2 for large X, so each selected x has a unique prime factor >=T. No clock length, prime cofactor or crossing restriction is imposed on the chosen population.
 
