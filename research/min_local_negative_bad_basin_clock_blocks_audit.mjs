@@ -7,7 +7,7 @@ function audit(){
  function next(a,v){let p=Infinity,w=Infinity;for(let c of clocks(a)){let t=mod(c.c-v,2*c.p)||2*c.p;if(t<w||t===w&&c.p<p){p=c.p;w=t}}return {p,w}}
  function prev(a,u){let d=0;for(let c of clocks(a)){let r=mod(a/2+c.c,2*c.p),t=u-mod(u-r,2*c.p);d=Math.max(d,t)}return d}
  function twin(a){return (spf[a-1]||a-1)===a-1&&(spf[a+1]||a+1)===a+1}
- let z={roots:0,events:0,successes:0,controls:0,blockNodes:0,branchCandidates:0,priorityRejected:0,heightRejected:0,budgetRejected:0,duplicateChecks:0,birthChecks:0,exactBasinChecks:0,prunedNodes:0,prunedCandidates:0,prunedPriorityRejected:0,prunedHeightRejected:0,prunedBudgetRejected:0,tailKeys:0,tailIncidences:0,tailCongruenceChecks:0,tailMultiplicityChecks:0,tailDistinctChecks:0,emptyControls:0,tailCRTControls:0,tailCRTRechecks:0,tailSieveControls:0,tailSieveRemainderChecks:0,maxTailProduct:0,rows:[]};
+ let z={roots:0,events:0,successes:0,controls:0,blockNodes:0,branchCandidates:0,priorityRejected:0,heightRejected:0,budgetRejected:0,duplicateChecks:0,birthChecks:0,exactBasinChecks:0,prunedNodes:0,prunedCandidates:0,prunedPriorityRejected:0,prunedHeightRejected:0,prunedBudgetRejected:0,tailKeys:0,tailIncidences:0,tailCongruenceChecks:0,tailMultiplicityChecks:0,tailDistinctChecks:0,emptyControls:0,tailCRTControls:0,tailCRTRechecks:0,tailSieveControls:0,tailSieveRemainderChecks:0,maxTailProduct:0,repeatedTailControls:0,repeatedTailIncidences:0,repeatedBadTailIncidences:0,repeatedCongruenceChecks:0,repeatedAdjacentExcluded:0,repeatedResidueChecks:0,repeatedCandidateChecks:0,rows:[]};
  for(let R of [3000,12000,48000,192000,480000,1000000]){
   let H=4*Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R))),L=Math.floor(H/4),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),basins=new Map(),row={R,H,L,roots:0,success:0,badSuccess:0,badCenters:0,reverseCenters:0,nodes:0,prunedNodes:0,maxNodes:0,maxMass:0,tail:[]};
   for(let A=lo;A<=hi;A+=6){let a=A,h=3,v=3-A/2,path=[];while(true){let e=next(a,v);if(h+e.w>H){let ar=basins.get(a)||[];ar.push({A,path});basins.set(a,ar);row.success++;z.successes++;break}
@@ -95,6 +95,35 @@ function audit(){
     ck(badStarts.size<=distinctTail.size&&badEndpoints.size<=distinctTail.size,"tail support");z.tailDistinctChecks++;z.tailKeys+=distinctTail.size;
     row.tail.push({Y,U,k,goodMass,badMass,badEndpoints:badEndpoints.size,badStarts:badStarts.size,distinctTail:distinctTail.size,maxPaths});
    }
+  }
+  // Allow repeated marks. A repeat in the same constant-ratio band
+  // forces a congruence for another intervening distinct prime.
+  row.repeats=[];
+  for(let Y of [19,23,31,47])for(let k of [2,3,4,5]){
+   let repeat=0,badRepeat=0,repeatKeys=new Set();
+   for(let [a,ar] of basins)for(let root of ar){
+    let marks=[],shift=0,off=0,valid=true;
+    for(let i=root.path.length-1;i>=0&&marks.length<k;i--){
+     let e=root.path[i];if(e.p<=5){shift+=e.p-1;ck(shift<=16,"low gap");continue}
+     if(e.p<Y||e.p>=2*Y){valid=false;break}
+     off+=shift;ck(e.a===a+off,"repeat offset");marks.push({p:e.p,d:shift,c:e.a%e.p===0?0:2,off});off+=e.p-1;shift=0
+    }
+    if(!valid||marks.length!==k||new Set(marks.map(m=>m.p)).size===k)continue;
+    repeat++;z.repeatedTailIncidences++;if(!twin(a)){badRepeat++;z.repeatedBadTailIncidences++}
+    repeatKeys.add(JSON.stringify([a,marks]));
+    for(let i=0;i<k;i++)for(let j=i+1;j<k;j++)if(marks[i].p===marks[j].p){
+     const p=marks[i].p;
+     ck(mod(marks[j].off-marks[i].off-marks[j].c+marks[i].c,p)===0,"repeat congruence");z.repeatedCongruenceChecks++;
+     ck(j>i+1,"adjacent repeat impossible");z.repeatedAdjacentExcluded++;
+     let r=marks.slice(i+1,j).find(m=>m.p!==p)?.p;ck(r!==undefined,"intervening label");
+     let coef=0,constant=marks[i].c-marks[j].c;
+     for(let l=i;l<j;l++){if(marks[l].p===r)coef++;else constant+=marks[l].p;constant-=1;constant+=marks[l+1].d;}
+     ck(coef>0&&coef<p&&mod(coef*r+constant,p)===0,"linear repeat constraint");z.repeatedResidueChecks++;
+     let candidates=0;for(let rr=Y;rr<2*Y;rr++)if(mod(coef*rr+constant,p)===0)candidates++;
+     ck(candidates<=2,"constant choices");z.repeatedCandidateChecks++;
+    }
+   }
+   z.repeatedTailControls++;row.repeats.push({Y,k,repeat,badRepeat,distinct:repeatKeys.size})
   }
   z.rows.push(row)
  }
