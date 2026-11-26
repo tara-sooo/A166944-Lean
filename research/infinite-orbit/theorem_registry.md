@@ -246,3 +246,20 @@ Large nonrank jumps and larger relay budgets remain. No full survivor, general u
 | A13 | 21921 actual triples,21722 Cramer reconstructions (2752 composite source),37559 local-rank word checks,12 independent exact censuses yielding678 nonrank candidates,12571440 lattice tuples | COMPUTATION; final pass, first broader run timed out; candidates not actual MIN |
 
 Unrestricted order-T jumps and larger relay budgets remain. No full model, general uncapped run bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XVI — asymmetric nonrank capacity, repeated-label affine sieve and clock phases
+
+[Asymmetric repeat paper](https://github.com/tara-sooo/A166944-Lean/blob/371926928e2d544c413138c7b3287c3d558b04b1/research/infinite-orbit/asymmetric_repeat.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D57 | Distinct-label triple a=r-p,b=v-p: Delta*r*v=a(b-a)[b(q+1)-(p+a)]+a C2(p+a)-b C1(p+b); abs(Delta)=O((abs(ab(b-a))+K(L+1))/T) | PAPER; all waits and cofactors; small minimum gap A gives nonrank toll AK²+K(L+1)>>T |
+| D58 | Nonrank distinct triple weight with min gap<=A,width<=K,relay<=L<T-1 is O((L+1)²[A²K³+AK²(L+1)]) | PAPER; asymmetric determinant lattice, Cramer, absolute count at sqrt scale |
+| D59 | Macro disjoint nonrank distinct triples with U=O(T log^alpha X), summed min gap O(T log^beta X) require sum K=Omega(X^(5/6)/log^(2(alpha+beta)/3) X) | PAPER; additional min-gap budget, not general XV strengthening |
+| D60 | Return p,r,p: q2=q+2m, r=M p+h, M=2m-1 odd, h=2-E2-e0+e2 even nonzero; rank iff M=1; nonrank r>=3p-E2. Elapsed time >=p-2 | PAPER; any waits/cofactors; no nonrank short return in band B<3T-L |
+| D61 | Return affine forms h*u=l*p+C1, q=M*u+l-1,q2=q+M+1, l odd, O(abs(h)+1) for L=o(T); p progression mod abs(h)/gcd(h,l) | PAPER; all designated prime forms nonproportional for E2<T-1, including nonrank returns |
+| D62 | Localized return weight O(Hspan (L+1)² log(2+L) (loglog X)^(2+vc)/log^(2+vc) X) for vc designated prime cofactors, polylog L, Hspan>=T^(1+eps); full block vc=0 bound O(X(L+1)²/log²X) | PAPER; macro disjoint return population excluded if relay exponent alpha<(2+vc)/2; no general long-word extension |
+| L27 | Fixed physical triple with first distinct labels, total elapsed <=W<2T: enumerate first arrival n via CRT mod2pr for each V1, third clock unique; O(W) phase candidates, then exact incoming/forward MIN filter | PAPER; local feasibility, not canonical ancestry or extra one-ray count saving |
+| A14 | 21921 triple determinant checks,20739 distinct,413 p,r,p returns incl191 short and41 short nonrank;12 affine/product exact censuses,27752 candidates;500 clock phase set equalities,8935 compatible,732 local exact MIN | COMPUTATION; final pass, overlapping sample incidences, no asymptotic test |
+
+Large all-distinct gaps, higher relay budgets, longer returns, and general fast composite-cofactor populations remain. No full all-constraint infinite model, general uncapped bound, Lean verification or finite-twin contradiction.
