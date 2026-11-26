@@ -5,7 +5,7 @@ function audit(N=60000){
  function inv(a,b){if(b===1)return 0;let x=1,y=0,c=b;a=mod(a,b);while(c){let q=Math.floor(a/c);[a,c]=[c,a-q*c];[x,y]=[y,x-q*y]}ok(a===1,"inv");return mod(x,b)}
  function factors(x){ok(x>0&&x<lim,"range");let s=[];while(x>1){let p=spf[x];s.push(p);x/=p}return s}
  function next(H,t){let z=null;for(let I=0;I<2;I++)for(let p of factors(H-1+2*I)){if(p===2||p*p>H+1)continue;let w=mod((I?p+2:0)-t,2*p)||2*p;if(!z||w<z.w||w===z.w&&p<z.p){let e=1-2*I,d=2*t-H,g=p-1,dp=d+2*w-g,D=dp-6*I;z={H,p,w,I,e,d,dp,D,h:D/(2*p),g,q:(H-e)/p}}}return z}
- const st={roots:0,events:0,cap:0,blocks:0,selected:0,pairs:0,closeNonzero:0,variableCapChecks:0,parameterChecks:0,parameterResidueChecks:0,horizonChecks:0,bandChecks:0,gcdSplitChecks:0,meanControls:0,meanTerms:0,weightedSumControls:0,weightedTerms:0,zeroEdges:0,zeroRuns:0,zeroRunEvents:0,zeroTripleChecks:0,zeroTripleTwins:0,zeroTripleNoTwin:0,zeroRunMax:0,zeroTwoBandChecks:0,zeroBandTwins:0,zeroBandNoTwinRuns:0,zeroProductChecks:0,zeroUnrestrictedPairs:0,zeroExamples:[],nonzeroExamples:[]};
+ const st={roots:0,events:0,cap:0,blocks:0,selected:0,pairs:0,closeNonzero:0,variableCapChecks:0,parameterChecks:0,parameterResidueChecks:0,horizonChecks:0,bandChecks:0,gcdSplitChecks:0,meanControls:0,meanTerms:0,weightedSumControls:0,weightedTerms:0,zeroEdges:0,zeroRuns:0,zeroRunEvents:0,zeroTripleChecks:0,zeroTripleTwins:0,zeroTripleNoTwin:0,zeroRunMax:0,zeroTwoBandChecks:0,zeroBandTwins:0,zeroBandNoTwinRuns:0,zeroProductChecks:0,zeroUnrestrictedPairs:0,zeroExamples:[],twinExamples:[],literalTicks:0,literalEvents:0,nonzeroExamples:[]};
  function J(n){let x=1;for(let f of new Set(factors(Math.abs(n))))if(f>2)x*=f/(f-2);return x}
  function inspect(rows,T,M,B,A){
   let l=rows.filter(z=>z.p>=T&&z.h>=1&&z.h<=M&&z.w>6&&4*z.w>=z.g),G=rows.reduce((s,z)=>s+z.g,0),F=l.reduce((s,z)=>s+z.g,0),V=rows.reduce((s,z)=>s+Math.abs(z.dp-z.d),0),Etotal=0,Vtotal=0,close=0,largeE=0,largeV=0;
@@ -26,14 +26,14 @@ function audit(N=60000){
   }
   ok(Etotal<=G-F&&Vtotal<=V,"budgets");
  }
- function zeroRuns(rows,T,B,band){
+ function zeroRuns(rows,T,B,band,root){
   let l=rows.filter(z=>z.p>=T&&z.D>0&&z.D/2<T**3&&z.w>6&&4*z.w>=z.g&&spf[z.q]===z.q&&(!band||z.p<2*T));
   for(let a=0;a<l.length;){let b=a+1;while(b<l.length&&l[b].D===l[b-1].D&&l[b].H-l[b-1].H-l[b-1].g<=B)b++;
    let n=b-a;if(n>=2){let v=l.slice(a,b),D=v[0].D,s=[...new Set(v.map(z=>z.p))],P=s.reduce((x,p)=>x*p,1);ok(s.length===2&&D%(2*P)===0&&n<=5,"zero chain");st.zeroEdges+=n-1;st.zeroRuns++;st.zeroRunEvents+=n;st.zeroRunMax=Math.max(st.zeroRunMax,n);st.zeroProductChecks++;
     let twins=0;
     for(let i=2;i<n;i++){let x=v[i-2],y=v[i-1],z=v[i];ok(x.p===z.p&&x.p!==y.p&&x.D===z.D,"alternation");let m=(z.q-x.q)/2,E=y.H-x.H-x.g+z.H-y.H-y.g;ok(Number.isInteger(m)&&m>=1&&z.H-x.H===x.p+y.p-2+E,"triple");
      if(x.p>y.p||band)ok(m===1,"max or band twin");
-     if(m===1){twins++;st.zeroTripleTwins++;if(band)st.zeroBandTwins++}else{ok(m>=5&&y.p>=9*x.p-2*B,"non-twin large middle");st.zeroTripleNoTwin++}st.zeroTripleChecks++;
+     if(m===1){twins++;st.zeroTripleTwins++;if(band)st.zeroBandTwins++;if(st.twinExamples.length<3&&!st.twinExamples.some(a=>a.H[0]===x.H&&a.p===x.p)){st.twinExamples.push({root,T,B,p:x.p,r:y.p,D,H:[x.H,y.H,z.H],q:[x.q,y.q,z.q],w:[x.w,y.w,z.w],sides:[x.e,y.e,z.e],E,post:[x.dp,y.dp,z.dp]})}}else{ok(m>=5&&y.p>=9*x.p-2*B,"non-twin large middle");st.zeroTripleNoTwin++}st.zeroTripleChecks++;
     }
     if(!twins)ok(n<=3,"no twin length");
     if(band){st.zeroTwoBandChecks++;if(!twins){ok(n<=2,"band no twin");st.zeroBandNoTwinRuns++}}
@@ -44,7 +44,7 @@ function audit(N=60000){
  for(let M=5;M<=N;M+=2){let H=2*M-2,t=M+2,rows=[];st.roots++;
   for(let i=0;i<180;i++){let z=next(H,t);if(!z)break;rows.push(z);H+=z.g;t+=z.w}st.events+=rows.length;if(rows.length===180)st.cap++;
   for(let [T,m,B,A] of [[17,8,8,12],[31,16,8,16],[47,32,12,24]])inspect(rows,T,m,B,A);
-  for(let T of [11,17,31])for(let B of [2,4,Math.floor(T/2)]){zeroRuns(rows,T,B,false);zeroRuns(rows,T,B,true)}
+  for(let T of [11,17,31])for(let B of [2,4,Math.floor(T/2)]){zeroRuns(rows,T,B,false,M);zeroRuns(rows,T,B,true,M)}
  }
  // Uniform gcd summation: J has bounded mean and harmonic mean. Verify finite
  // arithmetic inequalities with conservative rational upper estimates for J.
@@ -53,6 +53,11 @@ function audit(N=60000){
   let sum=0;for(let g=1;g<=Math.min(M,A);g++){let n=Math.floor(M/g),q=Math.floor(A/g);sum+=AJ[n]*HJ[n]*AJ[q];st.weightedTerms++}
   ok(sum<=30*A*M*Math.log(2*M),"gcd-summed weight bound");st.weightedSumControls++;
  }st.meanControls=1;
- ok(st.closeNonzero&&st.zeroEdges&&st.zeroProductChecks&&st.zeroTwoBandChecks,"coverage");return st
+ // Replay actual representative twin chain roots with the tickwise raw-GCD rule.
+ for(let v of st.twinExamples){let H=2*v.root-2,t=v.root+2;for(let i=0;i<180&&H<=v.H[2];i++){let z=next(H,t);ok(z,"replay event");let found=null;
+   for(let n=t+1;n<=t+z.w;n++){let I=n%2,e=1-2*I,d=gcd(n-2*I,H-e);let p=factors(d).filter(f=>f%2&&f*f<=H+1).sort((a,b)=>a-b)[0];st.literalTicks++;if(p){found={p,w:n-t,I};break}}
+   ok(found&&found.p===z.p&&found.w===z.w&&found.I===z.I,"literal replay");st.literalEvents++;H+=z.g;t+=z.w
+ }}
+ ok(st.twinExamples.length&&st.literalTicks&&st.closeNonzero&&st.zeroEdges&&st.zeroProductChecks&&st.zeroTwoBandChecks,"coverage");return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||60000)),null,2));
