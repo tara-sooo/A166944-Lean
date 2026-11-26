@@ -2,7 +2,7 @@
 function audit(){
  const ck=(x,m)=>{if(!x)throw Error(typeof m==="string"?m:JSON.stringify(m))},mod=(a,p)=>(a%p+p)%p,P=[3,5,7,11,13,17,19,23,29],rows=[],tables=new Map();
  function allowed(x,p){let r=mod(-x,p);return r<=(p-3)/2}
- let stats={localWallChecks:0,crtLifts:0,gapChecks:0,rootGapChecks:0,actualBlocks:0,actualEvents:0,lowRuns:0,cellBudgetChecks:0,nontrivialCellImprovement:0,heightRoots:0,heightTicks:0,heightChecks:0,heightRows:[],rows};
+ let stats={localWallChecks:0,crtLifts:0,gapChecks:0,rootGapChecks:0,actualBlocks:0,actualEvents:0,lowRuns:0,cellBudgetChecks:0,nontrivialCellImprovement:0,heightRoots:0,heightTicks:0,heightChecks:0,heightRows:[],wallPotentialChecks:0,neutralChecks:0,wallDropChecks:0,tailBudgetChecks:0,rows};
  for(let p of P)for(let r=0;r<p;r++){
   let cross=false;for(let d=0;d<(p-1)/2;d++)if(mod(2*(r+d)-1,p)===0||mod(2*(r+d)+1,p)===0)cross=true;
   ck(allowed(r,p)===!cross,"local exact wall");stats.localWallChecks++;
@@ -25,8 +25,9 @@ function audit(){
   let a=A,v=mode?17:3-A/2,arr=[];while(a>=R){let x=event(a,v);if(!mode&&v+x.w>-1)break;arr.push({a,p:x.p,b:a-x.p+1});v+=x.w;a-=x.p-1;stats.actualEvents++}
   if(!arr.length)continue;stats.actualBlocks++;
   for(let z of [3,5,7,11,13,17,19,23,29]){
-   let t=tables.get(z),low=0,high=0,run=null,used=new Map();
-   for(let x of arr){if(x.p>z){high++;if(run!==null){stats.lowRuns++;run=null}continue}
+   let t=tables.get(z),low=0,high=0,run=null,used=new Map(),recharge=0,positive=0,drop=0;
+   const distance=x=>x-wall(x,t);
+   for(let x of arr){let aa=x.a/2,bb=x.b/2,d=distance(bb)-distance(aa),C=wall(aa,t)-wall(bb,t);ck(C>=0&&d===bb-aa+C,'wall drop');stats.wallDropChecks++;drop+=C;if(x.p<=z)ck(C===0,'low drop');if(x.p>z){recharge+=d;positive+=Math.max(0,d);if((x.p-1)%(2*t.Q)===0){ck(d===0,'neutral');stats.neutralChecks++;}high++;if(run!==null){stats.lowRuns++;run=null}continue}
     let a=x.a/2,b=x.b/2,J=wall(a,t);ck(b>=J,"no cross");stats.rootGapChecks++;
     if(run===null)run=J;else ck(run===J||a===run,"same cell");
     low+=a-b;used.set(J,(used.get(J)||0)+a-b);
@@ -34,6 +35,11 @@ function audit(){
    if(run!==null)stats.lowRuns++;
    let caps=[...used].map(([J,g])=>{let c=gapFromWall(J,t);ck(g<=c,"cell capacity");return c});
    ck(used.size<=high+1&&low<=caps.reduce((a,b)=>a+b,0)&&low<=t.max*(high+1),"global cell cap");stats.cellBudgetChecks++;
+   let top=arr[0].a/2,bottom=arr.at(-1).b/2;ck(low===distance(top)-distance(bottom)+recharge&&low<=distance(top)+positive&&drop===wall(top,t)-wall(bottom,t),'wall potential telescope');stats.wallPotentialChecks++;
+   for(let B of [0,Math.ceil(t.Q/t.w.length),Math.ceil(2*t.Q/t.w.length)]){
+    let tail=0,j=wall(bottom,t);while(j<top){let d=gapFromWall(j,t),len=Math.max(0,Math.min(top,j+d)-Math.max(bottom,j));tail+=Math.max(0,len-B);j+=d}
+    ck(low<=B*(high+1)+tail,'tail cell budget');stats.tailBudgetChecks++;
+   }
    if(caps.reduce((a,b)=>a+b,0)<t.max*(high+1))stats.nontrivialCellImprovement++;
   }
  }
