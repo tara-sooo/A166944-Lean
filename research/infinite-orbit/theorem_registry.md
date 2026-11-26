@@ -313,3 +313,19 @@ General nonparallel outer pairs outside thin rational projection strips, larger 
 | A17 | 20379 length4..6 actual word incidences,292604 transport checks,693656 endpoint/return checks,1152000 synthetic lattice comparisons,40 independent candidate set comparisons incl4 nonempty actual local length4 words | COMPUTATION; standard sample had no stringent short words, extra244919 feasible local starts yielded11 short words,4 small-coefficient affine incidences; no canonical ancestry for targeted starts |
 
 Larger relay/elapsed budgets, arbitrary long words with no narrow projection, full all-constraint model and Lean/twin contradiction remain open.
+
+## Checkpoint XX — rational wait templates and odd-intercept return toll
+
+[Templated clock paper](https://github.com/tara-sooo/A166944-Lean/blob/c443272a92871d93e3c7be83f1f98805df4be33f/research/infinite-orbit/templated_clock.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L31 | Even N projection h=Nc-Ma, fixed odd common template denominator d, tau_j=d V_j-u_j p_j. Exact C_j p_j=A_j p_prev+xi_j, A_j=d h_prev even, C_j=d(h_j+M)-N u_j odd, xi_j=N(tau_j-2d sigma_j)-M d(E_j-1+2sigma_j) odd | PAPER; arbitrary waits/relays, fixed odd-denominator rational alphabet |
+| D80 | Zero source h=0 forces abs(xi_j)>=p_j. A word with some abs(h)<=A, total relay L and template error R has max abs(h)=O_m(A+1+(L+R)/T) | PAPER; no short elapsed assumption, fixed m |
+| D81 | Composing k edges gives C p_end=Aprod p_start+F with Aprod even, C and F odd; abs(F)<=k Z H^(k-1), Z=max abs(xi), H=max(1,abs(A_j),abs(C_j)). Repeated endpoint requires abs(F)>=T | PAPER; nondegenerate affine forms pairwise nonproportional by odd intercept, independent of short clock spacing |
+| D82 | Repeated-label m-word with anchor abs(h)<=A needs L+R+1>>T/(A+1)^(m-2); macro disjoint repeat words with polylog anchor cap require summed relay/error Omega(X/(A+1)^(m-2)) | PAPER; arbitrary elapsed; actual disjoint charges |
+| D83 | For fixed m, polylog A,L,R, nondegenerate all-distinct words follow from parity toll. Exact progression summation as XIX yields F_template<< X[(L+1)(R+1)]^(m-1)(A+1)^(1+eps)(loglog X)^m/log^m X | PAPER; finite odd-denominator template alphabet, long or mixed waits allowed, all composite cofactors permitted, absolute full-window count |
+| D84 | Macro disjoint template words with U=O(T log^alpha X), Rtot=O(T log^beta X), summed minimum projection O(T log^gamma X) excluded if (m-1)(alpha+beta)+gamma<m. Actual incoming wait residual transfers by R<=Rw+3d U | PAPER; replaces elapsed with deviation budget, not forced by usual fast or sibling near-saturation |
+| A18 | 39205 length3..5 words,406160 template rows,771404 composed-span controls,13504 repeat tolls,31128 zero-source tolls,354186 affine extensions,672966 pairwise nonproportionality controls;10 independent exact pattern sets all locally MIN | COMPUTATION; standard corpus,232 small-cutoff incidences incl214 long elapsed, no analytic sieve or macro hypothesis tested |
+
+Broad normalized waits, large projected multipliers, larger relays and unrestricted simultaneous congruences remain. No full all-constraint model, Lean or finite-twin contradiction.
