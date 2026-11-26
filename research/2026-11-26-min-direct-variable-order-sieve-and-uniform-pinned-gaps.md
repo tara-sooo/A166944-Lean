@@ -1,0 +1,75 @@
+# Variable-order grouped sieve, uniform pinned gaps, and a subpolynomial crossing alternative
+
+Continuation of [2a47be1](https://github.com/tara-sooo/A166944-Lean/blob/2a47be177db12d7fdcdc99daf9dfe7be0403da34/research/2026-11-26-min-direct-grouped-cut-sieve-and-all-label-corridors.md). The new ingredient is different truncation orders for logarithmic prime groups. The truncation errors become summable over the groups while the total logarithmic modulus remains O(log Z) at fixed relative accuracy. This extends the hybrid sieve transfer to arbitrary log Z=o(R). A second construction drops the unpinned ambient primes and uses elementary periodicity rather than Fourier: it gives uniform, not just almost-everywhere, control on cut gaps with a smoothing length exp(O(S)). The resulting crossing alternative trades a larger necessary count for a lower large-label threshold. The deep interior of a sufficiently large jump necessarily contains cuts in this new family; this is not an upper bound on the total gain of such jumps. Paper deductions and finite arithmetic audit; no twin-infinitude contradiction or Lean kernel verification.
+
+## 1. Group truncations of variable order
+
+Let S grow to infinity and Z>S. For the pin-only construction below take Z=floor(exp(3S)). For the hybrid construction use base primes through R>=S and Z>R. Let b_f be the indicator that a cut J is +/-1 modulo an extra prime f. Group the extra primes in logarithmic intervals (exp(L_i/2),exp(L_i)], where L_i=2^(-i)log Z, truncated at the lower cutoff. Index from the largest prime group; empty groups may be left in the indexing. If the lower cutoff tends to infinity, the reciprocal prime sum estimate gives, uniformly in i for sufficiently large cutoff,
+    mu_i=sum_(f in group i) 2/f <=2,
+    Q_i=prod_(f in group i)(1-2/f) >=1/20.
+For the latter bound use log Q_i=-mu_i+O(sum_(f>cutoff)1/f^2). Let Q=prod_i Q_i. Use even truncation order k_i=2(k0+i), where k0 is a positive integer. Define U_i as the upper Bonferroni polynomial through k_i, D_i as the positive degree-(k_i+1) gap polynomial, and I_i as the actual avoidance indicator. Then U_i>=I_i>=0 and U_i-I_i<=D_i. As in the preceding grouped construction,
+    U=prod_i U_i,
+    L=U-sum_i D_i prod_(j!=i) U_j
+satisfy L<=prod_i I_i<=U pointwise (telescope the product difference).
+
+Under the exact independent CRT distribution, write e_i=E[D_i], u_i=E[U_i]. The factorial estimate yields
+    e_i <= 2^(2(k0+i)+1)/(2(k0+i)+1)!.
+For k0>=6, successive terms in this upper sequence have ratio <=1/4. Thus sum_i e_i/Q_i <= (80/3) * 2^(2k0+1)/(2k0+1)!, regardless of the number of groups. For any fixed relative tolerance eps>0, take k0 sufficiently large depending only on eps so this quantity is <=eps/10 (and eps<=1/10). The relative deviations of E[U] and E[L] from Q are then <=eps/2: prod u_i/Q<=exp(sum e_i/Q_i), and E[U-L]=prod u_i sum e_i/u_i. For k0 tending to infinity the relative errors tend to zero uniformly. The total absolute coefficient weight, with each expanded monomial weighted by w_F=prod_(f in F)2/f, is <=(1+m)exp(mu), where m is the number of groups and mu=sum_i mu_i. This follows by bounding the absolute weight of each group polynomial and each gap by exp(mu_i), and summing the m correction products.
+
+Each expanded monomial uses <=k_i+1 primes in group i. Its modulus q_F therefore satisfies
+    log q_F <= sum_i (2k0+2i+1)L_i
+             <= (4k0+6) log Z = B.                     (1)
+This uses sum 2^(-i)=2 and sum i*2^(-i)=2, and holds even for the lower corrections. Compare the old equal-order bound O(k log Z) with k growing at least as loglog R/logloglog R to control the many groups. Here k0 can be fixed for a uniform relative tolerance, or grow arbitrarily slowly for vanishing tolerance.
+
+## 2. Improved hybrid cutoff with the earlier Fourier certificate
+
+In the previous hybrid construction let R be balanced, P=P_R<=sqrt X, r=pi_o(R), S=floor(R/loglog R), and ell=ceil(P^(4/11)). Keep its base density alpha and its ambient local intervals at primes S<f<=R. Now take ANY Z>R with log Z=o(R). Choose k0->infinity sufficiently slowly that k0 log Z=o(R); then B=o(R) by (1). The previous common-frequency argument with M=ceil(P^(7/11)*exp(r)*P_S*exp(2B)) has log M/log P->7/11, the same ambient prime count and uniform low-frequency entropy margin. The high-frequency bound for each normalized intersection f_F is
+    (P*q_F/(2 ell (M+1)))^2/(alpha*w_F)
+      <= (1/4) exp(-B-log P_S+(log2-2+o(1))*r).
+Thus its period <=sqrt X exp(B) and variance <=exp(-.001r) as in the preceding note. Mertens gives Q^(-1)=O(R^2), exp(mu)=O(R^2), m=O(log R) for log Z=o(R). The coefficient weights are polynomial in R, so summing the errors after division by Q preserves o(1) relative L2 error on O(X) windows. The unsmoothed normalized mass likewise has o(X) error by periodicity, because sqrt X exp(B) R^O(1)=o(X). The grouped envelope mean error tends to zero. Therefore the preceding uniform-over-families macroscopic mass inequalities with ell unchanged hold for every such cutoff Z, without the earlier growth restriction log Z=O(R/loglog R). This does not enlarge the offset-twin radius S^2. No exponential error in r for the final grouped approximation is claimed. The gain in cutoff is useful e.g. log Z=R/sqrt(loglog R), with k0 tending to infinity slowly enough, and anchor mass kappa G/(Z-1)=o(X) still follows. This extension uses the earlier Fourier certificate, not a fresh numerical verification of it.
+
+## 3. Pin-only construction with a uniform maximum gap
+
+A different tradeoff is obtained by pinning ALL base primes through S, with no ambient ordinary intervals at primes S<f<=R. Write P_S for the odd primorial, K=2P_S. Work in j=J/2 coordinates. The surviving indicator is
+    f_sv(j)=P_S * 1_(P_S|j) * prod_(S<f<=Z)(1-b_f),
+    Z=floor(exp(3S)).
+Every cut is an ordinary S barrier and its two neighbors avoid all odd primes <=Z. Indeed for p<=S it is a multiple of p, and for S<p<=Z the additional sieve excludes +/-1. The ordinary barrier follows directly: for an event of label p<=S, H=pq+e, q odd, the next even multiple of p after H is H+p-e, which is at least H+p-1; H itself is not divisible by p. Thus no event of label <=S crosses such a cut, including half-open endpoints. Every exact anchor H=J of an actual event has p>Z.
+
+The pin-only density is Q/P_S, and cut weight kappa=2P_S/Q. Mertens gives Q~(log S/log Z)^2, Q^(-1)=O(S^2), exp(mu)=O(S^2). Use section 1 at fixed relative accuracy eps=1/1000, with k0 a fixed sufficiently large integer (e.g. k0=10 satisfies the explicit factorial estimate). For each expanded intersection, the normalized nonnegative f_F has exact mean 1 and integer period P_S q_F. For ANY translate and ANY integer length n, its mean differs from 1 by at most P_S q_F/n: remove full periods and bound the remaining sum between zero and one full-period sum. No Fourier estimate is used. For f_sv, the pointwise grouped envelope, exact CRT expectations, weighted coefficient bound and (1) now imply, uniformly in ALL integer starting positions j,
+    | (f_sv)_ell(j)/Q - 1 | <= eps                       (2)
+for sufficiently large S, with
+    ell=ceil(P_S Z^(4k0+6) S^10).
+Here (f_sv)_ell is the forward average over ell positions. The residual normalized discrepancy is bounded by O((1+m)exp(mu) Q^(-1) P_S exp(B)/ell)=O(log S/S^6), and the relative envelope mean error is <=eps/2. In particular ell=exp(O_eps(S)), kappa=exp((1+o(1))S), and kappa/Z=o(1). This is a genuine uniform statement at the stated (possibly much larger than a typical gap) length: every interval of ell consecutive integer j positions contains a surviving cut. The full huge primorial P_Z is not used as a modulus in the analytic bound. The result applies to all translations, including ones outside a prescribed macroscopic window.
+
+More generally for ANY disjoint family of half-open even-horizon intervals, let G_* be its total physical length, n its interval count, and M its mass (2/Q times the sum of f_sv over their integer j positions). From (2), the inner/outer smoothing arguments give
+    (1-eps)(G_*-2(ell-1)n) <= M
+             <= (1+eps)(G_*+2(ell-1)n).                (3)
+There is no per-window exceptional set or extra o(X) term in (3). If the lower right-hand length is negative that lower bound is simply vacuous. In particular a cut-free contiguous recovery interval has length at most 2(ell-1). In the earlier last-exit corridor theorem any reset-free completed A1 corridor of gain >=1.5 T, for T>=8ell/3, must contain an actual crossing event, rather than being an exceptional long zero window. Whenever the previously established far geometry applies, such a crossing has p>S and is a far nonreset B event. This is a per-corridor exclusion conditional on that earlier corridor geometry, not a bound on how many B crossers can occur. If a corridor ends in a reset it is not included in this conclusion.
+
+## 4. Interior cuts, near-endpoint mass and the new crossing-clock alternative
+
+Use V=4 floor(S^2/4) and the preceding launch/landing/bypass geometry. In a crossed physical block of total gain G, for ANY threshold T>S, the number of events p>=T is <=G/(T-1). Each such event has at most one exact anchor, one near-launch and one near-landing cut, since K>2V for large S. Hence the mass of ALL these non-bypass cut incidences from p>=T is at most
+    3 kappa G/(T-1).                                    (4)
+The endpoint estimate is a simple count and does not require finite twins or completed recovery corridors. At p>=512ell+1 the right-hand side is o(G), since ell/kappa tends to infinity. Conversely each actual event of such a label has deep-interior bypass mass at least
+    (1-eps)(g-3V/2-4-2(ell-1)).                       (5)
+Indeed take the integer even positions strictly satisfying H+V<J<H'-V/2, an interval of length at least g-3V/2-4; apply (3). Such cuts satisfy the bypass criterion, and the lower bound is positive at the stated threshold. Their total mass over any disjoint high-event collection is at least (1-eps) times its gain minus the corresponding per-event boundary charges. Thus large bypass jumps are not rare merely from the cut geometry: once g exceeds this uniform smoothing length by a large constant, they necessarily provide almost their physical gain in normalized interior mass. This identifies which dynamical resource must be controlled; it is not an upper supply bound on those events.
+
+Let X be large on a hypothetical infinite fixed canonical ray, and consider the actual contiguous block crossing [X,16X], as in the previous crossing-clock theorem. Choose S=S(X)->infinity with S=o(log X) (for instance S=floor(loglog X) or the larger S=floor(log X/logloglog X)), so ell=X^o(1), T=512ell+1=o(sqrt X). Put G=15X+O(sqrt X), d_a<=5X+O(sqrt X), d_b>=0, and total elapsed ticks W. Every high event p>=T crosses at least one cut by (5). Let U be total gain of p<T (equivalently all events outside the high crossing family), M_low mass of its actual cut-crossing events, n_low their number. Let F_long be total gain of high events with 4w>=g, and m_H high count <=G/(T-1). The mass bounds on the full block and the disjoint high jumps give
+    (1-eps)(G-2(ell-1))
+       <= M_low+(1+eps)(G-U+2(ell-1)m_H),
+hence
+    U <= M_low + 2eps G + 2ell G/(T-1)+2ell.           (6)
+The exact old clock balance is 2W=G+d_b-d_a and
+    G-2d_a <= 4W-G <=11U+(7+8/(T-1))*F_long,
+using w<=2p and the long/fast split. Substitute (6) with eps=1/1000 and T=512ell+1. The constant error from 11*(2eps+2ell/(T-1))*G is <X eventually, and ell=o(X). Thus for all sufficiently large crossed windows,
+    3 X <= 11 M_low+(7+8/(T-1))*F_long.               (7)
+Also (3) bounds M_low <= (1+eps)(T-1+2(ell-1))*n_low. Therefore, on EVERY such window, at least one of
+    n_low = Omega(X/ell),
+    F_long = Omega(X)
+holds, where the former counts actual surviving-cut crossers S<p<T and the latter consists of ALL long p>=T events. Constants independent of S,X (eps,k0 fixed). This is unconditional, except for the premise that the canonical ray reaches the window. If twins are finite and S exceeds their last lower member, moderate crossings p<=S^2 are strict, have w<=2S, and satisfy the thickened corridor estimates in the earlier note. High crossings instead have asymptotically negligible endpoint mass by (4) and provide deep bypass mass by (5).
+
+For S=floor(loglog X), ell=exp(O(S))=(log X)^O(1), so the count alternative is Omega(X/(log X)^C0) for a fixed C0. For any S->infinity,o(log X), it has exponent 1-o(1). This is a different scale alternative than the earlier hybrid X^(9/11) middle-count statement: the threshold of the large branch is reduced to exp(O(S)), and its long events need not have prime cofactors. In particular it cannot replace the earlier cube-threshold prime certificate. One may apply the two constructions separately on the SAME ray; no statistical independence or comparison between their chosen crossing sets is assumed. The new result also gives an elementary way to use cut-free recovery corridors without a Fourier exceptional-set term. It does not force the low-count branch to fail or eliminate the lower-threshold high long branch. The latter may be supported by labels between T and the cube threshold. The next task is to upper bound the required low-count/high-long supply using additional MIN dynamics, not just refine the cut geometry.
+
+## 5. Finite diagnostics and persistence
+
+[Audit 8269f5a](https://github.com/tara-sooo/A166944-Lean/blob/8269f5a78d76b63a2c070ca7355a222e0a07d749/research/min_direct_variable_order_pinned_sieve_audit.mjs), blob cad6d37e046677e5c155ec1ae31f8ceff04e9b6b. Exact remote readback. Run node research/min_direct_variable_order_pinned_sieve_audit.mjs 20000. Actual ECMAScript executed in tool runtime. 30000 exact BigInt pointwise grouped envelope controls with variable orders; 25 exact factorial relative-error majorant checks; 660 exact weighted log-support controls. Three finite pinned sieve periods (S,Z)=(3,11),(5,13),(7,17), exact enumerated means, 9000 translated interval discrepancy and 9000 uniform full-period smoothing checks, 2115 cyclic gap checks (max finite physical gap1260). These finite smoothing controls use exact full periods, not the asymptotic truncated-modulus length ell. 9998 canonical odd roots through20000,150828 actual MIN events,0 unresolved cap180. 29109 block/cutoff controls with exact mass partition, coverage and clock balances;65801 event-crossing incidences,39931 anchors,61841 deep-bypass cut incidences,74397 other cut incidences. All anchors verified p>Z, every crosser p>S. The finite controls use finite T=2Z+1 and full-period smoothing, not the asymptotic T=512ell+1. All assertions passed. The uniform analytical smoothing, high-threshold mass bounds and asymptotic (7) are paper deductions, not numerically verified constants. No Lean executable/kernel verification, external novelty claim or final contradiction. Main and sibling branches not modified.
