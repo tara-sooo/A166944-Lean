@@ -650,7 +650,7 @@ stationary-sieve reduction.
 
 ## 9. Executed reproducible audits
 
-All three scripts below were executed in the
+All four scripts below were executed in the
 ECMAScript research runtime, fetched at the
 exact remote commit, and independently re-run
 with identical output. Reproduce with node.
@@ -795,7 +795,8 @@ of the forbidden sets; this audit
 does not implement a separate joint
 hazard test (jointHazardChecks=0).
 The finite joint adaptive-moment
-controls are in audit A.
+controls are in audit A; a separate complete-period
+joint preemption audit is given in D.
 
     L       samples    restricted success   Pi conditional   mu_1 estimate by (13)
     96        4096          .60498             .990569            5.21602
@@ -820,6 +821,54 @@ of endpoint basin counts; different
 sample means in B and C need not agree
 exactly. No claim that F_y(y) tends
 to one is made.
+
+D. research/min_local_negative_exact_absorption_joint_moments_audit.mjs
+   commit 0cddfa7f811e0a05edd8bac13109a6c7037d597e
+   blob 4028b6f968496281ce155099a6333655209e69e3
+
+Independent exact integer computation of (11)-(13)
+on complete restricted residue periods for L=6,12,18
+and y=L+1. The largest period contains 3,233,230
+canonical classes, with 757,350 y-rough classes.
+For every rough class and every canonical offset
+within budget, run the restricted tick rule to
+the target or failure and record omitted residue
+sets. Calculate the exact survival numerator as
+a product over omitted p of p-2-|B_p|, with common
+denominator prod(p-2). For second moments use
+the UNION of forbidden residues for each ordered
+pair of restricted ancestors. Compare the resulting
+exact rational moments with those in 8d83274
+and audit A.
+
+    complete periods                         3
+    rough low classes                   760350
+    offset controls                    3038370
+    restricted ancestor incidences     1901947
+    joint ancestor tuples              5690479
+    joint survival subset checks       5690479
+    exact rational moment comparisons        6
+    independent root enumerations        10080
+    root mass transport comparisons          2
+
+All comparisons passed, including all six rational
+values. The independent root enumeration is for
+L=6,12 only, while the complete rough class
+enumeration covers L=18 as well.
+
+    L   exact restricted fraction  nu_1       mean Pi
+     6       54/70                 1.8        .91488486
+    12       6373/10010            2.145791   .95101462
+    18       1895520/3233230       2.502832   .97289605
+
+The last fraction is .5862620... . These exact
+small-budget fractions are not monotone; in particular
+the sampled increase at larger L cannot be justified
+by a monotonicity assertion for restricted fractions.
+Mu_1 is nondecreasing, but the factor V(y) in (13)
+decreases with y. The second moment comparison here
+checks the correlated joint omitted-clock survival,
+not a product of marginal survival probabilities.
 
 ## 10. Research status
 
