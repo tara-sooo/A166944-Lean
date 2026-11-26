@@ -346,3 +346,20 @@ Broad normalized waits, large projected multipliers, larger relays and unrestric
 | A20 | Alternating:58 exact anchors,152651 repairs,57 deterministic low bridges0 success (17 stop,40 exceed cap);31 horizon-only DAG tests19 reachable | COMPUTATION; exact local anchors, finite initial-prefix sampling, no canonical ancestry |
 
 The models deliberately fail connecting congruences and some small-label cut constraints, so are not survivors of all MIN theorems. Next restore actual horizon divisibility in connectors before clock/competition. No Lean or finite-twin contradiction.
+
+## Checkpoint XXII — horizon-exact bridges, inverse clock reachability and terminal obstructions
+
+[Horizon clock bridge paper](https://github.com/tara-sooo/A166944-Lean/blob/868f74c33f36b66301f308a2ab17614f03e9c4e4/research/infinite-orbit/horizon_clock_bridge.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D88 | Exact horizon DAG path ending with prescribed arrival parity and E<=W<=2E admits parity-respecting scalar waits by rounding linear interpolation; endpoint envelope margins >=1 suffice | PAPER; all neighbor divisibility restored; clock divisibility not automatic |
+| M04 | Under finite twins, any eligible-factor horizon ray from canonical above last twin, choose parity-respecting waits tracking sqrt2 H; eventually t=sqrt2 H+O(1), unbounded labels | CONDITIONAL RELAXED INFINITE MODEL; no clock congruences or macro exact anchor guarantee |
+| D89 | Exact-clock last predecessor at (J,t), side s=t mod2, must divide gcd(J+2s,t-2s) with cap and predecessor eligibility. At XXI anchor pretime n-u use gcd(pq+1+2s,2pk-u-2s); u=1 excludes label3 by gcd(q,k)=1 | PAPER; necessary last-edge filter |
+| D90 | For q interval length >=c T/sqrt(log T), p in [T/2,T], cap R<=T/8, proportion among odd q admissible anchors with no low predecessor at BOTH u=1,2 >=1-3 sigma+1/9-o(1)>.45-o(1), sigma=sum odd prime 1/l²<.22 | PAPER; uniform irrational rotation and prime-count tail, tracks S=floor(sqrt(log T)) retain macro obstructed anchors; not original shorter track uniformity |
+| D91 | Exact per-label clock map f(t)=next clock; preimage of [a,b] is [a_*-2p,b_*-1] or empty. Backward unions on horizon DAG give exact clock-relaxed reachability; forward min/max only necessary | PAPER; arbitrary eligible choices, competition still relaxed |
+| D92 | Flexible target pretime interval [n-wmax,n-1] for exact anchor computed against all competing labels; fixed poststate permits concatenation via anchor DAG | PAPER; finite chain compatibility, no infinite extension claim |
+| A21 | 1239 anchors,1123 lack low predecessor at u=1,852 at both u1,2,675 throughout feasible wait interval;80 prescribed pairs30 horizon reachable,22 parity and scalar,1 fixed and11 flexible exact-clock,0 deterministic | COMPUTATION; witnesses restore both congruences but fail competition |
+| A22 | Adaptive first16 anchors X1048576,42 pairs up to3 indices ahead,13 exact-clock feasible, longest4-anchor chain;7 literal forward/backward comparisons incl1 nonempty,403998 states;123970 single-edge inverse checks | COMPUTATION; local finite same-track chain, no canonical ancestry or asymptotic inference |
+
+Infinite macro anchor construction with both divisibility laws remains unresolved. Earliest/minimum competition is still relaxed on the successful finite bridges. No Lean or finite-twin contradiction.
