@@ -42,3 +42,19 @@ Next registry expansion: extract exact statements and dependency graph from all 
 | U01–U05 | dense actual source allocation / collision and missing supply | not imposed | not imposed |
 
 These columns refer to DIFFERENT structures; their intersection remains open. The finite common-root obstruction uses only positive event congruences, not artificial factors. The scalar construction does not license an inference from selected time clocks to actual first-hit recurrence. No full theorem inventory or Lean verification yet.
+
+## Checkpoint III — exact standard horizon/clock constraints
+
+[Phase graph paper](https://github.com/tara-sooo/A166944-Lean/blob/252201a0a16a1bf1b3dd69c508e8309872683940/research/infinite-orbit/phase_graph.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L12 | Exact maximum wait W(H,p): min(2p, smaller same-side 2q-2, larger same-side 2q, opposite 2q-1) | PAPER proof by previous-clock gaps and CRT attainment, all standard even H, arbitrary time, not canonical ancestry |
+| L13 | For fixed standard horizon word, full earliest-hit/least-tie time cylinder: parity plus allowed residue sets for each factor q | PAPER exact equivalence, fixed waits, bounded interval must also meet resulting classes |
+| L14 | H/2<=t<=3H+3 for canonical adaptive states | PAPER necessary envelope, not sufficient ancestry |
+| D05 | High long edges p>=eta sqrt X,w>=p-2 require rough neighbors; eventually at most one eligible factor per side, semiprime or prime; possible H density o(1) | PAPER; initial source density, not later source-weighted transport |
+| D06 | Max good-run gain L bounds interruptions: G_good<=L(1+b_lo+U_hi/(T-1)) | PAPER, actual block with longSafe good events; uniform L=O(sqrt X) OPEN |
+| D07 | Bounded integer-slope tube t=mH+O(1) at large consecutive labels forces even side and exact line m=1 or2 | PAPER; residual one-sided prime chain, not all variable-slope rays |
+| A01 | Finite factor/clock DAG and exact bounded-phase max-run computation | COMPUTATION X=4096,16384,65536,262144, fixed K210,V12. Actual standard segments with envelope, not verified canonical ancestry; no asymptotic extrapolation |
+
+II-B's uninterrupted all-high long safe scalar model fails in all four tested windows even after relaxing phase consistency; exact MIN segments of two and three events nevertheless exist. The intersection of all constraints across arbitrary scales remains open. No new Lean verification.
