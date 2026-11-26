@@ -168,3 +168,19 @@ Large-denominator high states, strong complementary gain, positive-drift resonan
 | A08 | 64512 canonical roots,16702 targeted starts,1761174 events,122013 pair identities,67888 moment checks,120 integer-lattice censuses,152 upward cofactor repeats | COMPUTATION; all final tests pass, no repeated ordered pair within a tested list, no asymptotic constant inference |
 
 Large cofactor and denominator supports remain compatible. No full all-constraint infinite model, general uncapped bound, Lean verification, or finite-twin contradiction.
+
+## Checkpoint XI — coupled prime factors, shared-factor toll and rational factor strips
+
+[Factor pair paper](https://github.com/tara-sooo/A166944-Lean/blob/9007a10158e4e6a084f826f3e7268d145e737fc0/research/infinite-orbit/factor_pair.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L24 | Actual selected semiprime H=pq+e, p<=q, p>=T~sqrt X: products strictly increase, unordered factor edges unique, a prime cannot be a later cofactor after appearing as selected label | PAPER; all waits if q prime, asymptotically every positive high event |
+| D32 | Any two visits sharing factor v have H_j-H_i>=2v-2. Adjacent selected visits pay E>=2v-p_i-1>=p_i-1; cofactor v>p_i becoming next label pays E>=v(v-p_i)-p_i-1 | PAPER; no narrow-band condition, nonadjacent interval cannot charge selected gains to complement |
+| D33 | Sum shared adjacent source gain <=U full complement, so macro semiprime selected gain with U=o(X) has F-o(X) source gain in disjoint four-factor transitions with E=o(T) (suitable slow cutoff) | PAPER; positive population or actual semiprime selection only, not forced small U |
+| D34 | Prime v has <=1+floor((D+2)/(2v)) visits in a prehorizon interval D across both roles; role handoff requires v² in interval enlarged by1 | PAPER; square and handoff identity counts O(D/(T log T)) when D>=T^(1+eps) |
+| D35 | Fixed reduced factor ratio u/v>=1: gain of actual semiprime events abs(vq-up)<=K is O(X K/log²X + 1_(u=v=1) X/log X) via averaged two-form sieve; zero line only squares at large X | PAPER; no clock or U bound, fixed ratio or finite collection, not arbitrary growing ratio family |
+| D36 | Uniform localized strip gain O(D K/log²X + 1_(u=v=1) D/log X) on translated interval D>=T^(1+eps); original-tag sum with actual lifetime lengths | PAPER; shorter recycling bins require smaller logarithm; no omitted-mass conclusion |
+| A09 | 64512 canonical roots,9959 targeted states,1616573 events,59553 consecutive pair checks,1142 shared toll checks,2218 repeated factor controls; 72 independent lattice/product census comparisons | COMPUTATION; all pass; no role handoff observed; actual arbitrary intermediate ancestry unverified |
+
+Four-distinct-factor close transitions, composite cofactor fast events and general diverse factor supports remain. No full all-constraint survivor, uncapped general run bound, Lean verification or finite-twin contradiction.
