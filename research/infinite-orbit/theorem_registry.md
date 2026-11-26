@@ -88,3 +88,19 @@ No all-constraint infinite survivor or final contradiction. Medium relays, bad h
 | A03 | Exact unit-stratum mixed continuation with frozen arrival, and canonical first-good prefix scan | COMPUTATION; 261120 distinct roots incl43081 prime; 29026 unit cases pass; 6514 feasible arbitrary-state unit triples; max high count <=3 in four finite windows; ancestry of maxima not checked |
 
 Uniform later mixed-run bound L_R remains OPEN. No Lean verification, full all-constraint model, or finite-twin contradiction.
+
+## Checkpoint VI — signed recovery ledger and bounded-multiplier mixed-run capacity
+
+[Recovery budget paper](https://github.com/tara-sooo/A166944-Lean/blob/956c288e4152e8f35e1f7fbcc5c34bca02dd2c76/research/infinite-orbit/recovery_budget.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D14 | Good p>=T, drift >=delta g, low relays <=M_R, alpha=delta-M_R/(T-1)>0: cumulative good gain F_j implies d'_j-d_start>=alpha F_j and strictly increasing good post-deficits inside a mixed run | PAPER; long condition w>=p-2 uses delta=1-2/(T-1) |
+| D15 | Per mixed run all good gain with post d'<=D is <=D/alpha, even with deep vertices interspersed; full span if h<=k is <=(2kB+6)(1+M_R/(T-1))/alpha | PAPER; uniform O(sqrt X) at fixed R,k and square-root T, uncapped run bound remains open |
+| D16 | Adjacent deep-to-shallow good highs in a mixed run require (2k-1)p2>=2h1 p1-M_R-9 under long condition; unit return needs ratio >=4-o(1) | PAPER; relative multiplier may fall despite strictly growing absolute deficit |
+| D17 | Stop actual block once at last capped good; signed recovery P^-_bad >=alpha F - d_b+d_a - M_R(1+U_m/(r_R-1)+U_h/(T-1)); alpha F_cap<=D+M_R+c_m U_m+c_h U_h | PAPER; all earlier good gain in exact endpoint bound, actual physical budgets, no repeated boundary cost |
+| D18 | Fixed R, D=o(X), square-root long good macro capped gain forces macro medium/bad-high gain; if interruptions submacro, later good d'=Omega(X), h=Omega(sqrt X) after macro cumulative good gain | PAPER; no finite-twin assumption needed conditional on actual block; deep/positive-drift survivor remains |
+| U06 | Sum D17 once per full original tag: N(D+M_R) boundary; exact weighted cores use (D+M_R)sum b_Q instead | PAPER; no automatic missing-measure/core conclusion or implication from 4w>=g to positive ordinary drift |
+| A04 | Actual recovery audit incl prescribed strata, weighted costs, upward returns | COMPUTATION; 1,402,869 event incidences, 161077 exact endpoint checks, 1098 positive exact demand; zero coarse macro-cap positive-demand examples; not Lean |
+
+No full all-constraint infinite survivor, arbitrary uncapped run bound, or finite-twin contradiction.
