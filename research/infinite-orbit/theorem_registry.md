@@ -329,3 +329,20 @@ Larger relay/elapsed budgets, arbitrary long words with no narrow projection, fu
 | A18 | 39205 length3..5 words,406160 template rows,771404 composed-span controls,13504 repeat tolls,31128 zero-source tolls,354186 affine extensions,672966 pairwise nonproportionality controls;10 independent exact pattern sets all locally MIN | COMPUTATION; standard corpus,232 small-cutoff incidences incl214 long elapsed, no analytic sieve or macro hypothesis tested |
 
 Broad normalized waits, large projected multipliers, larger relays and unrestricted simultaneous congruences remain. No full all-constraint model, Lean or finite-twin contradiction.
+
+## Checkpoint XXI — irrational-clock stitched survivor
+
+[Stitched survivor paper](https://github.com/tara-sooo/A166944-Lean/blob/85dad2f9e88535c5722120e6806219c4e7ecde45/research/infinite-orbit/stitched_survivor.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D85 | For odd q>=prime p, k=floor(q/sqrt2), gcd(q,k)=1, H=pq+1,n=2pk, t=n-1 gives exact MIN p,w=1,s=0. Any fixed rational projection Nc-Ma=(N sqrt2-M)q+O(1) | PAPER; exact local anchors, not global ancestry |
+| D86 | Uniformly q=Theta(T), intervals length Q>=c T^(3/4) contain Omega(Q) admissible odd q; bad common factors >D cost O(Q/D+sqrt T) via quadratic irrational spacing; bad fraction among odds <=sum odd-prime 1/l²+o(1)<.22 | PAPER; ordinary irrational equidistribution and divisor bounds, no twin-prime assumption |
+| M01 | Infinite stitched scalar model X=16^i, T=sqrt X, S=floor(T^(1/4)) tracks of distinct p in [T/2,T], separated exact anchors: Theta(T) anchors and Theta(X) anchor gain per block, all fixed narrow rational projections avoided | RELAXED MODEL; growing support, positive linear deficit, connectors NOT exact MIN |
+| M02 | Alternating p/r bands [T/2,5T/8],[7T/8,T] in 512T bins, each of two 240T slots, positive fraction both occupied by bad-q bound; 2S label support, Theta(X) anchor gain, adjacent gaps >=T/4 | RELAXED MODEL; repeated pair within segment, macro connector gain, not arbitrary all-distinct words |
+| M03 | Greedy prime-gain connectors below T/8 with balanced waits floor(WG/E) differences, E<=W<=2E. Exact scalar gain/clock envelope, t/H->sqrt2, ordinary deficit nonnegative, macro complementary gain | RELAXED MODEL; no exact connector neighbor/clock divisibility or competition, no actual upward anchor supply, not all constraints |
+| D87 | Fixed bounded connector label alphabet cannot repair all prescribed bridges since low-only exact horizon paths cannot cross fixed primorial cuts and connector gain grows at least linearly in T | PAPER; growing cap reachability not settled |
+| A19 | Track:1181 exact anchors,162751 repairs,159183 horizon and159104 clock failures,54 actual repairs;1180 deterministic low bridges 0 success (313 stop,867 exceed cap);72 horizon-only DAG tests25 reachable | COMPUTATION; explicit failures, finite prescribed endpoints, no general impossibility |
+| A20 | Alternating:58 exact anchors,152651 repairs,57 deterministic low bridges0 success (17 stop,40 exceed cap);31 horizon-only DAG tests19 reachable | COMPUTATION; exact local anchors, finite initial-prefix sampling, no canonical ancestry |
+
+The models deliberately fail connecting congruences and some small-label cut constraints, so are not survivors of all MIN theorems. Next restore actual horizon divisibility in connectors before clock/competition. No Lean or finite-twin contradiction.
