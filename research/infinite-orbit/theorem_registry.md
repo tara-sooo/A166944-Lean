@@ -104,3 +104,18 @@ Uniform later mixed-run bound L_R remains OPEN. No Lean verification, full all-c
 | A04 | Actual recovery audit incl prescribed strata, weighted costs, upward returns | COMPUTATION; 1,402,869 event incidences, 161077 exact endpoint checks, 1098 positive exact demand; zero coarse macro-cap positive-demand examples; not Lean |
 
 No full all-constraint infinite survivor, arbitrary uncapped run bound, or finite-twin contradiction.
+
+## Checkpoint VII — deep inverse resonance and reverse branching
+
+[Deep inverse paper](https://github.com/tara-sooo/A166944-Lean/blob/b6a2dd4a675afb63715c663a8ac0b9a922e783fb/research/infinite-orbit/deep_inverse.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L19 | At post (J,n), side s=n mod2, possible incoming label p divides gcd(J+2s,n-2s); exact wait interval from competitor previous gaps and canonical envelope | PAPER; at most two distinct labels p>=eta sqrt X, not two pre-times; arbitrary feasible intermediate states need not have ancestry |
+| D19 | Distinct incoming high p,r force J=a pr-2s,n=c pr+2s, bounded integer a even,c, rational corrected slope c/a; positive nonreset d'-6s>=2pr, h_p>=r,h_r>=p | PAPER; reset exception, same-label merges unrestricted by this test |
+| D20 | Both labels long => ar-1,ap-1 prime; two-form upper sieve gives O(X/log^4 X) collision states, uniformly O(D/log^4 X) in translated interval D>=X^(1/2+epsilon) | PAPER; physical distinct states, not tagged multiplicity |
+| L20 | Exact reversed compressed high/low graph: in-degree <=8 times the offset-set size (1+floor(B/T)), with each candidate checked by inverse and actual forward competition | PAPER; fixed R and square-root band, no ancestry claim |
+| U07 | From first designated shallow high entry after gain <=D0=o(sqrt X), at most k highs with only low relays: source multiplicity <=(floor(D0/4)+1) sum_{j<k} (D_R^rev)^j; polylog D0 and k=o(log X) imply X^o(1) | PAPER; restricted history, not total unified mass |
+| A05 | 45,334,999 local arrival candidates, 1,849,266 feasible incidences, 40 distinct-label collision state incidences (all deep), 482 actual forward mixed pairs reverse-checked; 64,512 canonical roots show substantial equal-label merges | COMPUTATION; no Lean verification or asymptotic proof from finite data |
+
+Uncapped arbitrary mixed-run bound, full all-constraint infinite survivor and finite-twin contradiction remain open. 
