@@ -135,3 +135,19 @@ Uncapped arbitrary mixed-run bound, full all-constraint infinite survivor and fi
 | A06 | 64512 canonical roots,4608 targeted starts,1503465 actual events; 283 reverse checks,20 independent full integer-time enumerations,46948 cost-depth capacity checks; canonical narrow-band 15-source unit cohort, 9 first arrivals and 6 paid returns | COMPUTATION; all pass; no exhaustive asymptotic verification |
 
 Uncapped high-deficit regime and weak/short high population remain; no all-constraint infinite model, Lean verification or finite-twin contradiction.
+
+## Checkpoint IX — rational clock locking and transverse crossing costs
+
+[Rational clock paper](https://github.com/tara-sooo/A166944-Lean/blob/41dfbb76ed6d5ee4d5a6be42b8fe8218acc31469/research/infinite-orbit/rational_clock.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L22 | Corrected slope mu=(n-2s)/(J+2s); for reduced a/b, p divides Z=b(n-2s)-a(J+2s), so abs(Z)<T at p>=T forces exact resonance | PAPER; b odd forces even arrival side on resonance; includes resets |
+| D23 | Same-slope consecutive selected high post-states: w_j-mu g_j=mu E-W+2(1+mu)(s_j-s_i); absolute mismatch <=4E+10 | PAPER; arbitrary actual relays and waits, no deficit cap |
+| D24 | Reduced denominators <=Q: slope switch requires E+g>=X/(9Q²). Under 18 B Q²<=X, switch relay pays its own ending mismatch; sum mismatch <=4U+10(k-1)+4B | PAPER; uniform Q=o(X^(1/4)) at square-root B |
+| D25 | Locked-scale fast gain 4w<=g <=16U+40(k-1)+16B; deep nonpositive drift and long events below slope 1 have analogous mismatch bounds | PAPER; selected small-denominator population, not all deep high states |
+| U11 | Canonical root sentinel slope 1/2 removes initial 4B credit (Qstar=max(2,Q)); nonreset denominator b>=X/(6+5G0); reset-to-nonreset selected relay E>=(X/Q-6)/5-B | PAPER; actual full tagged lifetimes, no automatic missing-mass implication |
+| D26 | Diagonal L=n-J-4s divisible by p; strict opposite signs cost E>=(2T-B-5)/2, zero requires n=J even; long downward and fast upward sign/zero transitions have stronger costs | PAPER; any selected high list, no denominator cap |
+| A07 | 532803 start incidences incl27648 canonical,13484128 events; 3053230 alignment checks,763 strict diagonal crossings,1347 literal GCD controls | COMPUTATION; all assertions pass, no locked-scale switches or low-Q canonical nonreset entries observed |
+
+Large-denominator high states, strong complementary gain, positive-drift resonant trajectories and diagonal zeros remain. No full all-constraint infinite model, uncapped mixed-run bound, Lean verification or finite-twin contradiction.
