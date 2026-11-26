@@ -112,10 +112,9 @@ function audit(N=30000){
   for(let j=1;j<=w;j++){let n=t+BigInt(j),I=n%2n;assert(gcd(n-2n*I,H-1n+2n*I)===BigInt(j===w?p:1),"literal witness");st.actualWitnessTicks++}
   rows.push({H,d,p,w,I:0,dp:2*p});H+=BigInt(p-1);t+=BigInt(w)
  }
- for(let [S,R,V] of [[7,47,49],[11,47,121],[13,47,169],[47,3600,4900],[71,5233,6000]]){
-  // Big primorial choices would overflow Number; restrict to S<=13 for direct enumeration.
-  if(S>13)continue;let c={S,R,V,small:pr.filter(f=>f<=R),extra:pr.filter(f=>f>R&&f<=V),K:2*prod(pr.filter(f=>f<=S))};inspect(rows,c,3500,"witness")
+ for(let [S,R,V] of [[3,5,7],[5,13,25],[7,47,49],[11,47,121],[13,47,169],[73,3600,5329],[79,5233,6241]]){
+  let c={S,R,V,small:pr.filter(f=>f<=R),extra:pr.filter(f=>f>R&&f<=V),K:2n*bigprod(pr.filter(f=>f<=S))};inspect(rows,c,3500,"witness")
  }
- assert(st.longZeroRuns&&st.cutFree&&st.cutFreeHigh&&st.resetBad&&st.localL2Controls,"coverage");return st
+ assert(st.longZeroRuns&&st.cutFree&&st.cutFreeHigh&&st.resetBad&&st.crossBad&&st.extendedGood&&st.extendedModerate&&st.localL2Controls,"coverage");return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||30000)),null,2));
