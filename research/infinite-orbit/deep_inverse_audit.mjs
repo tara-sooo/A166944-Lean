@@ -58,7 +58,24 @@ if(prime(q1)&&prime(q2))primePairChecks++;else cofactorExceptions++;
 seenPairs.add([Math.min(p,r),Math.max(p,r),a].join(","));
 if(collisionExamples.length<4)collisionExamples.push({H2,n,p,r,a,c,d:2*n-H2,h:v.map(z=>(2*n-H2-6*s)/(2*z.p)),cofactors:[q1,q2],waits:v.map(z=>[z.l,z.u])});
 }
-results.push({X,T,B,candidate,arrivals,feasible,deep,gcdChecks,possibleRational,collided,deepCollided,ambiguousLabelIncidences,maxIncoming,primePairChecks,cofactorExceptions,distinctPairs:seenPairs.size,collisionExamples,sampled,maxBack,backAmbiguous,prevExamples})
+
+// Canonical controls: source-weighted visits versus distinct physical post states.
+let canon={roots:0,events:0,stops:0,exits:0,unresolved:0,goodVisits:0,deepVisits:0,maxMultiplicity:0,multipleSources:0,multipleLabels:0,multipleTimesSameLabel:0,firstGoodVisits:0,maxFirstMultiplicity:0,firstMultiLabels:0};
+let cmap=new Map(),fmap=new Map();
+function add(map,key,p,t){let v=map.get(key);if(!v){v={count:0,labels:new Map()};map.set(key,v)}v.count++;if(!v.labels.has(p))v.labels.set(p,new Set());v.labels.get(p).add(t);}
+for(let H0=X;H0<Y;H0+=4){canon.roots++;let H=H0,t=(H0+6)/2,seen=false,terminal=false;
+for(let i=0;i<3000&&H<Y;i++){let a=first(t,elig(H));if(!a.p){canon.stops++;terminal=true;break}canon.events++;
+let H2=H+a.p-1,n=t+a.w;
+if(a.p>=T&&a.w>=a.p-2){canon.goodVisits++;if(2*n-H2>=X/4)canon.deepVisits++;let key=H2+","+n;add(cmap,key,a.p,t);if(!seen){seen=true;canon.firstGoodVisits++;add(fmap,key,a.p,t)}}
+H=H2;t=n;
+}
+if(H>=Y)canon.exits++;else if(!terminal)canon.unresolved++;
+}
+for(let [key,v] of cmap){canon.maxMultiplicity=Math.max(canon.maxMultiplicity,v.count);if(v.count>1)canon.multipleSources++;if(v.labels.size>1){canon.multipleLabels++;let [H2,n]=key.split(",").map(Number);ok(inverse(H2,n).length>=v.labels.size,"canonical inverse collision");}if([...v.labels.values()].some(t=>t.size>1))canon.multipleTimesSameLabel++}
+for(let v of fmap.values()){canon.maxFirstMultiplicity=Math.max(canon.maxFirstMultiplicity,v.count);if(v.labels.size>1)canon.firstMultiLabels++}
+canon.physicalStates=cmap.size;canon.firstPhysicalStates=fmap.size;
+
+results.push({canon,X,T,B,candidate,arrivals,feasible,deep,gcdChecks,possibleRational,collided,deepCollided,ambiguousLabelIncidences,maxIncoming,primePairChecks,cofactorExceptions,distinctPairs:seenPairs.size,collisionExamples,sampled,maxBack,backAmbiguous,prevExamples})
 }
 return {relayOffsets:relays.length,literalChecks,reverseChecks,reverseEdges,relayChecks,results}
 }
