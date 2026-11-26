@@ -6,7 +6,7 @@ function elig(H){let b=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function mod(a,b){return (a%b+b)%b}
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let v=1+mod((i?q+2:0)-t-1,2*q);if(v<w||(v===w&&q<p)){p=q;w=v;s=i}}return {p,w,s}}
 function ok(x,m){if(!x)throw Error(m)}
-let summaries=[],totalEvents=0,capHits=0,runChecks=0,prefixChecks=0,recoveryChecks=0,weightedChecks=0,highChecks=0,nontrivial=0,shallowAfterDeep=0,negativeSmall=0,exactCostChecks=0,exactPositive=0,deepRecovery=0,examples=[];
+let summaries=[],totalEvents=0,capHits=0,runChecks=0,prefixChecks=0,recoveryChecks=0,weightedChecks=0,highChecks=0,nontrivial=0,shallowAfterDeep=0,negativeSmall=0,exactCostChecks=0,exactPositive=0,deepRecovery=0,upwardChecks=0,monotoneChecks=0,mediumCostChecks=0,upwardExamples=[],examples=[];
 const configs=[{R:3,M:4,r:5},{R:5,M:14,r:7},{R:7,M:34,r:11}];
 for(let X of [4096,16384,65536]){
 let Y=16*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1));
@@ -26,20 +26,21 @@ const {R,M,r,k,A,Q}=z, D=2*k*B+6;
 let good=e=>e.p>=T&&e.w>=e.p-2, shallow=e=>good(e)&&e.h<=k;
 let F=0,U=0,L=0,out=0,lastSh=-1,sh=0,nb=0;
 let runF=0,runL=0,runN=0,runSh=0,runHasDeep=false,runLive=false,runLastCap=0;
-let prevSh=null,betweenDrop=0,betweenGain=0,seenDeep=false;
-function finish(){if(runLive){z.goodRuns++;z.maxGoodRun=Math.max(z.maxGoodRun,runF);ok(runLastCap*A<=D*Q,"run cap");runChecks++;z.maxShallow=Math.max(z.maxShallow,runSh)}runF=runL=runN=runSh=runLastCap=0;runHasDeep=runLive=false}
+let prevSh=null,betweenDrop=0,betweenGain=0,seenDeep=false,prevGood=null;
+function finish(){if(runLive){z.goodRuns++;z.maxGoodRun=Math.max(z.maxGoodRun,runF);ok(runLastCap*A<=D*Q,"run cap");runChecks++;z.maxShallow=Math.max(z.maxShallow,runSh)}runF=runL=runN=runSh=runLastCap=0;runHasDeep=runLive=false;prevGood=null}
 for(let i=0;i<ev.length;i++){
  let e=ev[i];
  if(e.p<=R){L+=e.g;if(runLive)runL+=e.g}
- else{out++;if(good(e)){F+=e.g;if(!runLive){runLive=true;runF=runL=runN=runSh=runLastCap=0;runHasDeep=false}runF+=e.g;runN++;ok(runL<=M*(runN-1),"relay cap");ok(A*runF<=Q*e.d2,"growth lower");highChecks++;if(shallow(e)){runSh+=e.g;runLastCap=runF;ok(e.d2<=D,"shallow");capHits++;if(runHasDeep){z.deepThenShallow++;shallowAfterDeep++}}else runHasDeep=true}
+ else{out++;if(good(e)){F+=e.g;if(!runLive){runLive=true;runF=runL=runN=runSh=runLastCap=0;runHasDeep=false}if(prevGood){ok(e.d2>=prevGood.d2+e.g-2-M&&e.d2>prevGood.d2,"strict post monotone");monotoneChecks++;if(prevGood.h>k&&e.h<=k){ok((2*k-1)*e.p>=2*prevGood.h*prevGood.p-M-9,"upward return");upwardChecks++;if(upwardExamples.length<4)upwardExamples.push({X,R,k,first:[prevGood.H,prevGood.p,prevGood.h,prevGood.d2],second:[e.H,e.p,e.h,e.d2]});}}prevGood=e;
+ runF+=e.g;runN++;ok(runL<=M*(runN-1),"relay cap");ok(A*runF<=Q*e.d2,"growth lower");highChecks++;if(shallow(e)){runSh+=e.g;runLastCap=runF;ok(e.d2<=D,"shallow");capHits++;if(runHasDeep){z.deepThenShallow++;shallowAfterDeep++}}else runHasDeep=true}
  else {U+=e.g;nb++;finish()}}
  if(prevSh!==null){if(shallow(e)){let demand=prevSh.d2-e.d;ok(betweenDrop>=demand,"recovery telescope");recoveryChecks++;z.recoveryGain+=betweenGain;z.recoveryDemand+=Math.max(0,demand);if(demand>0){nontrivial++;if(examples.length<3)examples.push({X,R,k,from:prevSh.H,to:e.H,drop:demand,relayGain:betweenGain})}betweenDrop=betweenGain=0}else{betweenDrop+=Math.max(0,e.d-e.d2);betweenGain+=e.g}}
  if(good(e)&&!shallow(e))seenDeep=true;if(shallow(e)){if(seenDeep){deepRecovery++;seenDeep=false;}lastSh=i;sh+=e.g;prevSh=e}
  }
  finish();ok(L<=M*(out+1),"global low bound");ok(A*sh<=D*Q*(nb+1),"run-count bound");
- if(lastSh>=0){let pre=ev.slice(0,lastSh+1),f=0,u=0,neg=0,pos=0;for(let e of pre){if(good(e)){f+=e.g;pos+=e.d2-e.d}else if(e.p>R)u+=e.g;if(!good(e))neg+=Math.max(0,e.d-e.d2)}
+ if(lastSh>=0){let pre=ev.slice(0,lastSh+1),f=0,u=0,um=0,uh=0,neg=0,pos=0;for(let e of pre){if(good(e)){f+=e.g;pos+=e.d2-e.d}else if(e.p>R){u+=e.g;if(e.p<T)um+=e.g;else uh+=e.g;}if(!good(e))neg+=Math.max(0,e.d-e.d2)}
  let last=ev[lastSh];ok(neg>=pos-last.d2+ev[0].d,"negative resource");
- ok(A*f*(r-1)<=Q*((last.d2-ev[0].d+M)*(r-1)+(r-1+M)*u),"exact endpoint cost");exactCostChecks++;if(A*f>Q*(last.d2-ev[0].d+M))exactPositive++;ok(A*f*(r-1)<=Q*((D+M)*(r-1)+(r-1+M)*u),"gain cost");
+ ok(A*f*(r-1)<=Q*((last.d2-ev[0].d+M)*(r-1)+(r-1+M)*u),"exact endpoint cost");ok(A*f*(r-1)<=Q*((last.d2-ev[0].d+M)*(r-1)+(r-1+M)*um)+(Q+M)*(r-1)*uh,"medium and high separated cost");mediumCostChecks++;exactCostChecks++;if(A*f>Q*(last.d2-ev[0].d+M))exactPositive++;ok(A*f*(r-1)<=Q*((D+M)*(r-1)+(r-1+M)*u),"gain cost");
  let weight=1+(H0%17);z.weightedLhs+=weight*A*f*(r-1);z.weightedRhs+=weight*Q*((D+M)*(r-1)+(r-1+M)*u);
  prefixChecks++;if(f>D)z.nontrivialPrefix++;if(can)z.canonShallow+=sh;else z.arbitraryShallow+=sh;
  }
@@ -49,6 +50,6 @@ for(let i=0;i<ev.length;i++){
 for(let z of stats){ok(z.weightedLhs<=z.weightedRhs,"weighted");weightedChecks++}
 summaries.push({X,T,B,roots,intermediate,targeted,stop,exit,nCap,stats:stats.map(z=>({R:z.R,k:z.k,tags:z.tags,goodGain:z.goodGain,shallowGain:z.shallowGain,badGain:z.badGain,maxShallow:z.maxShallow,maxGoodRun:z.maxGoodRun,goodRuns:z.goodRuns,deepThenShallow:z.deepThenShallow,nontrivialPrefix:z.nontrivialPrefix,recoveryGain:z.recoveryGain,recoveryDemand:z.recoveryDemand,canonShallow:z.canonShallow,arbitraryShallow:z.arbitraryShallow}))});
 }
-return {totalEvents,capHits,runChecks,prefixChecks,recoveryChecks,weightedChecks,highChecks,nontrivial,shallowAfterDeep,negativeSmall,exactCostChecks,exactPositive,deepRecovery,examples,summaries};
+return {totalEvents,capHits,runChecks,prefixChecks,recoveryChecks,weightedChecks,highChecks,nontrivial,shallowAfterDeep,negativeSmall,exactCostChecks,exactPositive,deepRecovery,upwardChecks,monotoneChecks,mediumCostChecks,upwardExamples,examples,summaries};
 }
 console.log(JSON.stringify(audit(),null,2));
