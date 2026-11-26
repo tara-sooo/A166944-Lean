@@ -10,7 +10,7 @@ function elig(H){let B=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let v=1+mod((i?q+2:0)-t-1,2*q);if(v<w||(v===w&&q<p)){p=q;w=v;s=i}}return {p,w,s}}
 function gap(n,p,s,f){let W=2*p;for(let i=0;i<2;i++)for(let q of f[i])if(q!==p){let z=mod(n-(i?q+2:0),2*q);if(!z&&q<p)return 0;W=Math.min(W,z||2*q)}return W}
 function ok(a,m){if(!a)throw Error(m)}
-let totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,positive:0,primeCofactor:0,roughChecks:0,largeDenom:0,deep:0,pairs:0,sameCofactor:0,nonzeroShift:0,divisorChecks:0,pairBudgetChecks:0,tailChecks:0,cofactorMomentChecks:0,denominatorChecks:0,integerCensus:0,literalChecks:0,nonempty:0},results=[],examples={same:null,different:null,largeDenom:null,positive:null,repeatedPair:null},census=[];
+let totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,positive:0,primeCofactor:0,roughChecks:0,largeDenom:0,deep:0,pairs:0,sameCofactor:0,narrowSame:0,samePaid:0,cofactorMonotone:0,nonzeroShift:0,divisorChecks:0,pairBudgetChecks:0,tailChecks:0,cofactorMomentChecks:0,denominatorChecks:0,integerCensus:0,literalChecks:0,nonempty:0},results=[],examples={same:null,different:null,largeDenom:null,positive:null,repeatedPair:null},census=[];
 for(let X of [4096,16384,65536]){
 const Y=4*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1)),C=108,Lmax=Math.floor((Y+B+2)/T);
 let stats=[{name:"all",test:e=>true},{name:"large-denom",test:e=>e.b>=T/2},{name:"positive",test:e=>2*e.w>e.g},{name:"fast",test:e=>4*e.w<=e.g},{name:"narrow",test:e=>e.p<=Math.floor(1.5*T)}].map(z=>({...z,lists:0,selected:0,pairs:0,cofactors:0,denoms:0,maxS:0,maxF:0,maxPair:0,maxCofactorRepeat:0,maxBudgetRatio:0,largeDenomDeep:0}));
@@ -27,8 +27,10 @@ function scan(H0,t0,can){
  if(j===1999&&H<Y)totals.cap++;
  }
  if(H>=Y)totals.exits++;
- let high=ev.filter(e=>e.p>=T);
+ let high=ev.filter(e=>e.p>=T),lastByCofactor=new Map();
  for(let e of high){
+  let prior=lastByCofactor.get(e.L);if(prior){ok(e.p>prior.p&&e.p-prior.p>=2,"cofactor label monotonicity");totals.cofactorMonotone++;}lastByCofactor.set(e.L,e);
+  ok(e.L>=e.p+1,"adaptive cofactor lower");
   totals.high++;if(can)canonHigh++;else targetHigh++;
   let bin=e.b<=2?0:e.b<T/2?1:e.b<T?2:3;denomBins[can?"canonical":"targeted"][bin]++;
   if(e.b>=T/2){totals.largeDenom++;if(can)canonLarge++;else targetLarge++;if(e.x>=X/4&&!examples.largeDenom)examples.largeDenom={X,e,can}}
@@ -51,7 +53,7 @@ function scan(H0,t0,can){
    ok(E>=0&&E%2===0,"relay");ok((b.L-1)*b.p-a.L*a.p===shift,"pair equation");ok(shift%2!==0&&shift!==0&&shift%d===0&&d<=E+3,"odd gcd");
    relaySum+=E;totals.pairs++;totals.nonzeroShift++;totals.divisorChecks++;
    let key=a.L+","+b.L;if(!P.has(key))P.set(key,[]);P.get(key).push(E);
-   if(a.L===b.L){totals.sameCofactor++;if(!examples.same)examples.same={X,a,b,E,can}}
+   if(a.L===b.L){ok(b.p>a.p&&E>=2*a.L-b.p-1&&E>=2*T-b.p+1,"same cofactor toll");totals.sameCofactor++;if(a.p<=Math.floor(1.5*T)&&b.p<=Math.floor(1.5*T)){totals.narrowSame++;ok(E>=2*T-Math.floor(1.5*T)+1,"narrow same toll");totals.samePaid++;}if(!examples.same)examples.same={X,a,b,E,can}}
    else if(!examples.different&&a.b>=T/2&&b.b>=T/2)examples.different={X,a,b,E,can};
    if(census.length<120&&totals.pairs%71===0)census.push({X,T,B,a:a.L,b:b.L,s:a.s,t:b.s,K:[0,4,16,64,256][census.length%5],C});
   }
