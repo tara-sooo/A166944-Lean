@@ -10,7 +10,7 @@ function elig(H){let B=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let z=1+mod((i?q+2:0)-t-1,2*q);if(z<w||(z===w&&q<p)){p=q;w=z;s=i}}return {p,w,s}}
 function gap(n,p,f){let W=2*p;for(let i=0;i<2;i++)for(let q of f[i])if(q!==p){let z=mod(n-(i?q+2:0),2*q);if(!z&&q<p)return 0;W=Math.min(W,z||2*q)}return W}
 function ok(v,m){if(!v)throw Error(m)}
-let totals={roots:0,targeted:0,events:0,stops:0,exits:0,caps:0,high:0,words:0,rows:0,rank:0,rankNonzero:0,certified:0,rankWords:0,sourcePrime:0,rankPrime:0,repeat:0,clockRows:0,clockRank:0,clockCertified:0,bothRankWords:0,formChecks:0,offsetChecks:0,literal:0,censuses:0,candidateWords:0,rankCandidateWords:0,repeatParity:0,certifiedWords:0},results=[],examples={rank:null,rankPrime:null,nonrank:null,clock:null};
+let totals={roots:0,targeted:0,events:0,stops:0,exits:0,caps:0,high:0,words:0,rows:0,rank:0,rankNonzero:0,certified:0,rankWords:0,sourcePrime:0,rankPrime:0,repeat:0,clockRows:0,clockRank:0,clockCertified:0,bothRankWords:0,formChecks:0,offsetChecks:0,literal:0,censuses:0,candidateWords:0,rankCandidateWords:0,repeatParity:0,certifiedWords:0,primitiveChecks:0,clockPrimitiveChecks:0,uniformBoundChecks:0,uniformCertWords:0,uniformClockCertWords:0,rankDistinct3:0,rankDistinct4:0,rankDistinct5:0},results=[],examples={rank:null,rankPrime:null,nonrank:null,clock:null};
 for(let X of [4096,16384,65536]){
  const Y=4*X,T=Math.ceil(Math.sqrt(X)/2),B=Math.floor(Math.sqrt(Y+1));let roots=0,targeted=0,events=0,words=0,rankWords=0,rankPrime=0;
  function inspect(list,can){
@@ -25,12 +25,18 @@ for(let X of [4096,16384,65536]){
  let {j:j1,R:R1,k:k1,S:S1}=rows[1],rank=true,crank=true,cert=true;
  for(let x of rows.slice(1)){let z=d1*x.R-x.d*R1,det=d1*x.j-x.d*j1;ok(z===det*p,"rank elimination");if(det)rank=false;else totals.rank++;if(det)totals.rankNonzero++;
  if(Math.abs(z)<p){ok(det===0,"rank threshold");totals.certified++;}else cert=false;
- let zz=d1*x.S-x.d*S1,dd=d1*x.k-x.d*k1;ok(zz===dd*p,"clock elimination");if(dd)crank=false;else totals.clockRank++;if(Math.abs(zz)<p){ok(dd===0,"clock threshold");totals.clockCertified++;}
+ let zz=d1*x.S-x.d*S1,dd=d1*x.k-x.d*k1;totals.clockRows++;ok(zz===dd*p,"clock elimination");if(dd)crank=false;else totals.clockRank++;if(Math.abs(zz)<p){ok(dd===0,"clock threshold");totals.clockCertified++;}
  }
  if(cert)totals.certifiedWords++;
+ let K=Math.max(2,...rows.map(x=>Math.abs(x.d))),L=rows[rows.length-1].E,V=rows[rows.length-1].V,J0=rows.length-1;
+ let Hbound=J0*(K+1)+L+2+K*(J0+Math.max(...rows.map(x=>Math.abs(x.j)))),Cbound=V+2+K*Math.max(...rows.map(x=>Math.abs(x.k)));
+ for(let x of rows){ok(Math.abs(x.R)<=Hbound&&Math.abs(x.S)<=Cbound,"uniform residual bounds");totals.uniformBoundChecks++;}
+ if(2*K*Hbound<p){ok(rank,"uniform horizon certificate");totals.uniformCertWords++;}if(2*K*Cbound<p){ok(crank,"uniform clock certificate");totals.uniformClockCertWords++;}
  let primeQ=prime(q);if(primeQ)totals.sourcePrime++;
  if(rank){rankWords++;totals.rankWords++;if(primeQ){rankPrime++;totals.rankPrime++;}
- let labels=new Set(rows.map(x=>x.d)),cof=new Set(rows.filter((x,i)=>prime(list[i].q)).map(x=>x.i+x.j));if(labels.size<rows.length)totals.repeat++;
+ let labels=new Set(rows.map(x=>x.d)),cof=new Set(rows.filter((x,i)=>prime(list[i].q)).map(x=>x.i+x.j));if(labels.size<rows.length)totals.repeat++;if(labels.size>=3)totals['rankDistinct'+labels.size]++;
+ let gg=gcd(d1,j1),D0=d1/gg,J1=j1/gg;ok(gg%2===1&&R1%gg===0&&D0%2===0&&mod(J1,2)===1,"primitive anchor");
+ for(let x of rows){let ell=x.d/D0;ok(Number.isInteger(ell)&&x.j===ell*J1&&x.R===ell*(R1/gg)&&mod(ell,2)===x.i%2,"primitive row");totals.primitiveChecks++;if(crank){ok(gg*x.k===ell*k1&&gg*x.S===ell*S1,"clock primitive");totals.clockPrimitiveChecks++;}}
  let seen=new Map();
  for(let x of rows){ok(d1*x.j===x.d*j1&&d1*x.R===x.d*R1,"rank");let C=x.R+x.d*(x.i+x.j),calc=C-rows.slice(0,x.i).reduce((s,y)=>s+y.d-1,0)-e+list[x.i].e;ok(calc===x.E,"reconstructed offset");totals.offsetChecks++;if(seen.has(x.d)){ok(mod(x.i-seen.get(x.d),2)===0,"repeat parity");totals.repeatParity++;}seen.set(x.d,x.i);}
  for(let d of labels)for(let b of cof){ok(R1+d1*b+j1*d!==0,"cross determinant");totals.formChecks++;}
