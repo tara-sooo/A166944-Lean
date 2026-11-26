@@ -64,7 +64,7 @@ function audit(Xs=[4096,16384,65536]){
     }
    }
    for(let m of phaseMaps.values()){ok(m.forward.size===m.back.size,"bijection");maxPhase=Math.max(maxPhase,m.forward.size);if(m.forward.size>1)multiPhase++}
-   let phasePairs=0,actualDefects=0,persistentPairs=0,longGap=0,shortDefects=0,wheelDefects=0,binControls=0,binMass=0,smallPhaseMass=0,samePhaseMass=0,auxMass=0,auxDefectMass=0,auxChecks=0;
+   let phasePairs=0,actualDefects=0,persistentPairs=0,longGap=0,shortDefects=0,wheelDefects=0,binControls=0,binMass=0,smallPhaseMass=0,samePhaseMass=0,auxMass=0,auxDefectMass=0,auxChecks=0,targetedBins=0,targetedWheel6=0,targetedMass=0,targetedForced=0,targetedSame=0;
    let Delta=Math.max(4,Math.floor(M/2)),wheel=6;
    function strand(E,F){let e=slots.get(E),f=slots.get(F),id=e.ids.find(i=>f.ids.includes(i));ok(id!==undefined,"actual shared strand");let path=tags[id].path,a=path.findIndex(z=>z.s.key===E),b=path.findIndex(z=>z.s.key===F);ok(a>=0&&b>=a,"strand order");return {id,path:path.slice(a+1,b+1),E:e,F:f}}
    function compare(a,b){let lag=b.E.n-a.E.n,abs=Math.abs(lag),end=a.F.C+a.F.p-1,start=a.E.C+a.E.p-1,G=end-start;
@@ -84,6 +84,14 @@ function audit(Xs=[4096,16384,65536]){
      if(v.def){actualDefects++;if(v.lag%wheel===0){ok(wheel%v.def.p!==0,"wheel exclusion");wheelDefects++}if(v.def.C-(strands.get(a).E.C+strands.get(a).E.p-1)<Math.abs(v.lag))shortDefects++}
      else persistentPairs++;
      if(v.G>=Math.abs(v.lag)){longGap++;ok(v.def,"forced defect")}
+     if(v.G>Math.abs(v.lag)){
+      let width=Math.abs(v.lag)+1,origin=Math.min(strands.get(a).E.n,strands.get(b).E.n);
+      ok(width<=v.G&&Math.floor((strands.get(a).E.n-origin)/width)===Math.floor((strands.get(b).E.n-origin)/width),"targeted shifted bin");
+      let ws=[map.weights.get(a),map.weights.get(b)],sum=ws[0]+ws[1],small=0,same=0,cross=0;
+      for(let i=0;i<2;i++)if(ws[i]<=.75*sum){small+=ws[i];same+=ws[i]*ws[i]/sum;cross+=ws[i]*ws[1-i]/sum;ok(ws[i]*ws[1-i]/sum<=ws[1-i]+1e-9,"targeted aux marginal")}
+      ok(near(small,same+cross)&&cross>0&&same<=.75*small+1e-9,"targeted forced coupling");
+      targetedBins++;if(v.lag%6===0)targetedWheel6++;targetedMass+=small;targetedForced+=cross;targetedSame+=same;
+     }
     }
     // Finite bins by departure time and wheel, with a deliberately relaxed small-phase threshold.
     let bins=new Map();for(let E of es){let a=strands.get(E),k=Math.floor(a.E.n/Delta)+"/"+mod(a.E.n,wheel);if(!bins.has(k))bins.set(k,[]);bins.get(k).push(E)}
@@ -98,7 +106,7 @@ function audit(Xs=[4096,16384,65536]){
    }
    ok(near(auxMass,smallPhaseMass)&&samePhaseMass<=0.75*smallPhaseMass+1e-8,"coupling mass");
    ok(near(sourceMass,transport)&&near(transport,largeMass+shortMass)&&near(shortMass,stable+unstable),"partition");
-   res.push({X,focus,B,T,M,L,N:tags.length,events,S,R,V,A,lambda,alpha,Q,sources,persistent,tiles,clockRich,large,short,unclassified,moderateRich,nonmoderateRich,innerOuter,localProducts,matchedProducts,phaseChecks,multiPhase,maxPhase,stable,unstable,sourceMass,transport,largeMass,shortMass,maxJointCap,maxCutCap,maxTickCap,offsetTwin,cheap,projectedPairs:phaseMaps.size,Delta,wheel,phasePairs,actualDefects,persistentPairs,longGap,shortDefects,wheelDefects,binControls,binMass,smallPhaseMass,samePhaseMass,auxMass,auxDefectMass,auxChecks})
+   res.push({X,focus,B,T,M,L,N:tags.length,events,S,R,V,A,lambda,alpha,Q,sources,persistent,tiles,clockRich,large,short,unclassified,moderateRich,nonmoderateRich,innerOuter,localProducts,matchedProducts,phaseChecks,multiPhase,maxPhase,stable,unstable,sourceMass,transport,largeMass,shortMass,maxJointCap,maxCutCap,maxTickCap,offsetTwin,cheap,projectedPairs:phaseMaps.size,Delta,wheel,phasePairs,actualDefects,persistentPairs,longGap,shortDefects,wheelDefects,binControls,binMass,smallPhaseMass,samePhaseMass,auxMass,auxDefectMass,auxChecks,targetedBins,targetedWheel6,targetedMass,targetedForced,targetedSame})
   }
  }
  // Exact artificial phase cohort controls: distinct early sets and one later merged set

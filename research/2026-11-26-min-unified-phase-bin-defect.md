@@ -282,3 +282,24 @@ Run node research/min_unified_phase_bin_defect_audit.mjs 4096 16384 65536. Exact
 ]
 ```
 Main/direct unchanged.
+
+## 8. Supplementary actual targeted coupling controls
+
+The original fixed finite time-bin test had two nonempty multi-phase bins and six auxiliary comparisons, but no positive weight with the full gain>=Delta requirement; it was not a numerical test of the asymptotic forced-defect transport. To test nonvacuous coupling separately, take each actual matched phase pair with G>|lag|, choose a translated bin of width |lag|+1 (and wheel 2; record when wheel 6 also divides lag), containing those two phases. Restrict to these two actual phase weights and use the same normalized auxiliary coupling, finite small-phase threshold .75. This is a TARGETED finite control, not a new partition of the original measure or a numerical test of the fixed asymptotic bins. The already verified first defect in the two actual strands now receives positive cross-phase weight. Exact mass conservation and auxiliary marginal domination tested; no projected defect load capacity or asymptotic thin-gate test.
+
+```json
+{
+  "phasePairs": 145,
+  "actualDefects": 115,
+  "persistentPairs": 30,
+  "longGap": 14,
+  "wheelDefects": 43,
+  "binControls": 2,
+  "auxChecks": 6,
+  "targetedBins": 13,
+  "targetedWheel6": 2,
+  "targetedMass": 5.399857548409855,
+  "targetedForced": 2.5748808803142196,
+  "targetedSame": 2.8249766680956347
+}
+```
