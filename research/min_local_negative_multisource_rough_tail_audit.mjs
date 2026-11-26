@@ -5,12 +5,13 @@ function audit(){
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
  function next(a,v){let p=Infinity,w=Infinity,q=Infinity,c=0;for(let [d,e] of [[a+1,0],[a-1,2]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((e===0?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;c=e}}return {p,w,q,c}}
  function twin(a){return (spf[a-1]||a-1)===a-1&&(spf[a+1]||a+1)===a+1}
- let z={roots:0,events:0,successes:0,badSuccesses:0,slowEventChecks:0,allTailControls:0,tailIncidences:0,badTailIncidences:0,slowSourceChecks:0,shiftSeparationChecks:0,crtCongruenceChecks:0,repeatedTailChecks:0,goodPrimeResidueChecks:0,degeneratePrimeChecks:0,crtProgressionChecks:0,crtRemainderChecks:0,degreeControls:0,rows:[]};
+ let z={roots:0,events:0,successes:0,badSuccesses:0,slowEventChecks:0,allTailControls:0,tailIncidences:0,badTailIncidences:0,slowSourceChecks:0,shiftSeparationChecks:0,crtCongruenceChecks:0,repeatedTailChecks:0,goodPrimeResidueChecks:0,degeneratePrimeChecks:0,crtProgressionChecks:0,crtRemainderChecks:0,degreeControls:0,gapControls:0,gapTailIncidences:0,gapBadIncidences:0,gapShiftChecks:0,gapMultiplicityChecks:0,recordSlowChecks:0,fastGainChecks:0,rows:[]};
  for(let R of [3000,12000,48000,192000,480000,1000000]){
   const H=4*Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R))),L=Math.floor(H/4),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),basins=new Map(),row={R,H,L,success:0,bad:0,depthHist:{},controls:[]};
   for(let A=lo;A<=hi;A+=6){let a=A,h=3,v=3-A/2,path=[];
    while(true){let e=next(a,v);if(h+e.w>H){let ar=basins.get(a)||[];ar.push({A,path});basins.set(a,ar);row.success++;z.successes++;if(!twin(a)){row.bad++;z.badSuccesses++;}break}
     if(A-a+e.p-1>L)break;ck(e.w<=2*e.q,"wait cap");if(e.w>=e.p/4){ck(e.q>=e.p/8,"slow source");z.slowEventChecks++}
+    let G=A-a;ck(e.w>=(e.p-1)/2-11-7*G/4-1e-8,'preheight gain');if(e.w<e.p/4){ck(G>e.p/7-46/7-1e-8,'fast pre-gain');z.fastGainChecks++;}if(e.p>=368&&e.p>=8*G){ck(e.w>=e.p/4,'record slow');z.recordSlowChecks++;}
     path.push({p:e.p,w:e.w,q:e.q,c:e.c,b:a,a:a-e.p+1});a-=e.p-1;v+=e.w;h+=e.w-(e.p-1)/2;z.events++;
    }z.roots++;
   }
@@ -60,6 +61,29 @@ function audit(){
   for(let [a,ar] of basins)for(let root of ar){
    let non=root.path.filter(e=>e.p>5),last=non.at(-1),key=last?`${Math.floor(Math.log2(last.p))}:${last.w>=last.p/4?"slow":"fast"}`:"none";
    let p=row.depthHist[key]||[0,0];p[twin(a)?0:1]++;row.depthHist[key]=p;
+  }
+  // General bounded-gain gaps: skip arbitrary lower labels, rather
+  // than just the fixed alphabet 3,5. Count suffix word pairs, not
+  // incidence multiplicity. The bound uses only the recorded gaps.
+  row.gaps=[];
+  for(let Y of [11,17,31,47])for(let D of [16,64])for(let k of [1,2,3]){
+   let all=0,bad=0,slowAll=0,slowBad=0,keys=new Map(),byA=new Map(),byB=new Map();
+   for(let [a,ar] of basins)for(let root of ar){
+    let off=0,d=0,marks=[],valid=true;
+    for(let i=root.path.length-1;i>=0&&marks.length<k;i--){
+     let e=root.path[i];if(e.p<Y){d+=e.p-1;if(d>D){valid=false;break}continue}
+     if(e.p>=8*Y){valid=false;break}
+     off+=d;ck(e.a===a+off&&mod(e.a-e.c,e.p)===0,'gap congruence');
+     marks.push({p:e.p,d,c:e.c,source:e.b-a,slow:e.w>=e.p/4});off+=e.p-1;d=0;z.gapShiftChecks++;
+    }
+    if(!valid||marks.length!==k)continue;
+    all++;z.gapTailIncidences++;let isBad=!twin(a);if(isBad){bad++;z.gapBadIncidences++}
+    if(marks.every(m=>m.slow)){slowAll++;if(isBad)slowBad++}
+    let b=a+off,key=JSON.stringify([a,marks]);if(!keys.has(key)){keys.set(key,{a,b});byA.set(a,(byA.get(a)||0)+1);byB.set(b,(byB.get(b)||0)+1)}
+   }
+   let bound=(2*(Math.floor(D/2)+1)*2*Math.ceil(Math.log(2*R+30)/Math.log(Y)))**k;
+   for(let n of [...byA.values(),...byB.values()]){ck(n<=bound,'gap relation degree');z.gapMultiplicityChecks++}
+   row.gaps.push({Y,D,k,all,bad,slowAll,slowBad,keys:keys.size,starts:byB.size,ends:byA.size});z.gapControls++;
   }
   z.rows.push(row);
  }
