@@ -6,7 +6,7 @@ function fs(n){let a=[];while(n>1){let p=spf[n]||n;if(p>2)a.push(p);while(n%p===
 function event(a,v){let p=Infinity,w=Infinity,e=0,q=Infinity;for(let [d,s] of [[a+1,-1],[a-1,1]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((s===-1?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;e=s}}return {p,w,e,q}}
 function pack(bounds,c,par,min){let b=bounds.map(x=>Math.max(min,x)+mod(par-Math.max(min,x),2)).sort((a,b)=>a-b),t=[];for(let i=0;i<b.length;i++)t.push(Math.max(b[i],i>=c?t[i-c]+2:0));return t.reduce((a,x)=>a+x,0)-bounds.reduce((a,x)=>a+x,0)}
 function weighted(list,c,par,min,base){let w=[...new Set(list.map(x=>x.weight).filter(x=>x>0))].sort((a,b)=>a-b),last=0,s=0;for(let v of w){s+=(v-last)*pack(list.filter(x=>x.weight>=v).map(base),c,par,min);last=v}return s}
-let s={roots:0,events:0,blocks:0,controls:0,pairs:0,groups:0,repeatGroups:0,clockCRT:0,spatialCRT:0,capacity:0,clockPositive:0,spacePositive:0,clockImprovement:0,spaceImprovement:0,strictCombined:0,weightedChecks:0,globalChecks:0,maxClock:0,maxCombined:0,examples:[],synthetic:0,syntheticStrict:0,syntheticBrute:0};
+let s={roots:0,events:0,blocks:0,controls:0,pairs:0,groups:0,repeatGroups:0,clockCRT:0,spatialCRT:0,capacity:0,clockPositive:0,spacePositive:0,clockImprovement:0,spaceImprovement:0,strictCombined:0,weightedChecks:0,globalChecks:0,maxClock:0,maxCombined:0,examples:[],synthetic:0,syntheticStrict:0,syntheticBrute:0,roundedChecks:0,roundedImprovement:0,maxRounded:0,repeatClockPositive:0,repeatClockImprovement:0,clockBeyondParity:0,repeatClockBeyondParity:0};
 function check(arr,t){
  if(!arr.length)return;let n=arr.length,lev=arr.map(x=>x.p<t?-1:Math.floor(Math.log2(x.p/t))),max=Math.max(...lev),I=[],groups=new Map();
  for(let j=0;j<=max;j++){let last=-1;for(let i=0;i<n;i++){
@@ -22,13 +22,14 @@ function check(arr,t){
  }}
  let depth=Array(n).fill(0);for(let x of I)for(let i=x.l;i<x.r;i++)if(lev[i]<0)depth[i]++;
  for(let x of I){let d=0;for(let i=x.l;i<x.r;i++)d=Math.max(d,depth[i]);x.weight=d?1/d:0}
- let lowG=arr.reduce((g,x,i)=>g+(lev[i]<0?x.p-1:0),0),total=0,spaceTotal=0,clockTotal=0;
+ let lowG=arr.reduce((g,x,i)=>g+(lev[i]<0?x.p-1:0),0),total=0,spaceTotal=0,clockTotal=0,rounded=0;
  for(let g of groups.values()){
   let x=g[0],p=x.p,r=x.rp,span=Math.max(...g.map(x=>x.a))-Math.min(...g.map(x=>x.a)),ts=Math.max(...g.map(x=>x.n))-Math.min(...g.map(x=>x.n)),c=Math.floor(span/(2*p*r))+1,d=Math.floor(ts/(2*p*r))+1;
   for(let [key,cap,pos] of [["E",c,"a"],["tau",d,"n"]]){let m=new Map();for(let y of g){let a=m.get(y[key])||[];for(let z of a)ck(mod(z-y[pos],2*p*r)===0,"CRT capacity");a.push(y[pos]);m.set(y[key],a)}ck([...m.values()].every(a=>a.length<=cap),"count");s.capacity++}
   let es=pack(g.map(y=>y.H),c,0,0),et=pack(g.map(y=>y.base),d,x.par,x.par?1:2),actualG=g.reduce((a,y)=>a+y.g,0),actualV=g.reduce((a,y)=>a+y.u,0);
   ck(es<=actualG&&et<=actualV,"unweighted");ck(actualV<=3*actualG,"relay wait");
   let oldS=Math.max(0,pack(g.map(()=>0),c,0,0)-g.reduce((a,y)=>a+y.H,0)),oldT=Math.max(0,pack(g.map(()=>0),d,x.par,x.par?1:2)-g.reduce((a,y)=>a+y.base,0));
+  let parityCost=g.reduce((a,y)=>a+mod(x.par-y.base,2),0);if(et>parityCost){s.clockBeyondParity++;if(g.length>1)s.repeatClockBeyondParity++;}if(g.length>1&&et>0)s.repeatClockPositive++;if(g.length>1&&et>oldT)s.repeatClockImprovement++;
   if(es>0)s.spacePositive++;if(et>0)s.clockPositive++;if(es>oldS)s.spaceImprovement++;if(et>oldT)s.clockImprovement++;
   if(et/3>es){s.strictCombined++;if(s.examples.length<6)s.examples.push({p,r,n:g.length,c,d,es,et,actualG,actualV,base:g.map(y=>y.base),tau:g.map(y=>y.tau)})}
   s.maxClock=Math.max(s.maxClock,et);if(g.length>1)s.repeatGroups++;s.groups++;
@@ -36,14 +37,20 @@ function check(arr,t){
   let wg=g.reduce((a,y)=>a+y.weight*y.g,0),wv=g.reduce((a,y)=>a+y.weight*y.u,0);
   ck(ws<=wg+1e-8&&wt<=wv+1e-8&&wv<=3*wg+1e-8,"weighted");
   total+=Math.max(ws,wt/3);spaceTotal+=ws;clockTotal+=wt/3;s.weightedChecks++;
+  let weights=[...new Set(g.map(y=>y.weight).filter(x=>x>0))].sort((a,b)=>a-b),last=0,rc=0;
+  for(let v of weights){let sub=g.filter(y=>y.weight>=v),a=pack(sub.map(y=>y.H),c,0,0),b=pack(sub.map(y=>y.base),d,x.par,x.par?1:2);
+   let lb=Math.max(a,2*Math.ceil(b/6));ck(lb<=sub.reduce((a,y)=>a+y.g,0),"rounded subset");
+   rc+=(v-last)*lb;last=v;s.roundedChecks++;
+  }
+  ck(rc<=wg+1e-8&&rc>=Math.max(ws,wt/3)-1e-8,"rounded group");rounded+=rc;
  }
  for(let x of I)if(x.p===x.rp){
   let es=Math.max(0,x.p-1-x.H),first=x.base+mod(x.d-x.base,2*x.p);if(first<x.d)first=x.d;let et=first-x.base;
   ck(et>=0&&et<=x.u&&es<=x.g,"same residual");
-  total+=x.weight*Math.max(es,et/3);spaceTotal+=x.weight*es;clockTotal+=x.weight*et/3;
+  total+=x.weight*Math.max(es,et/3);spaceTotal+=x.weight*es;clockTotal+=x.weight*et/3;rounded+=x.weight*Math.max(es,2*Math.ceil(et/6));
  }
  for(let i=0;i<n;i++)if(lev[i]<0)ck(I.reduce((a,x)=>a+(x.l<=i&&i<x.r?x.weight:0),0)<=1+1e-9,"laminar capacity");
- ck(total<=lowG+1e-7&&total>=Math.max(spaceTotal,clockTotal)-1e-7,"global");s.globalChecks++;s.maxCombined=Math.max(s.maxCombined,total);s.controls++;
+ ck(total<=lowG+1e-7&&total>=Math.max(spaceTotal,clockTotal)-1e-7,"global");ck(rounded<=lowG+1e-7&&rounded>=total-1e-7,"rounded global");if(rounded>total+1e-7)s.roundedImprovement++;s.maxRounded=Math.max(s.maxRounded,rounded);s.globalChecks++;s.maxCombined=Math.max(s.maxCombined,total);s.controls++;
 }
 // Exact brute force on small slots with individual lower bounds.
 for(let c of [1,2,3])for(let n=1;n<=5;n++)for(let par of [0,1])for(let mode=0;mode<4;mode++){
