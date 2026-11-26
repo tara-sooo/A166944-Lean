@@ -10,7 +10,7 @@ function elig(H){let B=Math.floor(Math.sqrt(H+1));return [fac(H-1).filter(p=>p<=
 function first(t,f){let p=0,w=Infinity,s=0;for(let i=0;i<2;i++)for(let q of f[i]){let z=1+mod((i?q+2:0)-t-1,2*q);if(z<w||(z===w&&q<p)){p=q;w=z;s=i}}return {p,w,s}}
 function gap(n,p,f){let W=2*p;for(let i=0;i<2;i++)for(let q of f[i])if(q!==p){let z=mod(n-(i?q+2:0),2*q);if(!z&&q<p)return 0;W=Math.min(W,z||2*q)}return W}
 function ok(v,m){if(!v)throw Error(m)}
-const totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,literal:0,words:0,identities:0,spanChecks:0,short:0,shortDistinct:0,shortAnchor:0,affineWords:0,affineChecks:0,residence:0,oddCut:0,smallDeficit:0,censuses:0,necessary:0,local:0,latticeChecks:0,latticeCandidates:0};let results=[],examples={actual:null,local:null};
+const totals={roots:0,targeted:0,events:0,stops:0,exits:0,cap:0,high:0,literal:0,words:0,identities:0,spanChecks:0,short:0,shortDistinct:0,shortAnchor:0,affineWords:0,affineChecks:0,residence:0,oddCut:0,smallDeficit:0,censuses:0,necessary:0,local:0,latticeChecks:0,latticeCandidates:0,localStarts:0,localShortWords:0,localShortAnchor:0,localEvents:0};let results=[],examples={actual:null,local:null,localShort:null};
 const slopes=[[1,2],[1,1],[3,2],[2,3]];
 function clock(p,s){return s?p+2:0}
 function state(H,t,z){let {p,w,s}=z;return {H,t,p,w,s,e:1-2*s,q:(H-1+2*s)/p,J:H+p-1,n:t+w}}
@@ -63,6 +63,17 @@ H=v.J;t=v.n;if(it===1999&&H<Y)totals.cap++;
 }
 for(let H=X;H<Y;H+=4){scan(H,(H+6)/2,true);totals.roots++}
 let seen=new Set();for(let H=X;H<Y;H+=Math.max(2,2*Math.floor(Math.sqrt(X)/8))){let f=elig(H);for(let s=0;s<2;s++)for(let p of f[s]){if(p<T)continue;let r=clock(p,s),lo=H/2+1,hi=3*H+3+2*p;for(let frac of [1,3,5]){let n=Math.floor(lo+(hi-lo)*frac/6);n+=mod(r-n,2*p);if(n>hi)continue;let W=gap(n,p,f),l=Math.max(1,n-(3*H+3)),u=Math.min(W,n-H/2);if(l>u)continue;for(let w of new Set([l,u])){let t=n-w,key=H+","+t;if(seen.has(key))continue;seen.add(key);let a=first(t,f);ok(a.p===p&&a.w===w,"target");scan(H,t,false);totals.targeted++;}}}}
+// Target additional exact intermediate states in narrow even-denominator strips.
+if(X<=16384){
+let seenLocal=new Set();
+for(let H=X;H<Y;H+=2){let f=elig(H);for(let side=0;side<2;side++)for(let p of f[side]){if(p<T)continue;let a=(H-1+2*side)/p+1;
+for(let M of [1,3,5])for(let hv=-16;hv<=16;hv+=2){let c=(M*a+hv)/2,n=p*c+2*side;if(mod(n-clock(p,side),2*p)||n<H/2+1||n>3*H+3+2*p)continue;let key=H+","+n+","+p;if(seenLocal.has(key))continue;seenLocal.add(key);
+let l=Math.max(1,n-(3*H+3)),u=Math.min(gap(n,p,f),n-H/2);if(l>u)continue;let z=first(n-l,f);if(z.p!==p||z.s!==side||z.w!==l)continue;totals.localStarts++;
+let list=[state(H,n-l,z)],t=n,J=H+p-1,Etotal=0;
+for(let it=0;it<T&&J<Y&&t<n+T-3;it++){let z=first(t,elig(J));if(!z.p||t+z.w>n+T-3)break;let v=state(J,t,z);totals.localEvents++;if(v.p<T)Etotal+=v.p-1;else{list.push(v);if(list.length>=4){totals.localShortWords++;let pre=totals.shortAnchor;inspect(list,false);totals.localShortAnchor+=totals.shortAnchor-pre;if(!examples.localShort)examples.localShort={X,M,hv,list:[...list],Etotal,W:v.n-n};}if(list.length>=6)break;}if(Etotal>=T/4)break;J=v.J;t=v.n;}
+}
+}}
+}
 // Fixed shift patterns independently chosen, plus actual short observed patterns.
 for(let m of [4,5,6])for(let M of [1,3])for(let alt of [false,true]){
 let s=Array.from({length:m},(_,i)=>alt?i%2:0),E=Array(m-1).fill(0),V=Array(m-1).fill(alt?1:2),N=2,A=8,idx=Math.floor(m/2);
