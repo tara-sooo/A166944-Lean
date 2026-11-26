@@ -6,7 +6,7 @@ function audit(N=30000){
  const factors=x=>{ok(x>0&&x<lim,"factor range "+x);let a=[];while(x>1){let p=spf[x];a.push(p);x/=p}return a};
  const next=(H,t)=>{let z=null;for(let I=0;I<2;I++)for(let p of new Set(factors(H-1+2*I))){if(p===2||p*p>H+1)continue;let w=mod((I?p+2:0)-t,2*p)||2*p;if(!z||w<z.w||w===z.w&&p<z.p)z={H,t,p,w,I,d:2*t-H,dp:2*t-H+2*w-p+1}}return z};
  const reset=z=>z.p>=5&&z.dp===6*z.I,fast=z=>4*z.w<z.p-1;
- const st={roots:0,events:0,unresolved:0,periods:0,periodPositions:0,windowControls:0,coverageChecks:0,clockChecks:0,combinedChecks:0,crossingEvents:0,largeCrossingEvents:0,longCrossingEvents:0,roughnessChecks:0,factorBounds:{3:0,4:0,5:0,6:0},canonicalSegments:0,selectedSegments:0,fastEvents:0,fastResets:0,fastNonresets:0,upwardCrossers:0,excursionChecks:0,boundaryChecks:0,certificateSearch:0,certifiedRoots:0,primeCofactorChecks:0,independentTicks:0,examples:[],resetExample:null};
+ const st={roots:0,events:0,unresolved:0,periods:0,periodPositions:0,windowControls:0,coverageChecks:0,clockChecks:0,combinedChecks:0,crossingEvents:0,largeCrossingEvents:0,longCrossingEvents:0,roughnessChecks:0,factorBounds:{3:0,4:0,5:0,6:0},canonicalSegments:0,selectedSegments:0,fastEvents:0,fastResets:0,fastNonresets:0,upwardCrossers:0,excursionChecks:0,boundaryChecks:0,certificateSearch:0,certifiedRoots:0,primeCofactorChecks:0,certifiedCrossingControls:0,certifiedCrossingCutIncidences:0,flatRunChecks:0,flatNonresetLabelChecks:0,flatSupportChecks:0,flatMaxSupport:0,repeatedLongLabelChecks:0,twinCofactorPairs:0,independentTicks:0,examples:[],resetExample:null};
  function setup(S,R,V,L){
   let small=ps.filter(p=>p<=R),extra=ps.filter(p=>p>R&&p<=V),PS=prod(small.filter(p=>p<=S)),P=prod(small)*prod(extra);
   ok(P<=300000,"period cap");
@@ -44,6 +44,13 @@ function audit(N=30000){
   let den=BigInt(T-1),clock=BigInt(11*U)*den+BigInt(7*(T-1)+8)*BigInt(F);
   ok(BigInt(4*W-G)*den<=clock&&BigInt(G-2*rows[0].d)*den<=clock,"clock");st.clockChecks++;
   ok(BigInt(G-2*rows[0].d)*den*unit<=11n*(lowBound+E)*den+22n*BigInt((L-1)*G)*unit+BigInt(7*(T-1)+8)*BigInt(F)*unit,"combined");st.combinedChecks++;
+  // Constant-deficit high-nonreset support and local cofactor return spacing.
+  for(let i=0;i<rows.length;){if(rows[i].dp!==rows[i].d){i++;continue}let j=i+1,d=rows[i].d;while(j<rows.length&&rows[j].d===d&&rows[j].dp===d)j++;
+   let set=new Set;for(let h=i;h<j;h++){let z=rows[h];if(z.p>=T&&!reset(z)){ok(d>=2*z.p&&(d-6*z.I)%(2*z.p)===0,"flat divisibility");set.add(z.p);st.flatNonresetLabelChecks++}}
+   if(set.size){let P=[...set].reduce((a,s)=>a*BigInt(s),1n),D=BigInt(d/2)*BigInt((d-6)/2);ok(D>0n&&D%P===0n,"flat support product");st.flatSupportChecks++;st.flatMaxSupport=Math.max(st.flatMaxSupport,set.size)}
+   st.flatRunChecks++;i=j
+  }
+  let seen=new Map;for(let z of rows)if(z.p>=T&&!fast(z)){let q=(z.H-1+2*z.I)/z.p,prev=seen.get(z.p);if(prev){ok(q>=prev.q+2,"cofactor strictly increasing");if(q>=prev.q+4)ok(z.H-prev.H>=4*z.p-2,"gap four spacing");if(q===prev.q+2&&spf[q]===q&&spf[prev.q]===prev.q)st.twinCofactorPairs++;st.repeatedLongLabelChecks++}seen.set(z.p,{q,H:z.H})}
   let visits=[];
   for(let i=0;i<rows.length;i++){let z=rows[i],ct=z.H/2+3;if(z.H%4===0&&ct>=z.t&&ct<z.t+z.w)visits.push({time:ct,H:z.H,idx:i})}
   let endH=z.H+z.p-1,endT=z.t+z.w;if(endH%4===0&&2*endT-endH===6)visits.push({time:endT,H:endH,idx:rows.length});
@@ -80,13 +87,13 @@ function audit(N=30000){
  const primes=ps.filter(p=>p>=1050&&p<=2100);
  outer:for(let p of primes)for(let q of primes){if(q<p||p*q+3>=lim)continue;let H=p*q+(mod(p*q,4)===1?-1:1),M=H/2+1,t=M+2,z=next(H,t);st.certificateSearch++;
   if(!z||fast(z)||BigInt(z.p-1)**3n<=512n*BigInt(H+1))continue;
-  certify(z);st.certifiedRoots++;let rows=run(M,100);for(let c of cs)inspect(rows,c,Math.max(47,Math.floor(z.p/2)));
+  certify(z);st.certifiedRoots++;for(let c of cs){let n=c.mass(H/2,(H+z.p-1)/2);if(n){st.certifiedCrossingControls++;st.certifiedCrossingCutIncidences+=n}}let rows=run(M,100);for(let c of cs)inspect(rows,c,Math.max(47,Math.floor(z.p/2)));
   let found=null;for(let w=1;w<=z.w;w++){let n=t+w,I=n%2,e=1-2*I;let a=n-2*I,b=H-e;while(b)[a,b]=[b,a%b];let f=factors(a).filter(p=>p%2&&p*p<=H+1).sort((a,b)=>a-b)[0];if(f){found={w,p:f,I};break}st.independentTicks++}
   ok(found&&found.w===z.w&&found.p===z.p&&found.I===z.I,"literal clock");st.independentTicks++;
   if(st.examples.length<4)st.examples.push({M,H,p:z.p,q:(H-(1-2*z.I))/z.p,w:z.w,neighbors:[factors(H-1),factors(H+1)],d:z.d,dp:z.dp});
   if(st.certifiedRoots>=24)break outer
  }
- ok(st.certifiedRoots&&st.factorBounds[3]&&st.fastResets&&st.fastNonresets&&st.upwardCrossers&&st.excursionChecks&&st.combinedChecks,"coverage");
+ ok(st.certifiedRoots&&st.factorBounds[3]&&st.fastResets&&st.fastNonresets&&st.upwardCrossers&&st.excursionChecks&&st.combinedChecks&&st.flatSupportChecks&&st.repeatedLongLabelChecks&&st.certifiedCrossingControls,"coverage");
  return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||30000)),null,2));
