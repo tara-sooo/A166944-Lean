@@ -58,3 +58,19 @@ These columns refer to DIFFERENT structures; their intersection remains open. Th
 | A01 | Finite factor/clock DAG and exact bounded-phase max-run computation | COMPUTATION X=4096,16384,65536,262144, fixed K210,V12. Actual standard segments with envelope, not verified canonical ancestry; no asymptotic extrapolation |
 
 II-B's uninterrupted all-high long safe scalar model fails in all four tested windows even after relaxing phase consistency; exact MIN segments of two and three events nevertheless exist. The intersection of all constraints across arbitrary scales remains open. No new Lean verification.
+
+## Checkpoint IV — exact low relay and first-high entry
+
+[Mixed relay paper](https://github.com/tara-sooo/A166944-Lean/blob/c0f7f50e3fe9ad93693d1ffed951a211959a7c4a/research/infinite-orbit/low_relay.md), source direct [47a1442](https://github.com/tara-sooo/A166944-Lean/blob/47a14426499afbaacaadb11114dac7caccdb4fdf/research/2026-11-26-min-direct-variable-order-sieve-and-uniform-pinned-gaps.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L15 | Low-only transducer modulo K=2P_R terminates, gain E<=M_R<K, time B<=3E; actual low prefix agrees | PAPER; actual standard H+1>=R², no outside label allowed in prefix |
+| L16 | Good highs p>=T>2R+2, w>=p-2 are R-rough; any intervening all-low relay must reach exact restricted terminal; same p cannot recur consecutively if M_R<p-3 | PAPER; full competition still required for sufficiency |
+| D08 | G_low<=M_R(n_out+1); if R=o(log X), all outside labels >=Theta(sqrt X), then G_low=o(X); all outside long => d_b-d_a>=G-o(X) | PAPER; macroscopic positive variation allowed, not contradiction |
+| D09 | Mixed-run bound G_good<=L_R(1+b_mid+U_bad/(T-1)) | PAPER; uniform L_R=O(sqrt X) OPEN |
+| D10 | First outside long high after canonical low prefix has o(X) possible sources at fixed R, O((M_R+1)X/(loglog X)^2) count | PAPER; dense distinct odd canonical roots, not prime-root relative density or later source mass |
+| L17 | First outside long high if p>max(9,d+1): post d'=2p+6s, w=(3p-1+6s-d)/2 | PAPER; fixed R automatically at sufficiently large square-root scale, not arbitrary later high |
+| A02 | Compressed mixed DAG and exact bounded-phase audit with low relays; canonical first exit | COMPUTATION; R3,5,7 mixed and R3,5,7,11 first exit. Actual intermediate-state four-high word, canonical ancestry not checked; 5,222,400 first-exit source incidences, 84,643 applicable unit-multiplier checks pass. |
+
+No all-constraint infinite survivor or final contradiction. Medium relays, bad high events, eventual rather than initial entry, and dense transport remain open. No new Lean verification.
