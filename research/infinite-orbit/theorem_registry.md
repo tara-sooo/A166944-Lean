@@ -280,3 +280,19 @@ Large all-distinct gaps, higher relay budgets, longer returns, and general fast 
 | A15 | 20739 all-distinct triples,20456 paired congruence controls,19 short; no parallel/zero in ordinary corpus. Independent aligned clock/product vs affine census 9 exact sets,664 candidates,181 locally feasible incl84 wide gaps;20 ratio checks incl14 small-coefficient nonzero tests | COMPUTATION; final pass, factor domain expanded after initial incomplete census; local feasibility not canonical ancestry |
 
 General nonparallel, two-nonzero-ell, unrestricted label ratios remain; polylog elapsed and relay budgets not forced. No full survivor, general uncapped bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XVIII — coupled inverse and middle-clock projection
+
+[Middle projection paper](https://github.com/tara-sooo/A166944-Lean/blob/6e5ea87445fe3e1d0ef9a76cad4f77a6f20a4f75/research/infinite-orbit/middle_projection.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| D69 | For Z=D1 d2-D2 d1 nonzero with short invertible offsets, fixed outer prime pair p,v and shift/ell tuple determine at most one r by two congruences mod pv. Middle Cramer rows and outer transport reconstruct all six quotient coordinates | PAPER; necessary coordinate converse with parity/eligibility checks, actual MIN and canonical ancestry separate; unrestricted outer search remains too large |
+| L29 | Fixed coprime slope M/N, h_i=N c_i-M a_i, b_j=N d_j-M D_j: exact p_j(h_j+M)=p_(j-1)h_(j-1)+b_j | PAPER; any waits, labels, cofactors, rank |
+| D70 | Short distinct triple with middle abs(h)<=A polylog: p f=r(h+M)-b1, v g=r h+b2, f=h0,g=h2+M. If h!=0,-M all f,g,b1,b2 nonzero; three nonproportional affine prime forms in r | PAPER; no label-ratio or cofactor primality assumption; any ell and Z |
+| D71 | Summed inverse progression length over h,f,g is O((A+1) log^6(2+A)); weighted nondegenerate middle strip capacity O(X P²Q² (A+1) log^6(2+A) (loglog X)^3/log³ X), P=L+4,Q=W+2 | PAPER; polylog cutoffs, absolute full-window count, fixed cutoffs remove loglog |
+| D72 | Degenerate h=0 forces b2=g=ell2=0, h=-M forces b1=f=ell1=0. Two-form capacity O(X P Q min(P,Q) (loglog X)^2/log² X). No degeneracy for even N since D_j odd | PAPER; short distinct triples, fixed M,N, all cofactors |
+| D73 | M=1,N=2 gives p_i h_i=2n_i-J_i-6s_i. Macro disjoint middle strip population with U=O(T log^alpha X), Vtot=O(T log^beta X), width or average abs(h) O(log^gamma X) excluded if 2alpha+2beta+gamma<3 (even N); odd N also alpha+beta+min(alpha,beta)<2 | PAPER; actual disjoint relay/time charges, not forced short budgets |
+| A16 | 20739 all-distinct inverse controls,20206 unique middle CRT,103695 projection identities,20739 deficit identities;10 independent exact candidate sets,142 candidate incidences (105 degenerate),12 actual local MIN (8 degenerate), no slope 1/2 degeneracy | COMPUTATION; final pass; largest X uses smaller cutoffs; overlapping configurations, no asymptotic test or new ancestry claim |
+
+General nonparallel outer pairs outside thin rational projection strips, larger relay/elapsed budgets and localization remain. No full survivor, general uncapped bound, Lean verification or finite-twin contradiction.
