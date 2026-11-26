@@ -3,10 +3,10 @@ function audit(){
  const ck=(c,m)=>{if(!c)throw Error(m)},mod=(a,p)=>(a%p+p)%p,N=300000,spf=new Uint32Array(N+3);
  for(let p=2;p*p<=N+2;p++)if(!spf[p])for(let n=p*p;n<=N+2;n+=p)if(!spf[n])spf[n]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;if(p!==2)a.push(p);while(n%p===0)n/=p}return a}
- const Kmax=768,times=Array.from({length:Kmax+1},(_,k)=>k?fs(k%2===0?k:k+2):[]);
+ const Kmax=768,Klong=8192,times=Array.from({length:Klong+1},(_,k)=>k?fs(k%2===0?k:k+2):[]);
  function sign(k){return k%2===0?-1:1}
  function step(a,k){let p=times[k].find(p=>mod(a-sign(k),p)===0);return p===undefined?a:a-p+1}
- let s={primeTargets:0,compositeTargets:0,twinTargets:0,extinct:0,alive:0,reverseTicks:0,inverseChecks:0,forwardWitnessChecks:0,twinStationaryChecks:0,extentChecks:0,maxWidth:0,maxDeath:0,aliveExamples:[],longest:[],qSmallChecks:0,canonicalChecks:0,canonicalEvents:0,nonzeroPhases:0,periodControls:[],byQ:{},byRange:{}};
+ let s={primeTargets:0,compositeTargets:0,twinTargets:0,extinct:0,alive:0,reverseTicks:0,inverseChecks:0,forwardWitnessChecks:0,twinStationaryChecks:0,extentChecks:0,maxWidth:0,maxDeath:0,aliveExamples:[],longest:[],qSmallChecks:0,canonicalChecks:0,canonicalEvents:0,nonzeroPhases:0,periodControls:[],byQ:{},byRange:{},extended:0,extendedExtinct:0,extendedAlive:0,extendedMaxDeath:0,extendedExamples:[],extendedLongest:[],extendedMaxWidth:0};
  function back(a,K,witness=false){
   let S=new Set([a]),max=1,cap=0;
   for(let k=1;k<=K;k++){
@@ -48,10 +48,10 @@ function audit(){
   let range=p<=10000?"1009..10000":p<=100000?"10001..100000":"100001..300000",rr=s.byRange[range]??={n:0,extinct:0,alive:0,maxDeath:0};
   r.n++;rr.n++;r.maxWidth=Math.max(r.maxWidth,b.max);s.maxWidth=Math.max(s.maxWidth,b.max);
   if(b.dead){s.extinct++;r.extinct++;rr.extinct++;r.maxDeath=Math.max(r.maxDeath,b.dead);rr.maxDeath=Math.max(rr.maxDeath,b.dead);s.maxDeath=Math.max(s.maxDeath,b.dead);s.longest.push({p,q,dead:b.dead,width:b.max});}
-  else{s.alive++;r.alive++;rr.alive++;if(s.aliveExamples.length<20)s.aliveExamples.push({p,q,K,...b})}
+  else{s.alive++;r.alive++;rr.alive++;if(s.aliveExamples.length<20)s.aliveExamples.push({p,q,K,...b});let K2=Math.min(Klong,a/2-4),c=back(a,K2,true);s.extended++;s.extendedMaxWidth=Math.max(s.extendedMaxWidth,c.max);if(c.dead){s.extendedExtinct++;s.extendedMaxDeath=Math.max(s.extendedMaxDeath,c.dead);s.extendedLongest.push({p,q,dead:c.dead,width:c.max})}else{s.extendedAlive++;s.extendedExamples.push({p,q,K:K2,...c})}}
   if(q<=7){ck(b.dead>0&&b.dead<=(q===7?7:q-2),"small q universal");s.qSmallChecks++}
  }
- s.longest.sort((a,b)=>b.dead-a.dead);s.longest=s.longest.slice(0,10);
+ s.extendedLongest.sort((a,b)=>b.dead-a.dead);s.extendedLongest=s.extendedLongest.slice(0,10);s.longest.sort((a,b)=>b.dead-a.dead);s.longest=s.longest.slice(0,10);
  // independent canonical clock simulation for a sparse set and literal negative suffix check
  for(let A=6;A<=N;A+=198){
   let a=A,v=-A/2+3,last=0,prezero=null;
