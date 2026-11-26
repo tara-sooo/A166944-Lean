@@ -13,10 +13,11 @@ function audit(){
  let out=[];
  for(let {z,D,bands} of controls){
   let A=ps.filter(p=>p<=z),P=4*A.reduce((a,b)=>a*b,1),base=P,idx=new Map();bands.forEach((a,i)=>a.p.forEach(p=>idx.set(p,i)));
-  let s={z,D,bands,roots:0,actualEvents:0,unknownQueries:0,activeQueries:0,knownQueries:0,conditionalChecks:0,budgetStops:0,jointHits:0,terminalStops:0,gainStops:0,fullHits:0,eligibleOriginalHits:0,supermartingaleChecks:0,meanFinalPotential:0,initialPotential:bands.reduce((a,b)=>a*choose(b.B/(1-b.B),b.k),1),maxPotential:0,posteriorGroups:0};
+  let s={z,D,bands,roots:0,actualEvents:0,unknownQueries:0,activeQueries:0,knownQueries:0,budgetStops:0,jointHits:0,terminalStops:0,gainStops:0,fullHits:0,eligibleOriginalHits:0,supermartingaleChecks:0,meanFinalPotential:0,initialPotential:bands.reduce((a,b)=>a*choose(b.B/(1-b.B),b.k),1),maxPotential:0,sharpChecks:0,sharpInitial:bands.reduce((a,b)=>a*(b.k===1?b.B:choose(-Math.log1p(-b.B),b.k)),1),sharpMean:0};
   function run(X,truncated,record){
    let u=X,v=X/2+3,seen=new Map(),hit=new Set(),C=bands.map(()=>0),F=bands.map(()=>0),K=bands.map(()=>0),stopped=false,reason=null;
    const val=()=>bands.reduce((a,b,i)=>a*choose(Math.max(0,(b.B-C[i])/(1-b.B)),Math.max(0,b.k-K[i])),1);
+   const sharp=(i,c,k)=>{let b=bands[i],rem=Math.max(0,b.k-k);if(!rem)return 1;if(c>=b.B)return 0;if(b.k===1)return Math.max(0,(b.B-c)/(1-c));return choose(Math.max(0,Math.log((1-c)/(1-b.B))),rem)};
    function query(t,win,terminal){
     let e=t%2?-1:1,h=t-u/2,def=2*h+(e===1?1:-5);
     for(let p of A){if(p>win||def%p!==0)continue;
@@ -35,6 +36,7 @@ function audit(){
        let before=choose(left,rem),expected=(1-q)*choose(after,rem)+q*choose(after,rem-1);
        ck(expected<=before+1e-12,"one-step supermartingale");
        if(record)s.supermartingaleChecks++;
+       let a0=sharp(j,C[j],K[j]),a1=(1-q)*sharp(j,C[j]+cost,K[j])+q*sharp(j,C[j]+cost,K[j]+1);ck(a1<=a0+1e-12,"sharp one-step");if(record)s.sharpChecks++;
       }
       C[j]+=cost;if(!yes)F[j]+=cost;else K[j]++;
       if(record)s.activeQueries++;
@@ -52,7 +54,7 @@ function audit(){
     u+=a.p-1;v+=a.w;if(record)s.actualEvents++;
    }
    if(!reason)reason=u-X>=D?"gain":"success";
-   return {K,C,F,reason,value:val(),all:K.every((k,i)=>k>=bands[i].k)};
+   return {K,C,F,reason,value:val(),sharp:bands.reduce((a,b,i)=>a*sharp(i,C[i],K[i]),1),all:K.every((k,i)=>k>=bands[i].k)};
   }
   for(let X=base;X<base+P;X+=6){
    let full=run(X,false,false),a=run(X,true,true);s.roots++;
@@ -61,9 +63,9 @@ function audit(){
    if(eligible){s.eligibleOriginalHits++;ck(a.all,"eligible original survives")}
    if(a.all)s.jointHits++;
    if(a.reason==="budget")s.budgetStops++;else if(a.reason==="terminal")s.terminalStops++;else if(a.reason==="gain")s.gainStops++;
-   s.meanFinalPotential+=a.value;s.maxPotential=Math.max(s.maxPotential,a.value);
+   s.meanFinalPotential+=a.value;s.sharpMean+=a.sharp;s.maxPotential=Math.max(s.maxPotential,a.value);
   }
-  s.meanFinalPotential/=s.roots;
+  s.meanFinalPotential/=s.roots;s.sharpMean/=s.roots;ck(s.sharpMean<=s.sharpInitial+1e-10&&s.jointHits/s.roots<=s.sharpInitial+1e-10,"sharp global");
   ck(s.meanFinalPotential<=s.initialPotential+1e-10,"global supermartingale");ck(s.jointHits/s.roots<=s.initialPotential+1e-10,"joint tail");ck(s.eligibleOriginalHits===s.jointHits,"exact eligible success correspondence");
   out.push(s)
  }
