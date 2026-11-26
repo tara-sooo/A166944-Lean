@@ -23,7 +23,7 @@ function audit(maxR=1000000){
   return res;
  }
  let out=[];
- for(let [R,T,K] of [[100000,127,6],[100000,251,6],[1000000,251,6],[1000000,503,6],[1000000,997,6],[100000,127,60]].filter(a=>a[0]<=maxR)){
+ for(let [R,T,K] of [[100000,127,6],[100000,251,6],[1000000,251,6],[1000000,503,6],[1000000,997,6],[100000,127,60],[100000,503,60]].filter(a=>a[0]<=maxR)){
   let states=new Map(),s={R,T,K,arrivals:0,relayStates:0,distinctEndpoints:0,ambiguous:0,maxLabels:0,distinctLabelPairs:0,sameMultiplierPairs:0,crossMultiplierPairs:0,narrowControls:0,narrowHighControls:0,literalTicks:0,inverseChecks:0,example:null,maxExample:null,actualRoots:0,actualEvents:0,actualCovered:0,actualAmbiguous:0};
   function add(U,V,z){let d=2*V-U;if(d<=198||d>2*K*T)return;
    ck(U-z.u>=0&&U-z.u<=104&&V-z.v>=0&&V-z.v<=133,"relay extent");
