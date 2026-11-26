@@ -5,7 +5,7 @@ function audit(N=60000){
  function inv(a,b){let c=b,x=1,y=0;a=mod(a,b);while(c){let q=Math.floor(a/c);[a,c]=[c,a-q*c];[x,y]=[y,x-q*y]}ok(a===1,"inverse");return mod(x,b)}
  function factors(x){ok(x>0&&x<lim,"range");let a=[];while(x>1){let p=spf[x];a.push(p);while(x%p===0)x/=p}return a}
  function next(H,t){let z=null;for(let I=0;I<2;I++)for(let p of factors(H-1+2*I)){if(p===2||p*p>H+1)continue;let w=mod((I?p+2:0)-t,2*p)||2*p;if(!z||w<z.w||w===z.w&&p<z.p){let d=2*t-H,g=p-1,dp=d+2*w-g,D=dp-6*I,e=1-2*I;z={H,p,w,I,e,d,dp,D,x:D/2,g,q:(H-e)/p,h:D/(2*p)}}}return z}
- const st={roots:0,events:0,cap:0,blocks:0,selected:0,edges:0,close:0,autoLong:0,components:0,componentChecks:0,windows:{3:0,4:0,5:0},distinctWindows:{3:0,4:0,5:0},witnessWindows:0,repeatChecks:0,crtChecks:0,gcdChecks:0,detChecks:0,parameterChecks:0,coverChecks:0,budgetChecks:0,syntheticSystems:0,syntheticResidues:0,syntheticPrimeWindows:0,syntheticGcdCases:0,examples:[]};
+ const st={roots:0,events:0,cap:0,blocks:0,selected:0,edges:0,close:0,autoLong:0,components:0,componentChecks:0,windows:{3:0,4:0,5:0},distinctWindows:{3:0,4:0,5:0},witnessWindows:0,repeatChecks:0,crtChecks:0,gcdChecks:0,detChecks:0,parameterChecks:0,coverChecks:0,budgetChecks:0,syntheticSystems:0,syntheticResidues:0,syntheticPrimeWindows:0,syntheticGcdCases:0,syntheticComponentChecks:0,syntheticCoverChecks:0,syntheticSameStratumPairs:0,syntheticTwinPairs:0,syntheticNoTwinPairs:0,examples:[]};
  function arithmetic(h,c,x,actual){
   let j=h.length,P=h.reduce(lcm,1),ds=h.map((v,i)=>h.reduce((d,w,k)=>k===i?d:lcm(d,gcd(v,w)),1)),u=h.map((v,i)=>v/ds[i]),D=ds.reduce(lcm,1);
   ok(P===D*u.reduce((v,w)=>v*w,1),"lcm decomposition");
@@ -45,6 +45,19 @@ function audit(N=60000){
  }
  // Genuine prime tuples in the abstract deficit coordinate, without claiming clock realizability.
  for(let j of [3,4,5])for(let T of [31,61,101]){let ps=pr.filter(p=>p>=T&&p<2*T);for(let i=0;i+j<=ps.length;i++){let h=ps.slice(i,i+j).map((p,k)=>2+(k%2)),xs=h.map((v,k)=>v*ps[i+k]);if(new Set(xs).size!==j)continue;arithmetic(h,xs.map(x=>x-xs[0]),xs[0],false);st.syntheticPrimeWindows++}}
- ok(st.close&&st.autoLong&&st.syntheticSystems&&st.syntheticGcdCases&&st.syntheticPrimeWindows,"coverage");return st
+ // Independent component weights, not purported MIN paths.
+ for(let j of [3,4,5])for(let i=0;i<10000;i++){let T=17+rand(100),n=1+rand(40),g=Array.from({length:n},()=>T-1+rand(T)),cuts=[0];for(let k=1;k<n;k++)if(rand(5)===0)cuts.push(k);cuts.push(n);let W=0,short=0,F=g.reduce((a,b)=>a+b,0);
+  for(let k=1;k<cuts.length;k++){let v=g.slice(cuts[k-1],cuts[k]),len=v.length,tot=v.reduce((a,b)=>a+b,0);if(len<=j){short+=tot;continue}let paid=v.slice(j).reduce((a,b)=>a+b,0);ok(tot<=2*(j+1)*paid,"synthetic nontrivial component");W+=paid;st.syntheticComponentChecks++}
+  ok(F<=short+2*(j+1)*W&&short<=2*T*j*(cuts.length-1),"synthetic cover");st.syntheticCoverChecks++;
+ }
+ // Same adjusted deficit means the return clock parity constrains q modulo 4.
+ // Exercise the exact residue argument with prime cofactors, no MIN assertion.
+ for(let p of pr.filter(p=>p>=17&&p<=97))for(let h of [1,2,3,4])for(let I of [0,1])for(let J of [0,1])for(let q of pr.filter(q=>q>=p&&q<400)){
+  let e=1-2*I,f=1-2*J;if((p*q+e)%3||mod((q+1)/2+h-I,2))continue;
+  for(let s of pr.filter(s=>s>q&&s<=q+24)){if((p*s+f)%3||mod((s+1)/2+h-J,2))continue;
+   ok(s-q===2||s-q>=10,"same stratum spacing");st.syntheticSameStratumPairs++;if(s-q===2)st.syntheticTwinPairs++;else st.syntheticNoTwinPairs++;
+  }
+ }
+ ok(st.syntheticComponentChecks&&st.syntheticTwinPairs&&st.syntheticNoTwinPairs&&st.close&&st.autoLong&&st.syntheticSystems&&st.syntheticGcdCases&&st.syntheticPrimeWindows,"coverage");return st
 }
 console.log(JSON.stringify(audit(Number(process.argv[2]||60000)),null,2));
