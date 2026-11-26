@@ -53,20 +53,20 @@ def audit(R):
             if z[7] or z[6]<T or z[0]>H:continue
             u,v=s; y=dest[s]; m=nodes[y][0] if y in nodes else exitmass[y]
             allsmall+=z[0]*z[5]
-            if m>2*H:
-                assert m>2*z[0]
+            if m>H:
+                assert m>z[0]
                 growth_mass+=z[0];growth_wait+=z[0]*z[5]
             else:
                 slot=by_slot[u,y[1]];slot[0]+=z[0];slot[1]=max(slot[1],z[5])
         intervals=defaultdict(list)
         for (u,n),(m,w) in by_slot.items():
-            assert m<=2*H; intervals[u].append((n-w,n))
+            assert m<=H; intervals[u].append((n-w,n))
         for u,ints in intervals.items():
             ints.sort()
             assert all(x[1]<=y[0] for x,y in zip(ints,ints[1:]))
             assert sum(n-v for v,n in ints)<=u//2+3
-        assert growth_mass<=M*log(M,2)+1e-6
-        assert allsmall-growth_wait<=2*H*(R+3)*rough_count
+        assert growth_mass<=M
+        assert allsmall-growth_wait<=H*(R+3)*rough_count
         print(f'all_history T={T} H={H} rough_count={rough_count} small_wait={allsmall} growth_mass={growth_mass} growth_wait={growth_wait}')
     # Previous marked state along a heavy chain, and next marked state along successor.
     prev={}; nxt={}
