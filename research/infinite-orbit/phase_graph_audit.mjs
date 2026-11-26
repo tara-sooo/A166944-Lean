@@ -35,10 +35,10 @@ for(let X of [4096,16384,65536,262144]){
  let N=(Y-X)/2,types=["factor","nondecrease","long","longSafe"],stats=[];
  let finalGain,finalLen;
  for(let mode=0;mode<4;mode++){
-  let gain=new Int32Array(N),len=new Int32Array(N),nx=new Int32Array(N);let nEdges=0,nStarts=0,best=0,bi=0,vertices=0;
+  let gain=new Int32Array(N),len=new Int32Array(N),maxCount=new Int32Array(N),nx=new Int32Array(N);let nEdges=0,nStarts=0,best=0,bi=0,vertices=0;
   for(let i=N-1;i>=0;i--){
    let H=X+2*i;if(mode===3&&!safe(H))continue;vertices++;
-   let f=elig(H),bestg=0,bestl=0,bestp=0;
+   let f=elig(H),bestg=0,bestl=0,bestp=0,bc=0;
    for(let s=0;s<2;s++)for(let p of f[s]){
     if(p<T||p>B)continue;
     let W=maxwait(p,s,f),g=p-1,H2=H+g;
@@ -46,19 +46,19 @@ for(let X of [4096,16384,65536,262144]){
     if(mode>=2&&W<p-2)continue;
     if(mode===3&&!safe(H2))continue;
     nEdges++;let gi=g+(H2<Y?gain[(H2-X)/2]:0),li=1+(H2<Y?len[(H2-X)/2]:0);
-    if(gi>bestg){bestg=gi;bestl=li;bestp=p}
+    bc=Math.max(bc,1+(H2<Y?maxCount[(H2-X)/2]:0));if(gi>bestg){bestg=gi;bestl=li;bestp=p}
    }
-   gain[i]=bestg;len[i]=bestl;nx[i]=bestp;
+   gain[i]=bestg;len[i]=bestl;maxCount[i]=bc;nx[i]=bestp;
    if(bestg){nStarts++;if(bestg>best){best=bestg;bi=i}}
   }
   let H=X+2*bi,steps=[];while(H<Y&&nx[(H-X)/2]){let p=nx[(H-X)/2];steps.push([H,p]);H+=p-1}
   let entryMax=0;for(let i=0;i<=Math.floor((B-1)/2);i++)entryMax=Math.max(entryMax,gain[i]);
-  stats.push({mode:types[mode],vertices,nEdges,nStarts,maxGain:best,maxLen:len[bi],entryMax,example:steps});
+  let maxEvents=0;for(let v of maxCount)maxEvents=Math.max(maxEvents,v);stats.push({mode:types[mode],vertices,nEdges,nStarts,maxGain:best,gainMaximizerLen:len[bi],maxEvents,entryMax,example:steps});
   if(mode===3){finalGain=gain;finalLen=len}
  }
  // Exact phase search for any eligible safe long run with >=2 events. The first arrival is enough:
  // check existence of t in [ceil(H/2),3H+3] and w>=p-2, then deterministic continuation.
- let best=0,example=null,arrivalChecks=0,feasible=0,two=0,starts=0;
+ let best=0,maxEvents=0,example=null,arrivalChecks=0,feasible=0,two=0,starts=0;
  for(let i=0;i<N;i++){
  let H=X+2*i;if(!safe(H)||finalGain[i]===0)continue;
  let f=elig(H);
@@ -86,7 +86,7 @@ for(let X of [4096,16384,65536,262144]){
    if(a.p<T||a.p>B||a.w<a.p-2||!safe(h+a.p-1))break;
    steps.push([h,tt,a.p,a.w]);h+=a.p-1;tt+=a.w;gg+=a.p-1;
   }
-  if(steps.length>=2)two++;
+  maxEvents=Math.max(maxEvents,steps.length);if(steps.length>=2)two++;
   if(gg>best){best=gg;example=steps}
  }
  }
@@ -105,9 +105,9 @@ for(let X of [4096,16384,65536,262144]){
  }
  }
  }
- if(singleton>best){best=singleton;example=[singletonExample]}
+ if(singleton>best){best=singleton;example=[singletonExample]}if(singleton>0)maxEvents=Math.max(maxEvents,1);
  if(example)for(let [h,t,p,w] of example){let z=literal(h,t);ok(z.p===p&&z.w===w,"literal path");lit++}
- windows.push({X,T,B,K,V,stats,exact:{maxGain:best,example,starts,arrivalChecks,feasible,two,oneChecks}});
+ windows.push({X,T,B,K,V,stats,exact:{maxGain:best,maxEvents,example,starts,arrivalChecks,feasible,two,oneChecks}});
 }
 return {local,attained,crtAttain,strict,tie,opp,exactAffine,affineSurvivors,lit,windows}
 }
