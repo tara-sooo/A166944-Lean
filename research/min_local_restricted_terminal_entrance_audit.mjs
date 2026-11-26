@@ -14,7 +14,7 @@ function audit(){
  function stats(m){let E=0,max=0,n=0;for(let a of m.values()){E+=a*a;max=Math.max(max,a);n+=a}return {classes:m.size,E,max,n}}
  let periods=[],slabs=[];
  for(let T of [3,5,7,11,13,17]){
-  let A=ps.filter(p=>p<=T),Q=2*A.reduce((a,b)=>a*b,1),P=2*Q,base=P,term=new Map(),exact=new Map(),memo=new Map(),steps=0,control=0,maxGain=0,waitSum=0,roots=0;
+  let A=ps.filter(p=>p<=T),Q=2*A.reduce((a,b)=>a*b,1),P=2*Q,base=P,term=new Map(),exact=new Map(),memo=new Map(),steps=0,control=0,maxGain=0,gainSum=0,waitSum=0,roots=0;
   function terminal(x,v){
    let path=[],k;
    for(;;){k=x+":"+v;if(memo.has(k)){k=memo.get(k);break}
@@ -26,7 +26,7 @@ function audit(){
   for(let X=base;X<base+P;X+=6){
    roots++;let v=X/2+3,k=terminal(X,v),[u,t]=k.split(":").map(Number);add(term,u);add(exact,k);
    ck(u>=X&&u<=Q*(Math.floor(X/Q)+1),"terminal range");ck(A.every(p=>u%p!==1&&u%p!==p-1),"terminal rough");
-   maxGain=Math.max(maxGain,u-X);waitSum+=t-v;
+   maxGain=Math.max(maxGain,u-X);gainSum+=u-X;waitSum+=t-v;
    if(X<base+120){
     let x=X,n=v;
     while(x<u){let z=next(x,n,A);for(let i=1;i<=z.w;i++){let tick=n+i,g=gcd(tick%2?tick-2:tick,tick%2?x+1:x-1),p=A.find(r=>g%r===0);ck(i===z.w?p===z.p:p===undefined,"literal");control++}x+=z.p-1;n+=z.w}
@@ -39,12 +39,12 @@ function audit(){
   let folded=new Map(),foldedExact=new Map();for(let [u,n] of term)add(folded,mod(u,P),n);
   for(let [k,n] of exact){let [u,v]=k.split(":").map(Number),shift=Math.floor(u/P);add(foldedExact,mod(u,P)+":"+(v-shift*Q),n)}
   let rough=2*A.reduce((a,p)=>a*(p-2),1);
-  let z=stats(folded),zz=stats(foldedExact);ck(z.classes<=rough&&z.E*rough>=roots*roots,"rough CS");ck(z.n===roots&&zz.n===roots,"mass");
-  periods.push({T,Q,P,roots,rough,terminal:z,exactTerminal:zz,steps,control,maxGain,waitSum,meanSize:z.E/roots,maxNormalized:z.max/(Math.log(T)**2)})
+  let z=stats(folded),zz=stats(foldedExact);ck(3*(z.E-roots)<=gainSum,"period displacement energy");ck(z.classes<=rough&&z.E*rough>=roots*roots,"rough CS");ck(z.n===roots&&zz.n===roots,"mass");
+  periods.push({T,Q,P,roots,rough,terminal:z,exactTerminal:zz,steps,control,maxGain,gainSum,meanGain:gainSum/roots,waitSum,meanSize:z.E/roots,maxNormalized:z.max/(Math.log(T)**2)})
  }
  for(let [R,len,T] of [[10000,10000,13],[100000,30000,31],[100000,30000,127],[1000000,60000,251],[1000000,60000,503],[1000000,60000,997]]){
   let J=R+len,A=Array.from({length:T-2},(_,i)=>i+2).filter(p=>p>2&&!spf[p]),memo=new Map(),terminal=new Map(),offsetTerminal=new Map(),entr=new Map(),entrOff=new Map(),map=new Map(),mapOff=new Map();
-  let s={R,len,T,roots:0,lowEvents:0,firstHigh:0,noHigh:0,preempt:0,terminalHigh:0,terminalMemoSteps:0,literalTicks:0,replayChecks:0,distinctHighWithMultipleTerminalOffsets:0,example:null};
+  let s={R,len,T,roots:0,lowEvents:0,firstHigh:0,noHigh:0,preempt:0,terminalHigh:0,terminalMemoSteps:0,gainSum:0,literalTicks:0,replayChecks:0,distinctHighWithMultipleTerminalOffsets:0,example:null};
   function low(x,v){return next(x,v,fs(x-1).concat(fs(x+1)).filter(p=>p<T))}
   function term(x,v){
    let path=[],k;
@@ -57,7 +57,7 @@ function audit(){
    for(let a of path)memo.set(a,k);return k
   }
   for(let X=Math.ceil(R/6)*6;X<J;X+=6){
-   s.roots++;let x=X,v=X/2+3,k=term(x,v);add(terminal,k);let off=k.split(":")[1];add(offsetTerminal,off);
+   s.roots++;let x=X,v=X/2+3,k=term(x,v);add(terminal,k);let off=k.split(":")[1];add(offsetTerminal,off);s.gainSum+=Number(off)-X;
    while(x<J){
     let z=full(x,v);
     if(z.p>=T){
@@ -77,7 +77,7 @@ function audit(){
    if(x>=J){s.noHigh++;ck(k==="exit:"+x+":"+v,"exit")}
   }
   s.terminal=stats(terminal);s.offsetTerminal=stats(offsetTerminal);s.entrance=stats(entr);s.entranceOffsets=stats(entrOff);
-  ck(s.entrance.E<=s.terminal.E&&s.entrance.max<=s.terminal.max,"energy");ck(s.firstHigh+s.noHigh===s.roots,"partition");
+  ck(3*(s.offsetTerminal.E-s.roots)<=s.gainSum,"slab displacement energy");ck(s.entrance.E<=s.terminal.E&&s.entrance.max<=s.terminal.max,"energy");ck(s.firstHigh+s.noHigh===s.roots,"partition");
   for(let m of mapOff.values())if(m.size>1)s.distinctHighWithMultipleTerminalOffsets++;
   slabs.push(s)
  }
