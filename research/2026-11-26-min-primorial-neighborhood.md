@@ -18,6 +18,19 @@ If at least one of u±1 is composite, it has an odd prime factor q<=sqrt(u+1)<=S
 
 If twins are finite, there is a fixed offset U beyond all twin centers. For S>U+1, every plateau u<=U has a competitor <=U+1, so the number and total waiting of this initial segment are bounded solely by U (u increases by at least 2 each event). This also bounds the time at the first event leaving that segment. All subsequent events with pre-offset in [U,S^2-2] increase Phi by <2. Crossing to u>S^2-2 implies Phi>=sqrt(u+1)>=S (even offsets and integer S). Hence for all sufficiently large S every such crossing from (4,5) has m>=S/2-O_U(1) events. Stopping in the actual adaptive orbit at large H itself certifies twins H±1. A crossing family of size m<=(1/2-epsilon)S for arbitrarily large S and sufficiently large J, or an unbounded family of adaptive stops, proves twin infinitude. The earlier S/4 threshold is improved by factor 2. This result does not prove the requisite upper bound.
 
+## 2a. Unconditional short-crossing certificate with a prime-count error
+
+Assume a crossing from (4,5) has no rough pre-offset in [4,S^2-2]. Every exceptional plateau with both u±1 prime then has u-1<=S, so there are at most k<=pi(S) exceptional events, as pre-offsets strictly increase. At each exceptional plateau a prime <=S is eligible and the squared potential increases by <=4S. Ordinary events increase Phi by <2. Inductively, after m events with k exceptions,
+
+    Phi(v_m)<=2(m-k)+sqrt(11+4Sk).
+
+Indeed the ordinary step adds <=2, and for nonnegative a,b,c the elementary inequality sqrt((a+b)^2+c)<=a+sqrt(b^2+c) handles each exceptional step with c=4S. Crossing implies Phi(v_m)>=S, so
+
+    m >= S/2 - (1/2)sqrt(11+4S*pi(S))
+      = S/2 - O(S/sqrt(log S)),
+
+using the elementary Chebyshev prime-count upper bound. This estimate requires NO finite-twins assumption. In particular every sufficiently large S crossing with m<=(1/2-epsilon)S for fixed epsilon>0 contains a rough pre-offset and therefore directly yields a twin pair >S. The threshold can also be stated nonasymptotically using the displayed pi(S) expression. This is stronger than merely deriving a contradiction from a global finite-twins hypothesis; short crossing is a finite witness search.
+
 ## 3. Deterministic small-label shadow and exact lift
 
 Discard labels >S temporarily. At (u,v) the next event is the lexicographic minimum (w,p) over p<=S dividing u-1 (even clock n=0 mod 2p) or u+1 (odd clock n=p+2 mod 2p). This is exactly the small-prime clock system for every J divisible by 4P_S. Let A=max over its finite prefix of d+2w+1. All raw GCD prime factors up to the corresponding event are <=A, because the odd-clock defect has absolute value at most max(3,d+2w+1). If A<=S, the whole shadow prefix is forced in every sufficiently large lift, even without excluding large primes by CRT.
