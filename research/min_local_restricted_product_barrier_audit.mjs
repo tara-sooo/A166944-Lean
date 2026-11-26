@@ -8,13 +8,16 @@ function audit(){
  {base:[3,5,7],z:17,D:300,B:1.2,s:.5,R:1021020,len:1021020},
  {base:[3],z:31,D:45,B:1.0,s:.5,R:10000,len:10000},
  {base:[3,5],z:61,D:120,B:1.0,s:.4,R:100000,len:30000},
- {base:[3,5,7],z:127,D:300,B:1.25,s:.3,R:100000,len:30000}
+ {base:[3,5,7],z:127,D:300,B:1.25,s:.3,R:100000,len:30000},
+ {base:[3],z:17,D:300,B:2.0,s:.3,R:1021020,len:1021020},
+ {base:[3,5],z:31,D:1000,B:1.8,s:.3,R:100000,len:30000},
+ {base:[3],z:127,D:1000,B:1.5,s:.25,R:100000,len:30000}
  ];
  let out=[];
  for(let c of controls){
   let {base,z,D,B,s,R,len}=c,A=primes.filter(p=>p<=z),H=A.filter(p=>!base.includes(p)),P=4*base.reduce((t,p)=>t*p,1),M0=2*D/P;
   ck(M0>1&&H.length>0,"threshold");
-  let st={...c,P,M0,roots:0,classes:0,states:0,queries:0,leaves:0,certCount:0,weight:0,tiltedWeight:0,maxClassTilt:0,realHits:0,covered:0,exits:0,exitBudgetHits:0,budgetStops:0,terminalBeforeThreshold:0,wallChecks:0,clockChecks:0,maxMod:0,duplicateCovers:0};
+  let st={...c,P,M0,roots:0,classes:0,states:0,queries:0,leaves:0,certCount:0,weight:0,tiltedWeight:0,maxClassTilt:0,realHits:0,covered:0,exits:0,exitBudgetHits:0,budgetStops:0,terminalBeforeThreshold:0,wallChecks:0,clockChecks:0,maxMod:0,duplicateCovers:0,multiLeaves:0,multiHits:0};
   let certs=new Map(),a=p=>p**(s-1);
   function certificate(r,K,prod){
    let x=r,m=P;for(let [p,v] of K){let t=0;while(mod(x+m*t,p)!==v)t++;x+=m*t;m*=p}ck(m===P*prod&&m>=2*D&&m<2*D*z+1,"modulus");
@@ -24,7 +27,7 @@ function audit(){
    st.classes++;let leaves=[],weight=0,tilt=0,stack=[{G:0,W:0,j:1,i:0,neg:new Map(),known:new Map(),prod:1,cost:0}];
    while(stack.length){
     let {G,W,j,i,neg,known,prod,cost}=stack.pop();st.states++;
-    if(prod>=M0){let l=certificate(r,known,prod);leaves.push(l);st.leaves++;st.certCount+=l.n;weight+=1/prod;tilt+=prod**(s-1);st.maxMod=Math.max(st.maxMod,l.m);continue}
+    if(prod>=M0){let l=certificate(r,known,prod);leaves.push(l);st.leaves++;if(known.size>=2)st.multiLeaves++;st.certCount+=l.n;weight+=1/prod;tilt+=prod**(s-1);st.maxMod=Math.max(st.maxMod,l.m);continue}
     ck(G<D,"wall before product threshold");
     while(G<D&&j<=2*z){
      let t=r/2+3+W+j,h=3+W+j-G/2,e=t%2?-1:1,f=2*h+(e===1?1:-5);
@@ -56,7 +59,7 @@ function audit(){
      for(let j=1;j<=Math.min(w,2*z)&&!hit;j++){
       let t=v+j,h=3+W+j-G/2,e=t%2?-1:1,f=2*h+(e===1?1:-5);
       for(let q of A){if(f%q!==0)continue;let b=mod(e-G,q),yes=mod(X,q)===b;
-       if(!base.includes(q)&&!known.has(q)){let S=neg.get(q)||new Set();if(!S.has(b)){cost+=a(q);if(cost>B+1e-12)budgetExceeded=true;if(yes){known.set(q,b);prod*=q;if(prod>=M0){hit=true;st.realHits++;if(!budgetExceeded){st.covered++;let leaves=certs.get(mod(X,P)),n=leaves.filter(l=>mod(X-l.x,l.m)===0).length;ck(n>0,"coverage");st.duplicateCovers+=n-1}}}else{S.add(b);neg.set(q,S)}}}
+       if(!base.includes(q)&&!known.has(q)){let S=neg.get(q)||new Set();if(!S.has(b)){cost+=a(q);if(cost>B+1e-12)budgetExceeded=true;if(yes){known.set(q,b);prod*=q;if(prod>=M0){hit=true;st.realHits++;if(known.size>=2)st.multiHits++;if(!budgetExceeded){st.covered++;let leaves=certs.get(mod(X,P)),n=leaves.filter(l=>mod(X-l.x,l.m)===0).length;ck(n>0,"coverage");st.duplicateCovers+=n-1}}}else{S.add(b);neg.set(q,S)}}}
        if(yes){ck(p===q&&w===j,"clock");st.clockChecks++;break}
       }
      }
