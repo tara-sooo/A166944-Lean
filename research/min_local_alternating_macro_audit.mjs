@@ -13,7 +13,7 @@ function alternatingAudit(){
  const gcd=(x,y)=>{while(y){let z=x%y;x=y;y=z}return x<0n?-x:x};
  // Explicitly realize a four-word for an already-known admissible twin pair.
  let examples=[];
- for(let p=37;p<500;p++)if(p%12===5&&isprime(p)&&isprime(p+2)&&(p+1)%5===0){
+ for(let p=37;p<2500;p++)if(p%12===5&&isprime(p)&&isprime(p+2)&&(p+1)%5===0){
    let r=p+2,h=p+1;
    const qs=Array.from({length:r+8},(_,i)=>i+3).filter(isprime).filter(q=>q<=r+7);
    let conditions=[[12,0]],possible=true;
