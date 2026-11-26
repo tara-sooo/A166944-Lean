@@ -19,7 +19,7 @@ for(let start=lo;start+512*T<=hi;start+=512*T){let x=slot(p,start+8*T,start+248*
 }else for(let j=0;j<S;j++){let p=ps[Math.floor(j*ps.length/S)],lo=Math.ceil(X+j*width+16*T),hi=Math.floor(X+(j+1)*width-16*T),q=Math.ceil((lo-1)/p);if(q%2===0)q++;
 for(;p*q+1<=hi;q+=2){let k=Math.floor(Math.sqrt(2)*q/2),H=p*q+1;if(gcd(q,k)!==1||out.length&&H-out[out.length-1].H<16*T)continue;out.push({H,n:2*p*k,p,q,k});}}
 return out}
-let totals={tests:0,horizon:0,parity:0,scalar:0,terminal:0,bracket:0,exactClock:0,flexTerminal:0,flexBracket:0,flexClock:0,exactMin:0,reverseStates:0,reverseIntervals:0,reverseMax:0,reverseEdges:0,scalarEvents:0,scalarClockViolations:0,exactClockEvents:0,flexClockEvents:0,competitionFailures:0,bruteTests:0,bruteStates:0,anchorTests:0,noLast1:0,noLast2:0,noLastFlex:0},blocks=[],examples={scalar:null,clock:null,flex:null,terminal:null},first=null;
+let totals={tests:0,horizon:0,parity:0,scalar:0,terminal:0,bracket:0,exactClock:0,flexTerminal:0,flexBracket:0,flexClock:0,reverseStates:0,reverseIntervals:0,reverseMax:0,reverseEdges:0,scalarEvents:0,scalarClockViolations:0,exactClockEvents:0,flexClockEvents:0,competitionFailures:0,bruteTests:0,bruteStates:0,bruteNonempty:0,intervalTests:0,intervalTicks:0,deterministicTests:0,deterministicFixed:0,deterministicFlexible:0,anchorTests:0,noLast1:0,noLast2:0,noLastFlex:0},blocks=[],examples={scalar:null,clock:null,flex:null,terminal:null},first=null;
 function terminalOptions(H,t,cap){let s=mod(t,2),a=gcd(H+2*s,t-2*s);return factors(a).filter(p=>p>=3&&p<=cap&&H-p+1>=4&&p*p<=H-p+2)}
 function merge(a){if(!a.length)return a;a.sort((x,y)=>x[0]-y[0]||x[1]-y[1]);let r=[a[0]];for(let i=1;i<a.length;i++){let last=r[r.length-1],z=a[i];if(z[0]<=last[1]+1)last[1]=Math.max(last[1],z[1]);else r.push(z)}return r}
 function preimage(l,u,e){let a=l+mod(e.c-l,2*e.p),b=u-mod(u-e.c,2*e.p);return a<=b?[a-2*e.p,b-1]:null}
@@ -63,8 +63,9 @@ totals[record==="clock"?"exactClockEvents":"flexClockEvents"]+=path.length;total
 return yes;
 }
 let clock=!!(bracket&&terminal&&inverse(n,n,"clock")),flex=!!(flexBracket&&flexTerminal&&inverse(f0,f1,"flex"));
+let hh=H,tt=t;while(hh<J){let e=earliest(hh,tt);if(!e||e.p>cap)break;tt=next(tt,e);hh+=e.g;}totals.deterministicTests++;if(hh===J&&tt===n)totals.deterministicFixed++;if(hh===J&&tt>=f0&&tt<=f1)totals.deterministicFlexible++;
 if(clock)ok(flex,"fixed implies flexible");
-if(doBrute){let states=new Array(N+1);states[0]=new Set([t]);for(let i=0;i<N;i++)if(states[i])for(let tt of states[i]){totals.bruteStates++;for(let e of es[i]){let j=i+e.g/2,nn=next(tt,e),hh=H+2*j;if(nn>f1||nn<hh/2||nn>3*hh+3)continue;(states[j]??=new Set()).add(nn);}}let end=states[N]||new Set();ok(end.has(n)===clock&&[...end].some(v=>v>=f0&&v<=f1)===flex,"literal state census");totals.bruteTests++;}
+if(doBrute||(clock&&E<5000&&!totals.bruteNonempty)){let states=new Array(N+1);states[0]=new Set([t]);for(let i=0;i<N;i++)if(states[i])for(let tt of states[i]){totals.bruteStates++;for(let e of es[i]){let j=i+e.g/2,nn=next(tt,e),hh=H+2*j;if(nn>f1||nn<hh/2||nn>3*hh+3)continue;(states[j]??=new Set()).add(nn);}}let end=states[N]||new Set();ok(end.has(n)===clock&&[...end].some(v=>v>=f0&&v<=f1)===flex,"literal state census");totals.bruteTests++;if(end.size)totals.bruteNonempty++;}
 return {horizon:!!reach[N],parity:!!par,scalar,terminal,bracket:!!bracket,exactClock:clock,flexTerminal,flexBracket:!!flexBracket,flexClock:flex,lo:lo[N],hi:hi[N],W,E,mw};
 }
 for(let X of [4096,65536,1048576])for(let alternating of (X===4096?[false]:[false,true])){
@@ -75,6 +76,14 @@ let count=Math.min(alternating?4:24,as.length-1);
 for(let i=0;i<count;i++){let A=as[i],B=as[i+1],r=search(A,B,cap,X===4096&&i<6);totals.tests++;for(let key of ["horizon","parity","scalar","terminal","bracket","exactClock","flexTerminal","flexBracket","flexClock"])if(r[key])totals[key]++;cases.push(r);}
 blocks.push({X,alternating,anchors:as.length,cap,totals:Object.fromEntries(Object.keys(totals).map(k=>[k,totals[k]-before[k]])),ranges:cases.slice(0,3)});
 }
-return {totals,blocks,examples}
+let prescribed={...totals};
+// Adaptive DAG: keep the anchor post-state fixed, allow any feasible pretime at the next anchor.
+let X=1048576,as=anchors(X,false).slice(0,16),dp=new Int32Array(as.length),prev=new Int32Array(as.length);dp.fill(1);prev.fill(-1);let tested=0,success=0,records=[];
+for(let i=0;i<as.length;i++)for(let j=i+1;j<Math.min(as.length,i+4);j++){let r=search(as[i],as[j],128);tested++;if(r.flexClock){success++;records.push([i,j]);if(dp[i]+1>dp[j]){dp[j]=dp[i]+1;prev[j]=i;}}}
+let idx=dp.indexOf(Math.max(...dp)),chain=[];while(idx>=0){chain.push(idx);idx=prev[idx]}chain.reverse();
+let adaptive={X,anchors:as.length,tested,success,chain,chainAnchors:chain.map(i=>as[i]),records,totals:Object.fromEntries(Object.keys(totals).map(k=>[k,totals[k]-prescribed[k]]))};
+// Independent literal preimage checks, including nonempty interval unions and gaps.
+for(let p of [3,5,7,13,31])for(let s=0;s<2;s++)for(let a=10;a<=60;a+=5)for(let b=a;b<=a+24;b+=4){let e={p,s,c:s?p+2:0},z=preimage(a,b,e);for(let t=-60;t<=100;t++){let nn=next(t,e);ok((nn>=a&&nn<=b)===!!(z&&t>=z[0]&&t<=z[1]),'literal preimage');totals.intervalTicks++;}totals.intervalTests++;}
+return {totals,prescribed,blocks,examples,adaptive}
 }
 console.log(JSON.stringify(audit(),null,2));
