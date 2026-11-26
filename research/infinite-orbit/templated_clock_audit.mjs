@@ -42,7 +42,7 @@ for(let i=0;i<m-1;i++){
 let A=1n,C=1n,F=0n,H=1n,R=0n;
 for(let j=i;j<m-1;j++){let z=rows[j],a=BigInt(z.A),c=BigInt(z.C),b=BigInt(z.b);
 F=a*F+b*C;A=a*A;C=c*C;let h=BigInt(Math.max(Math.abs(z.A),Math.abs(z.C),1));if(h>H)H=h;let r=b<0n?-b:b;if(r>R)R=r;
-ok(C*BigInt(list[j+1].p)===A*BigInt(list[i].p)+F&&A%2n===0n&&C%2n!==0n,"composition");totals.composition++;
+ok(C*BigInt(list[j+1].p)===A*BigInt(list[i].p)+F&&A%2n===0n&&C%2n!==0n&&F%2n!==0n,"composition parity");totals.composition++;
 let bound=BigInt(j-i+1)*R*H**BigInt(j-i),absF=F<0n?-F:F;ok(absF<=bound,"composition bound");
 if(list[j+1].p===list[i].p){totals.repeat++;ok(absF>=BigInt(list[i].p)&&bound>=BigInt(T),"repeat toll");totals.repeatToll++;if(!examples.repeat)examples.repeat={X,can,M,d,labels:list.map(v=>v.p),hs,rows,i,j:j+1,F:String(F),bound:String(bound)};}
 if(bound<BigInt(T)){ok(list[j+1].p!==list[i].p,"finite escape");totals.finiteEscape++;}
@@ -51,7 +51,7 @@ if(rows.every(z=>z.A!==0)){
 let st={u:0n,k:1n,a:1n,c:0n},p0=BigInt(list[0].p),forms=[{a:1n,b:0n,c:1n}];
 for(let j=0;j<rows.length;j++){let z=rows[j],prev=forms[j];forms.push({a:BigInt(z.A)*prev.a,b:BigInt(z.A)*prev.b+BigInt(z.b)*prev.c,c:BigInt(z.C)*prev.c});
 st=extend(st,z.A,z.C,z.b);ok(st&&modB(p0-st.u,st.k)===0n&&st.a*((p0-st.u)/st.k)+st.c===BigInt(list[j+1].p),"affine exact");totals.affine++;}
-for(let i=0;i<m;i++)for(let j=i+1;j<m;j++){let a=forms[i],b=forms[j];ok(a.a*b.c!==b.a*a.c,"distinct slopes by parity");totals.nonprop++;}
+for(let i=0;i<m;i++)for(let j=i+1;j<m;j++){let a=forms[i],b=forms[j];ok(a.a*b.c!==b.a*a.c,"distinct slopes by parity");ok(a.a*b.b!==b.a*a.b,"nonproportional affine forms by odd composed intercept");totals.nonprop++;}
 if(L<=24&&R<=24&&Math.min(...hs.map(Math.abs))<=16){
 totals.smallTemplateWords++;if(hasLong){totals.longTemplateWords++;let data={X,can,M,N,d,list,hs,rows,L,R,modulus:String(st.k)};if(!examples.long)examples.long=data;
 if(patterns.size<6){let p={M,N,d,h0:hs[0],s:list.map(v=>v.s),E:rows.map(z=>z.E),a:rows.map(z=>z.a),tau:rows.map(z=>z.tau)};patterns.set(JSON.stringify(p),p);}
