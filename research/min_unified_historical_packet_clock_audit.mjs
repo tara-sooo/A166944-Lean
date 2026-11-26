@@ -75,6 +75,11 @@ function audit(Xs=[4096,16384,65536]){
  }
  // Artificial repeated colors: no disjoint-color assumption at merges.
  let groups=[[4,1,2],[2,5,0],[3,2,4]],R=7,A=v=>v.reduce((a,b)=>a+b,0)**2-v.reduce((a,b)=>a+b*b,0),f=v=>A(v)/(v.reduce((a,b)=>a+b,0)+R),v=[0,1,2].map(i=>groups.reduce((s,g)=>s+g[i],0));ok(f(v)>=groups.reduce((s,g)=>s+f(g),0),"overlapping-color merge");
- return {results,synthetic:{merged:f(v),separate:groups.reduce((s,g)=>s+f(g),0)}}
+ // Nonvacuous positive retirement surplus: twenty size-five packets and one singleton.
+ const survivors=Array(20).fill(5),before=[...survivors,1],regularizer=10,P=5;
+ const wgt=g=>A(g)/(g.reduce((s,x)=>s+x,0)+regularizer);
+ const excess=wgt(before)-wgt(survivors)-1,bound=P/(101+regularizer);
+ ok(excess>0&&excess<=bound+1e-12,"positive retirement surplus bound");
+ return {results,synthetic:{merged:f(v),separate:groups.reduce((s,g)=>s+f(g),0),positiveRetirementExcess:excess,retirementBound:bound}}
 }
 console.log(JSON.stringify(audit(process.argv.length>2?process.argv.slice(2).map(Number):undefined),null,2));

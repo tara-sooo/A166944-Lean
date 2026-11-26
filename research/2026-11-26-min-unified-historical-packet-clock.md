@@ -1060,3 +1060,7 @@ Run node research/min_unified_historical_packet_clock_audit.mjs 4096 16384 65536
 }
 ```
 Main/direct unchanged.
+
+## 8. Supplementary nonvacuous retirement surplus control
+
+The 24 finite actual controls had no positive local retirement surplus (the finite regularizer is substantial relative to those cohorts). To exercise (5) where it is genuinely needed, consider twenty surviving packets of five members and one retiring singleton, with P=5 and R=10. The exact excess is 0.023751023751032108, strictly positive and below 0.04504504504504504. This is an artificial graph, not an actual MIN orbit. The complete audit was rerun after adding this assertion. It confirms that monotonicity of eligible packet insertion does not imply a nonpositive retirement surplus; its small upper bound is the relevant estimate.
