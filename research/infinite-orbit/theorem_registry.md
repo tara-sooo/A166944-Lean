@@ -263,3 +263,20 @@ Unrestricted order-T jumps and larger relay budgets remain. No full model, gener
 | A14 | 21921 triple determinant checks,20739 distinct,413 p,r,p returns incl191 short and41 short nonrank;12 affine/product exact censuses,27752 candidates;500 clock phase set equalities,8935 compatible,732 local exact MIN | COMPUTATION; final pass, overlapping sample incidences, no asymptotic test |
 
 Large all-distinct gaps, higher relay budgets, longer returns, and general fast composite-cofactor populations remain. No full all-constraint infinite model, general uncapped bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XVII — coupled clock directions and wide-label affine supply
+
+[Clock direction paper](https://github.com/tara-sooo/A166944-Lean/blob/c80d8f09b0fd28b344e8b0499b6dc17720b2e316/research/infinite-orbit/clock_direction.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L28 | Corrected shifts D_j=E_j-1+2sigma_j odd nonzero, d_j=V_j-2sigma_j nonzero; adjacent distinct labels give integer ell_j=(D_j c_(j-1)-d_j a_(j-1))/p_j, D_j c_j-d_j a_j=p_(j-1)ell_j-d_j | PAPER; arbitrary gaps, waits, composite cofactors |
+| D63 | Parallel shifts (D_j,d_j)=t_j(D,d), primitive D>0 odd: m_1 v=m_0 p-d, m_i integer, nonzero same sign for abs(d)<T; parity-subsequence recurrence extends to same-direction words | PAPER; all-distinct triple, no horizon rank or small label-gap hypothesis |
+| D64 | With P=L+4,Q=W+2,S=P+Q polylog, parallel triple weight O(X P Q S log(2+S)(loglog X)^2/log² X) | PAPER; outer two prime forms, endpoint clock CRT, middle high divisor, summed primitive shifts; absolute full-window count |
+| D65 | Qdet=D1 d2-D2 d1: middle quotients reconstructed by (6); r(v ell2+d2)=-Qdet mod p and r(p ell1-d1)=-Qdet mod v | PAPER; short offsets invertible, nonzero Qdet hyperbola residues; both simultaneous, no independence assumed |
+| D66 | Nonparallel with either ell zero gives two affine label forms and weight O(X P² Q³ (loglog X)^2/log² X) | PAPER; no cofactor primality; fixed L,W removes loglog |
+| D67 | Fixed rational first-pair ratio N r=M p+h, 0<abs(h)<=A polylog, ell2 nonzero: h ell2 v+C=k p, C=h d2+N Qdet nonzero. Three affine prime labels, weighted capacity O(X P² Q² A S log(2+A) log(2+S)(loglog X)^3/log³ X) | PAPER; includes order-T gaps, all cofactors composite; narrow polylog absolute strip only |
+| D68 | Macro disjoint triple populations U=O(T log^alpha X), Vtot=O(T log^beta X): parallel mass o(X) if alpha+beta+max(alpha,beta)<2; both parallel and zero-ell o(X) if 2alpha+3beta<2. Ratio-strip nonzero-ell mass o(X) if 2alpha+2beta+gamma+max(alpha,beta)<3 with A=O(log^gamma X) | PAPER; genuinely short elapsed budgets, not merely 4w<=g, no shorter-span localization |
+| A15 | 20739 all-distinct triples,20456 paired congruence controls,19 short; no parallel/zero in ordinary corpus. Independent aligned clock/product vs affine census 9 exact sets,664 candidates,181 locally feasible incl84 wide gaps;20 ratio checks incl14 small-coefficient nonzero tests | COMPUTATION; final pass, factor domain expanded after initial incomplete census; local feasibility not canonical ancestry |
+
+General nonparallel, two-nonzero-ell, unrestricted label ratios remain; polylog elapsed and relay budgets not forced. No full survivor, general uncapped bound, Lean verification or finite-twin contradiction.
