@@ -6,9 +6,9 @@ function audit(){
  function ev(a,v){let p=Infinity,w=Infinity,e=0,q=Infinity;for(let [d,s] of [[a+1,-1],[a-1,1]])for(let r of fs(d)){q=Math.min(q,r);let t=mod((s===-1?0:r+2)-v,2*r)||2*r;if(t<w||t===w&&r<p){p=r;w=t;e=s}}return {p,w,e,q}}
  function clockHeight(a,p,e){let x=a/2,short=mod(x,2)===mod((p-1)/2,2);return ((short?1:3)*p+(e===-1?-1:5))/2}
  function staticFirst(a,h=3){let b=Infinity;for(let [d,e] of [[a+1,-1],[a-1,1]])for(let p of fs(d)){let t=clockHeight(a,p,e);while(t<=h)t+=2*p;b=Math.min(b,t)}return b}
- let z={roots:0,events:0,clockChecks:0,staticChecks:0,passages:0,cutoffs:0,smallGainChecks:0,extraChecks:0,missedClockChecks:0,roughSandwichChecks:0,twinChecks:0,rows:[]};
+ let z={roots:0,events:0,clockChecks:0,staticChecks:0,passages:0,cutoffs:0,smallGainChecks:0,extraChecks:0,missedClockChecks:0,roughSandwichChecks:0,twinChecks:0,shortMisses:0,longMisses:0,singleMissChecks:0,reducedHeightWitnesses:0,rows:[]};
  for(let R of [12000,48000,192000,480000]){
-  let S=Math.sqrt(2*R+1),hs=[64,128,256,Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R)))*4,Math.ceil(2*S),Math.ceil(4*S)].sort((a,b)=>a-b);
+  let S=Math.sqrt(2*R+1),hs=[64,128,256,Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R)))*4,Math.ceil(1.5*S+3),Math.ceil(2*S),Math.ceil(4*S)].sort((a,b)=>a-b);
   let lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6);
   for(let H of [...new Set(hs)]){
    let L=Math.floor(H/4),Ls=Math.max(0,Math.floor((4/35)*(H-72))),map=new Map(),mapS=new Map(),row={R,H,L,Ls,static:0,roughLow:0,roughHigh:0,twin:0,pass:0,small:0,dynamicExtra:0,belowBarrier:0,belowBarrierExtra:0,phase6Extra:0,minExtraRatio:null,extraExamples:[]};
@@ -33,10 +33,11 @@ function audit(){
       ck(b<=h,"missed static clock");let q0=Infinity;
       for(let [d,e] of [[a+1,-1],[a-1,1]])for(let q of fs(d))if(clockHeight(a,q,e)===b)q0=q;
       ck(Number.isFinite(q0)&&q0<=2*b+1&&H<h+2*q0&&H<5*h+2,"missed clock bound");z.missedClockChecks++;
+      if(h<H/2){ck(b+2*q0>H&&h<b+2*q0,'single missed opportunity');let sh=mod(a/2,2)===mod((q0-1)/2,2);if(sh){ck(q0>(2*H-5)/5-1e-8&&q0<=2*h+1,'short range');z.shortMisses++;}else{ck(q0>(2*H-5)/7-1e-8&&q0<=(2*h+1)/3,'long range');ck(G>(12/49)*H-10-1e-8,'long gain bound');z.longMisses++;}z.singleMissChecks++;}
       ck(G>(4/35)*(H-72)-1e-8,"static barrier");z.extraChecks++;
       if(phase===3){row.minExtraRatio=Math.min(row.minExtraRatio??Infinity,G/H);if(row.extraExamples.length<3)row.extraExamples.push({A,a,G,h,b,q0});}
      }
-     if(G<=Ls){ck(!extra,"small budget static");z.smallGainChecks++;}
+     if(G<=Ls){ck(!extra,"small budget static");z.smallGainChecks++;if(H>=Math.ceil(1.5*S+3)){ck(x.q>Math.sqrt(a+1),'reduced-height witness');z.reducedHeightWitnesses++;}}
      if(H>=Math.ceil(4*S)&&G<=L){ck(x.q>Math.sqrt(a+1),"twin endpoint");z.twinChecks++;}
      break
     }
