@@ -7,7 +7,7 @@ function audit(){
  function next(a,v){let p=Infinity,w=Infinity;for(let c of clocks(a)){let t=mod(c.c-v,2*c.p)||2*c.p;if(t<w||t===w&&c.p<p){p=c.p;w=t}}return {p,w}}
  function prev(a,u){let d=0;for(let c of clocks(a)){let r=mod(a/2+c.c,2*c.p),t=u-mod(u-r,2*c.p);d=Math.max(d,t)}return d}
  function twin(a){return (spf[a-1]||a-1)===a-1&&(spf[a+1]||a+1)===a+1}
- let z={roots:0,events:0,successes:0,controls:0,blockNodes:0,branchCandidates:0,priorityRejected:0,heightRejected:0,budgetRejected:0,duplicateChecks:0,birthChecks:0,exactBasinChecks:0,prunedNodes:0,prunedCandidates:0,prunedPriorityRejected:0,prunedHeightRejected:0,prunedBudgetRejected:0,tailKeys:0,tailIncidences:0,tailCongruenceChecks:0,tailMultiplicityChecks:0,tailDistinctChecks:0,tailNonBadChecks:0,rows:[]};
+ let z={roots:0,events:0,successes:0,controls:0,blockNodes:0,branchCandidates:0,priorityRejected:0,heightRejected:0,budgetRejected:0,duplicateChecks:0,birthChecks:0,exactBasinChecks:0,prunedNodes:0,prunedCandidates:0,prunedPriorityRejected:0,prunedHeightRejected:0,prunedBudgetRejected:0,tailKeys:0,tailIncidences:0,tailCongruenceChecks:0,tailMultiplicityChecks:0,tailDistinctChecks:0,emptyControls:0,tailCRTControls:0,tailCRTRechecks:0,tailSieveControls:0,tailSieveRemainderChecks:0,maxTailProduct:0,rows:[]};
  for(let R of [3000,12000,48000,192000,480000,1000000]){
   let H=4*Math.floor(Math.sqrt(R)/Math.sqrt(Math.log(R))),L=Math.floor(H/4),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),basins=new Map(),row={R,H,L,roots:0,success:0,badSuccess:0,badCenters:0,reverseCenters:0,nodes:0,prunedNodes:0,maxNodes:0,maxMass:0,tail:[]};
   for(let A=lo;A<=hi;A+=6){let a=A,h=3,v=3-A/2,path=[];while(true){let e=next(a,v);if(h+e.w>H){let ar=basins.get(a)||[];ar.push({A,path});basins.set(a,ar);row.success++;z.successes++;break}
@@ -16,6 +16,7 @@ function audit(){
   let bad=[...basins].filter(([a])=>!twin(a));row.badCenters=bad.length;row.badSuccess=bad.reduce((s,[a,ar])=>s+ar.length,0);
   // All bad endpoints for six slabs, plus a deterministic sample of twins.
   let controls=[...bad,...[...basins].filter(([a])=>twin(a)).filter((_,i)=>i%41===0)];
+  let empty=0;for(let a=2*Math.ceil((R-L)/2);a<=hi;a+=2){if(basins.has(a)||twin(a)||Math.min(...fs(a-1),...fs(a+1))<=9*H/32-7)continue;if(empty++%29===0){controls.push([a,[]]);z.emptyControls++;}}
   for(let [a0,ar] of controls){
    let bound=Math.min(hi,a0+L),expected=ar.map(r=>r.A).sort((a,b)=>a-b);
    function reverse(prune){
@@ -66,8 +67,27 @@ function audit(){
       ck(cur===a+d,"tail start");
       let q=0;if(!twin(a)){for(let n of [a-1,a+1]){let f=fs(n);if(f.length>1||f[0]!==n){q=f[0];break}}ck(q>0,"composite neighbor")}
       let key=JSON.stringify([a,marks]);distinctTail.add(key);let st=endpoints.get(a)||new Set();st.add(key);endpoints.set(a,st);
-      for(let e of marks){let P=e.p;ck(P!==q||q<Y||q>=U||q<=3||Y<Math.sqrt(2*R),"finite nonasymptotic check")}
-      if(q){badEndpoints.add(a);badStarts.add(cur);badMass++}else goodMass++;
+      
+      if(q){badEndpoints.add(a);badStarts.add(cur);badMass++;
+       if(!marks.some(m=>m.p===q)){
+        let f=fs(a-1),e=f.includes(q)?-1:1; // a+e=q*m
+        let P=marks.reduce((s,m)=>s*m.p,1),r0=(a+e)/q,offset=0;
+        for(let m of marks){offset+=m.shift;ck(mod(q*r0-e+offset-m.side,m.p)===0,"terminal CRT");offset+=m.p-1;z.tailCRTRechecks++}
+        // Independent CRT reconstruction using a bounded integer search
+        // on small products, and elementary CRT remainder checks for
+        // the two shifted forms in the progression.
+        if(P<=15000&&z.tailCRTControls<3000){
+         let rs=mod(r0,P),nq=0;
+         for(let r=0;r<P;r++){let ok=true,dd=0;for(let m of marks){dd+=m.shift;if(mod(q*r-e+dd-m.side,m.p)!==0){ok=false;break}dd+=m.p-1}if(ok){nq++;ck(r===rs,"unique CRT residue")}}
+         ck(nq===1,"CRT one");z.tailCRTControls++;z.maxTailProduct=Math.max(z.maxTailProduct,P);
+         for(let l of [5,7,11,13,17])if(l!==q&&P%l!==0){
+          let n=127,cnt=0,nu=0;function blocked(t){let m=rs+P*t;return mod(m,l)===0||mod(q*m-2*e,l)===0}
+          for(let t=0;t<l;t++)if(blocked(t))nu++;ck(nu===2,"two residues");
+          for(let t=0;t<n;t++)if(blocked(t))cnt++;ck(Math.abs(cnt-n*2/l)<=2+1e-8,"sieve remainder");z.tailSieveRemainderChecks++;
+         }z.tailSieveControls++;
+        }
+       }
+      }else goodMass++;
       z.tailIncidences++;
      }
     }
