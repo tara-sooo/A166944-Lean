@@ -184,3 +184,18 @@ Large cofactor and denominator supports remain compatible. No full all-constrain
 | A09 | 64512 canonical roots,9959 targeted states,1616573 events,59553 consecutive pair checks,1142 shared toll checks,2218 repeated factor controls; 72 independent lattice/product census comparisons | COMPUTATION; all pass; no role handoff observed; actual arbitrary intermediate ancestry unverified |
 
 Four-distinct-factor close transitions, composite cofactor fast events and general diverse factor supports remain. No full all-constraint survivor, uncapped general run bound, Lean verification or finite-twin contradiction.
+
+## Checkpoint XII — close-label affine sieve and simultaneous clock-factor equations
+
+[Close factor clock paper](https://github.com/tara-sooo/A166944-Lean/blob/5cd2c32f9f817d9a25b9c34a64805a0d5034bb85/research/infinite-orbit/close_factor_clock.md).
+
+| ID | Constraint / conclusion | Status and scope |
+|---|---|---|
+| L25 | Successive selected high events: delta=r-p, j=u-q, k=c2-c, D=E-1+2sigma, R=V-2sigma. Exact delta*a+(j-1)r=D and delta*c+kr=R; delta*q=(1-j)p+D-delta*j, delta*u=(1-j)p+D | PAPER; all waits, composite cofactors allowed |
+| D37 | Fixed distinct-label gap delta, cofactor jump j, relay E, sides give one affine parameter; p,r,q three nondegenerate prime forms if source q prime; fourth u allowed if prime and E<T-1 | PAPER; parity excludes zero determinants, shared-factor toll excludes j=0 in four-prime case |
+| D38 | Localized close-transition gain F_nu(Hspan;K,L) << Hspan (L+1) K log(2K) (loglog X)^nu/log^nu X for nu=3 or 4, 0<abs(delta)<=K,E<=L, polylog K,L, Hspan>=T^(1+eps), T~sqrt X | PAPER; fixed K,L remove loglog factor; no lower-scale recycling-bin claim |
+| D39 | Macro weight F>=rho X cannot coexist with U=O(T log^alpha X) and actual label variation Vp=O(T log^beta X) for alpha+beta<nu | PAPER; source prime cofactor or both as appropriate, consecutive selected pairs; same-label gain charged to U; tagged transfer uses actual disjoint relays |
+| D40 | delta*((j-1)c-k*a)=(j-1)R-kD; for E=o(T), abs(mu-k/(j-1)) << (E+V+1)/(T abs(j-1)); odd source side forces nonzero determinant | PAPER; prime-cofactor-free clock part, narrow approximation for fast ending; zero even-side determinant not excluded |
+| A10 | 64512 canonical roots,9959 targeted starts,1616573 events,43275 joint pair checks,42529 affine determinant checks,1693 close pairs including83 source-prime/composite-target;36 independent candidate set comparisons | COMPUTATION; all pass, no zero determinant observed in close sample; no asymptotic sieve test |
+
+Large label jumps, O(T) relays, arbitrary composite-cofactor sources, and bounded recovery words of the sibling lanes remain. No full survivor, general uncapped run bound, Lean verification, or finite-twin contradiction.
