@@ -15,7 +15,7 @@ function audit(){
   }
   return {h:b-(p?(p-1)/2:0),p,e,n}
  }
- let s={actualRoots:0,actualTicks:0,actualEvents:0,queries:0,clockChecks:0,heightChecks:0,cutoffChecks:0,wallChecks:0,cappedControls:0,cappedLeaves:0,cappedQueries:0,cappedFullChecks:0,intervalChecks:0,maxTVRatio:0,formalRows:[],actualRows:[]};
+ let s={actualRoots:0,actualTicks:0,actualEvents:0,queries:0,clockChecks:0,heightChecks:0,cutoffChecks:0,firstWaitChecks:0,firstWaitPeriodChecks:0,firstWaitRows:[],cappedControls:0,cappedLeaves:0,cappedQueries:0,cappedFullChecks:0,intervalChecks:0,maxTVRatio:0,formalRows:[],actualRows:[]};
  for(let A=120;A<=240000;A+=198){
   let j=A/6,par=j%2,a=A,v=3-A/2,t=0,h=3,stop=Math.min(1500,A/2-4),ev=next(a,v),due=ev.w,Q=1n,seen=new Set();
   for(t=1;t<=stop&&a>A/2;t++){
@@ -61,6 +61,27 @@ function audit(){
   return {par,K,Qmax,leaves:leaves.length,capLeaves:leaves.filter(x=>x.stop==="cap").length,probHorizon:leaves.filter(x=>x.stop==="horizon").reduce((a,x)=>a+x.prob,0),rows}
  }
  for(let par of [0,1])for(let [K,Q] of [[8,35],[12,385],[18,1155],[22,5005]])s.actualRows.push(capped(par,K,Q));
+ // Exact first-wait survival on each parity: along a stationary
+ // source, only two possible residues of each prime can be queried.
+ for(let K of [4,6,8,12,20,100,1000,10000,100000])for(let par of [0,1]){
+  let C=new Map();
+  for(let t=1;t<=K;t++){
+   let b=3+t,e=mod(3-3*par+t,2)===0?-1:1;
+   for(let q of fs(e===-1?2*b+1:2*b-5)){
+    let c=e===-1?0:q+2;if(q===3){ck(mod(3+t-c,3)!==0,"stationary 3");continue}
+    let r=mod((3+t-c)*inv3(q),q),a=C.get(q)||new Set();a.add(r);C.set(q,a);
+    ck(a.size<=2&&[...a].every(x=>mod(6*x-e,q)===0||mod(6*x+e,q)===0),"stationary residues");s.firstWaitChecks++;
+   }
+  }
+  let log=0,low=0,up=0,Q=1n;for(let q=5;q<=2*K+7;q+=2)if(!spf[q]){
+   let m=C.get(q)?.size||0;log+=Math.log1p(-m/q);low+=Math.log1p(-2/q);if(2*q<=K){up+=Math.log1p(-2/q);ck(m===2,"both sides tested")}
+   if(m)Q*=BigInt(q);
+  }
+  ck(low<=log+1e-10&&log<=up+1e-10,"first wait sandwich");
+  if(Q<=500000n){let cnt=0,qq=Number(Q);for(let l=0;l<qq;l++){let j=2*l+par;if([...C].every(([p,a])=>!a.has(j%p)))cnt++;s.firstWaitPeriodChecks++}
+   ck(Math.abs(cnt/qq-Math.exp(log))<1e-10,"first wait product")}
+  s.firstWaitRows.push({K,par,primes:C.size,prob:Math.exp(log),lower:Math.exp(low),upper:Math.exp(up),normalized:Math.exp(log)*Math.log(K)**2});
+ }
  let rng=123456789;function random(){rng=(Math.imul(rng,1664525)+1013904223)>>>0;return rng/4294967296}
  for(let K of [100,1000,10000,100000]){
   let row={K,runs:K===100000?80:240,meanHeightRatio:0,minHeightRatio:Infinity,maxHeightRatio:0,meanMaxHeightRatio:0,meanGainRatio:0,meanSelected:0,meanQueries:0,meanLogQ:0,meanLastEventRatio:0,meanEscapeTime:{8:0,16:0,32:0,64:0},escapeCount:{8:0,16:0,32:0,64:0}};
