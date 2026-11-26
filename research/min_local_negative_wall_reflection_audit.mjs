@@ -54,6 +54,15 @@ function audit(){
    }
   }reflection.push(s)
  }
- return {N,roots:N/6,events,merges,clockChecks,zeroChecks,wallChecks,compositeChecks,twinDirectChecks,certified,finalTwin,finalComposite,finalThree,maxH,maxCompositeRatio,hist,examples,byRange,reflection}
+ let phaseControls=0,phaseEvents=0,phaseComposite=0,phaseTwin=0,phaseThree=0,phaseZero=0,independentControls=0;
+ for(let a=6;a<=600;a+=6)for(let h0=0;h0<=Math.min(a/2+20,80);h0++){
+  let d=a,v=-a/2+h0,p,w,E,W=0;while(d){let q=next(d,v);p=q.p;w=q.w;E=a-d;ck(w<=3*(p-1),"phase wait");if(v<0)ck(v+w<=0,"phase zero ceiling");v+=w;W+=w;d-=p-1;phaseEvents++}
+  ck(p===a-E+1&&v%(2*p)===0&&v>=0&&W===a/2-h0+v,"phase final");
+  if(p===3)phaseThree++;else if(spf[p-2]){phaseComposite++;ck(a/2-h0+v<=3*E+2*Math.sqrt(p-2)+1e-9,"noncanonical composite inequality");}else phaseTwin++;
+  if(v===0)phaseZero++;phaseControls++;
+  if(h0===3){let x=res.get(a);ck(x.h===v&&x.p===p&&x.w===w,"independent small seed");independentControls++}
+ }
+ for(let a=3000;a<=N;a+=3000){let d=a,v=-a/2+3,p,w;while(d){let q=next(d,v);p=q.p;w=q.w;d-=p-1;v+=w}let x=res.get(a);ck(x.h===v&&x.p===p&&x.w===w,"independent large seed");independentControls++}
+ return {phaseControls,phaseEvents,phaseComposite,phaseTwin,phaseThree,phaseZero,independentControls,N,roots:N/6,events,merges,clockChecks,zeroChecks,wallChecks,compositeChecks,twinDirectChecks,certified,finalTwin,finalComposite,finalThree,maxH,maxCompositeRatio,hist,examples,byRange,reflection}
 }
 console.log(JSON.stringify(audit(),null,2));
