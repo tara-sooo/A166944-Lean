@@ -7148,4 +7148,106 @@ theorem twin_above_of_local_ensemble_moments (cost : Nat → Nat → Nat)
 #print axioms NegativeMIN.ensembleMass_local_lower
 #print axioms NegativeMIN.twin_above_of_local_ensemble_moments
 
+
+/-- Independent Bernoulli counts have K*Q ≤ K*S+S², where K is the
+number of equally weighted samples, S their sum, and Q their square sum.
+The following cap bound needs only that inequality, not independence. -/
+theorem clip_weak_variance_rational (xs : List Nat) (M K : Nat)
+    (hM : 0<M) (hvar : K*moment2 xs≤K*xs.sum+xs.sum*xs.sum) :
+    M*K*xs.sum≤(xs.map (min M)).sum*(M*K+xs.sum) := by
+  let S := xs.sum
+  let V := (xs.map (min M)).sum
+  let Q := moment2 xs
+  change K*Q≤K*S+S*S at hvar
+  change M*K*S≤V*(M*K+S)
+  by_cases hz : S=0
+  · simp [hz]
+  · have hS : 0<S := by omega
+    have hs := clip_sharp xs M hM
+    change M*S*S≤V*((M-1)*S+Q) at hs
+    have hm : M-1+1=M := by omega
+    have he : K*((M-1)*S)+K*S=S*(M*K) := by
+      calc
+        K*((M-1)*S)+K*S = (M-1+1)*(K*S) := by
+          simp only [Nat.add_mul,Nat.one_mul]
+          ac_rfl
+        _ = S*(M*K) := by rw [hm]; ac_rfl
+    have hden : K*((M-1)*S+Q)≤S*(M*K+S) := by
+      rw [Nat.mul_add,Nat.mul_add]
+      omega
+    have ht : S*(M*K*S)≤S*(V*(M*K+S)) := by
+      calc
+        S*(M*K*S) = K*(M*S*S) := by ac_rfl
+        _ ≤ K*(V*((M-1)*S+Q)) := Nat.mul_le_mul_left K hs
+        _ = V*(K*((M-1)*S+Q)) := by ac_rfl
+        _ ≤ V*(S*(M*K+S)) := Nat.mul_le_mul_left V hden
+        _ = S*(V*(M*K+S)) := by ac_rfl
+    exact Nat.le_of_mul_le_mul_left ht hS
+
+theorem clip_weak_variance_half (xs : List Nat) (M K : Nat)
+    (hM : 0<M) (hvar : K*moment2 xs≤K*xs.sum+xs.sum*xs.sum) :
+    min (M*K) xs.sum≤2*(xs.map (min M)).sum := by
+  let S := xs.sum
+  let V := (xs.map (min M)).sum
+  let C := M*K
+  have h := clip_weak_variance_rational xs M K hM hvar
+  change C*S≤V*(C+S) at h
+  change min C S≤2*V
+  by_cases hC : C=0
+  · simp [hC]
+  · by_cases hS : S=0
+    · simp [hS]
+    · by_cases hc : S≤C
+      · rw [Nat.min_eq_right hc]
+        have h1 := Nat.mul_le_mul_left V (show C+S≤2*C by omega)
+        have he : V*(2*C)=C*(2*V) := by ac_rfl
+        rw [he] at h1
+        exact Nat.le_of_mul_le_mul_left (Nat.le_trans h h1) (by omega)
+      · rw [Nat.min_eq_left (show C≤S by omega)]
+        have h1 := Nat.mul_le_mul_left V (show C+S≤2*S by omega)
+        have he : V*(2*S)=S*(2*V) := by ac_rfl
+        rw [he] at h1
+        rw [Nat.mul_comm C S] at h
+        exact Nat.le_of_mul_le_mul_left (Nat.le_trans h h1) (by omega)
+
+def ensembleSoftMass (cost : Nat → Nat → Nat) (R T M : Nat)
+    (bs : List (Nat → Nat)) : Nat :=
+  ((obsBins R T).map (fun b =>
+    min (M*bs.length) (ensembleBinMasses cost R T bs b).sum)).sum
+
+theorem ensembleSoftMass_lower (cost : Nat → Nat → Nat) (R T M : Nat)
+    (bs : List (Nat → Nat)) (hM : 0<M)
+    (hvar : ∀ b∈obsBins R T,
+      let xs := ensembleBinMasses cost R T bs b
+      bs.length*moment2 xs≤bs.length*xs.sum+xs.sum*xs.sum) :
+    ensembleSoftMass cost R T M bs≤2*(bs.map (individualHistoryMass cost R T M)).sum := by
+  rw [ensembleMass_swap,← sum_map_mul]
+  unfold ensembleSoftMass
+  apply sum_map_le
+  intro b hb
+  exact clip_weak_variance_half _ M bs.length hM (hvar b hb)
+
+theorem twin_above_of_soft_ensemble (cost : Nat → Nat → Nat)
+    (R T M B0 D err B : Nat) (bs : List (Nat → Nat))
+    (hT : 6≤T) (hM : 0<M) (hlarge : B+3*T+6<R)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hEst : HistoryLiveEstimate cost R T M B0 D err)
+    (hvar : ∀ b∈obsBins R T,
+      let xs := ensembleBinMasses cost R T bs b
+      bs.length*moment2 xs≤bs.length*xs.sum+xs.sum*xs.sum)
+    (hgap : 2*(bs.length*err+(bs.map (budgetTotal R)).sum) <
+      D*ensembleSoftMass cost R T M bs) :
+    ∃ x : Nat, B<x ∧ TwinCenter x := by
+  have hl := ensembleSoftMass_lower cost R T M bs hM hvar
+  have hmul := Nat.mul_le_mul_left D hl
+  have he : D*(2*(bs.map (individualHistoryMass cost R T M)).sum)=
+      2*(D*(bs.map (individualHistoryMass cost R T M)).sum) := by ac_rfl
+  rw [he] at hmul
+  exact twin_above_of_history_ensemble cost R T M B0 D err B bs hT hlarge hm hz hEst
+    (by omega)
+
+#print axioms NegativeMIN.clip_weak_variance_rational
+#print axioms NegativeMIN.ensembleSoftMass_lower
+#print axioms NegativeMIN.twin_above_of_soft_ensemble
+
 end NegativeMIN
