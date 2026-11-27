@@ -4545,4 +4545,351 @@ theorem residualProfit_le (z Y0 Y1 U wN wQ D R T A k : Nat) :
 #print axioms NegativeMIN.residualProfit_ge
 #print axioms NegativeMIN.residualProfit_le
 
+/-! Exact forward three-high-event ledger. Only the charge at the
+FIRST source is counted; later sources are actual completed firings
+inside the same prefix. -/
+structure HighItem where
+  state : State
+  narrowAfter : Nat
+
+def highLedger (z Y0 : Nat) : List State → Nat × List HighItem
+  | [] => (0,[])
+  | a::as =>
+    let h := highLedger z Y0 as
+    if Y0≤winner a then (0,⟨a,h.1⟩::h.2)
+    else (narrowInc z Y0 a+h.1,h.2)
+
+theorem highLedger_states (z Y0 : Nat) (xs : List State) :
+    ((highLedger z Y0 xs).2.map HighItem.state) =
+      xs.filter (fun a => decide (Y0≤winner a)) := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    by_cases h : Y0≤winner a <;> simp [highLedger,h,ih]
+
+theorem highLedger_narrow (z Y0 : Nat) (xs : List State) :
+    (highLedger z Y0 xs).1+((highLedger z Y0 xs).2.map HighItem.narrowAfter).sum =
+      (xs.map (narrowInc z Y0)).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    by_cases h : Y0≤winner a
+    · have hz : narrowInc z Y0 a=0 := by
+        unfold narrowInc
+        rw [if_neg (by omega)]
+      simp only [highLedger,h,if_true,List.map_cons,List.sum_cons, hz,Nat.zero_add]
+      exact ih
+    · simp only [highLedger,h,if_false,List.map_cons,List.sum_cons]
+      omega
+
+theorem highLedger_high (z Y0 : Nat) (xs : List State) (a : HighItem)
+    (ha : a∈(highLedger z Y0 xs).2) : Y0≤winner a.state := by
+  have hm : a.state∈((highLedger z Y0 xs).2.map HighItem.state) :=
+    List.mem_map.mpr ⟨a,ha,rfl⟩
+  rw [highLedger_states] at hm
+  have h := (List.mem_filter.mp hm).2
+  simpa only [decide_eq_true_eq] using h
+
+theorem highLedger_gain_le (z Y0 : Nat) (xs : List State) :
+    ((highLedger z Y0 xs).2.map (fun a => winner a.state-1)).sum≤
+      (xs.map (fun a => winner a-1)).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    by_cases h : Y0≤winner a <;> simp only [highLedger,h,if_true,if_false,
+      List.map_cons,List.sum_cons] <;> omega
+
+theorem highLedger_medium (z Y0 Y1 : Nat) (xs : List State) :
+    ((highLedger z Y0 xs).2.map (fun a => mediumInc Y0 Y1 a.state)).sum =
+      (xs.map (mediumInc Y0 Y1)).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    by_cases h : Y0≤winner a
+    · simp [highLedger,h,ih]
+    · have hz : mediumInc Y0 Y1 a=0 := by unfold mediumInc; rw [if_neg (by omega)]
+      simp [highLedger,h,ih,hz]
+
+def sumTriples {α : Type} (f : α → α → α → Nat) : List α → Nat
+  | a::b::c::xs => f a b c+sumTriples f (b::c::xs)
+  | _ => 0
+
+def lastTwoSum {α : Type} (w : α → Nat) : List α → Nat
+  | a::b::c::xs => lastTwoSum w (b::c::xs)
+  | [a,b] => w a+w b
+  | [a] => w a
+  | [] => 0
+
+theorem sumTriples_add {α : Type} (f g : α → α → α → Nat) (xs : List α) :
+    sumTriples (fun a b c => f a b c+g a b c) xs =
+      sumTriples f xs+sumTriples g xs := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    cases xs with
+    | nil => rfl
+    | cons b xs =>
+      cases xs with
+      | nil => rfl
+      | cons c xs =>
+        simp only [sumTriples]
+        omega
+
+theorem sumTriples_mul {α : Type} (f : α → α → α → Nat) (xs : List α) (U : Nat) :
+    sumTriples (fun a b c => U*f a b c) xs=U*sumTriples f xs := by
+  induction xs with
+  | nil => simp [sumTriples]
+  | cons a xs ih =>
+    cases xs with
+    | nil => simp [sumTriples]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples]
+      | cons c xs =>
+        simp only [sumTriples,Nat.mul_add]
+        rw [ih]
+
+theorem sumTriples_le {α : Type} (f g : α → α → α → Nat) (xs : List α)
+    (h : ∀ a∈xs, ∀ b∈xs, ∀ c∈xs, f a b c≤g a b c) :
+    sumTriples f xs≤sumTriples g xs := by
+  induction xs with
+  | nil => simp [sumTriples]
+  | cons a xs ih =>
+    have ht := ih (fun b hb c hc d hd => h b (by simp [hb]) c (by simp [hc]) d (by simp [hd]))
+    cases xs with
+    | nil => simp [sumTriples]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples]
+      | cons c xs =>
+        have ha := h a (by simp) b (by simp) c (by simp)
+        simp only [sumTriples]
+        omega
+
+theorem sumTriples_first_le {α : Type} (w : α → Nat) (xs : List α) :
+    sumTriples (fun a _ _ => w a) xs≤(xs.map w).sum := by
+  induction xs with
+  | nil => simp [sumTriples]
+  | cons a xs ih =>
+    cases xs with
+    | nil => simp [sumTriples]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples]
+      | cons c xs =>
+        simp only [sumTriples,List.map_cons,List.sum_cons] at *
+        omega
+
+theorem sumTriples_second_le {α : Type} (w : α → Nat) (xs : List α) :
+    sumTriples (fun _ b _ => w b) xs≤((xs.drop 1).map w).sum := by
+  induction xs with
+  | nil => simp [sumTriples]
+  | cons a xs ih =>
+    cases xs with
+    | nil => simp [sumTriples]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples]
+      | cons c xs =>
+        simp only [sumTriples,List.drop_succ_cons,List.drop_zero,List.map_cons,List.sum_cons] at *
+        omega
+
+theorem sumTriples_third_le {α : Type} (w : α → Nat) (xs : List α) :
+    sumTriples (fun _ _ c => w c) xs≤((xs.drop 2).map w).sum := by
+  induction xs with
+  | nil => simp [sumTriples]
+  | cons a xs ih =>
+    cases xs with
+    | nil => simp [sumTriples]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples]
+      | cons c xs =>
+        simp only [sumTriples,List.drop_succ_cons,List.drop_zero,List.map_cons,List.sum_cons] at *
+        omega
+
+theorem sum_drop_le {α : Type} (w : α → Nat) (xs : List α) (k : Nat) :
+    ((xs.drop k).map w).sum≤(xs.map w).sum := by
+  induction xs generalizing k with
+  | nil => simp
+  | cons a xs ih =>
+    cases k with
+    | zero => simp
+    | succ k =>
+      have h := ih k
+      simp only [List.drop_succ_cons,List.map_cons,List.sum_cons]
+      omega
+
+theorem sumTriples_lastTwo {α : Type} (w : α → Nat) (xs : List α) :
+    (xs.map w).sum=sumTriples (fun a _ _ => w a) xs+lastTwoSum w xs := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    cases xs with
+    | nil => simp [sumTriples,lastTwoSum]
+    | cons b xs =>
+      cases xs with
+      | nil => simp [sumTriples,lastTwoSum]
+      | cons c xs =>
+        simp only [sumTriples,lastTwoSum,List.map_cons,List.sum_cons]
+        omega
+
+theorem lastTwoSum_le {α : Type} (w : α → Nat) (xs : List α) (C : Nat)
+    (h : ∀ a∈xs, w a≤C) : lastTwoSum w xs≤2*C := by
+  induction xs with
+  | nil => simp [lastTwoSum]
+  | cons a xs ih =>
+    have ha := h a (by simp)
+    have ht := ih (fun b hb => h b (by simp [hb]))
+    cases xs with
+    | nil => simp [lastTwoSum]; omega
+    | cons b xs =>
+      have hb := h b (by simp)
+      cases xs with
+      | nil => simp [lastTwoSum]; omega
+      | cons c xs => exact ht
+
+def cleanTriple (Y1 U : Nat) (a b c : HighItem) : Prop :=
+  a.narrowAfter=0 ∧ b.narrowAfter=0 ∧
+    winner b.state<Y1*U ∧ winner c.state<Y1*U
+
+instance (Y1 U : Nat) (a b c : HighItem) : Decidable (cleanTriple Y1 U a b c) := by
+  unfold cleanTriple
+  infer_instance
+
+def forwardCharge (Y0 Y1 U : Nat) (a b c : HighItem) : Nat :=
+  if cleanTriple Y1 U a b c then mediumInc Y0 Y1 a.state else 0
+
+def badForwardCharge (Y0 Y1 U : Nat) (a b c : HighItem) : Nat :=
+  if cleanTriple Y1 U a b c then 0 else mediumInc Y0 Y1 a.state
+
+theorem forward_charge_partition (Y0 Y1 U : Nat) (a b c : HighItem) :
+    forwardCharge Y0 Y1 U a b c+badForwardCharge Y0 Y1 U a b c =
+      mediumInc Y0 Y1 a.state := by
+  unfold forwardCharge badForwardCharge
+  split <;> simp
+
+theorem badForward_scaled (Y0 Y1 U : Nat) (a b c : HighItem)
+    (hY : 0<Y0) (hb : 3≤winner b.state) (hc : 3≤winner c.state) :
+    U*badForwardCharge Y0 Y1 U a b c≤
+      (U*(2*Y1))*a.narrowAfter+(U*(2*Y1))*b.narrowAfter+
+        3*(winner b.state-1)+3*(winner c.state-1) := by
+  have ha := mediumInc_le_band Y0 Y1 a.state hY
+  have ham := Nat.mul_le_mul_left U ha
+  unfold badForwardCharge
+  by_cases h : cleanTriple Y1 U a b c
+  · simp [h]
+  · rw [if_neg h]
+    unfold cleanTriple at h
+    by_cases hn : a.narrowAfter=0
+    · by_cases hm : b.narrowAfter=0
+      · by_cases hbig : winner b.state<Y1*U
+        · have hcb : Y1*U≤winner c.state := by omega
+          have hh : U*(2*Y1)=2*(Y1*U) := by ac_rfl
+          rw [hh] at ham
+          omega
+        · have hh : U*(2*Y1)=2*(Y1*U) := by ac_rfl
+          rw [hh] at ham
+          omega
+      · have hm' : 1≤b.narrowAfter := by omega
+        have ht := Nat.mul_le_mul_left (U*(2*Y1)) hm'
+        rw [Nat.mul_one] at ht
+        omega
+    · have hn' : 1≤a.narrowAfter := by omega
+      have ht := Nat.mul_le_mul_left (U*(2*Y1)) hn'
+      rw [Nat.mul_one] at ht
+      omega
+
+theorem badForward_sum_bound (Y0 Y1 U : Nat) (xs : List HighItem)
+    (hY : 0<Y0) (hh : ∀ a∈xs, 3≤winner a.state) :
+    U*sumTriples (badForwardCharge Y0 Y1 U) xs≤
+      2*(U*(2*Y1))*((xs.map HighItem.narrowAfter).sum)+
+      6*((xs.map (fun a => winner a.state-1)).sum) := by
+  have h := sumTriples_le
+    (fun a b c => U*badForwardCharge Y0 Y1 U a b c)
+    (fun a b c => (U*(2*Y1))*a.narrowAfter+(U*(2*Y1))*b.narrowAfter+
+      3*(winner b.state-1)+3*(winner c.state-1))
+    xs (fun a _ b hb c hc => badForward_scaled Y0 Y1 U a b c hY (hh b hb) (hh c hc))
+  rw [sumTriples_mul,sumTriples_add,sumTriples_add,sumTriples_add,
+    sumTriples_mul,sumTriples_mul,sumTriples_mul,sumTriples_mul] at h
+  have h1 := sumTriples_first_le HighItem.narrowAfter xs
+  have h2 := Nat.le_trans (sumTriples_second_le HighItem.narrowAfter xs)
+    (sum_drop_le HighItem.narrowAfter xs 1)
+  have h3 := Nat.le_trans (sumTriples_second_le (fun a : HighItem => winner a.state-1) xs)
+    (sum_drop_le (fun a : HighItem => winner a.state-1) xs 1)
+  have h4 := Nat.le_trans (sumTriples_third_le (fun a : HighItem => winner a.state-1) xs)
+    (sum_drop_le (fun a : HighItem => winner a.state-1) xs 2)
+  have hn1 := Nat.mul_le_mul_left (U*(2*Y1)) h1
+  have hn2 := Nat.mul_le_mul_left (U*(2*Y1)) h2
+  have hg1 := Nat.mul_le_mul_left 3 h3
+  have hg2 := Nat.mul_le_mul_left 3 h4
+  have he : 2*(U*(2*Y1))*((xs.map HighItem.narrowAfter).sum) =
+      2*((U*(2*Y1))*((xs.map HighItem.narrowAfter).sum)) := by ac_rfl
+  rw [he]
+  omega
+
+def forwardCleanExpense (z Y0 Y1 U A k : Nat) : Nat :=
+  sumTriples (forwardCharge Y0 Y1 U) (highLedger z Y0 (prefixStates A k)).2
+
+/-- A complete actual prefix. Apart from at most its final two high
+events, every exceptional medium charge is paid by a narrow event
+in the next two relays, or a much larger subsequent jump. -/
+theorem medium_forward_reduction (z Y0 Y1 U A k : Nat)
+    (hY : 3≤Y0) :
+    U*pathCost (mediumInc Y0 Y1) (birth A) k≤
+      U*forwardCleanExpense z Y0 Y1 U A k+
+      4*(U*Y1)*(1+pathCost (narrowInc z Y0) (birth A) k)+
+      6*gain (birth A) (orbit A k) := by
+  let ss := prefixStates A k
+  let xs := (highLedger z Y0 ss).2
+  let w := fun a : HighItem => mediumInc Y0 Y1 a.state
+  have hs : pathCost (mediumInc Y0 Y1) (birth A) k=(xs.map w).sum := by
+    rw [← prefixStates_cost,← highLedger_medium z Y0 Y1]
+  have hn := highLedger_narrow z Y0 ss
+  have hnc : ((xs.map HighItem.narrowAfter).sum)≤pathCost (narrowInc z Y0) (birth A) k := by
+    change (highLedger z Y0 ss).1+((xs.map HighItem.narrowAfter).sum)=(ss.map (narrowInc z Y0)).sum at hn
+    change _≤_
+    have he := prefixStates_cost (narrowInc z Y0) A k
+    change (ss.map (narrowInc z Y0)).sum = _ at he
+    omega
+  have hg := highLedger_gain_le z Y0 ss
+  have hgain : ((xs.map (fun a => winner a.state-1)).sum)≤gain (birth A) (orbit A k) := by
+    have hledger := gain_ledger (birth A) k
+    change (ss.map (fun a => winner a-1)).sum=gain (birth A) (orbit A k) at hledger
+    change ((xs.map (fun a => winner a.state-1)).sum)≤(ss.map (fun a => winner a-1)).sum at hg
+    omega
+  have hh : ∀ a∈xs, 3≤winner a.state := fun a ha =>
+    Nat.le_trans hY (highLedger_high z Y0 ss a ha)
+  have hb := badForward_sum_bound Y0 Y1 U xs (by omega) hh
+  have ht := lastTwoSum_le w xs (2*Y1) (fun a _ => mediumInc_le_band Y0 Y1 a.state (by omega))
+  have hsplit := sumTriples_lastTwo w xs
+  have hpart : sumTriples (fun a b c => forwardCharge Y0 Y1 U a b c+badForwardCharge Y0 Y1 U a b c) xs =
+      sumTriples (fun a _ _ => w a) xs := by
+    apply Nat.le_antisymm
+    · apply sumTriples_le
+      intro a _ b _ c _
+      exact Nat.le_of_eq (forward_charge_partition Y0 Y1 U a b c)
+    · apply sumTriples_le
+      intro a _ b _ c _
+      exact Nat.le_of_eq (forward_charge_partition Y0 Y1 U a b c).symm
+  rw [sumTriples_add] at hpart
+  have hsum : pathCost (mediumInc Y0 Y1) (birth A) k =
+      forwardCleanExpense z Y0 Y1 U A k+sumTriples (badForwardCharge Y0 Y1 U) xs+lastTwoSum w xs := by
+    rw [hs,hsplit,← hpart]
+    rfl
+  rw [hsum,Nat.mul_add,Nat.mul_add]
+  have htn := Nat.mul_le_mul_left U ht
+  have hn2 := Nat.mul_le_mul_left (2*(U*(2*Y1))) hnc
+  have hg2 := Nat.mul_le_mul_left 6 hgain
+  have he1 : U*(2*(2*Y1))=4*(U*Y1) := by ac_rfl
+  have he2 : 2*(U*(2*Y1))=4*(U*Y1) := by ac_rfl
+  rw [he1] at htn
+  rw [he2] at hb hn2
+  rw [Nat.mul_add,Nat.mul_one]
+  omega
+
+#print axioms NegativeMIN.highLedger_medium
+#print axioms NegativeMIN.badForward_sum_bound
+#print axioms NegativeMIN.medium_forward_reduction
+
 end NegativeMIN
