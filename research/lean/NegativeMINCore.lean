@@ -2148,10 +2148,11 @@ theorem clip_moment_lower (xs : List Nat) (M K : Nat) (hMK : M ≤ K) :
   have h := sum_map_le xs (fun m => (M*K)*m)
     (fun m => (K*K)*min M m + M*(m*m)) (fun m _ => clip_pointwise M K m hMK)
   rw [sum_map_mul, sum_map_add, sum_map_mul, sum_map_mul] at h
-  induction xs with
-  | nil => simp [moment2]
-  | cons a xs ih =>
-    simpa only [moment2, List.map_cons, List.sum_cons, Nat.mul_add, Nat.add_mul] using h
+  have hid : xs.map (fun m : Nat => m) = xs := by
+    induction xs with
+    | nil => rfl
+    | cons a xs ih => simp [ih]
+  simpa only [moment2, hid] using h
 
 /-- A simple explicit threshold version of the moment criterion,
 valid even when the total untruncated pair loss bound exceeds the
@@ -2184,5 +2185,249 @@ theorem cheapRankDeath_moment_lower (inc : State → Nat) (R T M budget K : Nat)
 
 #print axioms NegativeMIN.clip_moment_lower
 #print axioms NegativeMIN.cheapRankDeath_moment_lower
+
+/-- End-to-end finite extraction via the actual cheap moments. The only
+analytic input is the ORIGINAL scaled live estimate on the constructed
+policy; the moment and budget surplus are explicit quantitative premises. -/
+theorem twin_lower_of_cheap_moments
+    (R T M budget K B0 z Y0 Y1 D wN wQ err : Nat)
+    (hT : 6 ≤ T) (hY : 0 < Y0) (hMK : M ≤ K) (hK : 0 < K)
+    (hQ : 2*moment2 (cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget) ≤
+      K*(cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget).sum)
+    (hEst : ScaledLiveEstimate
+      (cheapRankDeath (weightedInc z Y0 Y1 wN wQ) R T M budget)
+      R T M B0 z Y0 Y1 D wN wQ err) :
+    D*M*(cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget).sum -
+      2*K*((roots R).length*(budget+wN+wQ*(2*Y1))+err)
+      ≤ 2*K*(D*B0*M*T*twinCount R T) := by
+  let inc := weightedInc z Y0 Y1 wN wQ
+  let d := cheapRankDeath inc R T M budget
+  have hl := cheapRankDeath_moment_lower inc R T M budget K hT hMK hK hQ
+  have hc := cheapRankDeath_weightedBudget R T M budget z Y0 Y1 wN wQ hY
+  change wN*narrowCount d R T z Y0 + wQ*mediumCharge d R T Y0 Y1 ≤ _ at hc
+  have he : D*liveTicks d R T ≤ D*B0*M*T*twinCount R T +
+      (roots R).length*(budget+wN+wQ*(2*Y1))+err := by
+    unfold ScaledLiveEstimate at hEst
+    change D*liveTicks d R T ≤ _ at hEst
+    omega
+  have h1 := Nat.mul_le_mul_left D hl
+  have h2 := Nat.mul_le_mul_left (2*K) he
+  have hcomm : D*(2*K*liveTicks d R T) = 2*K*(D*liveTicks d R T) := by ac_rfl
+  change D*(M*(cheapMasses inc R T budget).sum) ≤ D*(2*K*liveTicks d R T) at h1
+  rw [hcomm] at h1
+  have h3 := Nat.le_trans h1 h2
+  change D*M*(cheapMasses inc R T budget).sum -
+    2*K*((roots R).length*(budget+wN+wQ*(2*Y1))+err) ≤ _
+  rw [← Nat.mul_assoc] at h3
+  simp only [Nat.mul_add] at h3 ⊢
+  omega
+
+theorem twin_above_of_cheap_moments
+    (R T M budget K B0 z Y0 Y1 D wN wQ err B : Nat)
+    (hT : 6 ≤ T) (hY : 0 < Y0) (hMK : M ≤ K) (hK : 0 < K)
+    (hlarge : B+3*T+6 < R)
+    (hQ : 2*moment2 (cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget) ≤
+      K*(cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget).sum)
+    (hEst : ScaledLiveEstimate
+      (cheapRankDeath (weightedInc z Y0 Y1 wN wQ) R T M budget)
+      R T M B0 z Y0 Y1 D wN wQ err)
+    (hSurplus : 2*K*((roots R).length*(budget+wN+wQ*(2*Y1))+err) <
+      D*M*(cheapMasses (weightedInc z Y0 Y1 wN wQ) R T budget).sum) :
+    ∃ x : Nat, B < x ∧ TwinCenter x := by
+  have ht := twin_lower_of_cheap_moments R T M budget K B0 z Y0 Y1 D wN wQ err
+    hT hY hMK hK hQ hEst
+  have hpos : 0 < twinCount R T := by
+    by_cases hz : twinCount R T = 0
+    · simp only [hz, Nat.mul_zero] at ht
+      omega
+    · omega
+  unfold twinCount at hpos
+  generalize he : twinSites R T = xs at hpos
+  cases xs with
+  | nil => simp at hpos
+  | cons x xs =>
+    have hm : x ∈ twinSites R T := by rw [he]; simp
+    simp only [twinSites, List.mem_filter, decide_eq_true_eq] at hm
+    have hh := hm.2.1
+    exact ⟨x, by omega, hm.2.2⟩
+
+#print axioms NegativeMIN.twin_lower_of_cheap_moments
+#print axioms NegativeMIN.twin_above_of_cheap_moments
+
+/-! Actual repeat geometry and primorial wall. These are independent
+of any assertion of small average cost or small collision moments. -/
+
+theorem winner_source_pin (s : State) (hw : winner s ≠ 0) :
+    ∃ k c : Int, (s.x : Int) = (winner s : Int)*k+c ∧ (c = -1 ∨ c = 1) := by
+  let p := winner s
+  have he := winner_sound s hw
+  change eligible s.x (s.n+1) p = true at he
+  by_cases hpar : (s.n+1) % 2 = 0
+  · simp only [eligible, Bool.and_eq_true, if_pos hpar, decide_eq_true_eq] at he
+    have h := Nat.div_add_mod (s.x+1) p
+    rw [he.2.1, Nat.add_zero] at h
+    have hc := congrArg (fun t : Nat => (t : Int)) h
+    simp only [Int.natCast_mul, Int.natCast_add] at hc
+    exact ⟨((s.x+1)/p : Nat), -1, by omega, Or.inl rfl⟩
+  · simp only [eligible, Bool.and_eq_true, if_neg hpar, decide_eq_true_eq] at he
+    have h := Nat.div_add_mod (s.x-1) p
+    rw [he.2.2.1, Nat.add_zero] at h
+    have hc := congrArg (fun t : Nat => (t : Int)) h
+    simp only [Int.natCast_mul] at hc
+    have hx := he.2.1
+    exact ⟨((s.x-1)/p : Nat), 1, by omega, Or.inr rfl⟩
+
+/-- Two actual sources of the same p>=5 have separation at least
+2p-2 once the first event has moved. This excludes the p=3 exception. -/
+theorem repeat_pin_gap (a b p k l c e : Int)
+    (hp : 5 ≤ p) (ho : p%2 = 1) (ha : a%2 = 0) (hb : b%2 = 0)
+    (hc : c = -1 ∨ c = 1) (he : e = -1 ∨ e = 1)
+    (h1 : a = p*k+c) (h2 : b = p*l+e) (hm : p-1 ≤ a-b) :
+    2*p-2 ≤ a-b := by
+  have hd : a-b = p*(k-l)+(c-e) := by rw [Int.mul_sub]; omega
+  have hce : -2 ≤ c-e ∧ c-e ≤ 2 := by omega
+  have hmod : (a-b)%2 = 0 := by omega
+  rw [hd, Int.add_emod, Int.mul_emod, ho] at hmod
+  have ht : (k-l)%2 = 0 := by
+    rcases hc with rfl | rfl <;> rcases he with rfl | rfl <;> omega
+  have hpos : 0 < k-l := by
+    by_cases hz : 0 < k-l
+    · exact hz
+    · have hle := Int.mul_le_mul_of_nonneg_left (show k-l ≤ 0 by omega)
+        (show 0 ≤ p by omega)
+      simp only [Int.mul_zero] at hle
+      omega
+  have htwo : 2 ≤ k-l := by omega
+  have hmul := Int.mul_le_mul_of_nonneg_left htwo (show 0 ≤ p by omega)
+  rw [Int.mul_comm p 2] at hmul
+  omega
+
+theorem orbit_center_mono (A i j : Nat) (h : i ≤ j) :
+    (orbit A j).x ≤ (orbit A i).x := by
+  have he : i+(j-i)=j := by omega
+  have hs : orbit A j = evolve (orbit A i) (j-i) := by
+    unfold orbit
+    rw [← he, evolve_add]
+  rw [hs]
+  exact evolve_center_le _ _
+
+theorem actual_repeat_gap (A i j p : Nat) (hA : A%2 = 0) (hij : i<j)
+    (hp : 5 ≤ p) (h1 : winner (orbit A i)=p) (h2 : winner (orbit A j)=p) :
+    2*(p-1) ≤ (orbit A i).x - (orbit A j).x := by
+  let a := orbit A i
+  let b := orbit A j
+  have ha : a.x%2=0 := evolve_even (birth A) i hA
+  have hb : b.x%2=0 := evolve_even (birth A) j hA
+  have hp' := eligible_three_le a.x (a.n+1) (winner a)
+    (winner_sound a (by change winner (orbit A i) ≠ 0; omega))
+  change winner a=p at h1
+  change winner b=p at h2
+  obtain ⟨k,c,hac,hc⟩ := winner_source_pin a (by omega)
+  obtain ⟨l,e,hbc,he⟩ := winner_source_pin b (by omega)
+  rw [h1] at hac hp'
+  rw [h2] at hbc
+  have hg := tick_gain_exact a
+  rw [h1] at hg
+  have hmono := orbit_center_mono A (i+1) j (by omega)
+  change b.x ≤ (tick a).x at hmono
+  have hgap := repeat_pin_gap (a.x : Int) (b.x : Int) (p : Int) k l c e
+    (by omega) (by omega) (by omega) (by omega) hc he hac hbc (by omega)
+  change 2*(p-1) ≤ a.x-b.x
+  omega
+
+theorem repeat_relay_gain (A i j p : Nat) (hA : A%2=0) (hij : i<j)
+    (hp : 5≤p) (h1 : winner (orbit A i)=p) (h2 : winner (orbit A j)=p) :
+    p-1 ≤ (orbit A (i+1)).x - (orbit A j).x := by
+  have hg := actual_repeat_gap A i j p hA hij hp h1 h2
+  have ht := tick_gain_exact (orbit A i)
+  rw [h1] at ht
+  change p-1 ≤ (tick (orbit A i)).x-(orbit A j).x
+  omega
+
+theorem even_small_pin_impossible (r p k c : Int)
+    (hp : 3≤p) (hr : 0≤r) (hre : r%2=0) (hc : c=-1 ∨ c=1)
+    (hpin : r=p*k+c) : p-1≤r := by
+  by_cases hk : 1≤k
+  · have h := Int.mul_le_mul_of_nonneg_left hk (show 0≤p by omega)
+    rw [Int.mul_one] at h
+    omega
+  · by_cases hz : k=0
+    · rw [hz, Int.mul_zero, Int.zero_add] at hpin
+      omega
+    · have h := Int.mul_le_mul_of_nonneg_left (show k≤ -1 by omega) (show 0≤p by omega)
+      rw [Int.mul_neg, Int.mul_one] at h
+      omega
+
+theorem winner_le_cell_remainder (s : State) (Q : Nat)
+    (hQ : 0<Q) (hQe : Q%2=0) (he : s.x%2=0)
+    (hw : winner s≠0) (hd : Q % winner s=0) :
+    winner s-1 ≤ s.x%Q := by
+  let p := winner s
+  obtain ⟨k,c,hpin,hc⟩ := winner_source_pin s hw
+  have hprime := eligible_three_le s.x (s.n+1) p (winner_sound s hw)
+  have hq := Nat.div_add_mod Q p
+  change Q%p=0 at hd
+  rw [hd,Nat.add_zero] at hq
+  have hx := Nat.div_add_mod s.x Q
+  have hpar := congrArg (fun a : Nat => a%2) hx
+  rw [Nat.add_mod, Nat.mul_mod, hQe, Nat.zero_mul, Nat.zero_mod, Nat.zero_add] at hpar
+  have hrem : (s.x%Q)%2=0 := by omega
+  have hqi := congrArg (fun a : Nat => (a : Int)) hq
+  have hxi := congrArg (fun a : Nat => (a : Int)) hx
+  simp only [Int.natCast_mul,Int.natCast_add] at hqi hxi
+  let t : Int := k - ((Q/p : Nat) : Int)*((s.x/Q : Nat) : Int)
+  have hres : (s.x%Q : Nat) = (s.x%Q : Nat) := rfl
+  have hres' : ((s.x%Q : Nat) : Int) = (p : Int)*t+c := by
+    dsimp [t]
+    rw [Int.mul_sub, ← Int.mul_assoc, hqi]
+    change (s.x : Int) = (p : Int)*k+c at hpin
+    omega
+  have hg := even_small_pin_impossible ((s.x%Q : Nat) : Int) (p : Int) t c
+    (by omega) (by omega) (by omega) hc hres'
+  change p-1≤s.x%Q
+  omega
+
+theorem tick_wall (s : State) (Q : Nat) (hQ : 0<Q) (hQe : Q%2=0)
+    (he : s.x%2=0) (hd : winner s=0 ∨ Q % winner s=0) :
+    (tick s).x/Q=s.x/Q := by
+  rcases hd with h | h
+  · simp [tick,h]
+  · by_cases hw : winner s=0
+    · simp [tick,hw]
+    · have hrem := winner_le_cell_remainder s Q hQ hQe he hw h
+      have hx := Nat.div_add_mod s.x Q
+      have hr := Nat.mod_lt s.x hQ
+      have hcoord : (tick s).x = (s.x%Q-(winner s-1))+Q*(s.x/Q) := by
+        have hg := tick_gain_exact s
+        omega
+      rw [hcoord,Nat.add_mul_div_left _ _ hQ,Nat.div_eq_of_lt (by omega : s.x%Q-(winner s-1)<Q)]
+      simp
+
+theorem evolve_wall (s : State) (Q k : Nat) (hQ : 0<Q) (hQe : Q%2=0)
+    (he : s.x%2=0)
+    (hd : ∀ i : Nat, i<k → winner (evolve s i)=0 ∨ Q%winner (evolve s i)=0) :
+    (evolve s k).x/Q=s.x/Q := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    have hpre := ih (fun i hi => hd i (by omega))
+    have ht := tick_wall (evolve s k) Q hQ hQe (evolve_even s k he) (hd k (by omega))
+    exact ht.trans hpre
+
+theorem evolve_wall_gain (s : State) (Q k : Nat) (hQ : 0<Q) (hQe : Q%2=0)
+    (he : s.x%2=0)
+    (hd : ∀ i : Nat, i<k → winner (evolve s i)=0 ∨ Q%winner (evolve s i)=0) :
+    gain s (evolve s k)<Q := by
+  have hw := evolve_wall s Q k hQ hQe he hd
+  have hx := Nat.div_add_mod s.x Q
+  have hy := Nat.div_add_mod (evolve s k).x Q
+  rw [hw] at hy
+  have hr := Nat.mod_lt s.x hQ
+  unfold gain
+  omega
+
+#print axioms NegativeMIN.actual_repeat_gap
+#print axioms NegativeMIN.repeat_relay_gain
+#print axioms NegativeMIN.evolve_wall_gain
 
 end NegativeMIN
