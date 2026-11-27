@@ -3535,7 +3535,8 @@ theorem profitNat_le (inc : State → Nat) (D R T A k : Nat) :
   have hm := Nat.mul_le_mul_left D hr
   simp only [Nat.mul_one] at hm
   have he : (D:Int)*(observedReward R T A k : Nat)≤(D:Int) := by
-    exact_mod_cast hm
+    have hh := Int.ofNat_le.mpr hm
+    simpa only [Int.natCast_mul] using hh
   by_cases h : (D:Int)*(observedReward R T A k : Nat) -
       (inc (orbit A k):Int)-recordDebt (rootNet inc D R T A) k≤0
   · rw [Int.max_eq_left h]
@@ -3672,5 +3673,258 @@ theorem debtDeath_fiber_profit_max (inc : State → Nat) (D R T M J x : Nat) (n 
     exact ⟨hf.1,hf.2.1.1.1,hf.2.1.1.2.1,hf.2.2.1,hf.2.2.2⟩
 
 #print axioms NegativeMIN.debtDeath_fiber_profit_max
+
+/-! Global record-profit identity and exact signed-net optimizer. -/
+theorem sum_filter_weight {α : Type} (xs : List α) (f : α → Bool) (g : α → Nat) :
+    ((xs.filter f).map g).sum=(xs.map (fun a => if f a then g a else 0)).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih => cases h : f a <;> simp [h,ih]
+
+theorem range_filter_prefix (T l : Nat) (h : l≤T) :
+    ((List.range T).filter (fun u => decide (u<l)))=List.range l := by
+  have he : List.range T=List.range l++(List.range (T-l)).map (l+·) := by
+    have hh := @List.range_add l (T-l)
+    have hs : l+(T-l)=T := by omega
+    rw [hs] at hh
+    exact hh
+  rw [he,List.filter_append]
+  have h1 : (List.range l).filter (fun u => decide (u<l))=List.range l := by
+    apply List.filter_eq_self.mpr
+    intro u hu
+    simpa using List.mem_range.mp hu
+  have h2 : ((List.range (T-l)).map (l+·)).filter (fun u => decide (u<l))=[] := by
+    apply List.filter_eq_nil_iff.mpr
+    intro u hu
+    obtain ⟨v,_,rfl⟩ := List.mem_map.mp hu
+    simp
+  rw [h1,h2,List.append_nil]
+
+theorem range_live_eq (d : Nat → Nat) (R T A : Nat) :
+    (List.range T).filter (fun u => liveAt d R T A u)=List.range (life d R T A) := by
+  rw [← range_filter_prefix T (life d R T A) (life_le d R T A)]
+  apply List.filter_congr
+  intro u hu
+  apply Bool.eq_iff_iff.mpr
+  simpa only [decide_eq_true_eq] using liveAt_iff_lt_life d R T A u (List.mem_range.mp hu)
+
+theorem sum_profit_before (inc : State → Nat) (D R T A k : Nat)
+    (h : k≤observeAge R T A) :
+    ((List.range k).map (profitNat inc D R T A)).sum=0 := by
+  have he : (List.range k).map (profitNat inc D R T A)=(List.range k).map (fun _ => 0) := by
+    apply List.map_congr_left
+    intro i hi
+    exact profitNat_preobserve inc D R T A i (by have := List.mem_range.mp hi; omega)
+  rw [he,sum_const_nat,Nat.mul_zero]
+
+def obsProfit (inc : State → Nat) (D R T A u : Nat) : Nat :=
+  profitNat inc D R T A (observeAge R T A+u)
+
+theorem rootProfit_sum_obs (inc : State → Nat) (D R T A : Nat) (d : Nat → Nat) :
+    ((List.range (prefixAge d R T A)).map (profitNat inc D R T A)).sum=
+      (((List.range T).filter (fun u => liveAt d R T A u)).map (obsProfit inc D R T A)).sum := by
+  rw [range_live_eq]
+  by_cases h : d A≤observeAge R T A
+  · have hl : life d R T A=0 := by unfold life; omega
+    rw [hl]
+    exact sum_profit_before inc D R T A _ (by unfold prefixAge; omega)
+  · have hk : prefixAge d R T A=observeAge R T A+life d R T A := by
+      unfold prefixAge life
+      omega
+    rw [hk,List.range_add,List.map_append,List.sum_append,List.map_map,
+      sum_profit_before inc D R T A _ (Nat.le_refl _),Nat.zero_add]
+    rfl
+
+theorem int_of_nat_sum_map {α : Type} (xs : List α) (f : α → Nat) :
+    (((xs.map f).sum : Nat) : Int)=(xs.map (fun a => (f a:Int))).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih => simp only [List.map_cons,List.sum_cons,Int.natCast_add,ih]
+
+theorem int_profit_sum (inc : State → Nat) (D R T A : Nat) (xs : List Nat) :
+    (((xs.map (profitNat inc D R T A)).sum : Nat):Int)=
+      (xs.map (recordProfit (rootNet inc D R T A))).sum := by
+  rw [int_of_nat_sum_map]
+  congr 1
+  apply List.map_congr_left
+  intro i _
+  have h := recordProfit_nonneg (rootNet inc D R T A) i
+  unfold profitNat
+  omega
+
+def policyGain (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) : Nat :=
+  ((roots R).map (fun A => (((List.range T).filter (fun u => liveAt d R T A u)).map
+    (obsProfit inc D R T A)).sum)).sum
+
+theorem peakTruncate_policyGain (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
+    policyNet inc D R T (peakTruncate inc D R T d)=(policyGain inc D R T d:Int) := by
+  rw [peakTruncate_policyNet]
+  unfold policyGain
+  rw [int_of_nat_sum_map]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  rw [← rootProfit_sum_obs, int_profit_sum]
+
+theorem int_sum_map_le {α : Type} (xs : List α) (f g : α → Int)
+    (h : ∀ a∈xs, f a≤g a) : (xs.map f).sum≤(xs.map g).sum := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    have h1 := h a (by simp)
+    have h2 := ih (fun b hb => h b (by simp [hb]))
+    simp only [List.map_cons,List.sum_cons]
+    omega
+
+theorem policyNet_le_peak (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
+    policyNet inc D R T d≤(policyGain inc D R T d:Int) := by
+  rw [← peakTruncate_policyGain]
+  unfold policyNet
+  apply int_sum_map_le
+  intro A _
+  rw [peakTruncate_prefix,peakTruncate,bestPrefix_peak (rootNet inc D R T A)]
+  exact runningPeak_ge (rootNet inc D R T A) _
+
+theorem sum_fiber_weight {α β : Type} [DecidableEq β]
+    (xs : List α) (keys : List β) (key : α → β) (w : α → Nat)
+    (hn : keys.Nodup) (hcover : ∀ a∈xs, key a∈keys) :
+    (keys.map (fun k => ((xs.filter (fun a => decide (key a=k))).map w).sum)).sum=
+      (xs.map w).sum := by
+  have he : (keys.map (fun k => ((xs.filter (fun a => decide (key a=k))).map w).sum)).sum=
+      (keys.map (fun k => (xs.map (fun a => if decide (key a=k) then w a else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro k _
+    exact sum_filter_weight xs _ w
+  rw [he,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro a ha
+  have hh : keys.map (fun k => if decide (key a=k) then w a else 0)=
+      keys.map (fun k => w a*(if key a=k then 1 else 0)) := by
+    apply List.map_congr_left
+    intro k _
+    by_cases h : key a=k <;> simp [h]
+  rw [hh,sum_map_mul,indicator_key_sum keys (key a) hn]
+  simp [hcover a ha]
+
+theorem policyGain_eq_obsBins (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
+    policyGain inc D R T d=
+      ((obsBins R T).map (fun b => ((obsLiveFiber d R T b.1 b.2).map
+        (fun A => obsProfit inc D R T A b.1)).sum)).sum := by
+  unfold policyGain
+  have he : ((roots R).map (fun A => (((List.range T).filter (fun u => liveAt d R T A u)).map
+      (obsProfit inc D R T A)).sum)).sum=
+      ((roots R).map (fun A => ((List.range T).map (fun u =>
+        if liveAt d R T A u then obsProfit inc D R T A u else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro A _
+    exact sum_filter_weight _ _ _
+  rw [he,sum_map_swap]
+  unfold obsBins
+  rw [sum_map_flatMap]
+  congr 1
+  apply List.map_congr_left
+  intro u _
+  simp only [List.map_map,Function.comp_def]
+  rw [← sum_filter_weight]
+  symm
+  unfold obsLiveFiber
+  apply sum_fiber_weight
+  · exact uniqueKeys_nodup _
+  · intro a ha
+    exact obsKeys_cover R T a u (List.mem_filter.mp ha).1
+
+theorem obsFiber_profit_eq (inc : State → Nat) (D R T J x u : Nat) (d : Nat → Nat)
+    (hT : 6≤T) (hu : u<T) :
+    ((obsLiveFiber d R T u (J,x)).map (fun A => obsProfit inc D R T A u)).sum=
+      ((physicalFiber d R T J x (obsClock R T J u)).map
+        (fun A => physicalProfit inc D R T A (obsClock R T J u))).sum := by
+  rw [obsLiveFiber_eq d R T J x u hT hu]
+  congr 1
+  apply List.map_congr_left
+  intro A hA
+  have hr := (List.mem_filter.mp hA).1
+  have hp := (List.mem_filter.mp hA).2
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+  simp only [Bool.and_eq_true,decide_eq_true_eq] at hp
+  have hg := obsClock_age R T A J u hT hr.2.1 hr.2.2 hp.2.1 hu
+  simp only [obsProfit,physicalProfit,hg.2.2]
+
+theorem policyGain_max (inc : State → Nat) (D R T M : Nat) (hT : 6≤T)
+    (d : Nat → Nat) (hc : FullCapped d R T M) :
+    policyGain inc D R T d≤policyGain inc D R T (debtDeath inc D R T M) := by
+  rw [policyGain_eq_obsBins,policyGain_eq_obsBins]
+  apply sum_map_le
+  intro b hb
+  obtain ⟨u,hu,hku⟩ := List.mem_flatMap.mp hb
+  obtain ⟨k,_,hk⟩ := List.mem_map.mp hku
+  subst b
+  obtain ⟨J,x⟩ := k
+  have ht := List.mem_range.mp hu
+  rw [obsFiber_profit_eq inc D R T J x u d hT ht,
+    obsFiber_profit_eq inc D R T J x u (debtDeath inc D R T M) hT ht]
+  exact debtDeath_fiber_profit_max inc D R T M J x (obsClock R T J u) hT d hc
+
+def optimalNetDeath (inc : State → Nat) (D R T M : Nat) : Nat → Nat :=
+  peakTruncate inc D R T (debtDeath inc D R T M)
+
+theorem optimalNetDeath_fullCapped (inc : State → Nat) (D R T M : Nat) (hT : 6≤T) :
+    FullCapped (optimalNetDeath inc D R T M) R T M :=
+  peakTruncate_fullCapped inc D R T M _ (debtDeath_fullCapped inc D R T M hT)
+
+theorem optimalNetDeath_optimal (inc : State → Nat) (D R T M : Nat) (hT : 6≤T)
+    (d : Nat → Nat) (hc : FullCapped d R T M) :
+    policyNet inc D R T d≤policyNet inc D R T (optimalNetDeath inc D R T M) := by
+  unfold optimalNetDeath
+  rw [peakTruncate_policyGain]
+  have hp := policyGain_max inc D R T M hT d hc
+  have hn := policyNet_le_peak inc D R T d
+  omega
+
+theorem prefix_life (d : Nat → Nat) (R T A : Nat) :
+    min T (prefixAge d R T A-observeAge R T A)=life d R T A := by
+  unfold prefixAge life
+  omega
+
+theorem policyNet_eq (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
+    policyNet inc D R T d=(D:Int)*(liveTicks d R T:Int)-(totalExpense inc R T d:Int) := by
+  unfold policyNet liveTicks totalExpense
+  rw [int_of_nat_sum_map,int_of_nat_sum_map]
+  generalize roots R = xs
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    simp only [List.map_cons,List.sum_cons,rootNet,prefix_life,Int.mul_add]
+    omega
+
+/-- Exact finite contradiction bridge, with the original analytical
+estimate still an explicit hypothesis. The new objective is not a
+surrogate survival criterion and allows arbitrary aggregate costs. -/
+theorem twin_above_of_optimal_net
+    (R T M B0 z Y0 Y1 D wN wQ err B : Nat)
+    (hlarge : B+3*T+6<R)
+    (hEst : ScaledLiveEstimate
+      (optimalNetDeath (weightedInc z Y0 Y1 wN wQ) D R T M)
+      R T M B0 z Y0 Y1 D wN wQ err)
+    (hNet : (err:Int)<policyNet (weightedInc z Y0 Y1 wN wQ) D R T
+      (optimalNetDeath (weightedInc z Y0 Y1 wN wQ) D R T M)) :
+    ∃ x : Nat, B<x ∧ TwinCenter x := by
+  let inc := weightedInc z Y0 Y1 wN wQ
+  let d := optimalNetDeath inc D R T M
+  have hn := policyNet_eq inc D R T d
+  have he := weightedCost_sum d R T z Y0 Y1 wN wQ
+  change totalExpense inc R T d = _ at he
+  rw [he] at hn
+  change (err:Int)<policyNet inc D R T d at hNet
+  have hs : wN*narrowCount d R T z Y0+wQ*mediumCharge d R T Y0 Y1+err<D*liveTicks d R T := by
+    simp only [Int.natCast_add,Int.natCast_mul] at hn
+    omega
+  exact twin_above_of_scaled_live_estimate d R T M B0 z Y0 Y1 D wN wQ err B hlarge hEst hs
+
+#print axioms NegativeMIN.optimalNetDeath_optimal
+#print axioms NegativeMIN.optimalNetDeath_fullCapped
+#print axioms NegativeMIN.twin_above_of_optimal_net
 
 end NegativeMIN
