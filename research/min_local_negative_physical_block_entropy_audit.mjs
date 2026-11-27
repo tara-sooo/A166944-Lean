@@ -15,6 +15,7 @@ function audit(){
     let key=b.a+":"+b.u,v=blocks.get(key)||{a:b.a,u:b.u,out:b.out,in:new Map(),mass:0};ck(v.out===b.out,"same block exit");let k=b.n+":"+b.arr+":"+b.side;v.in.set(k,(v.in.get(k)||0)+1);v.mass++;blocks.set(key,v);
    }
   }
+  let cuts=[Math.max(5,Math.floor(J/2)),Math.max(5,Math.floor(J/4)),Math.max(5,Math.floor(J/8))],splits=cuts.map(Y=>({Y,hi:0,lo:0,mixedHi:0,mixedLo:0,binary:0,insideHi:0,insideLo:0,maxHiGroups:0,terminalBinary:0}));
   let row={R,K,T,J,H,nr,ns,L:0,stationary:0,simultaneous:0,birth:0,resetStationary:0,nonresetStationary:0,resetSimultaneous:0,nonresetSimultaneous:0,birthTraffic:0,birthKeys:0,stationaryIncoming:0,stationaryBase:0,resetIncoming:0,nonresetIncoming:0,simultaneousMass:0,labelWithinBlock:0,timeWithinBlock:0,blockBirth:0,blockBirthTraffic:0,blockBirthKeys:0,timeUpper:0,nonresetLabelEntropy:0,resetLabelEntropy:0,meanEvents:totalEvents/ns,physicalHighMix:0,blockHighMix:0,birthVisitsAll:0,maxBirthTraffic:0,terminalEntropy:0,terminalBlockBirth:0,terminalLabel:0,terminalTime:0,nonterminalLabel:0,nonterminalTime:0,nonterminalBlockBirth:0,touchLabelMass:0,touchTimeMass:0,tightTimeUpper:0,tightLabelUpper:0,terminalBlocks:0,terminalArrivalGroups:0,birthCodeBound:0,liveClockEntropy:0,terminalClockEntropy:0,terminalClockRank:0,nonterminalClockRank:0,resetLabelUpper:0,nonresetLabelUpper:0};
   for(let v of blocks.values()){
    z.blocks++;let byTime=new Map(),byLabel=new Map(),total=0,birth=0;let lastClock=-Infinity;
@@ -24,6 +25,7 @@ function audit(){
    }
    ck(total===v.mass,"block mass");z.trafficChecks++;
    let labTotal=total-birth,labH=f(labTotal),timeH=0,timeUpper=0,tightTime=0;
+   for(let s of splits){let hi=[],lo=[];for(let [k,m] of v.in){let [n,p]=k.split(':').map(Number);if(p)(p>=s.Y?hi:lo).push(m)}let A=hi.reduce((a,b)=>a+b,0),B=lo.reduce((a,b)=>a+b,0),mix=phi(A,B);s.hi+=A;s.lo+=B;s.binary+=mix;s.insideHi+=f(A)-hi.reduce((a,b)=>a+f(b),0);s.insideLo+=f(B)-lo.reduce((a,b)=>a+f(b),0);if(A&&B){s.mixedHi+=A;s.mixedLo+=B;}s.maxHiGroups=Math.max(s.maxHiGroups,hi.length);if(!v.out)s.terminalBinary+=mix;}
    for(let l of byLabel.values()){labH-=f(l.m);timeH+=f(l.m)-l.entries.reduce((s,m)=>s+f(m),0);timeUpper+=l.m*g(l.age/l.m);if(l.entries.length>1){let kmin=Math.min(...l.times);tightTime+=l.m*g(l.age/l.m-kmin);row.touchTimeMass+=l.m}}
    if(byLabel.size>1){row.touchLabelMass+=labTotal;row.tightLabelUpper+=labTotal*Math.log(byLabel.size)}row.tightTimeUpper+=tightTime;ck(timeH<=tightTime+1e-7,'tight time');if(v.out===0){row.terminalBlocks++;row.terminalArrivalGroups+=v.in.size;row.terminalLabel+=labH;row.terminalTime+=timeH;row.terminalBlockBirth+=birth?phi(1,labTotal):0;row.terminalEntropy+=f(total)-[...v.in.values()].reduce((s,m)=>s+f(m),0)}else{row.nonterminalLabel+=labH;row.nonterminalTime+=timeH;row.nonterminalBlockBirth+=birth?phi(1,labTotal):0}row.labelWithinBlock+=labH;row.timeWithinBlock+=timeH;row.timeUpper+=timeUpper;ck(timeH<=timeUpper+1e-7,"time bound");
    if(birth){row.blockBirth+=phi(1,labTotal);row.blockBirthTraffic+=labTotal;row.blockBirthKeys++}
@@ -45,7 +47,7 @@ function audit(){
   let L=[...endpoints.values()].reduce((s,m)=>s+f(m),0);ck(Math.abs(L-row.stationary-row.simultaneous-row.birth)<1e-6&&Math.abs(L-row.labelWithinBlock-row.timeWithinBlock-row.blockBirth)<1e-6,"global");ck(row.birthKeys===ns,"birth count");row.L=L;
   row.birthCodeBound=ns*g(totalEvents/ns);row.birthUpper=ns*g(row.birthTraffic/ns);ck(row.birth<=row.birthCodeBound+1e-7,'birth events');row.blockBirthUpper=ns*g(row.blockBirthTraffic/ns);ck(row.birth<=row.birthUpper+1e-7&&row.blockBirth<=row.blockBirthUpper+1e-7,"birth Jensen");
   for(let k of Object.keys(row))if(!["R","K","T","J","H","nr","ns","meanEvents","maxBirthTraffic","birthKeys","blockBirthKeys"].includes(k))row[k]/=ns;
-  z.rows.push(row)
+  row.splits=splits.map(s=>{ck(s.hi<=ns*J/(s.Y-1)+1e-8,'high gain count');ck(Math.abs(s.hi+s.lo-totalEvents)<1e-6,'event count');ck(s.binary<=phi(s.mixedHi,s.mixedLo)+1e-7,'aggregate mix');ck(s.insideHi<=s.hi*Math.log(Math.max(1,s.maxHiGroups))+1e-7,'high groups');ck(Math.abs((s.binary+s.insideHi+s.insideLo)/ns-row.labelWithinBlock-row.timeWithinBlock)<1e-7,'split total');return {Y:s.Y,maxHiGroups:s.maxHiGroups,...Object.fromEntries(Object.entries(s).filter(([k])=>!['Y','maxHiGroups'].includes(k)).map(([k,v])=>[k,v/ns])),bound:(phi(s.mixedHi,s.mixedLo)+s.hi*Math.log(Math.max(1,s.maxHiGroups)))/ns}});z.rows.push(row)
  }
  return z
 }
