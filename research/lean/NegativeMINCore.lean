@@ -3670,7 +3670,7 @@ theorem debtDeath_fiber_profit_max (inc : State → Nat) (D R T M J x : Nat) (n 
     apply filter_len_mono
     intro a ha hf
     simp only [Bool.and_eq_true,decide_eq_true_eq,physicalLiveAt] at hf ⊢
-    exact ⟨hf.1,hf.2.1.1.1,hf.2.1.1.2.1,hf.2.2.1,hf.2.2.2⟩
+    exact ⟨hf.1,hf.2.1.1,hf.2.1.2.1,hf.2.2.1,hf.2.2.2⟩
 
 #print axioms NegativeMIN.debtDeath_fiber_profit_max
 
@@ -3896,6 +3896,7 @@ theorem policyNet_eq (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
   induction xs with
   | nil => simp
   | cons a xs ih =>
+    simp only [rootNet,prefix_life] at ih
     simp only [List.map_cons,List.sum_cons,rootNet,prefix_life,Int.mul_add]
     omega
 
