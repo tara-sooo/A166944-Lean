@@ -367,7 +367,9 @@ theorem tick_height_pin (s : State) (hp : winner s ≠ 0) :
     have h4 : 2 * ((2 * (p : Int)) * j) = (p : Int) * (4 * j) := by
       change 2 * ((2 * (p : Int)) * j) = (p : Int) * ((2 * 2) * j)
       ac_rfl
-    rw [Int.mul_sub, Int.mul_add, ← h4, Int.mul_one]
+    rw [Int.mul_sub]
+    simp only [Int.mul_add, Int.mul_one]
+    rw [← h4]
     omega
   · rw [if_neg hc] at he
     have hdiv := of_decide_eq_true he.2
@@ -382,7 +384,8 @@ theorem tick_height_pin (s : State) (hp : winner s ≠ 0) :
     have h4 : 2 * ((2 * (p : Int)) * j) = (p : Int) * (4 * j) := by
       change 2 * ((2 * (p : Int)) * j) = (p : Int) * ((2 * 2) * j)
       ac_rfl
-    rw [Int.mul_add, Int.mul_add, ← h4, Int.mul_one]
+    simp only [Int.mul_add, Int.mul_one]
+    rw [← h4]
     omega
 
 theorem tick_height_nonneg (s : State) (he : s.x % 2 = 0)
@@ -451,7 +454,9 @@ theorem firstEvent_gain (s : State) (w p : Nat)
   have hg := tick_gain_exact (evolve s (w - 1))
   rw [hwin, hq] at hg
   have hw' : w - 1 + 1 = w := by omega
-  simpa only [← evolve, hw'] using hg
+  calc
+    (evolve s w).x + (p - 1) = (evolve s (w - 1 + 1)).x + (p - 1) := by rw [hw']
+    _ = s.x := hg
 
 /-- The exact candidate calendar wait for either sign. A positive wait
 is required even if the current tick is itself congruent to the pin. -/
@@ -534,6 +539,116 @@ theorem firstEvent_minimum_label (s : State) (w p q : Nat)
 #print axioms NegativeMIN.firstEvent_minimum_tick
 #print axioms NegativeMIN.firstEvent_minimum_label
 #print axioms NegativeMIN.calendarWait_pin
+
+/-- Factor eligibility before the clock is selected. -/
+def SpatialFactor (x p : Nat) (plus : Bool) : Prop :=
+  oddPrime p = true ∧
+    (if plus then x ≥ 2 ∧ (x - 1) % p = 0 else (x + 1) % p = 0)
+
+theorem oddPrime_bounds (p : Nat) (h : oddPrime p = true) :
+    3 ≤ p ∧ p % 2 = 1 := by
+  simp only [oddPrime, Bool.and_eq_true, decide_eq_true_eq] at h
+  exact h.1
+
+theorem calendarWait_eligible (s : State) (p : Nat) (plus : Bool)
+    (h : SpatialFactor s.x p plus) :
+    eligible s.x (s.n + (calendarWait s.n p plus : Int)) p = true := by
+  have hp := oddPrime_bounds p h.1
+  let t := s.n + (calendarWait s.n p plus : Int)
+  let m : Int := 2 * (p : Int)
+  have hpin := calendarWait_pin s.n p plus hp.1
+  change t % m = _ at hpin
+  have hdiv := Int.mul_ediv_add_emod t m
+  rw [hpin] at hdiv
+  have hm : (m * (t / m)) % 2 = 0 := by
+    dsimp [m]
+    rw [Int.mul_assoc, Int.mul_emod_right]
+  have hpar := congrArg (fun a : Int => a % 2) hdiv
+  rw [Int.add_emod, hm, Int.zero_add] at hpar
+  cases plus
+  · have hzero : t % 2 = 0 := by simpa using hpar.symm
+    have hx : (s.x + 1) % p = 0 := h.2
+    change eligible s.x t p = true
+    simp [eligible, h.1, hzero, hx, hpin, m]
+  · have hone : t % 2 = 1 := by
+      simp only [Bool.true_eq, if_true] at hpar
+      omega
+    have hx : s.x ≥ 2 ∧ (s.x - 1) % p = 0 := h.2
+    have hne : t % 2 ≠ 0 := by omega
+    change eligible s.x t p = true
+    simp [eligible, h.1, hne, hx.1, hx.2, hpin, m]
+
+theorem firstEvent_wait_le_factor (s : State) (w p q : Nat) (plus : Bool)
+    (he : FirstEvent s w p) (hf : SpatialFactor s.x q plus)
+    (hq : q ≤ s.x + 1) : w ≤ 2 * q := by
+  have hp := oddPrime_bounds q hf.1
+  have hwait := calendarWait_pos_le s.n q plus (by omega)
+  have hmin := firstEvent_minimum_tick s w p (calendarWait s.n q plus) q
+    he hwait.1 (by omega) hq (calendarWait_eligible s q plus hf)
+  omega
+
+theorem firstEvent_wait_le_three_gain (s : State) (w p : Nat)
+    (he : FirstEvent s w p) : w ≤ 3 * (p - 1) := by
+  have hp := firstEvent_actual_pin s w p he
+  have hodd := eligible_three_le s.x (s.n + (w : Int)) p hp
+  have hwin := winner_le (evolve s (w - 1))
+  have hcenter := quiet_center s (w - 1) (fun j hj => he.2.2.2 j (by omega))
+  have hbound : p ≤ s.x + 1 := by
+    rw [he.2.2.1, hcenter] at hwin
+    exact hwin
+  by_cases hpar : (s.n + (w : Int)) % 2 = 0
+  · simp only [eligible, Bool.and_eq_true, if_pos hpar, decide_eq_true_eq] at hp
+    have hf : SpatialFactor s.x p false := ⟨hp.1, hp.2.1⟩
+    have h := firstEvent_wait_le_factor s w p p false he hf hbound
+    omega
+  · simp only [eligible, Bool.and_eq_true, if_neg hpar, decide_eq_true_eq] at hp
+    have hf : SpatialFactor s.x p true := ⟨hp.1, hp.2.1, hp.2.2.1⟩
+    have h := firstEvent_wait_le_factor s w p p true he hf hbound
+    omega
+
+/-- The exact synchronized window construction costs at most half a
+horizon of pre-observation age, including the partial last window. -/
+theorem observeAge_le_half (R T A : Nat)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0) :
+    2 * observeAge R T A ≤ T := by
+  let L := slabLo R
+  let W := windowWidth T
+  let J := (A - L) / W
+  have hL : L ≤ A := by dsimp [L, slabLo]; omega
+  have hW : 0 < W := by dsimp [W, windowWidth]; omega
+  have hWT : W ≤ T := by dsimp [W, windowWidth]; omega
+  have hrem := Nat.mod_lt (A - L) hW
+  have hdiv := Nat.div_add_mod (A - L) W
+  change W * J + (A - L) % W = A - L at hdiv
+  rw [Nat.mul_comm W J] at hdiv
+  have hbase : L + J * W ≤ A := by omega
+  have hgap : A < L + J * W + W := by omega
+  change 2 * ((3 - ((L + J * W : Nat) : Int) / 2) -
+    (3 - (A : Int) / 2)).toNat ≤ T
+  omega
+
+theorem observed_center_lower (R T A u : Nat)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0) (hu : u < T) :
+    R ≤ (observedState R T A u).x + 3 * T + 6 := by
+  have ha := observeAge_le_half R T A hT hR h6
+  have he : A % 2 = 0 := by omega
+  have hg := canonical_gain_bound A (observeAge R T A + u) he
+  have hmono := evolve_center_le (birth A) (observeAge R T A + u)
+  change ((A - (observedState R T A u).x : Nat) : Int) ≤ _ at hg
+  change (observedState R T A u).x ≤ A at hmono
+  omega
+
+theorem liveAbove_of_slab (deathAge : Nat → Nat) (R T B : Nat)
+    (hT : 6 ≤ T) (hB : B + 3 * T + 6 < R) :
+    LiveAbove deathAge R T B := by
+  intro A hA u hu
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hA
+  have hul := life_le deathAge R T A
+  have h := observed_center_lower R T A u hT hA.2.1 hA.2.2 (by omega)
+  omega
+
+#print axioms NegativeMIN.firstEvent_wait_le_three_gain
+#print axioms NegativeMIN.liveAbove_of_slab
 
 #print axioms NegativeMIN.actual_twin_of_live_gap
 #print axioms NegativeMIN.unbounded_of_liveGap
