@@ -4140,10 +4140,11 @@ theorem weightedExpense_partition (z Y0 Y1 wN wQ A k : Nat) :
     pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) k =
       firstWeightedExpense z Y0 Y1 wN wQ A k + repeatedWeightedExpense z Y0 Y1 wN wQ A k := by
   rw [← prefixStates_cost]
-  simp only [weightedInc]
+  change ((prefixStates A k).map (fun s => wN*narrowInc z Y0 s+wQ*mediumInc Y0 Y1 s)).sum = _
   rw [sum_map_add,sum_map_mul,sum_map_mul,← first_repeat_partition (narrowInc z Y0) (prefixStates A k) (List.range Y0),
     ← first_repeat_partition (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1)]
   unfold firstWeightedExpense repeatedWeightedExpense
+  simp only [Nat.mul_add]
   omega
 
 theorem total_firstWeightedExpense_le (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat)
@@ -4345,11 +4346,19 @@ theorem removedExpense_bound (z Y0 Y1 U wN wQ A k : Nat)
       U*wQ*firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k := by ac_rfl
   have he3 : U*(wQ*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k) =
       wQ*(U*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k) := by ac_rfl
-  unfold removedExpense
-  simp only [Nat.mul_add]
-  rw [he1,he2,he3]
-  simp only [← Nat.mul_assoc] at h1 h2 ⊢
-  omega
+  calc
+    U*removedExpense z Y0 Y1 U wN wQ A k =
+      (U*wN)*firstPositiveExpense (narrowInc z Y0) Y0 A k +
+      (U*wQ)*firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k +
+      wQ*(U*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k) := by
+        unfold removedExpense
+        simp only [Nat.mul_add]
+        rw [he1,he2,he3]
+        omega
+    _ ≤ (U*wN)*Y0+(U*wQ)*(2*Y1*Y1)+wQ*(3*(2*k+6)) := by omega
+    _ = _ := by
+      rw [Nat.mul_add U]
+      ac_rfl
 
 #print axioms NegativeMIN.residualExpense_partition
 #print axioms NegativeMIN.removedExpense_bound
