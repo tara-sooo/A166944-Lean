@@ -3166,4 +3166,206 @@ theorem peakTruncate_policyNet (inc : State → Nat) (D R T : Nat) (d : Nat → 
 #print axioms NegativeMIN.peakTruncate_fullCapped
 #print axioms NegativeMIN.peakTruncate_policyNet
 
+/-! Stable priority for reflected debt. A tie can arise when two
+different debts are both repaid. A fixed ID tie-break alone can
+then resurrect a discarded root. Reverse chronological debt
+history solves this; a variable radix avoids any growth assumption. -/
+def digitBase (xs : List Nat) (digit : Nat → Nat → Nat) (t : Nat) : Nat :=
+  1+(xs.map (fun a => digit a t)).sum
+
+def digitPlace (xs : List Nat) (digit : Nat → Nat → Nat) : Nat → Nat
+  | 0 => 1
+  | t+1 => digitPlace xs digit t * digitBase xs digit t
+
+def historyCode (xs : List Nat) (digit : Nat → Nat → Nat) (a : Nat) : Nat → Nat
+  | 0 => digit a 0
+  | t+1 => digit a (t+1)*digitPlace xs digit (t+1)+historyCode xs digit a t
+
+theorem digit_lt_base (xs : List Nat) (digit : Nat → Nat → Nat) (a t : Nat)
+    (ha : a∈xs) : digit a t < digitBase xs digit t := by
+  have h := member_le_sum (xs.map (fun b => digit b t)) (digit a t) (List.mem_map.mpr ⟨a,ha,rfl⟩)
+  unfold digitBase
+  omega
+
+theorem digitPlace_pos (xs : List Nat) (digit : Nat → Nat → Nat) (t : Nat) :
+    0<digitPlace xs digit t := by
+  induction t with
+  | zero => decide
+  | succ t ih =>
+    simp only [digitPlace]
+    apply Nat.mul_pos ih
+    unfold digitBase
+    omega
+
+theorem historyCode_bound (xs : List Nat) (digit : Nat → Nat → Nat) (a t : Nat)
+    (ha : a∈xs) : historyCode xs digit a t<digitPlace xs digit (t+1) := by
+  induction t with
+  | zero =>
+    simpa [historyCode,digitPlace] using digit_lt_base xs digit a 0 ha
+  | succ t ih =>
+    have hd := digit_lt_base xs digit a (t+1) ha
+    have hm := Nat.mul_le_mul_right (digitPlace xs digit (t+1))
+      (show digit a (t+1)+1≤digitBase xs digit (t+1) by omega)
+    rw [Nat.add_mul,Nat.one_mul,Nat.mul_comm (digitBase xs digit (t+1))] at hm
+    change digit a (t+1)*digitPlace xs digit (t+1)+historyCode xs digit a t <
+      digitPlace xs digit (t+1)*digitBase xs digit (t+1)
+    omega
+
+theorem historyCode_digit_le (xs : List Nat) (digit : Nat → Nat → Nat) (a b t : Nat)
+    (ha : a∈xs) (h : historyCode xs digit b t≤historyCode xs digit a t) :
+    digit b t≤digit a t := by
+  cases t with
+  | zero => exact h
+  | succ t =>
+    by_contra hn
+    have hb := historyCode_bound xs digit a t ha
+    have hm := Nat.mul_le_mul_right (digitPlace xs digit (t+1))
+      (show digit a (t+1)+1≤digit b (t+1) by omega)
+    rw [Nat.add_mul,Nat.one_mul] at hm
+    change digit b (t+1)*digitPlace xs digit (t+1)+historyCode xs digit b t ≤
+      digit a (t+1)*digitPlace xs digit (t+1)+historyCode xs digit a t at h
+    omega
+
+theorem historyCode_priority_step (xs : List Nat) (digit : Nat → Nat → Nat)
+    (a b t : Nat)
+    (h : Precedes (fun c => historyCode xs digit c t) b a)
+    (hd : digit b (t+1)≤digit a (t+1)) :
+    Precedes (fun c => historyCode xs digit c (t+1)) b a := by
+  have hm := Nat.mul_le_mul_right (digitPlace xs digit (t+1)) hd
+  simp only [Precedes,historyCode] at h ⊢
+  omega
+
+def epoch (R : Nat) : Int := 3-(R : Int)
+def absoluteTick (R t : Nat) : Int := epoch R+(t : Int)
+def absoluteAge (R : Nat) (n : Int) : Nat := (n-epoch R).toNat
+
+theorem epoch_le_birth (R A : Nat) (hA : A∈roots R) : epoch R≤(birth A).n := by
+  simp only [roots,List.mem_filter,List.mem_range,decide_eq_true_eq] at hA
+  unfold epoch birth
+  omega
+
+theorem absoluteTick_age (R : Nat) (n : Int) (hn : epoch R≤n) :
+    absoluteTick R (absoluteAge R n)=n := by
+  unfold absoluteTick absoluteAge
+  omega
+
+theorem observation_reward_clock (R T A : Nat) (n : Int)
+    (hT : 6≤T) (hA : A∈roots R) (hb : (birth A).n≤n) :
+    observedReward R T A (physicalAge A n)=
+      if observeStart R T A≤n ∧ n<observeStart R T A+(T : Int) then 1 else 0 := by
+  have ha := hA
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at ha
+  have hstart := observeStart_ge_birth R T A hT ha.2.1 ha.2.2
+  unfold observedReward
+  have he : (observeAge R T A≤physicalAge A n ∧
+      physicalAge A n<observeAge R T A+T) ↔
+      observeStart R T A≤n ∧ n<observeStart R T A+(T : Int) := by
+    unfold observeAge physicalAge
+    omega
+  by_cases h : observeStart R T A≤n ∧ n<observeStart R T A+(T : Int)
+  · simp [h,he.mpr h]
+  · simp [h,fun hh => h (he.mp hh)]
+
+def debtDigit (inc : State → Nat) (D R T A t : Nat) : Nat :=
+  (recordDebt (rootNet inc D R T A) (physicalAge A (absoluteTick R t))).toNat
+
+theorem contact_debt_step (inc : State → Nat) (D R T A B t : Nat)
+    (hT : 6≤T) (hA : A∈roots R) (hB : B∈roots R)
+    (hc : Contact R T A B (absoluteTick R t))
+    (hd : debtDigit inc D R T B t≤debtDigit inc D R T A t) :
+    debtDigit inc D R T B (t+1)≤debtDigit inc D R T A (t+1) := by
+  let n := absoluteTick R t
+  let a := physicalAge A n
+  let b := physicalAge B n
+  let f := rootNet inc D R T A
+  let g := rootNet inc D R T B
+  have hclock : absoluteTick R (t+1)=n+1 := by unfold n absoluteTick; omega
+  have ha : physicalAge A (absoluteTick R (t+1))=a+1 := by
+    have h := hc.1
+    rw [hclock]
+    unfold a physicalAge
+    change (birth A).n≤n at h
+    omega
+  have hb : physicalAge B (absoluteTick R (t+1))=b+1 := by
+    have h := hc.2.1
+    rw [hclock]
+    unfold b physicalAge
+    change (birth B).n≤n at h
+    omega
+  have hra := observation_reward_clock R T A n hT hA hc.1
+  have hrb := observation_reward_clock R T B n hT hB hc.2.1
+  have hs := contact_same_window_end R T A B hc.2.2.1
+  rw [hs] at hra
+  change observedReward R T A a = _ at hra
+  change observedReward R T B b = _ at hrb
+  have hrew := hra.trans hrb.symm
+  have hx := hc.2.2.2
+  change orbit A a=orbit B b at hx
+  have hfa := rootNet_increment inc D R T A a
+  have hgb := rootNet_increment inc D R T B b
+  change f (a+1)-f a = _ at hfa
+  change g (b+1)-g b = _ at hgb
+  rw [hrew,hx] at hfa
+  have hstep := hfa.trans hgb.symm
+  have hda := recordDebt_nonneg f a
+  have hdb := recordDebt_nonneg g b
+  change (recordDebt g b).toNat≤(recordDebt f a).toNat at hd
+  have hle : recordDebt g b≤recordDebt f a := by omega
+  unfold debtDigit
+  rw [ha,hb]
+  change (recordDebt g (b+1)).toNat≤(recordDebt f (a+1)).toNat
+  rw [recordDebt_succ,recordDebt_succ, hstep]
+  have hmax : max 0 (recordDebt g b-(g (b+1)-g b))≤
+      max 0 (recordDebt f a-(g (b+1)-g b)) := by
+    by_cases h : recordDebt g b-(g (b+1)-g b)≤0
+    · rw [Int.max_eq_left h]
+      exact Int.le_max_left _ _
+    · have h' : 0≤recordDebt f a-(g (b+1)-g b) := by omega
+      rw [Int.max_eq_right (by omega : 0≤recordDebt g b-(g (b+1)-g b)),Int.max_eq_right h']
+      omega
+  omega
+
+def debtScore (inc : State → Nat) (D R T A t : Nat) : Nat :=
+  historyCode (roots R) (debtDigit inc D R T) A t
+
+theorem debtScore_priority_step (inc : State → Nat) (D R T A B t : Nat)
+    (hT : 6≤T) (hA : A∈roots R) (hB : B∈roots R)
+    (hc : Contact R T A B (absoluteTick R t))
+    (hp : Precedes (fun c => debtScore inc D R T c t) B A) :
+    Precedes (fun c => debtScore inc D R T c (t+1)) B A := by
+  have hle : debtScore inc D R T B t≤debtScore inc D R T A t := by
+    simp only [Precedes] at hp
+    omega
+  have hd := historyCode_digit_le (roots R) (debtDigit inc D R T) A B t hA hle
+  exact historyCode_priority_step (roots R) (debtDigit inc D R T) A B t hp
+    (contact_debt_step inc D R T A B t hT hA hB hc hd)
+
+def debtRank (inc : State → Nat) (D R T A t : Nat) : Nat :=
+  ((roots R).filter (fun B => decide (Contact R T A B (absoluteTick R t) ∧
+    Precedes (fun c => debtScore inc D R T c t) B A))).length
+
+theorem debtRank_step (inc : State → Nat) (D R T A t : Nat)
+    (hT : 6≤T) (hA : A∈roots R) :
+    debtRank inc D R T A t≤debtRank inc D R T A (t+1) := by
+  unfold debtRank
+  apply filter_len_mono
+  intro B hB h
+  simp only [decide_eq_true_eq] at h ⊢
+  exact ⟨contact_mono R T A B _ _ (by unfold absoluteTick; omega) h.1,
+    debtScore_priority_step inc D R T A B t hT hA hB h.1 h.2⟩
+
+theorem debtRank_mono (inc : State → Nat) (D R T A i j : Nat)
+    (hT : 6≤T) (hA : A∈roots R) (hij : i≤j) :
+    debtRank inc D R T A i≤debtRank inc D R T A j := by
+  induction j with
+  | zero => have h : i=0 := by omega; rw [h]; exact Nat.le_refl _
+  | succ j ih =>
+    by_cases h : i=j+1
+    · rw [h]
+    · exact Nat.le_trans (ih (by omega)) (debtRank_step inc D R T A j hT hA)
+
+#print axioms NegativeMIN.historyCode_digit_le
+#print axioms NegativeMIN.contact_debt_step
+#print axioms NegativeMIN.debtRank_mono
+
 end NegativeMIN
