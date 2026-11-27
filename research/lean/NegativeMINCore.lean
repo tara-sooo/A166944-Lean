@@ -8715,23 +8715,27 @@ theorem passageRankDeath_net_lower (cost : Nat → Nat → Nat) (R T M D q : Nat
   apply sum_map_le
   intro A _
   let l := firstPassage cost R T D q
-  unfold passageRankDeath
-  dsimp only
-  by_cases h : 0<firstPassage cost R T D q A ∧ localRank (passageNeighbors R T (firstPassage cost R T D q) A) score A≤M
-  · simp only [h,decide_true,if_true]
-    change 0<l A ∧ _ at h
-    have hp := firstPassage_sound cost R T D q A h.1
+  let d := passageRankDeath cost R T M D q score
+  let P := 0<l A ∧ localRank (passageNeighbors R T l A) score A≤M
+  change cost A (prefixAge d R T A)+q*(if decide P then 1 else 0)≤D*life d R T A
+  have hd : d A=(if P then observeAge R T A+l A else 0) := rfl
+  by_cases h : P
+  · have hpos : 0<l A := h.1
+    have hp := firstPassage_sound cost R T D q A hpos
     have hc := hp.2
     change q≤passageProfit cost R T D A (l A) at hc
     simp only [passageProfit,if_neg (by omega : l A≠0)] at hc
+    have ht : l A≤T := hp.1
     unfold life prefixAge
-    change cost A (min (observeAge R T A+l A) (observeAge R T A+T)) + q*1 ≤ D*min T (observeAge R T A+l A-observeAge R T A)
+    rw [hd,if_pos h]
     have he : min (observeAge R T A+l A) (observeAge R T A+T)=observeAge R T A+l A := by omega
     have hl : min T (observeAge R T A+l A-observeAge R T A)=l A := by omega
     rw [he,hl]
-    simp only [Nat.mul_one]
+    simp [h]
     omega
-  · simp [h,life,prefixAge,hz]
+  · unfold life prefixAge
+    rw [hd,if_neg h]
+    simp [h,hz]
 
 theorem passageAccepted_upper (cost : Nat → Nat → Nat) (R T M B0 D q err : Nat)
     (score : Nat → Nat) (hT : 6≤T) (hz : ∀ A,cost A 0=0)
@@ -8913,7 +8917,8 @@ theorem satCount_append_bounds (z Y reset D : Nat) (xs ys : List Nat) :
   unfold satCount
   rw [chunkFold_append]
   change a.saturated+(chunkFold z Y reset D chunkInit ys).saturated≤
-    (chunkFold z Y reset D a ys).saturated ∧ _
+    (chunkFold z Y reset D a ys).saturated ∧
+    (chunkFold z Y reset D a ys).saturated≤a.saturated+(chunkFold z Y reset D chunkInit ys).saturated+1
   change (chunkFold z Y reset D b ys).saturated=(chunkFold z Y reset D chunkInit ys).saturated+a.saturated at hbEq'
   rcases hh with ⟨h,_⟩ | ⟨h,_⟩ <;> omega
 
@@ -8961,7 +8966,7 @@ theorem wordPotential_mono (C : List Nat → Nat) (endClock : Int)
   · have he : (endClock-s.n).toNat=0 := by omega
     have he' : (endClock-(s.n+1)).toNat=0 := by omega
     rw [he,he']
-    rfl
+    exact Nat.le_refl _
 
 theorem potentialInc_telescopes (F : State → Nat) (s : State) (k : Nat)
     (h : ∀ s,F (tick s)≤F s) :
@@ -8991,7 +8996,9 @@ theorem wordPotential_prefix_bounds (C : List Nat → Nat) (endClock : Int)
   have htel := potentialInc_telescopes (wordPotential C endClock) s k
     (wordPotential_mono C endClock hm)
   rw [he] at htel
-  unfold wordPotential at htel
+  change pathCost (potentialInc (wordPotential C endClock)) s k+
+    C (labelTrace (evolve s k) (endClock-(evolve s k).n).toNat)=
+      C (labelTrace s k++labelTrace (evolve s k) (endClock-(evolve s k).n).toNat) at htel
   omega
 
 theorem satCount_suffix_mono (z Y reset D : Nat) :
@@ -9068,7 +9075,11 @@ theorem wordPolicyNet_near_optimal (C : List Nat → Nat) (endClock : Int)
   change wordPolicyNet C D R T d≤policyNet inc D R T d+(((roots R).length*E:Nat):Int) at h1
   change policyNet inc D R T opt≤wordPolicyNet C D R T opt+(((roots R).length*E:Nat):Int) at h2
   change wordPolicyNet C D R T d≤wordPolicyNet C D R T opt+(((roots R).length*(2*E):Nat):Int)
-  rw [Nat.mul_comm 2 E,Nat.mul_assoc,Nat.mul_comm ((roots R).length*E) 2]
+  have he : (roots R).length*(2*E)=(roots R).length*E+(roots R).length*E := by
+    rw [Nat.mul_comm 2 E,Nat.mul_succ]
+    simp
+  rw [he,Int.natCast_add]
+  change policyNet inc D R T d≤policyNet inc D R T opt at h3
   omega
 
 theorem twin_above_of_wordPotential_records (C : List Nat → Nat) (endClock : Int)
@@ -9085,6 +9096,7 @@ theorem twin_above_of_wordPotential_records (C : List Nat → Nat) (endClock : I
   have he := hEst d (optimalNetDeath_fullCapped inc D R T M hT)
   have hr := optimalNetDeath_formula inc D R T M hT
   rw [policyNet_eq] at hr
+  change (D:Int)*(liveTicks d R T:Int)-(totalExpense inc R T d:Int)=(optimalRecordMass inc D R T M:Int) at hr
   change D*liveTicks d R T≤D*B0*M*T*twinCount R T+historyExpense (wordHistoryCost C) R T d+err at he
   change historyExpense (wordHistoryCost C) R T d≤totalExpense inc R T d+(roots R).length*E at hh
   change err+(roots R).length*E<optimalRecordMass inc D R T M at hgap
