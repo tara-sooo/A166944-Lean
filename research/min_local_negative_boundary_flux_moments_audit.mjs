@@ -52,26 +52,31 @@ function audit(Rs){
    for(let Q of widths){
     let K=Q/g.q,M=Q/6,controls=[];
     for(let shift=0;shift<K;shift++){
-     let row={shift,entropy:0,energy:0,posEnergy:0,posFrac:0,fracMoment:0,coarseMoment:0,bandPos:[0,0,0],bandFrac:[0,0,0],mass:0};
+     let row={shift,entropy:0,energy:0,posEnergy:0,posFrac:0,absFrac:0,fracMoment:0,coarseMoment:0,bandPos:[0,0,0],bandFrac:[0,0,0],mass:0};
      for(let k=mod(shift-g.start,K);k<g.F.length;k+=K){
       let a=0,m=0;for(let j=k;j<Math.min(k+K,g.F.length);j++){a+=initial[j];m+=final[j]}
       let F0=g.F[k],F1=g.F[k+K]||0,d=F1-F0;
       ck(a+d===m,"cell flux derivative");ck(a<=M,"initial cap");checks++;
-      let pos=Math.max(0,d);row.mass+=m;row.entropy+=f(m);row.energy+=d*d;row.posEnergy+=pos*pos;row.posFrac+=pos**1.5;row.fracMoment+=m**1.5;row.coarseMoment+=m*m;
+      let pos=Math.max(0,d);row.mass+=m;row.entropy+=f(m);row.energy+=d*d;row.absFrac+=Math.abs(d)**1.5;row.posEnergy+=pos*pos;row.posFrac+=pos**1.5;row.fracMoment+=m**1.5;row.coarseMoment+=m*m;
       for(let i=0;i<3;i++){let e=Math.max(0,(g.band[i][k+K]||0)-g.band[i][k]);row.bandPos[i]+=e*e;row.bandFrac[i]+=e**1.5;}
      }
      // If the first grid boundary lies beyond array start, all omitted cells are empty for these widths?
      // Handle padded left boundary explicitly, using its zero exterior flux.
      let first=mod(shift-g.start,K);
      if(first){let a=0,m=0;for(let j=0;j<first;j++){a+=initial[j];m+=final[j]}let d=g.F[first],pos=Math.max(0,d);
-      ck(a+d===m&&a<=M,"left partial cell");checks++;row.mass+=m;row.entropy+=f(m);row.energy+=d*d;row.posEnergy+=pos*pos;row.posFrac+=pos**1.5;row.fracMoment+=m**1.5;row.coarseMoment+=m*m;for(let i=0;i<3;i++){let e=g.band[i][first];row.bandPos[i]+=e*e;row.bandFrac[i]+=e**1.5}
+      ck(a+d===m&&a<=M,"left partial cell");checks++;row.mass+=m;row.entropy+=f(m);row.energy+=d*d;row.absFrac+=Math.abs(d)**1.5;row.posEnergy+=pos*pos;row.posFrac+=pos**1.5;row.fracMoment+=m**1.5;row.coarseMoment+=m*m;for(let i=0;i<3;i++){let e=g.band[i][first];row.bandPos[i]+=e*e;row.bandFrac[i]+=e**1.5}
      }
      ck(row.mass===N,"coarse mass");row.entropy/=N;
      row.bound2=Math.log(M)+2*Math.log1p(Math.sqrt(row.posEnergy/(N*M)));
      row.bound15=Math.log(M)+3*Math.log1p((row.posFrac/(N*Math.sqrt(M)))**(2/3));
+     row.sharp2=Math.log(M)+Math.log(1+row.energy/(N*M)+4*M/N);
+     row.sharp15=Math.log(M)+2*Math.log(1+row.absFrac/(N*Math.sqrt(M))+3*M/N);
+     row.sharpPos2=Math.log(M)+Math.log(2+row.posEnergy/(N*M)+4*M/N);
+     row.sharpPos15=Math.log(M)+2*Math.log(2+row.posFrac/(N*Math.sqrt(M))+3*M/N);
      row.actualRenyi2=Math.log(row.coarseMoment/N);
      row.actualRenyi15=2*Math.log(row.fracMoment/N);
      ck(fine<=row.entropy+1e-8&&row.entropy<=row.actualRenyi2+1e-8&&row.entropy<=row.actualRenyi15+1e-8&&row.actualRenyi2<=row.bound2+1e-8&&row.actualRenyi15<=row.bound15+1e-8,"moment bounds");
+     ck(row.actualRenyi2<=Math.min(row.sharp2,row.sharpPos2)+1e-8&&row.actualRenyi15<=Math.min(row.sharp15,row.sharpPos15)+1e-8,"Taylor bounds");
      ck(Math.sqrt(row.posEnergy)<=row.bandPos.reduce((s,x)=>s+Math.sqrt(x),0)+1e-6,"band Minkowski");
      controls.push(row);
     }
@@ -79,7 +84,7 @@ function audit(Rs){
     let best=controls.reduce((a,b)=>a.bound2<b.bound2?a:b),best15=controls.reduce((a,b)=>a.bound15<b.bound15?a:b);
     let avgBound2=Math.log(M)+2*Math.log1p(Math.sqrt(avg/(N*M))),avgBound15=Math.log(M)+3*Math.log1p((avgFrac/(N*Math.sqrt(M)))**(2/3));
     ck(best.bound2<=avgBound2+1e-8&&best15.bound15<=avgBound15+1e-8,"shift averaging");
-    output.push({q:g.q,Q,K,M,bestShift:best.shift,coarseEntropy:best.entropy,ratio2:best.posEnergy/(N*M),ratio15:best15.posFrac/(N*Math.sqrt(M)),bestBound2:best.bound2,bestBound15:best15.bound15,avgBound2,avgBound15,actualRenyi2:best.actualRenyi2,actualRenyi15:best.actualRenyi15});
+    output.push({q:g.q,Q,K,M,bestShift:best.shift,coarseEntropy:best.entropy,ratio2:best.posEnergy/(N*M),ratio15:best15.posFrac/(N*Math.sqrt(M)),bestBound2:best.bound2,bestBound15:best15.bound15,avgBound2,avgBound15,actualRenyi2:best.actualRenyi2,actualRenyi15:best.actualRenyi15,sharp2:best.sharp2,sharp15:best15.sharp15,sharpPos2:best.sharpPos2,sharpPos15:best15.sharpPos15,absEnergy:best.energy/(N*M),absFrac:best15.absFrac/(N*Math.sqrt(M))});
    }
   }
   rows.push({R,T,N,fine,jumps,checks,barriers:grids.reduce((s,g)=>s+g.barriers,0),intervals:grids.reduce((s,g)=>s+g.intervals,0),output});
