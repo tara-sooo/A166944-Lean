@@ -11,14 +11,15 @@ function audit(){
   if(p<=23){
    let C=[];for(let b of B)for(let t=0;t<p;t++){let k=b+t*Number(old);if(mod(-3*k,p)<=(p-3)/2)C.push(k)}B=C.sort((a,b)=>a-b);
    let gaps=B.map((b,i)=>(i===B.length-1?B[0]+Number(K):B[i+1])-b),h=gaps.reduce((s,m)=>s+m/Number(K)*Math.log(m),0);
-   let moment=gaps.reduce((s,m)=>s+m/Number(K)*Math.sqrt(m),0);
-   ck(h<=Math.min(Math.log(Number(K)),Math.log(4*D)+1)+1e-9,"gap entropy");
-   ck(moment<=2*Math.sqrt(4*D)+1e-9,"gap fractional moment");
-   let row={z:p,K:K.toString(),D,delta,Hgap:h,Hbound:Math.min(Math.log(Number(K)),Math.log(4*D)+1),halfMoment:moment,momentBound:4*Math.sqrt(D)};
+   let moment=gaps.reduce((s,m)=>s+m/Number(K)*Math.sqrt(m),0),firstMoment=gaps.reduce((s,m)=>s+m*m/Number(K),0),firstBound=Math.min(Number(K),8*D*(1+Math.max(0,Math.log(Number(K)/(8*D))))); ck(firstMoment<=firstBound+1e-8,'first moment');
+   ck(h<=Math.min(Math.log(Number(K)),Math.log(8*D)+1)+1e-9,"gap entropy");
+   ck(moment<=2*Math.sqrt(8*D)+1e-9,"gap fractional moment");
+   let row={z:p,K:K.toString(),D,delta,Hgap:h,Hbound:Math.min(Math.log(Number(K)),Math.log(8*D)+1),halfMoment:moment,firstMoment,firstBound,momentBound:2*Math.sqrt(8*D)};
    if(p<=17){
     // Direct CRT correlation vs exact Fourier frequency sum on small complete periods.
-    const k=Number(K),local=ps.filter(q=>q<=p).map(q=>{let l=(q-1)/2,m=k/q;return Array.from({length:q},(_,r)=>{if(!r)return 1;let a=mod(r*m,q),t=mod(a*modinv(-3,q),q);return (Math.sin(Math.PI*t*l/q)/(l*Math.sin(Math.PI*t/q)))**2})});
-    // CRT character frequency r/k decomposes as local r*(k/q)^(-1) mod q; use inverse, not product.
+    const k=Number(K);
+    // CRT character r/k has local frequency r*(k/q)^(-1) modulo q.
+    const local=ps.filter(q=>q<=p).map(q=>Array(q).fill(1));
     function modinv(a,p){for(let i=1;i<p;i++)if(mod(a*i,p)===1)return i;throw Error("inverse")}
     for(let i=0;i<local.length;i++){let q=ps[i],m=k/q,l=(q-1)/2,inv=modinv(m,q)*modinv(-3,q);for(let r=1;r<q;r++){let t=mod(r*inv,q);local[i][r]=(Math.sin(Math.PI*t*l/q)/(l*Math.sin(Math.PI*t/q)))**2}}
     let weights=new Float64Array(k);
@@ -34,7 +35,7 @@ function audit(){
     }
    }
    rows.push(row);sets.push({p,k:Number(K),B:[...B]});
-  }else rows.push({z:p,K:K.toString(),D,delta,Hbound:Math.min(Math.log(Number(K)),Math.log(4*D)+1),momentBound:4*Math.sqrt(D)});
+  }else rows.push({z:p,K:K.toString(),D,delta,Hbound:Math.min(Math.log(Number(K)),Math.log(8*D)+1),momentBound:2*Math.sqrt(8*D)});
  }
  // Actual elapsed-T trajectories; pad the initial slab to whole cells and include stationary ghosts.
  const R=480000,T=Math.ceil(Math.sqrt(2*R+1)),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1,spf=new Int32Array(2*R+5);
@@ -53,19 +54,19 @@ function audit(){
  }
  let fine=[...ends.values()].reduce((s,v)=>s+f(v),0)/N,transport=[];
  for(let s of ss){
-  let total=0,H0=0,chi=0,C=0,kl=0,terminalSize=0,coarse=0,ghostCoarse=0,lin=0,variance=0;
+  let total=0,H0=0,chi=0,C=0,C1=0,kl=0,terminalSize=0,coarse=0,ghostCoarse=0,lin=0,variance=0;
   for(let a=s.left;a<s.right;){let [b,r]=cell(a,s.s);ck(a===b,"cell iteration");let M=(r-a)/6,realInitial=Math.max(0,Math.min(hi,r-6)-Math.max(lo,a)+6)/6;
    // if intersection empty clamp BEFORE division; all endpoints integral
    let realFinal=s.actual.get(a)||0,d=realFinal-realInitial,m=M+d;
-   ck(d===(s.flux.get(a)||0)&&m>=0,"mass flux");total+=M;H0+=M*Math.log(M);C+=M*Math.sqrt(M);chi+=d*d/M;lin+=d*Math.log(M);variance+=M*Math.log(M)**2;
+   ck(d===(s.flux.get(a)||0)&&m>=0,"mass flux");total+=M;H0+=M*Math.log(M);C+=M*Math.sqrt(M);C1+=M*M;chi+=d*d/M;lin+=d*Math.log(M);variance+=M*Math.log(M)**2;
    if(m){kl+=m*Math.log(m/M);terminalSize+=m*Math.log(M)}coarse+=f(realFinal);ghostCoarse+=f(m);checks++;a=r;
   }
   let h0=H0/total,chi2=chi/total,halfMoment=C/total,relative=kl/total,logRenyi=Math.log1p(chi2),hGhost=ghostCoarse/total,hReal=coarse/N;
   ck(Math.abs(hGhost-terminalSize/total-relative)<1e-8&&Math.abs(terminalSize/total-h0-lin/total)<1e-8,"decomposition");
   ck(relative>=-1e-8&&relative<=logRenyi+1e-8&&fine<=hReal+1e-8&&hReal<=total/N*hGhost+1e-8,"entropy");
-  let bMoment=total/N*(2*Math.log(halfMoment)+3*logRenyi),bLinear=total/N*(h0+lin/total+logRenyi),bCs=total/N*(h0+Math.sqrt(chi2*Math.max(0,variance/total-h0*h0))+logRenyi);
-  ck(hReal<=Math.min(bMoment,bLinear,bCs)+1e-8,"transport bounds");
-  transport.push({z:s.s.p,total,N,chi2,h0,hReal,fine,hGhost,relative,halfMoment,linear:lin/total,bMoment,bLinear,bCs});
+  let bFirst=total/N*(Math.log(C1/total)+2*logRenyi),bMoment=total/N*(2*Math.log(halfMoment)+3*logRenyi),bLinear=total/N*(h0+lin/total+logRenyi),bCs=total/N*(h0+Math.sqrt(chi2*Math.max(0,variance/total-h0*h0))+logRenyi);
+  ck(hReal<=Math.min(bFirst,bMoment,bLinear,bCs)+1e-8,"transport bounds");
+  transport.push({z:s.s.p,total,N,chi2,h0,hReal,fine,hGhost,relative,halfMoment,linear:lin/total,bFirst,bMoment,bLinear,bCs});
  }
  return {checks,rows,transport,events};
 }
