@@ -18,7 +18,7 @@ function audit(Rs){
    const full=new Map();
    for(let A=l;A<=maxA;A+=6){let a=A,n=3-A/2;for(;;){let e=next(a,n),t=n+e.w;if(t>end)break;a-=e.p-1;n=t;literalEvents++;}full.set(A,a);}
    for(let c of specs){
-    let active=new Map(),buckets=new Map(),fullActive=new Map(),pairSeen=new Set(),longSeen=new Set(),youngSeen=new Set(),dead=new Set(),anchored=new Set();
+    let active=new Map(),buckets=new Map(),pairSeen=new Set(),longSeen=new Set(),youngSeen=new Set(),dead=new Set();
     let P=c.P,B=c.B,M=c.M,D=Math.ceil(P**c.d)+3*B+4;
     function status(t,x,n){
      if(t.anchor&&t.anchor.x-x>=0&&t.anchor.x-x<=B)return 2;
@@ -69,7 +69,7 @@ function audit(Rs){
          ck(a.p!==b.p,"same-prime close anchors impossible");
          ck((ka===0)===(kb===0),"no mixed singular regular");
         }else if(a.p===b.p)c.samePrime++;
-        if(ka===0&&kb===0){c.singular++;let delta=E-F-a.sg+b.sg;ck(mod(x+E-a.sg,a.p)===0&&mod(x+F-b.sg,b.p)===0,"singular spatial pins");
+        if(ka===0&&kb===0){c.singular++;c.singularKeys++;let delta=E-F-a.sg+b.sg;ck(mod(x+E-a.sg,a.p)===0&&mod(x+F-b.sg,b.p)===0,"singular spatial pins");
          if(a.p!==b.p){let u=(x+E-a.sg)/a.p,v=(x+F-b.sg)/b.p;ck(a.p*u-b.p*v===delta,"shifted hyperbola");
           for(let ell of [7,11,13,17,19,23,29,31])if(ell<Math.min(a.p**c.d,b.p**c.d)/2&&ell!==a.p&&ell!==b.p){ck([a.src-1,a.src+1,b.src-1,b.src+1].every(z=>mod(z,ell)!==0),"two sources rough");c.sourceTests++;}
          }
@@ -78,7 +78,7 @@ function audit(Rs){
         ck(H[i].idle||H[j].idle,"long needs resident");
         ck(n-b.n-3*B<=2*q(x),"resident long roughness");
         ck(q(x)>=P**c.d/2,"long resident rough");
-        let k=a.id+":"+x;ck(!longSeen.has(k)||true,"long key multiplicity allowed within node");longSeen.add(k);c.long++;
+        let k=a.id+":"+x;ck(!longSeen.has(k),"long incoming anchor/position unique");longSeen.add(k);c.long++;
         for(let ell of [7,11,13,17,19,23,29,31])if(ell<Math.min(a.p**c.d,P**c.d)/2){ck([a.src-1,a.src+1,x-1,x+1].every(z=>mod(z,ell)!==0),"source and resident rough");c.targetTests++;}
        }
        c.checks++;
@@ -99,7 +99,7 @@ function audit(Rs){
       active.set(x,v);sched(x,n,v);
      }
     }
-    c.shortKeys+=pairSeen.size;c.longKeys+=longSeen.size;c.youngKeys+=youngSeen.size;
+    c.shortKeys+=pairSeen.size-longSeen.size;c.longKeys+=longSeen.size;c.youngKeys+=youngSeen.size;
     let keep=0;for(let [x,v] of active){close(x,v,end);keep+=v.tokens.length;for(let t of v.tokens){ck(full.get(t.A)===x&&!dead.has(t.A),"surviving root path");rootCheck++;}}
     ck(keep+dead.size===full.size,"root mass ledger");c.ret+=keep;
    }
