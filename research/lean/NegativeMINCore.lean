@@ -2208,7 +2208,7 @@ theorem twin_lower_of_cheap_moments
   have he : D*liveTicks d R T ≤ D*B0*M*T*twinCount R T +
       (roots R).length*(budget+wN+wQ*(2*Y1))+err := by
     unfold ScaledLiveEstimate at hEst
-    change D*liveTicks d R T ≤ _ at hEst
+    change D*liveTicks d R T ≤ D*B0*M*T*twinCount R T + wN*narrowCount d R T z Y0 + wQ*mediumCharge d R T Y0 Y1 + err at hEst
     omega
   have h1 := Nat.mul_le_mul_left D hl
   have h2 := Nat.mul_le_mul_left (2*K) he
@@ -2268,14 +2268,22 @@ theorem winner_source_pin (s : State) (hw : winner s ≠ 0) :
     rw [he.2.1, Nat.add_zero] at h
     have hc := congrArg (fun t : Nat => (t : Int)) h
     simp only [Int.natCast_mul, Int.natCast_add] at hc
-    exact ⟨((s.x+1)/p : Nat), -1, by omega, Or.inl rfl⟩
+    change (p : Int)*(((s.x+1)/p : Nat) : Int) = (s.x : Int)+1 at hc
+    refine ⟨((s.x+1)/p : Nat), -1, ?_, Or.inl rfl⟩
+    change (s.x : Int) = (p : Int)*(((s.x+1)/p : Nat) : Int)+(-1)
+    omega
   · simp only [eligible, Bool.and_eq_true, if_neg hpar, decide_eq_true_eq] at he
     have h := Nat.div_add_mod (s.x-1) p
     rw [he.2.2.1, Nat.add_zero] at h
     have hc := congrArg (fun t : Nat => (t : Int)) h
     simp only [Int.natCast_mul] at hc
     have hx := he.2.1
-    exact ⟨((s.x-1)/p : Nat), 1, by omega, Or.inr rfl⟩
+    change (p : Int)*(((s.x-1)/p : Nat) : Int) = ((s.x-1 : Nat) : Int) at hc
+    have hsub : ((s.x-1 : Nat) : Int) = (s.x : Int)-1 := by omega
+    rw [hsub] at hc
+    refine ⟨((s.x-1)/p : Nat), 1, ?_, Or.inr rfl⟩
+    change (s.x : Int) = (p : Int)*(((s.x-1)/p : Nat) : Int)+1
+    omega
 
 /-- Two actual sources of the same p>=5 have separation at least
 2p-2 once the first event has moved. This excludes the p=3 exception. -/
@@ -2305,9 +2313,9 @@ theorem repeat_pin_gap (a b p k l c e : Int)
 theorem orbit_center_mono (A i j : Nat) (h : i ≤ j) :
     (orbit A j).x ≤ (orbit A i).x := by
   have he : i+(j-i)=j := by omega
-  have hs : orbit A j = evolve (orbit A i) (j-i) := by
-    unfold orbit
-    rw [← he, evolve_add]
+  have hs := evolve_add (birth A) i (j-i)
+  rw [he] at hs
+  change orbit A j = evolve (orbit A i) (j-i) at hs
   rw [hs]
   exact evolve_center_le _ _
 
@@ -2378,7 +2386,7 @@ theorem winner_le_cell_remainder (s : State) (Q : Nat)
   let t : Int := k - ((Q/p : Nat) : Int)*((s.x/Q : Nat) : Int)
   have hres : (s.x%Q : Nat) = (s.x%Q : Nat) := rfl
   have hres' : ((s.x%Q : Nat) : Int) = (p : Int)*t+c := by
-    dsimp [t]
+    change ((s.x%Q : Nat) : Int) = (p : Int)*(k-((Q/p : Nat) : Int)*((s.x/Q : Nat) : Int))+c
     rw [Int.mul_sub, ← Int.mul_assoc, hqi]
     change (s.x : Int) = (p : Int)*k+c at hpin
     omega
