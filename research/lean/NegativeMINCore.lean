@@ -6302,4 +6302,308 @@ theorem vectorChoices_mem {α : Type} (digits : List α) (xs : List α)
 #print axioms NegativeMIN.support_gain_counts
 #print axioms NegativeMIN.vectorChoices_length
 
+
+/-- At a use of p, the source residue is one of two possibilities. -/
+theorem winner_residue (s : State) (p : Nat) (hp : p≠0) (hw : winner s=p) :
+    s.x%p=1 ∨ s.x%p=p-1 := by
+  have h := winner_sound s (by omega)
+  rw [hw] at h
+  have hp3 := eligible_three_le s.x (s.n+1) p h
+  by_cases hpar : (s.n+1)%2=0
+  · simp only [eligible,Bool.and_eq_true,if_pos hpar,decide_eq_true_eq] at h
+    have h1 := h.2.1
+    rw [Nat.add_mod,Nat.mod_eq_of_lt (show 1<p by omega)] at h1
+    have hm := Nat.mod_lt s.x (show 0<p by omega)
+    have h2 := Nat.div_add_mod (s.x%p+1) p
+    rw [h1,Nat.add_zero] at h2
+    by_cases hd : (s.x%p+1)/p=0
+    · simp [hd] at h2; omega
+    · have hh : (s.x%p+1)/p=1 := by
+        have hh := Nat.div_le_div_right (c:=p) (show s.x%p+1≤p by omega)
+        simpa [Nat.div_self (show 0<p by omega)] using (show (s.x%p+1)/p≤p/p from hh)
+      rw [hh,Nat.mul_one] at h2
+      omega
+  · simp only [eligible,Bool.and_eq_true,if_neg hpar,decide_eq_true_eq] at h
+    have h1 := h.2.2.1
+    have he : s.x-1+1=s.x := by omega
+    rw [← he,Nat.add_mod,h1,Nat.zero_add,Nat.mod_eq_of_lt (show 1<p by omega)]
+    simp [Nat.mod_eq_of_lt (show 1<p by omega)]
+
+def supportDigit (s : State) (ps : List Nat) (B i p : Nat) : List Nat :=
+  match lastWinner s p i with
+  | none => [0]
+  | some r =>
+    if eventCount (evolve s r) (i-r)>B then [1] else
+      2 :: (if (evolve s r).x%p=1 then 0 else 1) ::
+        ps.map (fun q => labelCount (evolve s r) (i-r) q)
+
+def supportSignature (s : State) (ps : List Nat) (B i : Nat) : List (List Nat) :=
+  ps.map (supportDigit s ps B i)
+
+def supportDigitChoices (B k : Nat) : List (List Nat) :=
+  [[0],[1]] ++ ([0,1] : List Nat).flatMap (fun c =>
+    (vectorChoices (List.range (B+1)) k).map (fun vs => 2::c::vs))
+
+theorem supportDigitChoices_length (B k : Nat) :
+    (supportDigitChoices B k).length=2+2*(B+1)^k := by
+  simp only [supportDigitChoices,List.length_append,List.length_cons,List.length_nil,
+    List.length_flatMap,List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,
+    List.length_map,vectorChoices_length,List.length_range]
+  omega
+
+theorem supportDigit_mem (s : State) (ps : List Nat) (B i p : Nat)
+    (h0 : ∀ q∈ps,q≠0) :
+    supportDigit s ps B i∈supportDigitChoices B ps.length := by
+  unfold supportDigit
+  cases h : lastWinner s p i with
+  | none => simp [supportDigitChoices]
+  | some r =>
+    by_cases hb : eventCount (evolve s r) (i-r)>B
+    · simp [hb,supportDigitChoices]
+    · rw [if_neg hb]
+      apply List.mem_append.mpr
+      apply Or.inr
+      apply List.mem_flatMap.mpr
+      let c := if (evolve s r).x%p=1 then 0 else 1
+      have hc : c∈([0,1] : List Nat) := by dsimp [c]; split <;> simp
+      refine ⟨c,hc,?_⟩
+      apply List.mem_map.mpr
+      let vs := ps.map (fun q => labelCount (evolve s r) (i-r) q)
+      refine ⟨vs,?_,rfl⟩
+      have hv := vectorChoices_mem (List.range (B+1)) vs (by
+        intro a ha
+        obtain ⟨q,hq,he⟩ := List.mem_map.mp ha
+        have hl := labelCount_le_eventCount (evolve s r) (i-r) q (h0 q hq)
+        apply List.mem_range.mpr
+        omega)
+      simpa [vs] using hv
+
+theorem supportSignature_mem (s : State) (ps : List Nat) (B i : Nat)
+    (h0 : ∀ q∈ps,q≠0) :
+    supportSignature s ps B i∈vectorChoices (supportDigitChoices B ps.length) ps.length := by
+  have h := vectorChoices_mem (supportDigitChoices B ps.length) (supportSignature s ps B i) (by
+    intro a ha
+    obtain ⟨p,_,he⟩ := List.mem_map.mp ha
+    rw [← he]
+    exact supportDigit_mem s ps B i p h0)
+  simpa [supportSignature] using h
+
+/-- If a later firing exists, the number of events since its previous
+firing is bounded by one plus the bound for the deleted alphabet. -/
+theorem previous_use_recent (s : State) (ps : List Nat) (i j p B : Nat)
+    (hij : i≤j) (hp : p≠0) (hj : winner (evolve s j)=p)
+    (r : Nat) (hr : lastWinner s p i=some r)
+    (hgap : ∀ a b : Nat,a<b → b≤j → winner (evolve s a)=p →
+      winner (evolve s b)=p →
+      (∀ t : Nat,a<t → t<b → winner (evolve s t)≠p) →
+      eventCount (evolve s (a+1)) (b-(a+1))≤B) :
+    eventCount (evolve s r) (i-r)≤B+1 := by
+  obtain ⟨hrt,hrp,hrnone⟩ := lastWinner_some s p i r hr
+  obtain ⟨a,ha,haP,hmin⟩ := earliest_le (fun t => winner (evolve s (i+t))=p)
+    (j-i) ⟨j-i,Nat.le_refl _,by have he : i+(j-i)=j := by omega; rw [he]; exact hj⟩
+  have hnone : ∀ t : Nat,r<t → t<i+a → winner (evolve s t)≠p := by
+    intro t ht hta
+    by_cases hti : t<i
+    · exact hrnone t ht hti
+    · have he : i+(t-i)=t := by omega
+      have hh := hmin (t-i) (by omega)
+      rw [he] at hh
+      exact hh
+  have hg := hgap r (i+a) (by omega) (by omega) hrp haP hnone
+  have hlen : i-r≤i+a-r := by omega
+  have hm := eventCount_mono (evolve s r) (i-r) (i+a-r) hlen
+  have hsplit : i+a-r=1+(i+a-(r+1)) := by omega
+  rw [hsplit,eventCount_add] at hm
+  have hs : evolve (evolve s r) 1=evolve s (r+1) := by rw [← evolve_add]
+  rw [hs] at hm
+  have hc : eventCount (evolve s r) 1=1 := by simp [eventCount,pathCost,eventInc,hrp,hp]
+  rw [hc] at hm
+  omega
+
+theorem supportDigit_equal_gain_divisor (s : State) (ps : List Nat) (B i j p : Nat)
+    (hp : p≠0) (hn : ps.Nodup) (hij : i≤j)
+    (hlabels : ∀ t : Nat,t<j → winner (evolve s t)=0 ∨ winner (evolve s t)∈ps)
+    (r t : Nat) (hr : lastWinner s p i=some r) (ht : lastWinner s p j=some t)
+    (hb : eventCount (evolve s r) (i-r)≤B)
+    (hc : eventCount (evolve s t) (j-t)≤B)
+    (he : supportDigit s ps B i p=supportDigit s ps B j p) :
+    ((evolve s i).x-(evolve s j).x)%p=0 := by
+  have hrs := lastWinner_some s p i r hr
+  have hts := lastWinner_some s p j t ht
+  unfold supportDigit at he
+  rw [hr,ht,if_neg (by omega : ¬eventCount (evolve s r) (i-r)>B),
+    if_neg (by omega : ¬eventCount (evolve s t) (j-t)>B)] at he
+  have hh := List.cons.inj (List.cons.inj he).2
+  have hres1 := winner_residue (evolve s r) p hp hrs.2.1
+  have hres2 := winner_residue (evolve s t) p hp hts.2.1
+  have hres : (evolve s r).x%p=(evolve s t).x%p := by
+    have hps := eligible_three_le (evolve s r).x ((evolve s r).n+1) p
+      (by rw [← hrs.2.1]; exact winner_sound _ (by omega))
+    by_cases h1 : (evolve s r).x%p=1 <;> by_cases h2 : (evolve s t).x%p=1
+    · omega
+    · simp [h1,h2] at hh
+    · simp [h1,h2] at hh
+    · omega
+  have hg1 := support_gain_counts (evolve s r) (i-r) ps hn (by
+    intro u hu
+    have h := hlabels (r+u) (by omega)
+    rw [evolve_add] at h
+    exact h)
+  have hg2 := support_gain_counts (evolve s t) (j-t) ps hn (by
+    intro u hu
+    have h := hlabels (t+u) (by omega)
+    rw [evolve_add] at h
+    exact h)
+  have hEq : (ps.map (fun q => (q-1)*labelCount (evolve s r) (i-r) q)).sum=
+      (ps.map (fun q => (q-1)*labelCount (evolve s t) (j-t) q)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro q hq
+    rw [map_eq_at_mem_core ps _ _ hh.2 q hq]
+  have h1 : r+(i-r)=i := by omega
+  have h2 : t+(j-t)=j := by omega
+  rw [← evolve_add s r (i-r),h1] at hg1
+  rw [← evolve_add s t (j-t),h2] at hg2
+  have hm1 := evolve_center_mono_segment s r i (by omega)
+  have hm2 := evolve_center_mono_segment s t j (by omega)
+  have hm3 := evolve_center_mono_segment s i j hij
+  unfold gain at hg1 hg2
+  have hle : (evolve s t).x≤(evolve s r).x := by omega
+  have hd : (evolve s r).x-(evolve s t).x=(evolve s i).x-(evolve s j).x := by omega
+  rw [← hd]
+  exact gain_mod_zero_of_equal _ _ _ hle hres
+
+/-- Equality of compressed signatures would make the positive spatial
+gain divisible by every label used between the two signatures. -/
+theorem supportSignature_no_return (s : State) (ps : List Nat) (B i j : Nat)
+    (he : s.x%2=0) (hn : ps.Nodup) (h0 : ∀ q∈ps,q≠0)
+    (hij : i<j) (hi : winner (evolve s i)≠0)
+    (hlabels : ∀ t : Nat,t<j → winner (evolve s t)=0 ∨ winner (evolve s t)∈ps)
+    (hgap : ∀ p∈ps,∀ a b : Nat,a<b → b<j →
+      winner (evolve s a)=p → winner (evolve s b)=p →
+      (∀ t : Nat,a<t → t<b → winner (evolve s t)≠p) →
+      eventCount (evolve s (a+1)) (b-(a+1))≤B)
+    (hs : supportSignature s ps (B+1) i=supportSignature s ps (B+1) j) : False := by
+  apply no_used_gain_divisor_return s i j he hij hi
+  intro u hui huj
+  rcases hlabels u huj with hzero | hp
+  · exact Or.inl hzero
+  · apply Or.inr
+    let p := winner (evolve s u)
+    have hp0 := h0 p hp
+    have hd := map_eq_at_mem_core ps (supportDigit s ps (B+1) i)
+      (supportDigit s ps (B+1) j) hs p hp
+    cases hj : lastWinner s p j with
+    | none => exact False.elim (lastWinner_none s p j hj u huj rfl)
+    | some t =>
+      cases hi' : lastWinner s p i with
+      | none =>
+        unfold supportDigit at hd
+        rw [hi',hj] at hd
+        split at hd <;> simp at hd
+      | some r =>
+        have hrec := previous_use_recent s ps i u p B hui hp0 rfl r hi'
+          (fun a b hab hbu ha hb hn => hgap p hp a b hab (by omega) ha hb hn)
+        have hrec' : eventCount (evolve s t) (j-t)≤B+1 := by
+          by_contra hbad
+          unfold supportDigit at hd
+          rw [hi',hj,if_neg (by omega : ¬eventCount (evolve s r) (i-r)>B+1),
+            if_pos (by omega : eventCount (evolve s t) (j-t)>B+1)] at hd
+          simp at hd
+        exact supportDigit_equal_gain_divisor s ps (B+1) i j p hp0 hn
+          (by omega) hlabels r t hi' hj hrec hrec' hd
+
+def finiteSupportLimit : Nat → Nat
+  | 0 => 0
+  | k+1 => (2+2*(finiteSupportLimit k+2)^(k+1))^(k+1)-1
+
+/-- Exact explicit uniform bound on completed non-idle events of every
+even actual MIN segment on a finite alphabet, independent of magnitudes. -/
+theorem finite_support_event_bound (s : State) (K : Nat) (ps : List Nat)
+    (he : s.x%2=0) (hn : ps.Nodup) (h0 : ∀ q∈ps,q≠0)
+    (hlabels : ∀ t : Nat,t<K → winner (evolve s t)=0 ∨ winner (evolve s t)∈ps) :
+    eventCount s K≤finiteSupportLimit ps.length := by
+  generalize hl : ps.length=n
+  induction n generalizing s K ps with
+  | zero =>
+    have hp : ps=[] := List.length_eq_zero_iff.mp hl
+    subst ps
+    rw [eventCount_filter]
+    have hh : (List.range K).filter (fun i => decide (winner (evolve s i)≠0))=[] := by
+      apply List.filter_eq_nil_iff.mpr
+      intro i hi
+      have h := hlabels i (List.mem_range.mp hi)
+      simpa using h
+    rw [hh]
+    exact Nat.le_refl _
+  | succ n ih =>
+    let B := finiteSupportLimit n
+    have hgap : ∀ p∈ps,∀ a b : Nat,a<b → b<K →
+        winner (evolve s a)=p → winner (evolve s b)=p →
+        (∀ t : Nat,a<t → t<b → winner (evolve s t)≠p) →
+        eventCount (evolve s (a+1)) (b-(a+1))≤B := by
+      intro p hp a b hab hb ha hb' hnone
+      have hlen := List.length_erase_of_mem hp
+      have hnodup : (ps.erase p).Nodup := (List.erase_sublist _ _).nodup hn
+      have hzero : ∀ q∈ps.erase p,q≠0 := fun q hq => h0 q ((List.erase_sublist _ _).subset hq)
+      have hh : ∀ t : Nat,t<b-(a+1) →
+          winner (evolve (evolve s (a+1)) t)=0 ∨
+            winner (evolve (evolve s (a+1)) t)∈ps.erase p := by
+        intro t ht
+        have h := hlabels (a+1+t) (by omega)
+        rw [evolve_add] at h
+        rcases h with h | h
+        · exact Or.inl h
+        · apply Or.inr
+          apply mem_erase_preserve ps p _ (by
+            rw [← evolve_add]; exact hnone _ (by omega) (by omega)) h
+      exact ih (evolve s (a+1)) (b-(a+1)) (ps.erase p)
+        (evolve_even s (a+1) he) hnodup hzero hh (by omega)
+    let xs := ((List.range K).filter (fun i => decide (winner (evolve s i)≠0)))++[K]
+    have hxn : xs.Nodup := by
+      unfold xs
+      apply List.nodup_append.mpr
+      refine ⟨List.filter_sublist.nodup List.nodup_range,by simp,?_⟩
+      intro a ha b hb h
+      simp only [List.mem_singleton] at hb
+      subst b
+      have ht := List.mem_range.mp (List.mem_filter.mp ha).1
+      omega
+    have hxmem : ∀ i∈xs,i≤K ∧ (i<K → winner (evolve s i)≠0) := by
+      intro i hi
+      rcases List.mem_append.mp hi with h | h
+      · have hh := List.mem_filter.mp h
+        exact ⟨by have ht := List.mem_range.mp hh.1; omega,fun _ => of_decide_eq_true hh.2⟩
+      · have he : i=K := by simpa using h
+        omega
+    let f := supportSignature s ps (B+1)
+    have hInj : ∀ i∈xs,∀ j∈xs,f i=f j → i=j := by
+      intro i hi j hj hij
+      have hi' := hxmem i hi
+      have hj' := hxmem j hj
+      by_contra hne
+      by_cases hh : i<j
+      · exact supportSignature_no_return s ps B i j he hn h0 hh (hi'.2 (by omega))
+          (fun t ht => hlabels t (by omega))
+          (fun p hp a b hab hb h1 h2 h3 => hgap p hp a b hab (by omega) h1 h2 h3) hij
+      · exact supportSignature_no_return s ps B j i he hn h0 (by omega) (hj'.2 (by omega))
+          (fun t ht => hlabels t (by omega))
+          (fun p hp a b hab hb h1 h2 h3 => hgap p hp a b hab (by omega) h1 h2 h3) hij.symm
+    have hn' := map_nodup_of_inj_core xs f hxn hInj
+    have hBound := nodup_subset_length_core (xs.map f)
+      (vectorChoices (supportDigitChoices (B+1) ps.length) ps.length) hn'
+      (by intro a ha; obtain ⟨i,_,rfl⟩ := List.mem_map.mp ha; exact supportSignature_mem s ps (B+1) i h0)
+    rw [List.length_map,vectorChoices_length,supportDigitChoices_length,hl] at hBound
+    have hxlen : xs.length=eventCount s K+1 := by
+      unfold xs
+      rw [List.length_append,← eventCount_filter]
+      rfl
+    rw [hxlen] at hBound
+    unfold finiteSupportLimit
+    change eventCount s K≤(2+2*(B+2)^(n+1))^(n+1)-1
+    omega
+
+#print axioms NegativeMIN.supportSignature_no_return
+#print axioms NegativeMIN.finite_support_event_bound
+
 end NegativeMIN
