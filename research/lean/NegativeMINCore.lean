@@ -5483,9 +5483,9 @@ theorem peak_suffix (f : Nat → Int) (a k : Nat) :
     simp [runningPeak,netSuffix,Int.max_eq_left h]
   | succ k ih =>
     rw [Nat.add_succ,runningPeak,ih,runningPeak]
+    simp only [Nat.succ_eq_add_one]
     have he : f a+netSuffix f a (k+1)=f (a+k+1) := by
       unfold netSuffix
-      rw [Nat.add_succ]
       omega
     by_cases h : runningPeak (netSuffix f a) k≤netSuffix f a (k+1)
     · rw [Int.max_eq_right h]
@@ -5511,7 +5511,10 @@ theorem suffix_profit_sum (f : Nat → Int) (a k : Nat) :
   | zero => simp
   | succ k ih =>
     rw [List.range_succ,List.map_append,List.sum_append]
-    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Int.add_zero,ih,recordProfit,Nat.add_succ]
+    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Int.add_zero,ih]
+    unfold recordProfit
+    rw [Nat.add_succ]
+    simp only [Nat.succ_eq_add_one]
     omega
 
 theorem suffix_profit_peak (f : Nat → Int) (a k : Nat) :
@@ -5538,6 +5541,7 @@ theorem common_suffix_debt_order (f g : Nat → Int) (a b : Nat)
     have h2 := congrFun h (k+1)
     unfold netSuffix at h1 h2
     rw [Nat.add_succ,Nat.add_succ] at h2
+    simp only [Nat.succ_eq_add_one] at h2 ⊢
     omega
 
 theorem common_suffix_profit_order (f g : Nat → Int) (a b : Nat)
@@ -5549,6 +5553,7 @@ theorem common_suffix_profit_order (f g : Nat → Int) (a b : Nat)
   have h2 := congrFun h (k+1)
   unfold netSuffix at h1 h2
   rw [Nat.add_succ,Nat.add_succ] at h2
+  simp only [Nat.succ_eq_add_one] at h2 ⊢
   have he := common_suffix_debt_order f g a b h hd k
   omega
 
@@ -5604,6 +5609,7 @@ theorem contact_netSuffix (inc : State → Nat) (D R T A B : Nat) (n : Int)
     rw [hrew,hs] at hfa
     unfold netSuffix at ih ⊢
     rw [Nat.add_succ,Nat.add_succ]
+    simp only [Nat.succ_eq_add_one]
     omega
 
 theorem actual_contact_pair_profit (inc : State → Nat) (D R T A B k : Nat) (n : Int)
