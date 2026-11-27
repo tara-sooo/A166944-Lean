@@ -4044,4 +4044,195 @@ theorem two_source_forms (A i j p r : Nat) (hij : i<j)
 #print axioms NegativeMIN.repeat_source_forms
 #print axioms NegativeMIN.two_source_forms
 
+/-! First-use costs and small charge/gain ratios. The unused list
+is a finite accounting resource, not a restriction on actual MIN. -/
+
+def firstExpense (inc : State → Nat) : List State → List Nat → Nat
+  | [], _ => 0
+  | s::ss, unused =>
+    (if winner s ∈ unused then inc s else 0) +
+      firstExpense inc ss (unused.erase (winner s))
+
+def repeatExpense (inc : State → Nat) : List State → List Nat → Nat
+  | [], _ => 0
+  | s::ss, unused =>
+    (if winner s ∈ unused then 0 else inc s) +
+      repeatExpense inc ss (unused.erase (winner s))
+
+theorem first_repeat_partition (inc : State → Nat) (ss : List State) (unused : List Nat) :
+    firstExpense inc ss unused+repeatExpense inc ss unused=(ss.map inc).sum := by
+  induction ss generalizing unused with
+  | nil => rfl
+  | cons a ss ih =>
+    have h := ih (unused.erase (winner a))
+    by_cases hm : winner a ∈ unused <;> simp [firstExpense,repeatExpense,hm] <;> omega
+
+theorem firstExpense_le (inc : State → Nat) (ss : List State) (unused : List Nat) (C : Nat)
+    (hinc : ∀ s : State, inc s≤C) :
+    firstExpense inc ss unused≤C*unused.length := by
+  induction ss generalizing unused with
+  | nil => simp [firstExpense]
+  | cons a ss ih =>
+    have h := ih (unused.erase (winner a))
+    by_cases hm : winner a∈unused
+    · have hl := List.length_erase_of_mem hm
+      have hpos : 0<unused.length := List.length_pos_of_mem hm
+      have he : unused.length=(unused.length-1)+1 := by omega
+      rw [hl] at h
+      have hc : C*unused.length=C*(unused.length-1)+C := by
+        conv_lhs => rw [he]
+        rw [Nat.mul_add,Nat.mul_one]
+      simp only [firstExpense,hm,if_true]
+      have ha := hinc a
+      omega
+    · have hl := List.length_erase_le (a := winner a) (l := unused)
+      have hc := Nat.mul_le_mul_left C hl
+      simp only [firstExpense,hm,if_false,Nat.zero_add]
+      omega
+
+def prefixStates (A k : Nat) : List State := (List.range k).map (orbit A)
+
+theorem prefixStates_cost (inc : State → Nat) (A k : Nat) :
+    ((prefixStates A k).map inc).sum=pathCost inc (birth A) k := by
+  rw [pathCost_sum]
+  simp only [prefixStates,List.map_map,Function.comp_def,orbit]
+
+theorem narrowInc_le_one (z Y0 : Nat) (s : State) : narrowInc z Y0 s≤1 := by
+  unfold narrowInc
+  split <;> omega
+
+theorem mediumInc_le_band (Y0 Y1 : Nat) (s : State) (hY : 0<Y0) :
+    mediumInc Y0 Y1 s≤2*Y1 := by
+  unfold mediumInc
+  split
+  next h =>
+    have hw : winner s≠0 := by omega
+    have hq := qmin_le_winner s hw
+    omega
+  next _ => omega
+
+/-- Exact first-use ledger using the full actual prefix, including any
+pre-observation or killing tick. Zero-cost occurrences still consume
+their own label; this is first use of the label, not first charged use. -/
+def firstWeightedExpense (z Y0 Y1 wN wQ A k : Nat) : Nat :=
+  wN*firstExpense (narrowInc z Y0) (prefixStates A k) (List.range Y0) +
+  wQ*firstExpense (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1)
+
+def repeatedWeightedExpense (z Y0 Y1 wN wQ A k : Nat) : Nat :=
+  wN*repeatExpense (narrowInc z Y0) (prefixStates A k) (List.range Y0) +
+  wQ*repeatExpense (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1)
+
+theorem firstWeightedExpense_le (z Y0 Y1 wN wQ A k : Nat) (hY : 0<Y0) :
+    firstWeightedExpense z Y0 Y1 wN wQ A k≤wN*Y0+wQ*(2*Y1*Y1) := by
+  have hn := firstExpense_le (narrowInc z Y0) (prefixStates A k) (List.range Y0) 1
+    (narrowInc_le_one z Y0)
+  have hq := firstExpense_le (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1) (2*Y1)
+    (fun s => mediumInc_le_band Y0 Y1 s hY)
+  rw [List.length_range,Nat.one_mul] at hn
+  rw [List.length_range] at hq
+  have h1 := Nat.mul_le_mul_left wN hn
+  have h2 := Nat.mul_le_mul_left wQ hq
+  unfold firstWeightedExpense
+  omega
+
+theorem weightedExpense_partition (z Y0 Y1 wN wQ A k : Nat) :
+    pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) k =
+      firstWeightedExpense z Y0 Y1 wN wQ A k + repeatedWeightedExpense z Y0 Y1 wN wQ A k := by
+  rw [← prefixStates_cost]
+  simp only [weightedInc]
+  rw [sum_map_add,sum_map_mul,sum_map_mul,← first_repeat_partition (narrowInc z Y0) (prefixStates A k) (List.range Y0),
+    ← first_repeat_partition (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1)]
+  unfold firstWeightedExpense repeatedWeightedExpense
+  simp only [Nat.mul_add]
+  omega
+
+theorem total_firstWeightedExpense_le (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat)
+    (hY : 0<Y0) :
+    ((roots R).map (fun A => firstWeightedExpense z Y0 Y1 wN wQ A (prefixAge d R T A))).sum
+      ≤ (roots R).length*(wN*Y0+wQ*(2*Y1*Y1)) := by
+  rw [← sum_const_nat]
+  apply sum_map_le
+  intro A _
+  exact firstWeightedExpense_le z Y0 Y1 wN wQ A _ hY
+
+def totalRepeatExpense (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat) : Nat :=
+  ((roots R).map (fun A => repeatedWeightedExpense z Y0 Y1 wN wQ A (prefixAge d R T A))).sum
+
+theorem total_weightedExpense_partition (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat) :
+    totalExpense (weightedInc z Y0 Y1 wN wQ) R T d =
+      ((roots R).map (fun A => firstWeightedExpense z Y0 Y1 wN wQ A (prefixAge d R T A))).sum +
+      totalRepeatExpense R T z Y0 Y1 wN wQ d := by
+  unfold totalExpense totalRepeatExpense
+  rw [← sum_map_add]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  exact weightedExpense_partition z Y0 Y1 wN wQ A _
+
+theorem totalRepeatExpense_error (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat) (hY : 0<Y0) :
+    totalRepeatExpense R T z Y0 Y1 wN wQ d ≤ totalExpense (weightedInc z Y0 Y1 wN wQ) R T d ∧
+    totalExpense (weightedInc z Y0 Y1 wN wQ) R T d ≤ totalRepeatExpense R T z Y0 Y1 wN wQ d +
+      (roots R).length*(wN*Y0+wQ*(2*Y1*Y1)) := by
+  have he := total_weightedExpense_partition R T z Y0 Y1 wN wQ d
+  have hb := total_firstWeightedExpense_le R T z Y0 Y1 wN wQ d hY
+  omega
+
+/-- Exact sum of actual jump gains, including idle ticks. -/
+theorem gain_ledger (s : State) (k : Nat) :
+    ((List.range k).map (fun i => winner (evolve s i)-1)).sum =
+      gain s (evolve s k) := by
+  induction k with
+  | zero => simp [gain,evolve]
+  | succ k ih =>
+    rw [List.range_succ,List.map_append,List.sum_append]
+    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Nat.add_zero,ih]
+    have ht := tick_gain_exact (evolve s k)
+    have hm := evolve_center_le s k
+    unfold gain
+    change s.x-(evolve s k).x+(winner (evolve s k)-1)=s.x-(tick (evolve s k)).x
+    omega
+
+/-- Any charge whose scaled magnitude is bounded by the gain can
+be discarded at a controlled error, even without a mass cap. -/
+theorem charge_gain_bound (inc : State → Nat) (U V : Nat) (s : State) (k : Nat)
+    (h : ∀ i : Nat, i<k → U*inc (evolve s i)≤V*(winner (evolve s i)-1)) :
+    U*pathCost inc s k≤V*gain s (evolve s k) := by
+  have hh := sum_map_le (List.range k)
+    (fun i => U*inc (evolve s i)) (fun i => V*(winner (evolve s i)-1))
+    (fun i hi => h i (List.mem_range.mp hi))
+  rw [sum_map_mul,sum_map_mul,← pathCost_sum,gain_ledger] at hh
+  exact hh
+
+def imbalancedMedium (Y0 Y1 U : Nat) (s : State) : Nat :=
+  if U*qmin s.x≤winner s then mediumInc Y0 Y1 s else 0
+
+theorem imbalancedMedium_gain (Y0 Y1 U : Nat) (s : State) (hY : 0<Y0) :
+    U*imbalancedMedium Y0 Y1 U s≤3*(winner s-1) := by
+  unfold imbalancedMedium
+  split
+  next h =>
+    unfold mediumInc
+    split
+    next hs =>
+      have hw : winner s≠0 := by omega
+      have hp := eligible_three_le s.x (s.n+1) (winner s) (winner_sound s hw)
+      have hm : U*(2*qmin s.x)=2*(U*qmin s.x) := by ac_rfl
+      rw [hm]
+      omega
+    next _ => simp
+  next _ => simp
+
+theorem imbalancedMedium_prefix_bound (Y0 Y1 U A k : Nat) (hY : 0<Y0)
+    (hA : A%2=0) :
+    U*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k≤3*(2*k+6) := by
+  have hg := charge_gain_bound (imbalancedMedium Y0 Y1 U) U 3 (birth A) k
+    (fun i _ => imbalancedMedium_gain Y0 Y1 U _ hY)
+  have hc := canonical_gain_bound A k hA
+  change U*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k≤3*gain (birth A) (orbit A k) at hg
+  omega
+
+#print axioms NegativeMIN.totalRepeatExpense_error
+#print axioms NegativeMIN.gain_ledger
+#print axioms NegativeMIN.imbalancedMedium_prefix_bound
+
 end NegativeMIN
