@@ -9781,4 +9781,152 @@ theorem common_suffix_pair_profit_local_lower (f g u v w : Nat → Int)
 #print axioms NegativeMIN.common_suffix_pair_profit_local_upper
 #print axioms NegativeMIN.common_suffix_pair_profit_local_lower
 
+
+/-! A reward field on observed physical bins need not be a root-history
+cost. The full-deadline clip simultaneously attains every bin's capacity,
+so it exactly optimizes every nonnegative such field, including a
+future-defined good-phase mask. No debt or moment of debt is needed. -/
+
+def fullDeadline (R T : Nat) (A : Nat) : Nat := observeAge R T A+T
+
+theorem fullDeadline_obsFiber (R T : Nat) (b : DualBin) (hu : b.1<T) :
+    obsLiveFiber (fullDeadline R T) R T b.1 b.2=fullObsFiber R T b := by
+  unfold obsLiveFiber fullObsFiber
+  have hh : (roots R).filter (fun A => liveAt (fullDeadline R T) R T A b.1)=roots R := by
+    apply List.filter_eq_self.mpr
+    intro A _
+    simp [liveAt,fullDeadline,hu]
+  rw [hh]
+
+theorem deadlineClip_obsFiber_exact (R T M : Nat) (d : Nat → Nat)
+    (b : DualBin) (hT : 6≤T) (hu : b.1<T) :
+    (obsLiveFiber (deadlineClip R T M d) R T b.1 b.2).length=
+      min M (obsLiveFiber d R T b.1 b.2).length := by
+  obtain ⟨u,J,x⟩ := b
+  rw [obsLiveFiber_eq _ R T J x u hT hu,obsLiveFiber_eq d R T J x u hT hu]
+  exact deadlineClip_exact R T M J x (obsClock R T J u) d hT
+
+theorem obsBins_time_lt (R T : Nat) (b : DualBin) (hb : b∈obsBins R T) :
+    b.1<T := by
+  obtain ⟨u,hu,hk⟩ := List.mem_flatMap.mp hb
+  obtain ⟨key,_,he⟩ := List.mem_map.mp hk
+  subst b
+  exact List.mem_range.mp hu
+
+def binFieldMass (R T : Nat) (d : Nat → Nat) (w : DualBin → Nat) : Nat :=
+  ((obsBins R T).map (fun b => w b*(obsLiveFiber d R T b.1 b.2).length)).sum
+
+def clippedBinField (R T M : Nat) (w : DualBin → Nat) : Nat :=
+  ((obsBins R T).map (fun b => w b*min M (fullObsFiber R T b).length)).sum
+
+theorem fullDeadline_field_exact (R T M : Nat) (w : DualBin → Nat) (hT : 6≤T) :
+    binFieldMass R T (deadlineClip R T M (fullDeadline R T)) w=
+      clippedBinField R T M w := by
+  unfold binFieldMass clippedBinField
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  have hu := obsBins_time_lt R T b hb
+  rw [deadlineClip_obsFiber_exact R T M _ b hT hu,fullDeadline_obsFiber R T b hu]
+
+theorem observedFiber_full_bound (R T : Nat) (d : Nat → Nat) (b : DualBin) :
+    (obsLiveFiber d R T b.1 b.2).length≤(fullObsFiber R T b).length := by
+  apply nodup_subset_length_core
+  · unfold obsLiveFiber
+    exact List.filter_sublist.nodup (List.filter_sublist.nodup (roots_nodup R))
+  · intro A ha
+    have ho := List.mem_filter.mp ha
+    have hi := List.mem_filter.mp ho.1
+    exact (fullObsFiber_mem R T b A).mpr ⟨hi.1,of_decide_eq_true ho.2⟩
+
+theorem binFieldMass_upper (R T M : Nat) (d : Nat → Nat)
+    (w : DualBin → Nat) (h : ObservedCap d R T M) :
+    binFieldMass R T d w≤clippedBinField R T M w := by
+  unfold binFieldMass clippedBinField
+  apply sum_map_le
+  intro b hb
+  have hh := Nat.le_min.mpr ⟨h b hb,observedFiber_full_bound R T d b⟩
+  exact Nat.mul_le_mul_left (w b) hh
+
+theorem fullDeadline_field_optimal (R T M : Nat) (d : Nat → Nat)
+    (w : DualBin → Nat) (hT : 6≤T) (h : ObservedCap d R T M) :
+    binFieldMass R T d w≤binFieldMass R T
+      (deadlineClip R T M (fullDeadline R T)) w := by
+  rw [fullDeadline_field_exact R T M w hT]
+  exact binFieldMass_upper R T M d w h
+
+theorem binFieldMass_add (R T : Nat) (d : Nat → Nat) (w v : DualBin → Nat) :
+    binFieldMass R T d (fun b => w b+v b)=binFieldMass R T d w+binFieldMass R T d v := by
+  unfold binFieldMass
+  simp only [Nat.add_mul,sum_map_add]
+
+theorem binFieldMass_constant (R T D : Nat) (d : Nat → Nat) :
+    binFieldMass R T d (fun _ => D)=D*liveTicks d R T := by
+  unfold binFieldMass
+  rw [sum_map_mul,liveTicks_eq_bins]
+
+def goodBinWeight (good : DualBin → Bool) (D : Nat) (b : DualBin) : Nat :=
+  if good b then D else 0
+
+def badBinWeight (good : DualBin → Bool) (D : Nat) (b : DualBin) : Nat :=
+  if good b then 0 else D
+
+theorem good_bad_field_partition (R T D : Nat) (d : Nat → Nat)
+    (good : DualBin → Bool) :
+    binFieldMass R T d (goodBinWeight good D)+binFieldMass R T d (badBinWeight good D)=
+      D*liveTicks d R T := by
+  rw [← binFieldMass_add]
+  have hh : (fun b => goodBinWeight good D b+badBinWeight good D b)=(fun _ => D) := by
+    funext b
+    cases h : good b <;> simp [goodBinWeight,badBinWeight,h]
+  rw [hh,binFieldMass_constant]
+
+/-- A uniform deterministic charge of excluded (bad) observed ticks
+implies the good mask is at least as powerful as the history objective,
+up to the explicit remainder. -/
+theorem goodField_dominates_history (R T M D err : Nat) (d : Nat → Nat)
+    (good : DualBin → Bool) (cost : Nat → Nat → Nat)
+    (hc : ObservedCap d R T M)
+    (hb : binFieldMass R T d (badBinWeight good D)≤historyExpense cost R T d+err) :
+    D*liveTicks d R T≤clippedBinField R T M (goodBinWeight good D)+
+      historyExpense cost R T d+err := by
+  have h1 := good_bad_field_partition R T D d good
+  have h2 := binFieldMass_upper R T M d (goodBinWeight good D) hc
+  omega
+
+def GoodFieldEstimate (good : DualBin → Bool) (R T M B0 D err : Nat) : Prop :=
+  ∀ d : Nat → Nat,FullCapped d R T M →
+    binFieldMass R T d (goodBinWeight good D)≤D*B0*M*T*twinCount R T+err
+
+theorem goodField_upper (good : DualBin → Bool) (R T M B0 D err : Nat)
+    (hT : 6≤T) (he : GoodFieldEstimate good R T M B0 D err) :
+    clippedBinField R T M (goodBinWeight good D)≤D*B0*M*T*twinCount R T+err := by
+  rw [← fullDeadline_field_exact R T M _ hT]
+  exact he _ (deadlineClip_fullCapped R T M _ hT)
+
+theorem twin_above_of_goodField (good : DualBin → Bool) (R T M B0 D err B : Nat)
+    (hT : 6≤T) (hlarge : B+3*T+6<R)
+    (he : GoodFieldEstimate good R T M B0 D err)
+    (hgap : err<clippedBinField R T M (goodBinWeight good D)) :
+    ∃ x : Nat,B<x ∧ TwinCenter x := by
+  have hh := goodField_upper good R T M B0 D err hT he
+  have hc : 0<twinCount R T := by
+    by_cases hz : twinCount R T=0
+    · rw [hz,Nat.mul_zero,Nat.zero_add] at hh
+      omega
+    · omega
+  unfold twinCount at hc
+  generalize hs : twinSites R T=xs at hc
+  cases xs with
+  | nil => simp at hc
+  | cons x xs =>
+    have hm : x∈twinSites R T := by rw [hs]; simp
+    simp only [twinSites,List.mem_filter,decide_eq_true_eq] at hm
+    exact ⟨x,by have := hm.2.1; omega,hm.2.2⟩
+
+#print axioms NegativeMIN.fullDeadline_field_exact
+#print axioms NegativeMIN.fullDeadline_field_optimal
+#print axioms NegativeMIN.goodField_dominates_history
+#print axioms NegativeMIN.twin_above_of_goodField
+
 end NegativeMIN
