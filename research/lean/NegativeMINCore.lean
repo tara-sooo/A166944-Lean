@@ -1448,7 +1448,7 @@ theorem extreme_mem (xs : List Nat) (rel : Nat → Nat → Prop)
         intro b hb
         simp only [List.mem_cons] at hb
         rcases hb with rfl | hb
-        · exact (htotal x x).elim id id
+        · exact (htotal b b).elim id id
         · exact htrans b a x (hmax b hb) hx
 
 theorem filter_len_exception {α : Type} [DecidableEq α] (xs : List α)
@@ -1543,7 +1543,9 @@ theorem pathCost_add (inc : State → Nat) (s : State) (a b : Nat) :
   induction b with
   | zero => simp [pathCost]
   | succ b ih =>
-    simp only [Nat.add_succ, pathCost, ih, evolve_add]
+    change pathCost inc s (a+b) + inc (evolve s (a+b)) =
+      pathCost inc s a + (pathCost inc (evolve s a) b + inc (evolve (evolve s a) b))
+    rw [ih, evolve_add]
     omega
 
 theorem pathCost_mono (inc : State → Nat) (s : State) (a b : Nat) (h : a ≤ b) :
@@ -1574,7 +1576,7 @@ theorem contact_priority_mono (inc : State → Nat) (R T A B : Nat) (n m : Int)
   have hb := physicalCost_advance inc B n (m-n).toNat hc.2.1
   rw [hk, hc.2.2.2] at ha
   rw [hk] at hb
-  unfold Precedes at *
+  simp only [Precedes] at hp ⊢
   omega
 
 def costRank (inc : State → Nat) (R T A : Nat) (n : Int) : Nat :=
@@ -1664,7 +1666,7 @@ theorem cheapFiber_localRank (inc : State → Nat) (R T budget J x A : Nat) (n :
     have hx := congrArg State.x hc.2.2.2
     have hcost : physicalCost inc B n ≤ physicalCost inc A n := by
       have hp := h.2
-      unfold Precedes at hp
+      simp only [Precedes] at hp
       omega
     refine ⟨h.2, hc.2.1, ?_, hc.2.2.1.symm.trans ha.2.2.1,
       hx.symm.trans ha.2.2.2.1, Nat.le_trans hcost ha.2.2.2.2⟩
@@ -1676,7 +1678,12 @@ theorem cheapRankDeath_fiber_eq (inc : State → Nat) (R T M budget J x : Nat) (
     physicalFiber (cheapRankDeath inc R T M budget) R T J x n =
       rankClip (cheapFiber inc R T budget J x n) (fun a => physicalCost inc a n) M := by
   unfold physicalFiber rankClip
-  conv_rhs => unfold cheapFiber; rw [List.filter_filter]
+  change _ = (((roots R).filter (fun A => decide ((birth A).n ≤ n ∧
+    n < observeStart R T A + (T : Int) ∧ windowId R T A = J ∧
+    (physicalState A n).x = x ∧ physicalCost inc A n ≤ budget))).filter
+      (fun a => decide (localRank (cheapFiber inc R T budget J x n)
+        (fun a => physicalCost inc a n) a ≤ M)))
+  rw [List.filter_filter]
   apply List.filter_congr
   intro A hA
   have hr := hA
@@ -1742,8 +1749,9 @@ theorem cheapRankDeath_budget (inc : State → Nat) (R T M budget A delta : Nat)
     calc
       pathCost inc (birth A) d = pathCost inc (birth A) (d-1) +
           inc (evolve (birth A) (d-1)) := by
-        conv_lhs => rw [he]
-        rfl
+        have hstep : pathCost inc (birth A) ((d-1)+1) = _ := rfl
+        rw [← he] at hstep
+        exact hstep
       _ ≤ budget + delta := by omega
 
 #print axioms NegativeMIN.rankClip_length
