@@ -45,7 +45,7 @@ function audit(Rs){
     ck(fire<=end,"unfinished path");G+=e.p-1;a=b;n=fire;
    }
   }
-  let cap=0,twins=0;for(let a=lo-3*T-6;a<=hi;a+=2){if(a<4)continue;if(q(a)<=S)cap+=w(q(a));else twins++}
+  let cap=0,twins=0;for(let a=2*Math.ceil((lo-3*T-6)/2);a<=hi;a+=2){if(a<4)continue;if(q(a)<=S)cap+=w(q(a));else twins++}
   for(let s of stats){
    const M=s.Q/6;
    let preSupport=0,bestSupport=0,visitedSupport=0,maxFiber=0;
