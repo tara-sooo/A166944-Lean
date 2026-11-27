@@ -9933,4 +9933,184 @@ theorem twin_above_of_goodField (good : DualBin → Bool) (R T M B0 D err B : Na
 #print axioms NegativeMIN.goodField_dominates_history
 #print axioms NegativeMIN.twin_above_of_goodField
 
+
+/-! A bounded alphabet may be interrupted by a controlled number of
+exceptional labels. Their count, not the magnitude of the primes in the
+regular alphabet, controls how many bounded-support pieces occur. -/
+
+theorem gain_evolve_add (s : State) (a b : Nat) :
+    gain s (evolve s (a+b))=gain s (evolve s a)+
+      gain (evolve s a) (evolve (evolve s a) b) := by
+  rw [evolve_add]
+  have h1 := evolve_center_le s a
+  have h2 := evolve_center_le (evolve s a) b
+  unfold gain
+  omega
+
+theorem finiteSupport_gain_bound (ps : List Nat) (P : Nat)
+    (hn : ps.Nodup) (h0 : ∀ p∈ps,p≠0) (hP : ∀ p∈ps,p≤P) :
+    SupportGainBound (fun p => p∈ps) (finiteSupportLimit ps.length*P) := by
+  intro s k he hs
+  have hcount := finite_support_event_bound s k ps he hn h0 hs
+  have h := sum_map_le (List.range k) (fun i => winner (evolve s i)-1)
+    (fun i => P*eventInc (evolve s i)) (by
+      intro i hi
+      rcases hs i (List.mem_range.mp hi) with hz | hm
+      · simp [eventInc,hz]
+      · have hp := hP _ hm
+        have hp0 := h0 _ hm
+        simp [eventInc,hp0]
+        omega)
+  rw [gain_ledger,sum_map_mul,← pathCost_sum] at h
+  change gain s (evolve s k)≤P*eventCount s k at h
+  exact Nat.le_trans h (by rw [Nat.mul_comm (finiteSupportLimit ps.length) P]; exact Nat.mul_le_mul_left P hcount)
+
+def exceptionInc (allowed : Nat → Bool) (s : State) : Nat :=
+  if winner s≠0 ∧ allowed (winner s)=false then 1 else 0
+
+def exceptionCount (allowed : Nat → Bool) (s : State) (k : Nat) : Nat :=
+  pathCost (exceptionInc allowed) s k
+
+theorem mixedSupport_gain (allowed : Nat → Bool) (B P : Nat)
+    (hB : SupportGainBound (fun p => allowed p=true) B)
+    (s : State) (k : Nat) (he : s.x%2=0)
+    (hP : ∀ i : Nat,i<k → exceptionInc allowed (evolve s i)=1 →
+      winner (evolve s i)≤P) :
+    gain s (evolve s k)≤(exceptionCount allowed s k+1)*B+
+      exceptionCount allowed s k*P := by
+  induction k using Nat.strongRecOn generalizing s with
+  | ind k ih =>
+    by_cases hn : ∃ i : Nat,i<k ∧ exceptionInc allowed (evolve s i)=1
+    · obtain ⟨i,hi,hx,hfirst⟩ := earliest_le
+        (fun i => i<k ∧ exceptionInc allowed (evolve s i)=1) k
+        (by obtain ⟨i,hi,hx⟩ := hn; exact ⟨i,by omega,hi,hx⟩)
+      have hi' := hx.1
+      have hpre : ∀ j : Nat,j<i → winner (evolve s j)=0 ∨ allowed (winner (evolve s j))=true := by
+        intro j hj
+        have hn := hfirst j hj
+        by_cases hz : winner (evolve s j)=0
+        · exact Or.inl hz
+        · right
+          cases h : allowed (winner (evolve s j))
+          · exfalso
+            exact hn ⟨by omega,by simp [exceptionInc,hz,h]⟩
+          · rfl
+      have hgain := hB s i he hpre
+      have hcount : exceptionCount allowed s i=0 := by
+        unfold exceptionCount
+        rw [pathCost_sum]
+        have hmap : (List.range i).map (fun j => exceptionInc allowed (evolve s j))=
+          (List.range i).map (fun _ => 0) := by
+          apply List.map_congr_left
+          intro j hj
+          rcases hpre j (List.mem_range.mp hj) with hz | ht
+          · simp [exceptionInc,hz]
+          · simp [exceptionInc,ht]
+        rw [hmap,sum_const_nat,Nat.mul_zero]
+      let a := i+1
+      let t := evolve s a
+      let m := k-a
+      have hk : a+m=k := by dsimp [a,m]; omega
+      have hm : m<k := by dsimp [a,m]; omega
+      have ht : t.x%2=0 := evolve_even s a he
+      have hp := hP i hi' hx.2
+      have htail : ∀ j : Nat,j<m → exceptionInc allowed (evolve t j)=1 →
+          winner (evolve t j)≤P := by
+        intro j hj h
+        have hidx : a+j<k := by omega
+        have heq : evolve s (a+j)=evolve t j := evolve_add s a j
+        apply hP (a+j) hidx
+        rw [heq]
+        exact h
+      have htailBound := ih m hm t ht htail
+      have hg := gain_evolve_add s a m
+      rw [hk] at hg
+      have hg1 := gain_evolve_add s i 1
+      have hgstep : gain (evolve s i) (evolve (evolve s i) 1)≤P := by
+        have h := tick_gain_exact (evolve s i)
+        change (evolve s i).x-(tick (evolve s i)).x≤P
+        omega
+      have hga : gain s (evolve s a)≤B+P := by
+        change gain s (evolve s a)=_ at hg1
+        omega
+      have hc1 : exceptionCount allowed s a=1 := by
+        change pathCost (exceptionInc allowed) s (i+1)=1
+        rw [pathCost]
+        change exceptionCount allowed s i+exceptionInc allowed (evolve s i)=1
+        omega
+      have hc := pathCost_add (exceptionInc allowed) s a m
+      rw [hk] at hc
+      change exceptionCount allowed s k=exceptionCount allowed s a+exceptionCount allowed t m at hc
+      change gain s (evolve s k)=gain s t+gain t (evolve t m) at hg
+      change gain s t≤B+P at hga
+      rw [hc,hc1]
+      have hEq : (1+exceptionCount allowed t m+1)*B=
+          (exceptionCount allowed t m+1)*B+B := by
+        have h : 1+exceptionCount allowed t m+1=(exceptionCount allowed t m+1)+1 := by omega
+        rw [h,Nat.add_mul,Nat.one_mul]
+      rw [hEq,Nat.add_mul,Nat.one_mul]
+      omega
+    · have hpre : ∀ j : Nat,j<k → winner (evolve s j)=0 ∨ allowed (winner (evolve s j))=true := by
+        intro j hj
+        by_cases hz : winner (evolve s j)=0
+        · exact Or.inl hz
+        · right
+          cases h : allowed (winner (evolve s j))
+          · exfalso
+            exact hn ⟨j,hj,by simp [exceptionInc,hz,h]⟩
+          · rfl
+      have h := hB s k he hpre
+      have h1 : B≤(exceptionCount allowed s k+1)*B := by
+        rw [Nat.add_mul,Nat.one_mul]
+        omega
+      omega
+
+/-- Completed segments cannot take more than three times their total
+gain. A final idle tail is deliberately not included. -/
+theorem completed_segment_wait_bound (s : State) (k : Nat)
+    (hk : 0<k) (hf : winner (evolve s (k-1))≠0) :
+    k≤3*gain s (evolve s k) := by
+  induction k using Nat.strongRecOn generalizing s with
+  | ind k ih =>
+    obtain ⟨j,hj,hwin,hmin⟩ := earliest_le
+      (fun j => winner (evolve s j)≠0) (k-1)
+      ⟨k-1,Nat.le_refl _,hf⟩
+    let w := j+1
+    let p := winner (evolve s j)
+    have hw : FirstEvent s w p := by
+      refine ⟨by dsimp [w]; omega,hwin,?_,?_⟩
+      · have he : w-1=j := by dsimp [w]; omega
+        rw [he]
+      · intro i hi
+        have ht : i<j := by dsimp [w] at hi; omega
+        by_cases h : winner (evolve s i)=0
+        · exact h
+        · exact False.elim (hmin i ht h)
+    have htime := firstEvent_wait_le_three_gain s w p hw
+    have hg := firstEvent_gain s w p hw
+    have hgw : gain s (evolve s w)=p-1 := by unfold gain; omega
+    by_cases he : w=k
+    · rw [← he,hgw]
+      exact htime
+    · let m := k-w
+      let t := evolve s w
+      have hpos : 0<m := by dsimp [m,w]; omega
+      have hm : m<k := by dsimp [m,w]; omega
+      have hsum : w+m=k := by dsimp [m,w]; omega
+      have ht : winner (evolve t (m-1))≠0 := by
+        have heq : w+(m-1)=k-1 := by omega
+        have hh := evolve_add s w (m-1)
+        rw [heq] at hh
+        change evolve s (k-1)=evolve t (m-1) at hh
+        rw [← hh]
+        exact hf
+      have hh := ih m hm t hpos ht
+      have hg2 := gain_evolve_add s w m
+      rw [hsum,hgw] at hg2
+      change gain s (evolve s k)=p-1+gain t (evolve t m) at hg2
+      omega
+
+#print axioms NegativeMIN.mixedSupport_gain
+#print axioms NegativeMIN.completed_segment_wait_bound
+
 end NegativeMIN
