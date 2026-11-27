@@ -8507,24 +8507,28 @@ theorem firstPositiveIndex_spec (f : Nat → Bool) (k : Nat) :
     (j=0 ∧ ∀ i : Nat,0<i → i≤k → f i=false) ∨
     (0<j ∧ j≤k ∧ f j=true ∧ ∀ i : Nat,0<i → i<j → f i=false) := by
   induction k with
-  | zero => simp [firstPositiveIndex]
+  | zero =>
+    left
+    exact ⟨rfl,fun i hi hk => by omega⟩
   | succ k ih =>
     dsimp only at ih ⊢
     rcases ih with ⟨hz,hn⟩ | ⟨hp,hk,hf,hn⟩
-    · by_cases h : f (k+1)=true
-      · simp only [firstPositiveIndex,hz,ne_eq,not_true_eq_false,if_false,h,if_true]
+    · have hprev : ¬ firstPositiveIndex f k≠0 := by omega
+      rw [firstPositiveIndex,if_neg hprev]
+      by_cases h : f (k+1)=true
+      · rw [if_pos h]
         right
         exact ⟨by omega,by omega,h,fun i hi hj => hn i hi (by omega)⟩
-      · have h' : f (k+1)=false := by cases he : f (k+1) <;> simp_all
-        simp only [firstPositiveIndex,hz,ne_eq,not_true_eq_false,if_false,h',Bool.false_eq_true]
+      · rw [if_neg h]
         left
         refine ⟨rfl,?_⟩
         intro i hi hj
         by_cases he : i=k+1
-        · simpa [he] using h'
+        · subst i
+          cases he : f (k+1) <;> simp_all
         · exact hn i hi (by omega)
     · have hne : firstPositiveIndex f k≠0 := by omega
-      simp only [firstPositiveIndex,hne,if_true]
+      rw [firstPositiveIndex,if_pos hne]
       exact Or.inr ⟨hp,by omega,hf,hn⟩
 
 def firstPassage (cost : Nat → Nat → Nat) (R T D q A : Nat) : Nat :=
@@ -8585,7 +8589,9 @@ theorem firstPassage_overshoot (cost : Nat → Nat → Nat) (R T D q A : Nat)
     simp only [passageProfit,if_neg (by omega : l-1≠0)] at hh
     have he : D*l=D*(l-1)+D := by
       have h1 : l-1+1=l := by omega
-      rw [← Nat.mul_succ,h1]
+      rw [← Nat.mul_succ]
+      have hh : (l-1).succ=l := by omega
+      rw [hh]
     omega
 
 theorem endpointMass_mono (R T A l k : Nat) (ha : A∈roots R)
@@ -8669,7 +8675,8 @@ theorem passageRankDeath_observedCap (cost : Nat → Nat → Nat) (R T M D q : N
     dsimp only at hl
     split at hl
     · rename_i hp
-      exact ⟨hm,by omega,(firstPassage_sound cost R T D q A hp.1).1,hp.2⟩
+      have hlt : b.1<l A := by dsimp [l]; omega
+      exact ⟨hm,hlt,(firstPassage_sound cost R T D q A hp.1).1,hp.2⟩
     · omega
   have hn : xs.Nodup := by
     unfold xs obsLiveFiber
@@ -8710,12 +8717,15 @@ theorem passageRankDeath_net_lower (cost : Nat → Nat → Nat) (R T M D q : Nat
   let l := firstPassage cost R T D q
   unfold passageRankDeath
   dsimp only
-  by_cases h : 0<l A ∧ localRank (passageNeighbors R T l A) score A≤M
+  by_cases h : 0<firstPassage cost R T D q A ∧ localRank (passageNeighbors R T (firstPassage cost R T D q) A) score A≤M
   · simp only [h,decide_true,if_true]
+    change 0<l A ∧ _ at h
     have hp := firstPassage_sound cost R T D q A h.1
     have hc := hp.2
+    change q≤passageProfit cost R T D A (l A) at hc
     simp only [passageProfit,if_neg (by omega : l A≠0)] at hc
     unfold life prefixAge
+    change cost A (min (observeAge R T A+l A) (observeAge R T A+T)) + q*1 ≤ D*min T (observeAge R T A+l A-observeAge R T A)
     have he : min (observeAge R T A+l A) (observeAge R T A+T)=observeAge R T A+l A := by omega
     have hl : min T (observeAge R T A+l A-observeAge R T A)=l A := by omega
     rw [he,hl]
