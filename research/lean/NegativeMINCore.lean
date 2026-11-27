@@ -9360,4 +9360,224 @@ theorem diversityWordCost_history (z Y reset D wS wL A k : Nat) :
 #print axioms NegativeMIN.diversityWordCost_defect
 #print axioms NegativeMIN.diversityWordCost_suffix_mono
 
+
+/-! The stronger joint broad-count/diversity latch charges at most
+once per reset block. The entire block (including an unfinished last
+block) is charged if both monotone thresholds are met. -/
+
+def resetBlockScan (reset : Nat) (P : List Nat → Nat) :
+    List Nat → List Nat → Nat
+  | cur,[] => P cur
+  | cur,p::ps =>
+    if reset≤p then P cur+resetBlockScan reset P [] ps
+    else resetBlockScan reset P (cur++[p]) ps
+
+theorem resetBlockScan_initial (reset : Nat) (P : List Nat → Nat)
+    (a b xs : List Nat) (hb : ∀ s,P s≤1)
+    (hm : ∀ s t,P t≤P (s++t)) :
+    resetBlockScan reset P b xs≤resetBlockScan reset P (a++b) xs ∧
+    resetBlockScan reset P (a++b) xs≤resetBlockScan reset P b xs+1 := by
+  induction xs generalizing b with
+  | nil =>
+    simp only [resetBlockScan]
+    have h1 := hm a b
+    have h2 := hb (a++b)
+    omega
+  | cons p xs ih =>
+    by_cases hr : reset≤p
+    · simp only [resetBlockScan,if_pos hr]
+      have h1 := hm a b
+      have h2 := hb (a++b)
+      omega
+    · simp only [resetBlockScan,if_neg hr,List.append_assoc]
+      exact ih (b++[p])
+
+def resetBlockCost (reset : Nat) (P : List Nat → Nat) (xs : List Nat) : Nat :=
+  resetBlockScan reset P [] xs
+
+theorem resetBlockScan_defect (reset : Nat) (P : List Nat → Nat)
+    (cur xs ys : List Nat) (hb : ∀ s,P s≤1)
+    (hm : ∀ s t,P t≤P (s++t)) :
+    resetBlockScan reset P cur (xs++ys)≤
+      resetBlockScan reset P cur xs+resetBlockCost reset P ys+1 ∧
+    resetBlockScan reset P cur xs+resetBlockCost reset P ys≤
+      resetBlockScan reset P cur (xs++ys)+1 := by
+  induction xs generalizing cur with
+  | nil =>
+    have h := resetBlockScan_initial reset P cur [] ys hb hm
+    simp only [List.append_nil,resetBlockCost] at h ⊢
+    simp only [List.nil_append,resetBlockScan]
+    have hp := hb cur
+    omega
+  | cons p xs ih =>
+    by_cases hr : reset≤p
+    · simp only [List.cons_append,resetBlockScan,if_pos hr]
+      have h := ih []
+      omega
+    · simp only [List.cons_append,resetBlockScan,if_neg hr]
+      exact ih (cur++[p])
+
+theorem resetBlockCost_defect (reset : Nat) (P : List Nat → Nat)
+    (hb : ∀ s,P s≤1) (hm : ∀ s t,P t≤P (s++t)) :
+    WordCostDefect (resetBlockCost reset P) 1 :=
+  fun xs ys => resetBlockScan_defect reset P [] xs ys hb hm
+
+theorem resetBlockCost_suffix (reset : Nat) (P : List Nat → Nat)
+    (hb : ∀ s,P s≤1) (hm : ∀ s t,P t≤P (s++t)) :
+    WordSuffixMono (resetBlockCost reset P) := by
+  intro p xs
+  unfold resetBlockCost
+  by_cases hr : reset≤p
+  · simp only [resetBlockScan,if_pos hr]
+    omega
+  · simp only [resetBlockScan,if_neg hr,List.nil_append]
+    have h := (resetBlockScan_initial reset P [p] [] xs hb hm).1
+    simpa using h
+
+theorem resetBlockScan_snoc (reset : Nat) (P : List Nat → Nat)
+    (cur xs : List Nat) (p : Nat) (hm : ∀ s t,P s≤P (s++t)) :
+    resetBlockScan reset P cur xs≤resetBlockScan reset P cur (xs++[p]) := by
+  induction xs generalizing cur with
+  | nil =>
+    by_cases hr : reset≤p
+    · simp only [List.nil_append,resetBlockScan,if_pos hr]
+      omega
+    · simp only [List.nil_append,resetBlockScan,if_neg hr]
+      exact hm cur [p]
+  | cons q xs ih =>
+    by_cases hr : reset≤q
+    · simp only [List.cons_append,resetBlockScan,if_pos hr]
+      have h := ih []
+      omega
+    · simp only [List.cons_append,resetBlockScan,if_neg hr]
+      exact ih (cur++[q])
+
+def distinctFilteredCount (f : Nat → Bool) (xs : List Nat) : Nat :=
+  (uniqueKeys (xs.filter f)).length
+
+theorem distinctFilteredCount_append (f : Nat → Bool) (xs ys : List Nat) :
+    distinctFilteredCount f xs≤distinctFilteredCount f (xs++ys) ∧
+    distinctFilteredCount f ys≤distinctFilteredCount f (xs++ys) := by
+  unfold distinctFilteredCount
+  constructor
+  · apply nodup_subset_length_core _ _ (uniqueKeys_nodup _)
+    intro p hp
+    apply (mem_uniqueKeys _ _).mpr
+    rw [List.filter_append]
+    exact List.mem_append_left _ ((mem_uniqueKeys _ _).mp hp)
+  · apply nodup_subset_length_core _ _ (uniqueKeys_nodup _)
+    intro p hp
+    apply (mem_uniqueKeys _ _).mpr
+    rw [List.filter_append]
+    exact List.mem_append_right _ ((mem_uniqueKeys _ _).mp hp)
+
+def jointBlockScore (z Y Yb D K : Nat) (xs : List Nat) : Nat :=
+  if K<(xs.filter (fun p => decide (z<p ∧ p<Yb))).length ∧
+    D<distinctFilteredCount (fun p => decide (z<p ∧ p<Y)) xs then 1 else 0
+
+theorem jointBlockScore_le_one (z Y Yb D K : Nat) (xs : List Nat) :
+    jointBlockScore z Y Yb D K xs≤1 := by
+  unfold jointBlockScore
+  split <;> omega
+
+theorem jointBlockScore_append (z Y Yb D K : Nat) (xs ys : List Nat) :
+    jointBlockScore z Y Yb D K xs≤jointBlockScore z Y Yb D K (xs++ys) ∧
+    jointBlockScore z Y Yb D K ys≤jointBlockScore z Y Yb D K (xs++ys) := by
+  let f := fun p => decide (z<p ∧ p<Yb)
+  let g := fun p => decide (z<p ∧ p<Y)
+  have h := distinctFilteredCount_append g xs ys
+  have hlen : ((xs++ys).filter f).length=(xs.filter f).length+(ys.filter f).length := by
+    rw [List.filter_append,List.length_append]
+  unfold jointBlockScore
+  change (if K<(xs.filter f).length ∧ D<distinctFilteredCount g xs then 1 else 0)≤
+    (if K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) then 1 else 0) ∧
+    (if K<(ys.filter f).length ∧ D<distinctFilteredCount g ys then 1 else 0)≤
+    (if K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) then 1 else 0)
+  constructor
+  · split
+    · rename_i hp
+      have ht : K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) := by omega
+      simp [ht]
+    · omega
+  · split
+    · rename_i hp
+      have ht : K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) := by omega
+      simp [ht]
+    · omega
+
+def jointWordCount (z Y Yb reset D K : Nat) : List Nat → Nat :=
+  resetBlockCost reset (jointBlockScore z Y Yb D K)
+
+theorem jointWordCount_defect (z Y Yb reset D K : Nat) :
+    WordCostDefect (jointWordCount z Y Yb reset D K) 1 :=
+  resetBlockCost_defect reset _ (jointBlockScore_le_one z Y Yb D K)
+    (fun s t => (jointBlockScore_append z Y Yb D K s t).2)
+
+theorem jointWordCount_suffix (z Y Yb reset D K : Nat) :
+    WordSuffixMono (jointWordCount z Y Yb reset D K) :=
+  resetBlockCost_suffix reset _ (jointBlockScore_le_one z Y Yb D K)
+    (fun s t => (jointBlockScore_append z Y Yb D K s t).2)
+
+theorem jointWordCount_snoc (z Y Yb reset D K : Nat) (xs : List Nat) (p : Nat) :
+    jointWordCount z Y Yb reset D K xs≤jointWordCount z Y Yb reset D K (xs++[p]) :=
+  resetBlockScan_snoc reset _ [] xs p (fun s t => (jointBlockScore_append z Y Yb D K s t).1)
+
+def jointDiversityWordCost (z Y Yb reset D K wS wL : Nat) (xs : List Nat) : Nat :=
+  wS*jointWordCount z Y Yb reset D K xs+wL*nonemptyChunkCount z Y Y D xs
+
+theorem jointDiversityWordCost_defect (z Y Yb reset D K wS wL : Nat) :
+    WordCostDefect (jointDiversityWordCost z Y Yb reset D K wS wL) (wS+wL) := by
+  intro xs ys
+  have hs := jointWordCount_defect z Y Yb reset D K xs ys
+  have hn := nonemptyChunk_append_bounds z Y Y D xs ys
+  have h1 := Nat.mul_le_mul_left wS hs.1
+  have h2 := Nat.mul_le_mul_left wS hs.2
+  have h3 := Nat.mul_le_mul_left wL hn.1
+  have h4 := Nat.mul_le_mul_left wL hn.2
+  simp only [Nat.mul_add,Nat.mul_one] at h1 h2 h3 h4
+  unfold jointDiversityWordCost
+  omega
+
+theorem jointDiversityWordCost_suffix (z Y Yb reset D K wS wL : Nat) :
+    WordSuffixMono (jointDiversityWordCost z Y Yb reset D K wS wL) := by
+  intro p xs
+  have h1 := Nat.mul_le_mul_left wS (jointWordCount_suffix z Y Yb reset D K p xs)
+  have h2 := Nat.mul_le_mul_left wL (nonemptyChunk_suffix_mono z Y Y D p xs)
+  unfold jointDiversityWordCost
+  omega
+
+theorem jointDiversityHistory_zero (z Y Yb reset D K wS wL A : Nat) :
+    wordHistoryCost (jointDiversityWordCost z Y Yb reset D K wS wL) A 0=0 := by
+  simp [wordHistoryCost,labelTrace,jointDiversityWordCost,jointWordCount,resetBlockCost,
+    resetBlockScan,jointBlockScore,nonemptyChunkCount,chunkFold,chunkInit]
+
+theorem jointDiversityHistory_mono (z Y Yb reset D K wS wL A i j : Nat) (hij : i≤j) :
+    wordHistoryCost (jointDiversityWordCost z Y Yb reset D K wS wL) A i≤
+      wordHistoryCost (jointDiversityWordCost z Y Yb reset D K wS wL) A j := by
+  have h : ∀ k : Nat,
+    wordHistoryCost (jointDiversityWordCost z Y Yb reset D K wS wL) A k≤
+      wordHistoryCost (jointDiversityWordCost z Y Yb reset D K wS wL) A (k+1) := by
+    intro k
+    have hs := Nat.mul_le_mul_left wS
+      (jointWordCount_snoc z Y Yb reset D K (labelTrace (birth A) k)
+        (winner (evolve (birth A) k)))
+    rw [← labelTrace_succ] at hs
+    have hn := Nat.mul_le_mul_left wL (chunkAt_nonempty_mono z Y Y D (birth A) k (k+1) (by omega))
+    change wL*nonemptyChunkCount z Y Y D (labelTrace (birth A) k)≤
+      wL*nonemptyChunkCount z Y Y D (labelTrace (birth A) (k+1)) at hn
+    unfold wordHistoryCost jointDiversityWordCost
+    omega
+  induction j with
+  | zero =>
+    have he : i=0 := by omega
+    rw [he]
+  | succ j ih =>
+    by_cases he : i=j+1
+    · rw [he]
+    · exact Nat.le_trans (ih (by omega)) (h j)
+
+#print axioms NegativeMIN.jointWordCount_defect
+#print axioms NegativeMIN.jointDiversityWordCost_defect
+#print axioms NegativeMIN.jointDiversityHistory_mono
+
 end NegativeMIN
