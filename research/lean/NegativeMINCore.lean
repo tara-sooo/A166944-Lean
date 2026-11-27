@@ -7950,4 +7950,185 @@ theorem pushDualPrices_feasible (cost : Nat → Nat → Nat) (R T D : Nat)
 #print axioms NegativeMIN.dual_weak_bound
 #print axioms NegativeMIN.pushDualPrices_feasible
 
+
+/-- Price at a bin whose full ancestry is at most M can be paid instead
+as individual root slack, without increasing the dual objective. -/
+def heavyDualPrices (R T M : Nat) (ps : List DualPrice) : List DualPrice :=
+  ps.filter (fun p => decide (M<(fullObsFiber R T p.1).length))
+
+def lightDualPrices (R T M : Nat) (ps : List DualPrice) : List DualPrice :=
+  ps.filter (fun p => decide ((fullObsFiber R T p.1).length≤M))
+
+theorem dualPriceTotal_split (R T M : Nat) (ps : List DualPrice) :
+    dualPriceTotal ps=dualPriceTotal (heavyDualPrices R T M ps)+
+      dualPriceTotal (lightDualPrices R T M ps) := by
+  induction ps with
+  | nil => rfl
+  | cons p ps ih =>
+    by_cases h : M<(fullObsFiber R T p.1).length
+    · have h' : ¬ (fullObsFiber R T p.1).length≤M := by omega
+      simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_true h,
+        decide_eq_false h',if_true,if_false,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
+      omega
+    · have h' : (fullObsFiber R T p.1).length≤M := by omega
+      simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_false h,
+        decide_eq_true h',if_true,if_false,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
+      omega
+
+theorem dualCharge_split (R T M A l : Nat) (ps : List DualPrice) :
+    dualCharge R T A l ps=dualCharge R T A l (heavyDualPrices R T M ps)+
+      dualCharge R T A l (lightDualPrices R T M ps) := by
+  induction ps with
+  | nil => rfl
+  | cons p ps ih =>
+    by_cases h : M<(fullObsFiber R T p.1).length
+    · have h' : ¬ (fullObsFiber R T p.1).length≤M := by omega
+      simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_true h,
+        decide_eq_false h',if_true,if_false,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
+      omega
+    · have h' : (fullObsFiber R T p.1).length≤M := by omega
+      simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_false h,
+        decide_eq_true h',if_true,if_false,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
+      omega
+
+theorem dualCharge_mono (R T A l k : Nat) (ps : List DualPrice) (h : l≤k) :
+    dualCharge R T A l ps≤dualCharge R T A k ps := by
+  unfold dualCharge
+  apply sum_map_le
+  intro p _
+  by_cases hh : dualHit R T A l p.1=true
+  · have hk : dualHit R T A k p.1=true := by
+      simp only [dualHit,decide_eq_true_eq] at hh ⊢
+      exact ⟨by omega,hh.2⟩
+    simp [hh,hk]
+  · simp [hh]
+
+def lightDualSlack (R T M : Nat) (ps : List DualPrice) (slack : Nat → Nat) : Nat → Nat :=
+  fun A => slack A+dualCharge R T A T (lightDualPrices R T M ps)
+
+theorem heavyDual_feasible (cost : Nat → Nat → Nat) (R T M D : Nat)
+    (ps : List DualPrice) (slack : Nat → Nat)
+    (hf : DualFeasible cost R T D ps slack) :
+    DualFeasible cost R T D (heavyDualPrices R T M ps) (lightDualSlack R T M ps slack) := by
+  intro A ha k hk
+  let l := min T (k-observeAge R T A)
+  have hh := hf A ha k hk
+  change D*l≤cost A k+dualCharge R T A l ps+slack A at hh
+  rw [dualCharge_split R T M A l ps] at hh
+  have hm := dualCharge_mono R T A l T (lightDualPrices R T M ps) (Nat.min_le_left _ _)
+  change D*l≤cost A k+dualCharge R T A l (heavyDualPrices R T M ps)+
+    (slack A+dualCharge R T A T (lightDualPrices R T M ps))
+  omega
+
+theorem fullObservation_fiber (R T : Nat) (b : DualBin) (hu : b.1<T) :
+    obsLiveFiber (fun A => observeAge R T A+T) R T b.1 b.2=fullObsFiber R T b := by
+  unfold obsLiveFiber fullObsFiber
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A _
+  simp [liveAt,hu]
+
+theorem heavyDual_objective (R T M : Nat) (ps : List DualPrice) (slack : Nat → Nat)
+    (hp : ∀ p∈ps,p.1∈obsBins R T) :
+    dualObjective R M (heavyDualPrices R T M ps) (lightDualSlack R T M ps slack)≤
+      dualObjective R M ps slack := by
+  let ls := lightDualPrices R T M ps
+  have hl : ∀ p∈ls,p.1∈obsBins R T := by
+    intro p h
+    exact hp p (List.mem_filter.mp h).1
+  let d := fun A => observeAge R T A+T
+  have h := dualCharge_sum d R T ls hl
+  have he : ∀ A : Nat,life d R T A=T := by
+    intro A
+    exact life_eq_full_of_survives d R T A (by rfl)
+  simp only [he] at h
+  have hh := sum_map_le ls (fun p => p.2*(obsLiveFiber d R T p.1.1 p.1.2).length)
+    (fun p => M*p.2) (by
+      intro p hpm
+      have hlen := (List.mem_filter.mp hpm).2
+      simp only [decide_eq_true_eq] at hlen
+      rw [fullObservation_fiber R T p.1 (obsBin_time R T p.1 (hl p hpm)),Nat.mul_comm p.2]
+      exact Nat.mul_le_mul_right p.2 hlen)
+  rw [sum_map_mul] at hh
+  have hcharge : ((roots R).map (fun A => dualCharge R T A T ls)).sum≤M*dualPriceTotal ls :=
+    Nat.le_trans (Nat.le_of_eq h) hh
+  unfold dualObjective lightDualSlack
+  rw [sum_map_add,dualPriceTotal_split R T M ps,Nat.mul_add]
+  change M*dualPriceTotal (heavyDualPrices R T M ps)+
+    (((roots R).map slack).sum+((roots R).map (fun A => dualCharge R T A T ls)).sum)≤_
+  omega
+
+theorem earliestFiber_has_merge (R T : Nat) (b : DualBin) (hT : 6≤T)
+    (hb : b∈obsBins R T) (hu : 0<b.1)
+    (hmin : ∀ a∈obsBins R T,a.1<b.1 → fullObsFiber R T a≠fullObsFiber R T b) :
+    ∃ A B : Nat,A∈fullObsFiber R T b ∧ B∈fullObsFiber R T b ∧
+      obsKey R T A (b.1-1)≠obsKey R T B (b.1-1) := by
+  classical
+  obtain ⟨A,ha⟩ := obsBin_full_nonempty R T b hb
+  have har := ((fullObsFiber_mem R T b A).mp ha).1
+  have ht := obsBin_time R T b hb
+  let a : DualBin := (b.1-1,obsKey R T A (b.1-1))
+  have hab : a∈obsBins R T := obsBin_of_root R T A _ har (by omega)
+  have ham : A∈fullObsFiber R T a := (fullObsFiber_mem R T a A).mpr ⟨har,rfl⟩
+  have hn := fullObsFiber_nested R T a b A hT (by dsimp [a]; omega) ht ham ha
+  by_cases hex : ∃ B : Nat,B∈fullObsFiber R T b ∧ obsKey R T A (b.1-1)≠obsKey R T B (b.1-1)
+  · obtain ⟨B,hB,hne⟩ := hex
+    exact ⟨A,B,ha,hB,hne⟩
+  · have he : fullObsFiber R T a=fullObsFiber R T b := by
+      unfold fullObsFiber
+      apply List.filter_congr
+      intro B hB
+      apply Bool.eq_iff_iff.mpr
+      simp only [decide_eq_true_eq]
+      constructor
+      · intro hk
+        exact ((fullObsFiber_mem R T b B).mp
+          (hn B ((fullObsFiber_mem R T a B).mpr ⟨hB,hk⟩))).2
+      · intro hk
+        have hb' := (fullObsFiber_mem R T b B).mpr ⟨hB,hk⟩
+        by_cases hh : obsKey R T A (b.1-1)=obsKey R T B (b.1-1)
+        · exact hh.symm
+        · exact False.elim (hex ⟨B,hb',hh⟩)
+    exact False.elim (hmin a hab (by dsimp [a]; omega) he)
+
+theorem observedState_succ (R T A u : Nat) :
+    observedState R T A (u+1)=tick (observedState R T A u) := by
+  unfold observedState orbit
+  rw [← Nat.add_assoc]
+  rfl
+
+theorem distinct_incoming_has_firing (R T A B u : Nat)
+    (hbefore : obsKey R T A u≠obsKey R T B u)
+    (hafter : obsKey R T A (u+1)=obsKey R T B (u+1)) :
+    winner (observedState R T A u)≠0 ∨ winner (observedState R T B u)≠0 := by
+  by_cases ha : winner (observedState R T A u)=0
+  · by_cases hb : winner (observedState R T B u)=0
+    · have hj := congrArg Prod.fst hafter
+      have hx := congrArg Prod.snd hafter
+      change (observedState R T A (u+1)).x=(observedState R T B (u+1)).x at hx
+      rw [observedState_succ,observedState_succ] at hx
+      simp only [tick,ha,hb,Nat.zero_sub,Nat.sub_zero] at hx
+      exact False.elim (hbefore (Prod.ext hj hx))
+    · exact Or.inr hb
+  · exact Or.inl ha
+
+theorem earliestFiber_has_firing (R T : Nat) (b : DualBin) (hT : 6≤T)
+    (hb : b∈obsBins R T) (hu : 0<b.1)
+    (hmin : ∀ a∈obsBins R T,a.1<b.1 → fullObsFiber R T a≠fullObsFiber R T b) :
+    ∃ A∈fullObsFiber R T b,winner (observedState R T A (b.1-1))≠0 := by
+  obtain ⟨A,B,ha,hb',hn⟩ := earliestFiber_has_merge R T b hT hb hu hmin
+  have he : b.1-1+1=b.1 := by omega
+  have hk : obsKey R T A (b.1-1+1)=obsKey R T B (b.1-1+1) := by
+    rw [he]
+    exact ((fullObsFiber_mem R T b A).mp ha).2.trans
+      ((fullObsFiber_mem R T b B).mp hb').2.symm
+  rcases distinct_incoming_has_firing R T A B _ hn hk with h | h
+  · exact ⟨A,ha,h⟩
+  · exact ⟨B,hb',h⟩
+
+#print axioms NegativeMIN.heavyDual_feasible
+#print axioms NegativeMIN.heavyDual_objective
+#print axioms NegativeMIN.earliestFiber_has_merge
+#print axioms NegativeMIN.earliestFiber_has_firing
+
 end NegativeMIN
