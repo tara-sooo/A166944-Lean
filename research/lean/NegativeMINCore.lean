@@ -6664,7 +6664,8 @@ theorem chunkStep_inv (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
           subst D
           simp [ChunkInvariant,hem,hs,ht]
           omega
-        · simp [ChunkInvariant,hem,hnot,hd]
+        · simp [ChunkInvariant,hem,hnot,hd,hn,hl]
+          have hD : 0 < D := by omega
           omega
       · have hlen : 0<c.seen.length := List.length_pos_iff.mpr hem
         by_cases hm : p∈c.seen
@@ -6698,8 +6699,8 @@ theorem chunkStep_nonempty_mono (z Y reset D : Nat) (c : ChunkStats) (p : Nat) :
   · split
     · dsimp only
       split
-      · omega
-      · split <;> omega
+      · simp
+      · split <;> simp
     · exact Nat.le_refl _
 
 theorem chunkStep_total (z Y reset D : Nat) (c : ChunkStats) (p : Nat) (hY : Y≤reset) :
@@ -6726,7 +6727,6 @@ theorem chunkStep_seen_kept (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
   simp only [if_neg (by omega : ¬reset≤p)] at hs ⊢
   by_cases hp : z<p ∧ p<Y
   · simp only [if_pos hp] at hs ⊢
-    dsimp only at hs ⊢
     by_cases hm : p∈c.seen
     · simp [hm,hp]
     · by_cases hd : D≤c.seen.length
