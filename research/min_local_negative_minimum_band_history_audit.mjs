@@ -11,6 +11,7 @@ function audit(Rs){
   const T=Math.ceil(Math.sqrt(2*R+1)),W=6*Math.floor(T/6),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1,L=Math.log(R);
   const M=Math.max(1,Math.floor(L**2.1)),z=5,Q=30,Y=47,B=32,Pmax=Math.max(Y+1,Math.floor(T/2));
   const controls=[1,4,16,64,256],byCost=controls.map(H=>({H,retained:0,births:0,twins:0}));
+  const caps=[1,4,16,64,M].map(C=>({C,ret:0,loss:0,traffic:0,deleted:0,cost:0,thresholds:[4,16,64].map(H=>({H,ret:0,mergeLoss:0,thresholdLoss:0,twins:0}))}));
   let events=0,merges=0,checks=0,rootEvents=0,retained=0,actualCost=0,greedyCost=0,traffic=0,deletedCost=0,deletedMass=0,greedyLow=0,greedyRelay=0,greedyRepeat=0,twinRetained=0;
   for(let l=lo;l<=hi;l+=W){
    let maxA=Math.min(hi,l+W-6),start=3-maxA/2,n0=3-l/2,end=n0+T,active=new Map(),buckets=new Map(),byEnd=new Map();
@@ -22,6 +23,9 @@ function audit(Rs){
      let v=active.get(e.a);if(v!==e.v)continue;
      active.delete(e.a);let inc=+(e.p>z&&e.p<Y);
      traffic+=v.cost.length*inc;
+     for(let c of caps){let list=v.cost.slice(0,c.C);c.traffic+=list.length*inc;
+      if(inc)for(let h of c.thresholds)h.thresholdLoss+=list.filter(x=>x===h.H).length;
+     }
      push(e.a-e.p+1,{m:v.m,cost:v.cost.map(c=>c+inc)});events++;
     }
     let A=2*(3-n);if(A>=l&&A<=maxA&&A%6===0)push(A,{m:1,cost:[0]});
@@ -30,6 +34,11 @@ function audit(Rs){
      let m=gs.reduce((s,g)=>s+g.m,0),all=gs.flatMap(g=>g.cost).sort((a,b)=>a-b),cost=all.slice(0,M),discard=all.slice(M);
      ck(cost.length===Math.min(M,m),"clipped mass invariant");
      deletedCost+=discard.reduce((s,c)=>s+c,0);deletedMass+=discard.length;
+     for(let c of caps){
+      let before=gs.flatMap(g=>g.cost.slice(0,c.C)),after=cost.slice(0,c.C);
+      c.loss+=before.length-after.length;c.deleted+=before.reduce((s,x)=>s+x,0)-after.reduce((s,x)=>s+x,0);
+      for(let h of c.thresholds){let d=before.filter(x=>x<=h.H).length-after.filter(x=>x<=h.H).length;ck(d>=0,"cheap merge loss");h.mergeLoss+=d;}
+     }
      if(gs.length>1)merges++;
      let x={m,cost};active.set(a,x);sched(a,n,x);checks++;
     }
@@ -71,12 +80,16 @@ function audit(Rs){
     greedyLow+=sel.reduce((s,x)=>s+x.low,0);greedyRelay+=sel.reduce((s,x)=>s+x.relay,0);greedyRepeat+=sel.reduce((s,x)=>s+x.rep,0);
     let twin=Math.min(spf[a-1]||a-1,spf[a+1]||a+1)>Math.sqrt(2*R+1);
     if(twin)twinRetained+=actual.length;
+    for(let c of caps){let list=v.cost.slice(0,c.C);c.ret+=list.length;c.cost+=list.reduce((s,x)=>s+x,0);
+     for(let h of c.thresholds){let m=list.filter(x=>x<=h.H).length;ck(m===Math.min(c.C,rs.filter(x=>x.cost<=h.H).length),"cheap cap exact");h.ret+=m;if(twin)h.twins+=m;}
+    }
     for(let c of byCost){let n=rs.filter(x=>x.cost<=c.H).length,m=Math.min(n,M);ck(v.cost.filter(x=>x<=c.H).length===m,"threshold clipped mass");c.retained+=m;c.births+=n;if(twin)c.twins+=m;}
     checks++;
    }
   }
   ck(retained+deletedMass===N&&traffic===greedyCost+deletedCost&&greedyCost===actualCost,"exact cost and mass telescope");
-  rows.push({R,N,T,M,z,Q,Y,B,Pmax,events,merges,rootEvents,checks,retention:retained/N,twinRetention:twinRetained/N,meanMinCost:greedyCost/N,meanMinRepeat:greedyRepeat/N,meanTraffic:traffic/N,meanDeletedCost:deletedCost/N,low:greedyLow/N,longRelay:greedyRelay/N,thresholds:byCost.map(c=>({H:c.H,retained:c.retained/N,roots:c.births/N,twin:c.twins/N}))});
+  for(let c of caps){ck(c.ret+c.loss===N&&c.traffic===c.cost+c.deleted,"subcap mass and cost ledger");for(let h of c.thresholds)ck(h.ret+h.mergeLoss+h.thresholdLoss===N,"combined cheap cap ledger");}
+  rows.push({R,N,T,M,z,Q,Y,B,Pmax,caps:caps.map(c=>({C:c.C,ret:c.ret/N,meanCost:c.cost/N,traffic:c.traffic/N,deleted:c.deleted/N,loss:c.loss/N,thresholds:c.thresholds.map(h=>({H:h.H,ret:h.ret/N,mergeLoss:h.mergeLoss/N,thresholdLoss:h.thresholdLoss/N,twins:h.twins/N}))})),events,merges,rootEvents,checks,retention:retained/N,twinRetention:twinRetained/N,meanMinCost:greedyCost/N,meanMinRepeat:greedyRepeat/N,meanTraffic:traffic/N,meanDeletedCost:deletedCost/N,low:greedyLow/N,longRelay:greedyRelay/N,thresholds:byCost.map(c=>({H:c.H,retained:c.retained/N,roots:c.births/N,twin:c.twins/N}))});
  }
  return rows;
 }
