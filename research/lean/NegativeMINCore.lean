@@ -6239,7 +6239,7 @@ theorem mem_erase_preserve {α : Type} [DecidableEq α] (xs : List α) (a b : α
       simp [hne] at hb
       simpa using hb
     · have hmem := List.mem_cons.mp hb
-      have hc' : (c == a) = false := by simp [hc]
+      have hc' : ¬ (c == a) = true := by simp [hc]
       rw [List.erase_cons_tail hc']
       simp only [List.mem_cons]
       rcases hmem with h | h
@@ -6323,10 +6323,11 @@ theorem winner_residue (s : State) (p : Nat) (hp : p≠0) (hw : winner s=p) :
     have h2 := Nat.div_add_mod (s.x%p+1) p
     rw [h1,Nat.add_zero] at h2
     by_cases hd : (s.x%p+1)/p=0
-    · simp [hd] at h2; omega
+    · simp [hd] at h2
     · have hh : (s.x%p+1)/p=1 := by
         have hh := Nat.div_le_div_right (c:=p) (show s.x%p+1≤p by omega)
-        simpa [Nat.div_self (show 0<p by omega)] using (show (s.x%p+1)/p≤p/p from hh)
+        rw [Nat.div_self (show 0<p by omega)] at hh
+        omega
       rw [hh,Nat.mul_one] at h2
       omega
   · simp only [eligible,Bool.and_eq_true,if_neg hpar,decide_eq_true_eq] at h
@@ -6359,14 +6360,14 @@ theorem supportDigitChoices_length (B k : Nat) :
 
 theorem supportDigit_mem (s : State) (ps : List Nat) (B i p : Nat)
     (h0 : ∀ q∈ps,q≠0) :
-    supportDigit s ps B i∈supportDigitChoices B ps.length := by
+    supportDigit s ps B i p∈supportDigitChoices B ps.length := by
   unfold supportDigit
   cases h : lastWinner s p i with
   | none => simp [supportDigitChoices]
   | some r =>
     by_cases hb : eventCount (evolve s r) (i-r)>B
     · simp [hb,supportDigitChoices]
-    · rw [if_neg hb]
+    · simp only [hb,if_false]
       apply List.mem_append.mpr
       apply Or.inr
       apply List.mem_flatMap.mpr
@@ -6406,7 +6407,10 @@ theorem previous_use_recent (s : State) (ps : List Nat) (i j p B : Nat)
     eventCount (evolve s r) (i-r)≤B+1 := by
   obtain ⟨hrt,hrp,hrnone⟩ := lastWinner_some s p i r hr
   obtain ⟨a,ha,haP,hmin⟩ := earliest_le (fun t => winner (evolve s (i+t))=p)
-    (j-i) ⟨j-i,Nat.le_refl _,by have he : i+(j-i)=j := by omega; rw [he]; exact hj⟩
+    (j-i) ⟨j-i,Nat.le_refl _,by
+      have he : i+(j-i)=j := by omega
+      rw [he]
+      exact hj⟩
   have hnone : ∀ t : Nat,r<t → t<i+a → winner (evolve s t)≠p := by
     intro t ht hta
     by_cases hti : t<i
@@ -6422,7 +6426,7 @@ theorem previous_use_recent (s : State) (ps : List Nat) (i j p B : Nat)
   rw [hsplit,eventCount_add] at hm
   have hs : evolve (evolve s r) 1=evolve s (r+1) := by rw [← evolve_add]
   rw [hs] at hm
-  have hc : eventCount (evolve s r) 1=1 := by simp [eventCount,pathCost,eventInc,hrp,hp]
+  have hc : eventCount (evolve s r) 1=1 := by simp [eventCount,pathCost,eventInc,evolve,hrp,hp]
   rw [hc] at hm
   omega
 
@@ -6437,7 +6441,7 @@ theorem supportDigit_equal_gain_divisor (s : State) (ps : List Nat) (B i j p : N
   have hrs := lastWinner_some s p i r hr
   have hts := lastWinner_some s p j t ht
   unfold supportDigit at he
-  rw [hr,ht,if_neg (by omega : ¬eventCount (evolve s r) (i-r)>B),
+  simp only [hr,ht,if_neg (by omega : ¬eventCount (evolve s r) (i-r)>B),
     if_neg (by omega : ¬eventCount (evolve s t) (j-t)>B)] at he
   have hh := List.cons.inj (List.cons.inj he).2
   have hres1 := winner_residue (evolve s r) p hp hrs.2.1
@@ -6504,18 +6508,15 @@ theorem supportSignature_no_return (s : State) (ps : List Nat) (B i j : Nat)
     | some t =>
       cases hi' : lastWinner s p i with
       | none =>
-        unfold supportDigit at hd
-        rw [hi',hj] at hd
-        split at hd <;> simp at hd
+        by_cases hbad : eventCount (evolve s t) (j-t)>B+1 <;>
+          simp [supportDigit,hi',hj,hbad] at hd
       | some r =>
         have hrec := previous_use_recent s ps i u p B hui hp0 rfl r hi'
           (fun a b hab hbu ha hb hn => hgap p hp a b hab (by omega) ha hb hn)
         have hrec' : eventCount (evolve s t) (j-t)≤B+1 := by
-          by_contra hbad
-          unfold supportDigit at hd
-          rw [hi',hj,if_neg (by omega : ¬eventCount (evolve s r) (i-r)>B+1),
-            if_pos (by omega : eventCount (evolve s t) (j-t)>B+1)] at hd
-          simp at hd
+          by_cases hbad : eventCount (evolve s t) (j-t)>B+1
+          · simp [supportDigit,hi',hj,show ¬eventCount (evolve s r) (i-r)>B+1 by omega,hbad] at hd
+          · omega
         exact supportDigit_equal_gain_divisor s ps (B+1) i j p hp0 hn
           (by omega) hlabels r t hi' hj hrec hrec' hd
 
@@ -6550,8 +6551,8 @@ theorem finite_support_event_bound (s : State) (K : Nat) (ps : List Nat)
         eventCount (evolve s (a+1)) (b-(a+1))≤B := by
       intro p hp a b hab hb ha hb' hnone
       have hlen := List.length_erase_of_mem hp
-      have hnodup : (ps.erase p).Nodup := (List.erase_sublist _ _).nodup hn
-      have hzero : ∀ q∈ps.erase p,q≠0 := fun q hq => h0 q ((List.erase_sublist _ _).subset hq)
+      have hnodup : (ps.erase p).Nodup := (List.erase_sublist : (ps.erase p).Sublist ps).nodup hn
+      have hzero : ∀ q∈ps.erase p,q≠0 := fun q hq => h0 q ((List.erase_sublist : (ps.erase p).Sublist ps).subset hq)
       have hh : ∀ t : Nat,t<b-(a+1) →
           winner (evolve (evolve s (a+1)) t)=0 ∨
             winner (evolve (evolve s (a+1)) t)∈ps.erase p := by
@@ -6587,7 +6588,9 @@ theorem finite_support_event_bound (s : State) (K : Nat) (ps : List Nat)
       intro i hi j hj hij
       have hi' := hxmem i hi
       have hj' := hxmem j hj
-      by_contra hne
+      by_cases hne : i=j
+      · exact hne
+      exfalso
       by_cases hh : i<j
       · exact supportSignature_no_return s ps B i j he hn h0 hh (hi'.2 (by omega))
           (fun t ht => hlabels t (by omega))
