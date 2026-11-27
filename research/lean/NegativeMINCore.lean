@@ -5358,7 +5358,7 @@ theorem optimalNet_record_sharp (inc : State → Nat) (D R T M : Nat)
       policyNet inc D R T (optimalNetDeath inc D R T M) *
         (((M-1)*xs.sum+moment2 xs : Nat):Int) := by
   dsimp only
-  rw [optimalNetDeath_formula]
+  rw [optimalNetDeath_formula inc D R T M hT]
   have h := clip_sharp (recordMasses inc D R T) M hM
   rw [recordMasses_clip] at h
   have hi := Int.ofNat_le.mpr h
@@ -5378,7 +5378,7 @@ theorem threshold_square_pair {α : Type} (xs : List α) (w : α → Nat) (D : N
     let f := fun a => if t<w a then 1 else 0
     have hf : (xs.filter (fun a => decide (t<w a))).length=(xs.map f).sum := by
       rw [filter_length_indicator]
-      rfl
+      simp only [f,decide_eq_true_eq]
     rw [hf]
     have he1 : (xs.map (fun a => (xs.map (fun b =>
         if t<w a ∧ t<w b then 1 else 0)).sum)).sum =
@@ -5444,7 +5444,12 @@ theorem recordEnergy_pairs (inc : State → Nat) (D R T : Nat) :
 theorem recordMasses_sum (inc : State → Nat) (D R T : Nat) :
     (recordMasses inc D R T).sum=optimalRecordMass inc D R T (roots R).length := by
   rw [← recordMasses_clip]
-  congr 1
+  have he : (recordMasses inc D R T).map (fun a => a)=recordMasses inc D R T := by simp
+  apply congrArg List.sum
+  calc
+    recordMasses inc D R T = (recordMasses inc D R T).map (fun a => a) := he.symm
+    _ = _ := ?_
+
   apply List.map_congr_left
   intro b hb
   unfold recordMasses at hb
