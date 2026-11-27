@@ -6078,13 +6078,13 @@ theorem eventCount_step (s : State) (k : Nat) :
 theorem labelCount_le_eventCount (s : State) (k p : Nat) (hp : p≠0) :
     labelCount s k p≤eventCount s k := by
   induction k with
-  | zero => rfl
+  | zero => exact Nat.le_refl _
   | succ k ih =>
     unfold labelCount eventCount at *
     simp only [pathCost,labelInc,eventInc]
     by_cases h : winner (evolve s k)=p
     · have h0 : winner (evolve s k)≠0 := by omega
-      simp [h,h0,ih]
+      simp [h,hp,ih]
     · simp [h]
       omega
 
@@ -6175,8 +6175,12 @@ theorem no_used_gain_divisor_return (s : State) (i j : Nat)
   have hw := eligible_three_le u.x (u.n+1) (winner u) (winner_sound u hi)
   have ht := tick_gain_exact u
   change (evolve s j).x≤(tick u).x at hmono
-  have hG : 0<gain u (evolve u k) := by rw [hf]; unfold gain; change 0<(evolve s i).x-_; change (tick u).x+(winner u-1)=u.x at ht; dsimp [u] at ht hw; omega
-  have hu := evolve_even s i he
+  have hG : 0<gain u (evolve u k) := by
+    rw [hf]
+    unfold gain
+    change 0<u.x-(evolve s j).x
+    omega
+  have hu : u.x%2=0 := evolve_even s i he
   have hej := evolve_even u k hu
   let Q := gain u (evolve u k)
   have hQe : Q%2=0 := by dsimp [Q,gain]; have hm := evolve_center_le u k; omega
@@ -6235,7 +6239,9 @@ theorem mem_erase_preserve {α : Type} [DecidableEq α] (xs : List α) (a b : α
       simp [hne] at hb
       simpa using hb
     · have hmem := List.mem_cons.mp hb
-      simp only [List.erase_cons_tail (by simpa using hc),List.mem_cons]
+      have hc' : (c == a) = false := by simp [hc]
+      rw [List.erase_cons_tail hc']
+      simp only [List.mem_cons]
       rcases hmem with h | h
       · exact Or.inl h
       · exact Or.inr (ih h)
