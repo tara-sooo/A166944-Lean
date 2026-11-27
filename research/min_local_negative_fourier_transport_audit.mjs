@@ -38,17 +38,17 @@ function audit(){
   }else rows.push({z:p,K:K.toString(),D,delta,Hbound:Math.min(Math.log(Number(K)),Math.log(8*D)+1),momentBound:2*Math.sqrt(8*D)});
  }
  // Actual elapsed-T trajectories; pad the initial slab to whole cells and include stationary ghosts.
- const R=480000,T=Math.ceil(Math.sqrt(2*R+1)),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1,spf=new Int32Array(2*R+5);
+ const R=480000,T=Math.ceil(Math.sqrt(2*R+1)),W=6*Math.floor(T/6),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1,spf=new Int32Array(2*R+5);
  for(let p=2;p*p<spf.length;p++)if(!spf[p])for(let j=p*p;j<spf.length;j+=p)if(!spf[j])spf[j]=p;
  function fs(n){let a=[];while(n>1){let p=spf[n]||n;a.push(p);while(n%p===0)n/=p}return a}
  function next(a,n){let p=Infinity,w=Infinity;for(let s of [-1,1])for(let q of fs(a-s)){let d=mod((s===-1?0:q+2)-n,2*q)||2*q;if(d<w||d===w&&q<p){p=q;w=d}}return {p,w}}
  function cell(a,s){let t=a/6,k=Math.floor(t/s.k),u=t-k*s.k,l=0,r=s.B.length;while(l<r){let m=(l+r)>>1;if(s.B[m]<=u)l=m+1;else r=m}return [6*(k*s.k+(l?s.B[l-1]:s.B.at(-1)-s.k)),6*(k*s.k+(l<s.B.length?s.B[l]:s.k+s.B[0]))]}
- const ss=sets.filter(s=>s.p<=19).map(s=>({s,initial:new Map(),final:new Map(),actual:new Map(),flux:new Map(),left:cell(lo-2*T-6,s)[0],right:cell(hi,s)[1]}));
- let ends=new Map(),events=0;
+ const ss=sets.filter(s=>s.p<=19).map(s=>({s,actual:new Map(),flux:new Map(),left:cell(lo-3*T-6,s)[0],right:cell(hi,s)[1]}));
+ let ends=new Map(),events=0,terminal=0,proxy=0,actualPenalty=0; const S=Math.sqrt(2*R+1),L=Math.log(S),q=a=>Math.min(spf[a-1]||a-1,spf[a+1]||a+1),cost=p=>{let t=Math.log(Math.min(p,S)),d=L-t;return 2*Math.log(L/t)+Math.log1p(d)+2*Math.log1p(Math.log1p(d))};
  const add=(m,k,v=1)=>m.set(k,(m.get(k)||0)+v),f=x=>x?x*Math.log(x):0;
  for(let A=lo;A<=hi;A+=6){
-  let a=A,n=3-A/2,end=n+T;
-  for(;;){let e=next(a,n);if(n+e.w>end)break;a-=e.p-1;n+=e.w;events++}
+  let a=A,n=3-A/2,left=lo+Math.floor((A-lo)/W)*W,n0=3-left/2,end=n0+T,seen=0;
+  for(;;){let e=next(a,n),stop=n+e.w,dt=Math.max(0,Math.min(stop,end)-Math.max(n,n0)); seen+=dt; actualPenalty+=dt/T*cost(q(a)); if(stop>end){terminal+=dt/T;break;}proxy+=dt/T*cost(e.p);a-=e.p-1;n=stop;events++;}ck(seen===T&&A-a<=3*T+6,'synchronized observation');
   add(ends,a);
   for(let s of ss){let [l]=cell(A,s.s),[r]=cell(a,s.s);add(s.actual,r);if(l!==r){add(s.flux,r,1);add(s.flux,l,-1)}}
  }
@@ -68,6 +68,6 @@ function audit(){
   ck(hReal<=Math.min(bFirst,bMoment,bLinear,bCs)+1e-8,"transport bounds");
   transport.push({z:s.s.p,total,N,chi2,h0,hReal,fine,hGhost,relative,halfMoment,linear:lin/total,bFirst,bMoment,bLinear,bCs});
  }
- return {checks,rows,transport,events};
+ return {checks,rows,transport,events,terminal:terminal/N,proxy:proxy/N,actualPenalty:actualPenalty/N};
 }
 console.log(JSON.stringify(audit(),null,2));
