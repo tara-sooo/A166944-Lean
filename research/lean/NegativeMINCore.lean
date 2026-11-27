@@ -888,4 +888,372 @@ theorem center_only_coalescence_false :
 #print axioms NegativeMIN.height_gain_identity
 #print axioms NegativeMIN.liveAt_iff_lt_life
 
+/-! Fixed-cohort rank selection and integrated collision charging.
+A cohort is selected once, before the policy begins (it may be chosen by
+a deterministic lookahead). This does not alter any underlying orbit. -/
+
+def physicalState (A : Nat) (n : Int) : State :=
+  orbit A (physicalAge A n)
+
+theorem physicalState_clock (A : Nat) (n : Int) (hb : (birth A).n ≤ n) :
+    (physicalState A n).n = n := by
+  unfold physicalState orbit physicalAge
+  rw [evolve_clock]
+  omega
+
+theorem physicalState_advance (A : Nat) (n : Int) (k : Nat)
+    (hb : (birth A).n ≤ n) :
+    physicalState A (n + (k : Int)) = evolve (physicalState A n) k := by
+  have ha : physicalAge A (n + (k : Int)) = physicalAge A n + k := by
+    unfold physicalAge
+    omega
+  simp only [physicalState, ha, orbit, evolve_add]
+
+def Contact (R T A B : Nat) (n : Int) : Prop :=
+  (birth A).n ≤ n ∧ (birth B).n ≤ n ∧
+    windowId R T A = windowId R T B ∧ physicalState A n = physicalState B n
+
+instance (R T A B : Nat) (n : Int) : Decidable (Contact R T A B n) := by
+  unfold Contact
+  infer_instance
+
+theorem contact_mono (R T A B : Nat) (n m : Int) (hn : n ≤ m)
+    (h : Contact R T A B n) : Contact R T A B m := by
+  obtain ⟨ha, hb, hj, hs⟩ := h
+  have hk : n + ((m-n).toNat : Int) = m := by omega
+  refine ⟨by omega, by omega, hj, ?_⟩
+  rw [← hk, physicalState_advance A n _ ha, physicalState_advance B n _ hb, hs]
+
+theorem contact_of_center (R T A B : Nat) (n : Int)
+    (ha : (birth A).n ≤ n) (hb : (birth B).n ≤ n)
+    (hj : windowId R T A = windowId R T B)
+    (hx : (physicalState A n).x = (physicalState B n).x) :
+    Contact R T A B n := by
+  refine ⟨ha, hb, hj, ?_⟩
+  have hn := physicalState_clock A n ha
+  have hm := physicalState_clock B n hb
+  cases hA : physicalState A n
+  cases hB : physicalState B n
+  simp only [hA, hB] at hx hn hm ⊢
+  congr <;> omega
+
+/-- A useful finite counting lemma, with no duplicate-free hypothesis. -/
+theorem filter_len_mono {α : Type} (xs : List α) (f g : α → Bool)
+    (h : ∀ a ∈ xs, f a = true → g a = true) :
+    (xs.filter f).length ≤ (xs.filter g).length := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    have hi := ih (fun b hb => h b (by simp [hb]))
+    by_cases hf : f a = true
+    · have hg := h a (by simp) hf
+      simp [hf, hg, hi]
+    · by_cases hg : g a = true <;> simp [hf, hg] <;> omega
+
+theorem sum_map_le {α : Type} (xs : List α) (f g : α → Nat)
+    (h : ∀ a ∈ xs, f a ≤ g a) :
+    (xs.map f).sum ≤ (xs.map g).sum := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    have hi := ih (fun b hb => h b (by simp [hb]))
+    have ha := h a (by simp)
+    simp only [List.map_cons, List.sum_cons]
+    omega
+
+theorem sum_map_add {α : Type} (xs : List α) (f g : α → Nat) :
+    (xs.map (fun a => f a + g a)).sum = (xs.map f).sum + (xs.map g).sum := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih => simp only [List.map_cons, List.sum_cons, ih]; omega
+
+theorem sum_map_mul {α : Type} (xs : List α) (c : Nat) (f : α → Nat) :
+    (xs.map (fun a => c * f a)).sum = c * (xs.map f).sum := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih => simp [ih, Nat.mul_add]
+
+theorem filter_length_indicator {α : Type} (xs : List α) (f : α → Bool) :
+    (xs.filter f).length = (xs.map (fun a => if f a then 1 else 0)).sum := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih => cases h : f a <;> simp [h, ih, Nat.add_comm]
+
+theorem sum_map_swap {α β : Type} (xs : List α) (ys : List β) (f : α → β → Nat) :
+    (xs.map (fun a => (ys.map (f a)).sum)).sum =
+      (ys.map (fun b => (xs.map (fun a => f a b)).sum)).sum := by
+  induction xs with
+  | nil => induction ys <;> simp_all
+  | cons a xs ih =>
+    simp only [List.map_cons, List.sum_cons]
+    rw [ih, ← sum_map_add]
+
+/-- Counting a Boolean initial interval: no search oracle or choice. -/
+theorem antitone_count_spec (f : Nat → Bool)
+    (hf : ∀ i j : Nat, i ≤ j → f j = true → f i = true)
+    (H i : Nat) :
+    i < ((List.range H).filter f).length ↔ i < H ∧ f i = true := by
+  induction H with
+  | zero => simp
+  | succ H ih =>
+    rw [List.range_succ, List.filter_append, List.length_append]
+    by_cases h : f H = true
+    · have he : (List.range H).filter f = List.range H := by
+        apply List.filter_eq_self.mpr
+        intro j hj
+        exact hf j H (by have := List.mem_range.mp hj; omega) h
+      rw [he]
+      simp only [List.length_range, List.filter_cons, h, if_true, List.filter_nil,
+        List.length_cons, List.length_nil]
+      constructor
+      · intro hi
+        exact ⟨by omega, hf i H (by omega) h⟩
+      · intro hi
+        omega
+    · have hfalse : f H = false := by cases h' : f H <;> simp_all
+      simp only [List.filter_cons, hfalse, Bool.false_eq_true, if_false,
+        List.filter_nil, List.length_nil, Nat.add_zero]
+      rw [ih]
+      constructor
+      · intro hi
+        exact ⟨by omega, hi.2⟩
+      · intro hi
+        have hiH : i ≠ H := fun e => h (e ▸ hi.2)
+        exact ⟨by omega, hi.2⟩
+
+/-- Strictly smaller root IDs are higher-priority. Rank includes self. -/
+def cohort (R : Nat) (select : Nat → Bool) : List Nat :=
+  (roots R).filter select
+
+def rankList (R T A : Nat) (select : Nat → Bool) (n : Int) : List Nat :=
+  (roots R).filter (fun B => select B && decide (B ≤ A ∧ Contact R T A B n))
+
+def rank (R T A : Nat) (select : Nat → Bool) (n : Int) : Nat :=
+  (rankList R T A select n).length
+
+theorem rank_mono (R T A : Nat) (select : Nat → Bool) (n m : Int)
+    (h : n ≤ m) : rank R T A select n ≤ rank R T A select m := by
+  unfold rank rankList
+  apply filter_len_mono
+  intro B _ hb
+  simp only [Bool.and_eq_true, decide_eq_true_eq] at hb ⊢
+  exact ⟨hb.1, hb.2.1, contact_mono R T A B n m h hb.2.2⟩
+
+def rankOK (R T M A : Nat) (select : Nat → Bool) (i : Nat) : Bool :=
+  decide (rank R T A select ((birth A).n + (i : Int)) ≤ M)
+
+theorem rankOK_antitone (R T M A : Nat) (select : Nat → Bool)
+    (i j : Nat) (h : i ≤ j) (hj : rankOK R T M A select j = true) :
+    rankOK R T M A select i = true := by
+  simp only [rankOK, decide_eq_true_eq] at hj ⊢
+  exact Nat.le_trans (rank_mono R T A select _ _ (by omega)) hj
+
+def rankDeath (R T M : Nat) (select : Nat → Bool) (A : Nat) : Nat :=
+  if select A then
+    ((List.range (observeAge R T A + T)).filter (rankOK R T M A select)).length
+  else 0
+
+theorem rankDeath_spec (R T M A i : Nat) (select : Nat → Bool) :
+    i < rankDeath R T M select A ↔
+      select A = true ∧ i < observeAge R T A + T ∧
+        rank R T A select ((birth A).n + (i : Int)) ≤ M := by
+  by_cases h : select A = true
+  · simp only [rankDeath, h, if_true, true_and]
+    rw [antitone_count_spec _ (rankOK_antitone R T M A select)]
+    simp [rankOK]
+  · have hf : select A = false := by cases he : select A <;> simp_all
+    simp [rankDeath, hf]
+
+theorem list_max_mem (xs : List Nat) (h : xs ≠ []) :
+    ∃ a ∈ xs, ∀ b ∈ xs, b ≤ a := by
+  induction xs with
+  | nil => contradiction
+  | cons x xs ih =>
+    by_cases he : xs = []
+    · subst xs
+      exact ⟨x, by simp, by simp⟩
+    · obtain ⟨a, ha, hmax⟩ := ih he
+      by_cases hx : x ≤ a
+      · refine ⟨a, by simp [ha], ?_⟩
+        intro b hb
+        simp only [List.mem_cons] at hb
+        rcases hb with rfl | hb
+        · exact hx
+        · exact hmax b hb
+      · refine ⟨x, by simp, ?_⟩
+        intro b hb
+        simp only [List.mem_cons] at hb
+        rcases hb with rfl | hb
+        · exact Nat.le_refl _
+        · have := hmax b hb
+          omega
+
+/-- This is a real irreversible capped policy, not a cap on a relaxed
+terminal map. All times, including pre-window births, are covered. -/
+theorem rankDeath_fullCapped (R T M : Nat) (select : Nat → Bool) :
+    FullCapped (rankDeath R T M select) R T M := by
+  intro J x n
+  let f := fun A => physicalLiveAt (rankDeath R T M select) R T A n &&
+    decide (windowId R T A = J ∧ (orbit A (physicalAge A n)).x = x)
+  change ((roots R).filter f).length ≤ M
+  by_cases he : (roots R).filter f = []
+  · simp [he]
+  · obtain ⟨A, hA, hmax⟩ := list_max_mem ((roots R).filter f) he
+    have ha := (List.mem_filter.mp hA).2
+    dsimp [f] at ha
+    simp only [Bool.and_eq_true, physicalLiveAt, decide_eq_true_eq] at ha
+    have hbirth := ha.1.1
+    have hspec := (rankDeath_spec R T M A (physicalAge A n) select).mp ha.1.2.2
+    have hclock : (birth A).n + (physicalAge A n : Int) = n := by
+      unfold physicalAge
+      omega
+    rw [hclock] at hspec
+    apply Nat.le_trans (filter_len_mono (roots R) f
+      (fun B => select B && decide (B ≤ A ∧ Contact R T A B n)) ?_) hspec.2.2
+    intro B hB hf
+    have hm : B ∈ (roots R).filter f := List.mem_filter.mpr ⟨hB, hf⟩
+    have hle := hmax B hm
+    dsimp [f] at hf
+    simp only [Bool.and_eq_true, physicalLiveAt, decide_eq_true_eq] at hf
+    have hs := (rankDeath_spec R T M B (physicalAge B n) select).mp hf.1.2.2
+    simp only [Bool.and_eq_true, decide_eq_true_eq]
+    refine ⟨hs.1, hle, ?_⟩
+    apply contact_of_center R T A B n hbirth hf.1.1 (ha.2.1.trans hf.2.1.symm)
+    exact ha.2.2.trans hf.2.2.symm
+
+/-- Observation clock: all canonical births in the window have happened. -/
+theorem observeStart_ge_birth (R T A : Nat) (hT : 6 ≤ T)
+    (hR : R ≤ A) (h6 : A % 6 = 0) : (birth A).n ≤ observeStart R T A := by
+  let L := slabLo R
+  let W := windowWidth T
+  let J := (A-L)/W
+  have hL : L ≤ A := by dsimp [L, slabLo]; omega
+  have hd := Nat.div_add_mod (A-L) W
+  change W*J+(A-L)%W = A-L at hd
+  rw [Nat.mul_comm W J] at hd
+  have hbase : L+J*W ≤ A := by omega
+  change 3-(A : Int)/2 ≤ 3-((L+J*W : Nat) : Int)/2
+  omega
+
+theorem rankDeath_observed_iff (R T M A u : Nat) (select : Nat → Bool)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0) (hu : u < T) :
+    liveAt (rankDeath R T M select) R T A u = true ↔
+      select A = true ∧ rank R T A select (observeStart R T A + (u : Int)) ≤ M := by
+  have hb := observeStart_ge_birth R T A hT hR h6
+  have hc : (birth A).n + ((observeAge R T A + u : Nat) : Int) =
+      observeStart R T A + (u : Int) := by
+    unfold observeAge
+    omega
+  simp only [liveAt, decide_eq_true_eq, rankDeath_spec, hc]
+  omega
+
+/-- Count distinct, higher-priority contacts, not the diagonal. -/
+def strictRank (R T A : Nat) (select : Nat → Bool) (n : Int) : Nat :=
+  ((roots R).filter (fun B => select B && decide (B < A ∧ Contact R T A B n))).length
+
+theorem rank_le_strict_add_one_list (xs : List Nat) (A : Nat) (f : Nat → Bool)
+    (hn : xs.Nodup) :
+    (xs.filter (fun B => f B && decide (B ≤ A))).length ≤
+      (xs.filter (fun B => f B && decide (B < A))).length + 1 := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih =>
+    have hn' := List.nodup_cons.mp hn
+    by_cases he : x = A
+    · subst x
+      have eqf : xs.filter (fun B => f B && decide (B ≤ A)) =
+          xs.filter (fun B => f B && decide (B < A)) := by
+        apply List.filter_congr
+        intro b hb
+        have hne : b ≠ A := fun e => hn'.1 (e ▸ hb)
+        have heq : (b ≤ A) = (b < A) := propext (by omega)
+        rw [heq]
+      rw [List.filter_cons, List.filter_cons, eqf]
+      cases h : f A <;> simp [h]
+    · have hi := ih hn'.2
+      have hx : (x ≤ A) = (x < A) := propext (by omega)
+      simp only [List.filter_cons, hx]
+      cases h : f x && decide (x < A) <;> simp [h] <;> omega
+
+theorem rank_le_strict_add_one (R T A : Nat) (select : Nat → Bool) (n : Int) :
+    rank R T A select n ≤ strictRank R T A select n + 1 := by
+  have hnd : (roots R).Nodup := by
+    unfold roots
+    exact (List.filter_sublist (p := fun A => decide (R ≤ A ∧ A % 6 = 0))).nodup
+      List.nodup_range
+  have h := rank_le_strict_add_one_list (roots R) A
+    (fun B => select B && decide (Contact R T A B n)) hnd
+  have h1 : rankList R T A select n =
+      (roots R).filter (fun B => (select B && decide (Contact R T A B n)) && decide (B ≤ A)) := by
+    unfold rankList
+    apply List.filter_congr
+    intro B _
+    by_cases hb : B ≤ A <;> by_cases hc : Contact R T A B n <;> simp [hb, hc]
+  have h2 : (roots R).filter (fun B => select B && decide (B < A ∧ Contact R T A B n)) =
+      (roots R).filter (fun B => (select B && decide (Contact R T A B n)) && decide (B < A)) := by
+    apply List.filter_congr
+    intro B _
+    by_cases hb : B < A <;> by_cases hc : Contact R T A B n <;> simp [hb, hc]
+  simpa only [rank, strictRank, h1, h2] using h
+
+/-- Every lost selected root-tick is charged to at least M distinct
+higher-priority full-cohort contacts at that tick. No discarded token
+needs to be reactivated. -/
+theorem rankDeath_pointwise_loss (R T M A u : Nat) (select : Nat → Bool)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0) (hu : u < T)
+    (hs : select A = true) :
+    M * (if liveAt (rankDeath R T M select) R T A u then 0 else 1) ≤
+      strictRank R T A select (observeStart R T A + (u : Int)) := by
+  by_cases h : liveAt (rankDeath R T M select) R T A u = true
+  · simp [h]
+  · have hn : ¬ rank R T A select (observeStart R T A + (u : Int)) ≤ M :=
+      fun hr => h ((rankDeath_observed_iff R T M A u select hT hR h6 hu).mpr ⟨hs, hr⟩)
+    have hr := rank_le_strict_add_one R T A select (observeStart R T A + (u : Int))
+    have hf : liveAt (rankDeath R T M select) R T A u = false := by
+      cases he : liveAt (rankDeath R T M select) R T A u <;> simp_all
+    simp [hf]
+    omega
+
+/-- First-contact weight in integer ticks. The contact predicate is
+monotone, so this is exactly T minus the clipped first contact offset. -/
+def contactTicks (R T A B : Nat) : Nat :=
+  ((List.range T).filter
+    (fun u => decide (Contact R T A B (observeStart R T A + (u : Int))))).length
+
+def firstContactOffset (R T A B : Nat) : Nat :=
+  ((List.range T).filter
+    (fun u => !decide (Contact R T A B (observeStart R T A + (u : Int))))).length
+
+theorem firstContact_spec (R T A B u : Nat) (hu : u < T) :
+    firstContactOffset R T A B ≤ u ↔
+      Contact R T A B (observeStart R T A + (u : Int)) := by
+  have hant : ∀ i j : Nat, i ≤ j →
+      (!decide (Contact R T A B (observeStart R T A + (j : Int)))) = true →
+      (!decide (Contact R T A B (observeStart R T A + (i : Int)))) = true := by
+    intro i j hij hj
+    simp only [Bool.not_eq_true, decide_eq_false_iff_not] at hj ⊢
+    exact fun hi => hj (contact_mono R T A B _ _ (by omega) hi)
+  have h := antitone_count_spec _ hant T u
+  change u < firstContactOffset R T A B ↔ _ at h
+  simp only [Bool.not_eq_true, decide_eq_false_iff_not, hu, true_and] at h
+  by_cases hc : Contact R T A B (observeStart R T A + (u : Int)) <;> simp_all <;> omega
+
+theorem contactTicks_add_offset (R T A B : Nat) :
+    contactTicks R T A B + firstContactOffset R T A B = T := by
+  unfold contactTicks firstContactOffset
+  generalize List.range T = xs
+  have h : xs.length = T := by simp_all
+  rw [← h]
+  clear h
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    cases hc : decide (Contact R T A B (observeStart R T A + (a : Int))) <;>
+      simp [hc] <;> omega
+
+#print axioms NegativeMIN.rankDeath_fullCapped
+#print axioms NegativeMIN.rankDeath_pointwise_loss
+#print axioms NegativeMIN.firstContact_spec
+#print axioms NegativeMIN.contactTicks_add_offset
+
 end NegativeMIN
