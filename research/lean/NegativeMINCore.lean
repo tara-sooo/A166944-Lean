@@ -359,7 +359,7 @@ theorem tick_height_pin (s : State) (hp : winner s ≠ 0) :
     have hx := Nat.div_add_mod (s.x + 1) p
     rw [hdiv.1, Nat.add_zero] at hx
     have hx' := congrArg (fun t : Nat => (t : Int)) hx
-    simp only [Int.ofNat_mul, Int.ofNat_add] at hx'
+    simp only [Int.natCast_mul, Int.natCast_add] at hx'
     rw [hdiv.2, Int.add_zero] at hn
     refine ⟨4 * j + ((s.x + 1) / p : Nat) - 1, ?_⟩
     change height2 (tick s) = (p : Int) * _ + (if (s.n + 1) % 2 = 0 then 0 else 6)
@@ -374,7 +374,7 @@ theorem tick_height_pin (s : State) (hp : winner s ≠ 0) :
     have hx := Nat.div_add_mod (s.x - 1) p
     rw [hdiv.2.1, Nat.add_zero] at hx
     have hx' := congrArg (fun t : Nat => (t : Int)) hx
-    simp only [Int.ofNat_mul] at hx'
+    simp only [Int.natCast_mul] at hx'
     rw [hdiv.2.2] at hn
     refine ⟨4 * j + ((s.x - 1) / p : Nat) + 1, ?_⟩
     change height2 (tick s) = (p : Int) * _ + (if (s.n + 1) % 2 = 0 then 0 else 6)
@@ -419,6 +419,121 @@ theorem canonical_gain_bound (A k : Nat) (he : A % 2 = 0) :
   · exact he
   · rw [birth_height2 A he]
     decide
+
+/-- No non-idle event can occur in an explicitly quiet prefix. -/
+theorem quiet_center (s : State) (k : Nat)
+    (h : ∀ j : Nat, j < k → winner (evolve s j) = 0) :
+    (evolve s k).x = s.x := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    have hk : winner (evolve s k) = 0 := h k (by omega)
+    have hpre : (evolve s k).x = s.x := ih (fun j hj => h j (by omega))
+    simp [evolve, tick, hk, hpre]
+
+theorem firstEvent_actual_pin (s : State) (w p : Nat)
+    (h : FirstEvent s w p) :
+    eligible s.x (s.n + (w : Int)) p = true := by
+  obtain ⟨hw, hp, hwin, hquiet⟩ := h
+  have hq := quiet_center s (w - 1) (fun j hj => hquiet j (by omega))
+  have hc := evolve_clock s (w - 1)
+  have hs : winner (evolve s (w - 1)) ≠ 0 := by omega
+  have he := winner_sound (evolve s (w - 1)) hs
+  have hclock : (evolve s (w - 1)).n + 1 = s.n + (w : Int) := by omega
+  rw [hq, hclock, hwin] at he
+  exact he
+
+theorem firstEvent_gain (s : State) (w p : Nat)
+    (h : FirstEvent s w p) :
+    (evolve s w).x + (p - 1) = s.x := by
+  obtain ⟨hw, _, hwin, hquiet⟩ := h
+  have hq := quiet_center s (w - 1) (fun j hj => hquiet j (by omega))
+  have hg := tick_gain_exact (evolve s (w - 1))
+  rw [hwin, hq] at hg
+  have hw' : w - 1 + 1 = w := by omega
+  simpa only [← evolve, hw'] using hg
+
+/-- The exact candidate calendar wait for either sign. A positive wait
+is required even if the current tick is itself congruent to the pin. -/
+def calendarWait (n : Int) (p : Nat) (plus : Bool) : Nat :=
+  ((((if plus then (p : Int) + 2 else 0) - n - 1) %
+    (2 * (p : Int))) + 1).toNat
+
+theorem calendarWait_pos_le (n : Int) (p : Nat) (plus : Bool)
+    (hp : 0 < p) :
+    0 < calendarWait n p plus ∧ calendarWait n p plus ≤ 2 * p := by
+  let r := (if plus then (p : Int) + 2 else 0) - n - 1
+  have hm : 0 ≤ r % (2 * (p : Int)) :=
+    Int.emod_nonneg _ (by omega)
+  have hl : r % (2 * (p : Int)) < 2 * (p : Int) :=
+    Int.emod_lt_of_pos _ (by omega)
+  change 0 < (r % (2 * (p : Int)) + 1).toNat ∧
+      (r % (2 * (p : Int)) + 1).toNat ≤ 2 * p
+  omega
+
+/-- The candidate calendar reaches its prescribed congruence, including
+the negative-clock case. For p≥3 both offsets lie in [0,2p). -/
+theorem calendarWait_pin (n : Int) (p : Nat) (plus : Bool)
+    (hp : 3 ≤ p) :
+    (n + (calendarWait n p plus : Int)) % (2 * (p : Int)) =
+      (if plus then (p : Int) + 2 else 0) := by
+  let t : Int := if plus then (p : Int) + 2 else 0
+  let m : Int := 2 * (p : Int)
+  let r := t - n - 1
+  have hm : 0 ≤ r % m := Int.emod_nonneg _ (by dsimp [m]; omega)
+  have h0 : 0 ≤ t := by cases plus <;> simp [t] <;> omega
+  have ht : t < m := by cases plus <;> simp [t, m] <;> omega
+  have hr := Int.emod_add_mul_ediv r m
+  have hc : (calendarWait n p plus : Int) = r % m + 1 := by
+    change ((r % m + 1).toNat : Int) = r % m + 1
+    omega
+  change (n + (calendarWait n p plus : Int)) % m = t
+  rw [hc]
+  have heq : n + (r % m + 1) = t - m * (r / m) := by
+    dsimp [r] at hr ⊢
+    omega
+  rw [heq, Int.sub_mul_emod_self_left]
+  exact Int.emod_eq_of_lt h0 ht
+
+/-- First hit has minimum clock, and at that clock minimum prime.
+This formulation compares to every eligible earlier tick without assuming
+that the proposed competitor actually wins. -/
+theorem firstEvent_minimum_tick (s : State) (w p v q : Nat)
+    (h : FirstEvent s w p) (hv : 0 < v)
+    (hq : 0 < q) (hb : q ≤ s.x + 1)
+    (he : eligible s.x (s.n + (v : Int)) q = true) :
+    w ≤ v := by
+  by_cases hc : w ≤ v
+  · exact hc
+  · have hquiet := h.2.2.2
+    have hqcenter := quiet_center s (v - 1) (fun j hj => hquiet j (by omega))
+    have hn := evolve_clock s (v - 1)
+    have hclock : (evolve s (v - 1)).n + 1 = s.n + (v : Int) := by omega
+    have hbound : q ≤ (evolve s (v - 1)).x + 1 := by simpa [hqcenter] using hb
+    have hel : eligible (evolve s (v - 1)).x
+        ((evolve s (v - 1)).n + 1) q = true := by simpa [hqcenter, hclock] using he
+    have hmin := winner_minimal (evolve s (v - 1)) q hq hbound hel
+    have hz := hquiet (v - 1) (by omega)
+    omega
+
+theorem firstEvent_minimum_label (s : State) (w p q : Nat)
+    (h : FirstEvent s w p) (hq : 0 < q) (hb : q ≤ s.x + 1)
+    (he : eligible s.x (s.n + (w : Int)) q = true) :
+    p ≤ q := by
+  have hw := h.1
+  have hqcenter := quiet_center s (w - 1) (fun j hj => h.2.2.2 j (by omega))
+  have hn := evolve_clock s (w - 1)
+  have hclock : (evolve s (w - 1)).n + 1 = s.n + (w : Int) := by omega
+  have hbound : q ≤ (evolve s (w - 1)).x + 1 := by simpa [hqcenter] using hb
+  have hel : eligible (evolve s (w - 1)).x
+      ((evolve s (w - 1)).n + 1) q = true := by simpa [hqcenter, hclock] using he
+  have hmin := winner_minimal (evolve s (w - 1)) q hq hbound hel
+  rw [h.2.2.1] at hmin
+  exact hmin.2
+
+#print axioms NegativeMIN.firstEvent_minimum_tick
+#print axioms NegativeMIN.firstEvent_minimum_label
+#print axioms NegativeMIN.calendarWait_pin
 
 #print axioms NegativeMIN.actual_twin_of_live_gap
 #print axioms NegativeMIN.unbounded_of_liveGap
