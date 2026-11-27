@@ -17,7 +17,7 @@ function audit(){
    cost.push(W*(2*sat+low));if(p)x-=p-1;n++;
   }
   let a=start-b;
-  return {A,x:states.slice(a),p:labels.slice(a),g:Array.from({length:T+1},(_,k)=>k===0?0:D*k-cost[a+k]),start};
+  return {A,fullx:states,fullp:labels,age:a,x:states.slice(a),p:labels.slice(a),g:Array.from({length:T+1},(_,k)=>k===0?0:D*k-cost[a+k]),start};
  }
  function group(rs,T){
   let nodes=[],keyed=new Map(),at=rs.map(()=>Array(T));
@@ -127,6 +127,45 @@ function audit(){
   return {primal,slack,prices};
  }
 
+
+ function transportPriceToEntries(rs,T,M,groups,sol){
+  let Q=6;for(let q of [30,210,2310])if(q<=6*M)Q=q;
+  let newSlack=sol.slack.slice(),prices=new Map(),foreign=0,native=0,maxInflation=0;
+  function add(u,x,p){let key=u+":"+x;prices.set(key,(prices.get(key)||0)+p)}
+  for(let j=0;j<groups.nodes.length;j++){
+   let p=sol.prices[j];if(!p)continue;let a=groups.nodes[j],u=a.u;
+   if(!u){add(0,a.x,p);continue}
+   let cell=Math.floor(a.x/Q),entries=new Map(),natives=[];
+   for(let i of a.ids){
+    let r=rs[i];
+    if(Math.floor(r.A/Q)===cell){natives.push(i);native++;continue}
+    foreign++;
+    let k=0;while(Math.floor(r.fullx[k]/Q)!==cell){k++;ck(k<=r.age+u,"entry exists")}
+    ck(k>0&&r.fullp[k-1]>0&&Q%r.fullp[k-1]!==0,"non-divisor boundary entry");
+    let e=Math.max(0,k-r.age),x=r.x[e],key=e+":"+x;ck(e<=u,"entry before price");
+    if(!entries.has(key))entries.set(key,{u:e,x,ids:[]});entries.get(key).ids.push(i);
+   }
+   ck(natives.length<=Q/6,"native root cap");ck(entries.size>0,"heavy merge contains foreign root");
+   for(let i of natives)newSlack[i]+=p;
+   let units=natives.length;
+   for(let e of entries.values()){
+    units+=Math.min(M,e.ids.length);
+    if(e.ids.length<M)for(let i of e.ids)newSlack[i]+=p;
+    else add(e.u,e.x,p);
+   }
+   maxInflation=Math.max(maxInflation,units/M);
+  }
+  let objective=M*[...prices.values()].reduce((s,x)=>s+x,0)+newSlack.reduce((s,x)=>s+x,0);
+  ck(objective>=sol.primal,"entry-restricted dual cannot improve optimum");
+  for(let i=0;i<rs.length;i++){
+   let tax=0;for(let k=1;k<=T;k++){
+    tax+=prices.get((k-1)+":"+rs[i].x[k-1])||0;
+    ck(tax+newSlack[i]>=rs[i].g[k],"transported dual still feasible");
+   }
+  }
+  return {objective,foreign,native,maxInflation};
+ }
+
  function endpointRank(rs,T,M,groups){
   let n=rs.length,H=1n;
   const gcdB=(a,b)=>{while(b){[a,b]=[b,a%b]}return a};
@@ -198,7 +237,7 @@ function audit(){
  let results=[];
  for(let config of [{R:600,T:18,M:1,count:34},{R:2400,T:36,M:2,count:60},{R:12000,T:72,M:4,count:100},{R:48000,T:144,M:8,count:100},{R:192000,T:288,M:16,count:100}]){
   let {R,T,M,count}=config,W=T,D=1,priceScale=Math.max(1,Math.floor(T/18));
-  let row={...config,rootCount:0,rawProfit:0,opt:0,cutM:0,cut2M:0,cut4M:0,price0:0,priceSmall:0,priceOther:0,priceReset:0,slack:0,groups:0,heavyGroups:0,positivePriceGroups:0,endpointBound:0,endpointNet:0,prioritySteps:0};
+  let row={...config,rootCount:0,rawProfit:0,opt:0,cutM:0,cut2M:0,cut4M:0,price0:0,priceSmall:0,priceOther:0,priceReset:0,slack:0,groups:0,heavyGroups:0,positivePriceGroups:0,endpointBound:0,endpointNet:0,prioritySteps:0,entryDual:0,entryNative:0,entryForeign:0,maxEntryInflation:0};
   let totalWindows=Math.ceil((Math.floor(R/6)+1)/(W/6)),chosen=new Set();
   for(let j=0;j<Math.min(count,totalWindows);j++)chosen.add(Math.floor(j*totalWindows/Math.min(count,totalWindows)));
   for(let j of chosen){
@@ -206,6 +245,7 @@ function audit(){
    if(!rs.length)continue;windows++;roots+=rs.length;row.rootCount+=rs.length;
    let gr=group(rs,T),sol=optimize(rs,T,M,gr,true);
    if(R<=2400||j===0){let raw=optimize(rs,T,M,gr,false);ck(raw.primal===sol.primal,"uncontracted optimizer matches");comparisons++}
+   let ed=transportPriceToEntries(rs,T,M,gr,sol);row.entryDual+=ed.objective;row.entryNative+=ed.native;row.entryForeign+=ed.foreign;row.maxEntryInflation=Math.max(row.maxEntryInflation,ed.maxInflation);
    let ep=endpointRank(rs,T,M,gr);ck(ep.net<=sol.primal,"endpoint net vs exact optimum");row.endpointBound+=ep.expected;row.endpointNet+=ep.net;row.prioritySteps+=ep.changes;
    row.rawProfit+=rs.reduce((s,r)=>s+Math.max(...r.g),0);row.opt+=sol.primal;row.slack+=sol.slack.reduce((s,x)=>s+x,0);
    for(let K of [M,2*M,4*M]){let q=cutoff(rs,T,M,gr,K);ck(q.best<=sol.primal,"cutoff lower vs exact optimum");row[K===M?"cutM":K===2*M?"cut2M":"cut4M"]+=q.best}
@@ -216,7 +256,7 @@ function audit(){
    }
   }
   ck(row.opt===row.slack+row.price0+row.priceSmall+row.priceOther,"dual aggregate");
-  row.normalizedEndpointBound=row.endpointBound/(row.rootCount*T);row.normalizedEndpointNet=row.endpointNet/(row.rootCount*T);row.normalizedOpt=row.opt/(row.rootCount*T);row.normalizedCutM=row.cutM/(row.rootCount*T);row.normalizedCut2M=row.cut2M/(row.rootCount*T);row.normalizedCut4M=row.cut4M/(row.rootCount*T);
+  row.entryDualRatio=row.entryDual/row.opt;row.normalizedEndpointBound=row.endpointBound/(row.rootCount*T);row.normalizedEndpointNet=row.endpointNet/(row.rootCount*T);row.normalizedOpt=row.opt/(row.rootCount*T);row.normalizedCutM=row.cutM/(row.rootCount*T);row.normalizedCut2M=row.cut2M/(row.rootCount*T);row.normalizedCut4M=row.cut4M/(row.rootCount*T);
   results.push(row);
  }
  return {assertions,cycles,windows,roots,ticks,comparisons,smallFiringHeavy,results};
