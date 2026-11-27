@@ -5029,4 +5029,172 @@ theorem optimalNet_boostedNarrow_comparison (R T M D z Y0 Y1 U wN wQ : Nat)
 #print axioms NegativeMIN.boostedNarrow_comparison
 #print axioms NegativeMIN.optimalNet_boostedNarrow_comparison
 
+/-! Actual least-factor and relay clock lemmas, needed for the
+fast-successor part of the forward sieve. -/
+
+theorem oddPrime_factor_exists (n : Nat) (h3 : 3≤n) (ho : n%2=1) :
+    ∃ p : Nat, oddPrime p=true ∧ n%p=0 ∧ p≤n := by
+  induction n using Nat.strongRecOn with
+  | ind n ih =>
+    by_cases hd : ∃ d : Nat, 2≤d ∧ d<n ∧ n%d=0
+    · obtain ⟨d,hd2,hdn,hdv⟩ := hd
+      have hdiv := Nat.div_add_mod n d
+      rw [hdv,Nat.add_zero] at hdiv
+      have hod : d%2=1 := by
+        have hm := congrArg (fun x : Nat => x%2) hdiv
+        rw [Nat.mul_mod,ho] at hm
+        by_cases h : d%2=0
+        · rw [h,Nat.zero_mul,Nat.zero_mod] at hm
+          omega
+        · omega
+      obtain ⟨p,hp,hpd,hpl⟩ := ih d hdn (by omega) hod
+      have hpdiv := Nat.dvd_trans (Nat.dvd_of_mod_eq_zero hpd) (Nat.dvd_of_mod_eq_zero hdv)
+      exact ⟨p,hp,Nat.mod_eq_zero_of_dvd hpdiv,by omega⟩
+    · have hp : oddPrime n=true := by
+        simp only [oddPrime,Bool.and_eq_true,decide_eq_true_eq,List.all_eq_true]
+        refine ⟨⟨h3,ho⟩,?_⟩
+        intro d hm
+        by_cases h : d<2
+        · exact Or.inl h
+        · exact Or.inr (fun hz => hd ⟨d,by omega,List.mem_range.mp hm,hz⟩)
+      exact ⟨n,hp,Nat.mod_self _,Nat.le_refl _⟩
+
+theorem leastOddFactor_sound (n : Nat) (h3 : 3≤n) (ho : n%2=1) :
+    oddPrime (leastOddFactor n)=true ∧ n%leastOddFactor n=0 ∧ leastOddFactor n≤n := by
+  obtain ⟨p,hp,hpd,hpl⟩ := oddPrime_factor_exists n h3 ho
+  obtain ⟨q,hq,he⟩ := range_find_le (fun r => oddPrime r && decide (n%r=0))
+    (n+1) p (by omega) (by simp [hp,hpd])
+  have hs := List.find?_some he
+  simp only [Bool.and_eq_true,decide_eq_true_eq] at hs
+  unfold leastOddFactor
+  rw [he]
+  exact ⟨hs.1,hs.2,by omega⟩
+
+theorem qmin_spatial (x : Nat) (h4 : 4≤x) (he : x%2=0) :
+    ∃ plus : Bool, SpatialFactor x (qmin x) plus ∧ qmin x≤x+1 := by
+  have ha := leastOddFactor_sound (x-1) (by omega) (by omega)
+  have hb := leastOddFactor_sound (x+1) (by omega) (by omega)
+  unfold qmin
+  by_cases h : leastOddFactor (x-1)≤leastOddFactor (x+1)
+  · rw [Nat.min_eq_left h]
+    exact ⟨true,⟨ha.1,by omega,ha.2.1⟩,by omega⟩
+  · rw [Nat.min_eq_right (by omega)]
+    exact ⟨false,⟨hb.1,hb.2.1⟩,hb.2.2⟩
+
+theorem firstEvent_wait_le_qmin (s : State) (w p : Nat)
+    (he : FirstEvent s w p) (h4 : 4≤s.x) (hEven : s.x%2=0) :
+    w≤2*qmin s.x := by
+  obtain ⟨plus,hf,hb⟩ := qmin_spatial s.x h4 hEven
+  exact firstEvent_wait_le_factor s w p (qmin s.x) plus he hf hb
+
+theorem earliest_le (P : Nat → Prop) (k : Nat) (h : ∃ i : Nat, i≤k ∧ P i) :
+    ∃ j : Nat, j≤k ∧ P j ∧ ∀ i : Nat, i<j → ¬P i := by
+  classical
+  induction k with
+  | zero =>
+    obtain ⟨i,hi,hp⟩ := h
+    have he : i=0 := by omega
+    subst i
+    exact ⟨0,Nat.le_refl _,hp,fun i hi => by omega⟩
+  | succ k ih =>
+    by_cases hprev : ∃ i : Nat, i≤k ∧ P i
+    · obtain ⟨j,hj,hp,hmin⟩ := ih hprev
+      exact ⟨j,by omega,hp,hmin⟩
+    · obtain ⟨i,hi,hp⟩ := h
+      have he : i=k+1 := by
+        by_cases hh : i≤k
+        · exact False.elim (hprev ⟨i,hh,hp⟩)
+        · omega
+      refine ⟨k+1,Nat.le_refl _,he ▸ hp,?_⟩
+      intro j hj hjp
+      exact hprev ⟨j,by omega,hjp⟩
+
+/-- All completed intermediate waits cost at most three times their
+actual gain; the final wait costs at most twice the least factor.
+No bounds on the number or identity of intermediate firings. -/
+theorem relay_wait_gain (s : State) (k : Nat)
+    (he : s.x%2=0) (h4 : 4≤(evolve s k).x)
+    (hw : winner (evolve s k)≠0) :
+    k+1≤3*gain s (evolve s k)+2*qmin (evolve s k).x := by
+  induction k using Nat.strongRecOn generalizing s with
+  | ind k ih =>
+    obtain ⟨j,hjk,hj,hmin⟩ := earliest_le (fun i => winner (evolve s i)≠0) k ⟨k,Nat.le_refl _,hw⟩
+    let p := winner (evolve s j)
+    have hFirst : FirstEvent s (j+1) p := by
+      refine ⟨by omega,by dsimp [p]; omega,?_,?_⟩
+      · simp [p]
+      · intro i hi
+        have hn := hmin i (by omega)
+        by_cases hz : winner (evolve s i)=0
+        · exact hz
+        · exact False.elim (hn hz)
+    by_cases hEq : j=k
+    · have hquiet := quiet_center s j (fun i hi => by
+        have hn := hmin i hi
+        by_cases hz : winner (evolve s i)=0
+        · exact hz
+        · exact False.elim (hn hz))
+      have hq := firstEvent_wait_le_qmin s (j+1) p hFirst (by rw [hEq] at hquiet; omega) he
+      rw [hEq] at hquiet hq
+      rw [hquiet]
+      exact Nat.le_trans hq (by omega)
+    · let s' := evolve s (j+1)
+      let k' := k-(j+1)
+      have hkj : j+1+k'=k := by dsimp [k']; omega
+      have hs := evolve_add s (j+1) k'
+      rw [hkj] at hs
+      change evolve s k=evolve s' k' at hs
+      have hp := firstEvent_wait_le_three_gain s (j+1) p hFirst
+      have hGain := firstEvent_gain s (j+1) p hFirst
+      have hRest := ih k' (by dsimp [k']; omega) s'
+        (evolve_even s (j+1) he) (by rw [← hs]; exact h4)
+        (by rw [← hs]; exact hw)
+      rw [← hs] at hRest
+      have hmono := evolve_center_le s (j+1)
+      have hmono' := evolve_center_le s' k'
+      rw [← hs] at hmono'
+      change s'.x≤s.x at hmono
+      change s'.x+(p-1)=s.x at hGain
+      unfold gain at hRest ⊢
+      omega
+
+theorem actual_two_clock_gap (A i j : Nat) (hA : A%2=0) (hij : i<j)
+    (hj : winner (orbit A j)≠0) (h4 : 4≤(orbit A j).x) :
+    j-i≤3*((orbit A (i+1)).x-(orbit A j).x)+2*qmin (orbit A j).x := by
+  let k := j-(i+1)
+  have he : i+1+k=j := by dsimp [k]; omega
+  have hs := evolve_add (birth A) (i+1) k
+  rw [he] at hs
+  change orbit A j=evolve (orbit A (i+1)) k at hs
+  have h := relay_wait_gain (orbit A (i+1)) k (evolve_even (birth A) (i+1) hA)
+    (by rw [← hs]; exact h4) (by rw [← hs]; exact hj)
+  rw [← hs] at h
+  unfold gain at h
+  omega
+
+theorem actual_adjacent_repeat_impossible (A i j p B : Nat) (hA : A%2=0)
+    (hij : i<j) (hp : 5≤p) (h1 : winner (orbit A i)=p)
+    (h2 : winner (orbit A j)=p) (hB : B<p-1)
+    (hgap : (orbit A (i+1)).x-(orbit A j).x≤B) : False := by
+  have h := repeat_relay_gain A i j p hA hij hp h1 h2
+  omega
+
+theorem actual_repeat_third_middle (A i j k p r : Nat) (hA : A%2=0)
+    (hij : i<j) (hjk : j<k) (hp : 5≤p)
+    (h1 : winner (orbit A i)=p) (h2 : winner (orbit A j)=r)
+    (h3 : winner (orbit A k)=p) (hr : 0<r) :
+    p≤r+((orbit A (i+1)).x-(orbit A j).x)+
+      ((orbit A (j+1)).x-(orbit A k).x) := by
+  have hg := repeat_relay_gain A i k p hA (by omega) hp h1 h3
+  have hmono := orbit_center_mono A (i+1) j (by omega)
+  have hmono2 := orbit_center_mono A (j+1) k (by omega)
+  have ht := tick_gain_exact (orbit A j)
+  rw [h2] at ht
+  change (orbit A (j+1)).x+(r-1)=(orbit A j).x at ht
+  omega
+
+#print axioms NegativeMIN.leastOddFactor_sound
+#print axioms NegativeMIN.actual_two_clock_gap
+#print axioms NegativeMIN.actual_repeat_third_middle
+
 end NegativeMIN
