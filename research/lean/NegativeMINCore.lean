@@ -709,7 +709,9 @@ theorem observedTwin_stays (R T A u k : Nat)
     have hw := observedTwin_next_idle R T A (u + k) hT hR h6 (by omega) hlarge htw
     have hnext : observedState R T A (u + (k + 1)) =
         tick (observedState R T A (u + k)) := by
-      simp only [observedState, orbit, Nat.add_assoc, evolve]
+      unfold observedState orbit
+      rw [show observeAge R T A + (u + (k + 1)) = (observeAge R T A + (u + k)) + 1 by omega]
+      rfl
     rw [hnext]
     simp [tick, hw, hpre]
 
@@ -754,7 +756,7 @@ theorem life_integral (deathAge : Nat → Nat) (R T A : Nat) :
         · exact False.elim (hh (h.mp he))
       simp [hh, hfalse]
   rw [hfilter, range_below_length]
-  omega [life_le deathAge R T A]
+  exact Nat.min_eq_right (life_le deathAge R T A)
 
 /-- Prefix events include the event on whose arrival a budget death occurs;
 pre-window events also count. Only observation time is truncated below. -/
@@ -832,7 +834,46 @@ theorem twin_above_of_scaled_live_estimate (deathAge : Nat → Nat)
   | cons x xs =>
     have hm : x ∈ twinSites R T := by rw [hl]; simp
     simp only [twinSites, List.mem_filter, decide_eq_true_eq] at hm
-    exact ⟨x, by omega [hm.2.1], hm.2.2⟩
+    have hloc := hm.2.1
+    exact ⟨x, by omega, hm.2.2⟩
+
+/-- Repeated finite weighted certificates imply unbounded actual twin
+centers. The hypotheses are the explicit scaled analytical estimate and
+strict survival surplus; neither is asserted to be automatic. -/
+theorem unbounded_of_scaled_live_family
+    (h : ∀ B : Nat, ∃ (R T M B0 z Y0 Y1 D wN wQ err : Nat) (deathAge : Nat → Nat),
+      B + 3*T + 6 < R ∧ 6 ≤ T ∧ 0 < M ∧ FullCapped deathAge R T M ∧
+      ScaledLiveEstimate deathAge R T M B0 z Y0 Y1 D wN wQ err ∧
+      wN * narrowCount deathAge R T z Y0 +
+        wQ * mediumCharge deathAge R T Y0 Y1 + err < D * liveTicks deathAge R T) :
+    UnboundedTwinCenters := by
+  intro B
+  obtain ⟨R, T, M, B0, z, Y0, Y1, D, wN, wQ, err, deathAge,
+    hlarge, _, _, _, hest, hgap⟩ := h B
+  exact twin_above_of_scaled_live_estimate deathAge R T M B0 z Y0 Y1 D wN wQ err B
+    hlarge hest hgap
+
+/-! Finite, independently generated controls. These are kernel-reduced
+specific examples, not evidence for a universal asymptotic theorem. -/
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 2000000 in
+example : orbit 36 5 = ⟨30, -10⟩ := by decide
+
+set_option maxRecDepth 10000 in
+set_option maxHeartbeats 2000000 in
+example : orbit 54 20 = ⟨30, -4⟩ := by decide
+
+set_option maxRecDepth 10000 in
+example : eligible 62 0 7 = true ∧ winner ⟨62, -1⟩ = 3 := by decide
+
+/-- Refutes coalescence based only on center, on actual canonical histories.
+Both times are from the same canonical root A=6. -/
+theorem center_only_coalescence_false :
+    (orbit 6 1).x = (orbit 6 6).x ∧
+    (orbit 6 2).x ≠ (orbit 6 7).x := by decide
+
+#print axioms NegativeMIN.unbounded_of_scaled_live_family
+#print axioms NegativeMIN.center_only_coalescence_false
 
 #print axioms NegativeMIN.observedTwin_stays
 #print axioms NegativeMIN.life_integral
