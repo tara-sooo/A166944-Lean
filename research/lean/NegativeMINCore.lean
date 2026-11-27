@@ -77,10 +77,10 @@ theorem firstLabel_sound (x : Nat) (n : Int) (b : Nat)
   induction b with
   | zero => simp [firstLabel] at h
   | succ b ih =>
-    simp only [firstLabel] at h ⊢
-    split at h ⊢
-    next hcond => exact hcond.2
-    next _ => exact ih h
+    by_cases hc : firstLabel x n b = 0 ∧ eligible x n (b + 1) = true
+    · simpa [firstLabel, hc] using hc.2
+    · have hb : firstLabel x n b ≠ 0 := by simpa [firstLabel, hc] using h
+      simpa [firstLabel, hc] using ih hb
 
 theorem firstLabel_le_of_eligible (x : Nat) (n : Int) (b q : Nat)
     (hq : 0 < q) (hb : q ≤ b) (he : eligible x n q = true) :
@@ -246,6 +246,10 @@ not a terminal proxy, and the arithmetic proof uses no asymptotic claim. -/
 def TwinCenter (x : Nat) : Prop :=
   2 ≤ x ∧ oddPrime (x - 1) = true ∧ oddPrime (x + 1) = true
 
+instance (x : Nat) : Decidable (TwinCenter x) := by
+  unfold TwinCenter
+  infer_instance
+
 def liveNonTwinTicks (deathAge : Nat → Nat) (R T : Nat) : Nat :=
   ((roots R).map (fun A =>
     ((List.range (life deathAge R T A)).filter (fun u =>
@@ -262,15 +266,163 @@ def LiveAbove (deathAge : Nat → Nat) (R T B : Nat) : Prop :=
   ∀ A : Nat, A ∈ roots R → ∀ u : Nat, u < life deathAge R T A →
     B < (observedState R T A u).x
 
-/-- Exact eventual target: the weighted analytic upper bound on non-twin
-live ticks and the independent lower bound must ultimately yield this strict
-finite gap on unbounded slabs. This is not declared as a proven theorem. -/
+/-- Finite-gap extraction obligation. This is not a replacement for the
+specific weighted asymptotic criterion; that criterion is recorded separately. -/
 def LiveGapTarget : Prop :=
   ∀ B : Nat, ∃ R T M : Nat, 6 ≤ T ∧ 0 < M ∧
     ∃ deathAge : Nat → Nat, Capped deathAge R T M ∧
       LiveAbove deathAge R T B ∧
       liveNonTwinTicks deathAge R T < liveTicks deathAge R T
 
+theorem liveNonTwin_eq_of_no_twin
+    (deathAge : Nat → Nat) (R T B : Nat)
+    (hAbove : LiveAbove deathAge R T B)
+    (hNo : ¬ LiveTwinAbove deathAge R T B) :
+    liveNonTwinTicks deathAge R T = liveTicks deathAge R T := by
+  unfold liveNonTwinTicks liveTicks
+  congr 1
+  apply List.map_congr_left
+  intro A hA
+  have hfilter :
+      (List.range (life deathAge R T A)).filter
+        (fun u => !(decide (TwinCenter (observedState R T A u).x))) =
+        List.range (life deathAge R T A) := by
+    apply List.filter_eq_self.mpr
+    intro u hu
+    have hul : u < life deathAge R T A := List.mem_range.mp hu
+    have hn : ¬ TwinCenter (observedState R T A u).x :=
+      fun ht => hNo ⟨A, hA, u, hul, hAbove A hA u hul, ht⟩
+    simp [hn]
+  rw [hfilter, List.length_range]
+
+theorem actual_twin_of_live_gap
+    (deathAge : Nat → Nat) (R T B : Nat)
+    (hAbove : LiveAbove deathAge R T B)
+    (hGap : liveNonTwinTicks deathAge R T < liveTicks deathAge R T) :
+    LiveTwinAbove deathAge R T B := by
+  classical
+  by_cases h : LiveTwinAbove deathAge R T B
+  · exact h
+  · have he := liveNonTwin_eq_of_no_twin deathAge R T B hAbove h
+    omega
+
+def UnboundedTwinCenters : Prop := ∀ B : Nat, ∃ x : Nat, B < x ∧ TwinCenter x
+
+theorem unbounded_of_liveGap (h : LiveGapTarget) : UnboundedTwinCenters := by
+  intro B
+  obtain ⟨R, T, M, _, _, deathAge, _, hAbove, hGap⟩ := h B
+  obtain ⟨A, _, u, _, hB, ht⟩ := actual_twin_of_live_gap deathAge R T B hAbove hGap
+  exact ⟨(observedState R T A u).x, hB, ht⟩
+
+/-- A pin modulo an odd label, together with evenness, implies
+nonnegative postheight. The lower bound 3-p comes from one real tick.
+Unlike a mere modulo-p estimate, parity excludes the spurious negative
+representative 6-p in the odd-clock branch. -/
+theorem nonnegative_of_height_pin (p H j c : Int)
+    (hp : 3 ≤ p) (hodd : p % 2 = 1)
+    (heven : H % 2 = 0) (hc : c = 0 ∨ c = 6)
+    (hfloor : 3 - p ≤ H) (hpin : H = p * j + c) : 0 ≤ H := by
+  have hj : j % 2 = 0 := by
+    have hmod := congrArg (fun t : Int => t % 2) hpin
+    rcases hc with rfl | rfl <;>
+      rw [heven, Int.add_emod, Int.mul_emod, hodd] at hmod <;> omega
+  by_cases h : 0 ≤ j
+  · have hm := Int.mul_nonneg (by omega : 0 ≤ p) h
+    omega
+  · have hle : j ≤ -2 := by omega
+    have hm := Int.mul_le_mul_of_nonneg_left hle (by omega : 0 ≤ p)
+    rw [Int.mul_comm p (-2)] at hm
+    omega
+
+/-- Actual postheight pins are obtained by retaining the exact signed
+clock and spatial quotient; no height invariant is assumed here. -/
+theorem tick_height_pin (s : State) (hp : winner s ≠ 0) :
+    ∃ j : Int, height2 (tick s) =
+      (winner s : Int) * j + (if (s.n + 1) % 2 = 0 then 0 else 6) := by
+  let p := winner s
+  have hprime := eligible_three_le s.x (s.n + 1) p (winner_sound s hp)
+  have he := winner_sound s hp
+  change eligible s.x (s.n + 1) p = true at he
+  simp only [eligible, Bool.and_eq_true] at he
+  have hg := tick_gain_exact s
+  change (tick s).x + (p - 1) = s.x at hg
+  have hcoord : height2 (tick s) =
+      2 * (s.n + 1) + (s.x : Int) - (p : Int) + 1 := by
+    simp only [height2, tick_clock]
+    omega
+  let j := (s.n + 1) / (2 * (p : Int))
+  have hn := Int.mul_ediv_add_emod (s.n + 1) (2 * (p : Int))
+  change (2 * (p : Int)) * j + (s.n + 1) % (2 * (p : Int)) = s.n + 1 at hn
+  by_cases hc : (s.n + 1) % 2 = 0
+  · rw [if_pos hc] at he
+    have hdiv := of_decide_eq_true he.2
+    have hx := Nat.div_add_mod (s.x + 1) p
+    rw [hdiv.1, Nat.add_zero] at hx
+    have hx' := congrArg (fun t : Nat => (t : Int)) hx
+    simp only [Int.ofNat_mul, Int.ofNat_add] at hx'
+    rw [hdiv.2, Int.add_zero] at hn
+    refine ⟨4 * j + ((s.x + 1) / p : Nat) - 1, ?_⟩
+    change height2 (tick s) = (p : Int) * _ + (if (s.n + 1) % 2 = 0 then 0 else 6)
+    rw [if_pos hc, hcoord]
+    have h4 : 2 * ((2 * (p : Int)) * j) = (p : Int) * (4 * j) := by
+      change 2 * ((2 * (p : Int)) * j) = (p : Int) * ((2 * 2) * j)
+      ac_rfl
+    rw [Int.mul_sub, Int.mul_add, ← h4, Int.mul_one]
+    omega
+  · rw [if_neg hc] at he
+    have hdiv := of_decide_eq_true he.2
+    have hx := Nat.div_add_mod (s.x - 1) p
+    rw [hdiv.2.1, Nat.add_zero] at hx
+    have hx' := congrArg (fun t : Nat => (t : Int)) hx
+    simp only [Int.ofNat_mul] at hx'
+    rw [hdiv.2.2] at hn
+    refine ⟨4 * j + ((s.x - 1) / p : Nat) + 1, ?_⟩
+    change height2 (tick s) = (p : Int) * _ + (if (s.n + 1) % 2 = 0 then 0 else 6)
+    rw [if_neg hc, hcoord]
+    have h4 : 2 * ((2 * (p : Int)) * j) = (p : Int) * (4 * j) := by
+      change 2 * ((2 * (p : Int)) * j) = (p : Int) * ((2 * 2) * j)
+      ac_rfl
+    rw [Int.mul_add, Int.mul_add, ← h4, Int.mul_one]
+    omega
+
+theorem tick_height_nonneg (s : State) (he : s.x % 2 = 0)
+    (hh : 0 ≤ height2 s) : 0 ≤ height2 (tick s) := by
+  by_cases hp : winner s = 0
+  · simp only [height2, tick, hp, Nat.zero_sub, Nat.sub_zero] at *
+    omega
+  · have hp' := eligible_three_le s.x (s.n + 1) (winner s) (winner_sound s hp)
+    obtain ⟨j, hj⟩ := tick_height_pin s hp
+    have he' := tick_even s he
+    have hg := tick_gain_exact s
+    have hn := tick_clock s
+    apply nonnegative_of_height_pin (winner s : Int) (height2 (tick s)) j
+      (if (s.n + 1) % 2 = 0 then 0 else 6)
+    · omega
+    · omega
+    · unfold height2
+      omega
+    · split <;> simp
+    · unfold height2 at hh ⊢
+      omega
+    · exact hj
+
+theorem evolve_height_nonneg (s : State) (k : Nat) (he : s.x % 2 = 0)
+    (hh : 0 ≤ height2 s) : 0 ≤ height2 (evolve s k) := by
+  induction k with
+  | zero => exact hh
+  | succ k ih => exact tick_height_nonneg _ (evolve_even s k he) ih
+
+theorem canonical_gain_bound (A k : Nat) (he : A % 2 = 0) :
+    (gain (birth A) (orbit A k) : Int) ≤ 6 + 2 * (k : Int) := by
+  apply gain_le_of_nonneg_height A k he
+  apply evolve_height_nonneg
+  · exact he
+  · rw [birth_height2 A he]
+    decide
+
+#print axioms NegativeMIN.actual_twin_of_live_gap
+#print axioms NegativeMIN.unbounded_of_liveGap
+#print axioms NegativeMIN.canonical_gain_bound
 #print axioms NegativeMIN.winner_minimal
 #print axioms NegativeMIN.coalescence
 #print axioms NegativeMIN.height_gain_identity
