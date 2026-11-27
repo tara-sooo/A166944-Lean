@@ -5483,7 +5483,8 @@ theorem peak_suffix (f : Nat → Int) (a k : Nat) :
     simp [runningPeak,netSuffix,Int.max_eq_left h]
   | succ k ih =>
     rw [Nat.add_succ,runningPeak,ih,runningPeak]
-    simp only [Nat.succ_eq_add_one]
+    change max (max (runningPeak f a) (f a+runningPeak (netSuffix f a) k)) (f (a+k+1)) =
+      max (runningPeak f a) (f a+max (runningPeak (netSuffix f a) k) (netSuffix f a (k+1)))
     have he : f a+netSuffix f a (k+1)=f (a+k+1) := by
       unfold netSuffix
       omega
@@ -5513,8 +5514,7 @@ theorem suffix_profit_sum (f : Nat → Int) (a k : Nat) :
     rw [List.range_succ,List.map_append,List.sum_append]
     simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Int.add_zero,ih]
     unfold recordProfit
-    rw [Nat.add_succ]
-    simp only [Nat.succ_eq_add_one]
+    rw [← Nat.add_assoc]
     omega
 
 theorem suffix_profit_peak (f : Nat → Int) (a k : Nat) :
