@@ -5771,4 +5771,161 @@ theorem same_box_gap (R H A i j : Nat) (hH : 0<H) (hij : i≤j)
 #print axioms NegativeMIN.narrow_box_error
 #print axioms NegativeMIN.same_box_gap
 
+
+/-! A repeat-free insertion principle for arbitrary actual orbit segments.
+This permits bounds on separated alphabets to be used after any contact,
+not only at canonical birth. -/
+
+theorem evolve_center_mono_segment (s : State) (i j : Nat) (h : i≤j) :
+    (evolve s j).x≤(evolve s i).x := by
+  have he : i+(j-i)=j := by omega
+  rw [← he,evolve_add]
+  exact evolve_center_le _ _
+
+theorem evolve_repeat_gap (s : State) (i j p : Nat) (he : s.x%2=0)
+    (hij : i<j) (hp : 5≤p) (h1 : winner (evolve s i)=p)
+    (h2 : winner (evolve s j)=p) :
+    2*(p-1)≤(evolve s i).x-(evolve s j).x := by
+  let a := evolve s i
+  let b := evolve s j
+  have ha : a.x%2=0 := evolve_even s i he
+  have hb : b.x%2=0 := evolve_even s j he
+  change winner a=p at h1
+  change winner b=p at h2
+  have hp' := eligible_three_le a.x (a.n+1) (winner a)
+    (winner_sound a (by omega))
+  obtain ⟨k,c,hac,hc⟩ := winner_source_pin a (by omega)
+  obtain ⟨l,e,hbc,he'⟩ := winner_source_pin b (by omega)
+  rw [h1] at hac hp'
+  rw [h2] at hbc
+  have hg := tick_gain_exact a
+  rw [h1] at hg
+  have hm := evolve_center_mono_segment s (i+1) j (by omega)
+  change b.x≤(tick a).x at hm
+  have hgap := repeat_pin_gap (a.x:Int) (b.x:Int) (p:Int) k l c e
+    (by omega) (by omega) (by omega) (by omega) hc he' hac hbc (by omega)
+  change 2*(p-1)≤a.x-b.x
+  omega
+
+theorem evolve_repeat_relay (s : State) (i j p : Nat) (he : s.x%2=0)
+    (hij : i<j) (hp : 5≤p) (h1 : winner (evolve s i)=p)
+    (h2 : winner (evolve s j)=p) :
+    p-1≤(evolve s (i+1)).x-(evolve s j).x := by
+  have hg := evolve_repeat_gap s i j p he hij hp h1 h2
+  have ht := tick_gain_exact (evolve s i)
+  rw [h1] at ht
+  change p-1≤(tick (evolve s i)).x-(evolve s j).x
+  omega
+
+def SupportGainBound (allowed : Nat → Prop) (B : Nat) : Prop :=
+  ∀ (s : State) (k : Nat), s.x%2=0 →
+    (∀ i : Nat, i<k → winner (evolve s i)=0 ∨ allowed (winner (evolve s i))) →
+    gain s (evolve s k)≤B
+
+theorem divisor_support_bound (Q : Nat) (hQ : 0<Q) (hQe : Q%2=0) :
+    SupportGainBound (fun p => Q%p=0) (Q-1) := by
+  intro s k he hd
+  have h := evolve_wall_gain s Q k hQ hQe he hd
+  omega
+
+/-- If the old alphabet has gain strictly less than p-1, two uses of
+p cannot occur without leaving the enlarged alphabet. -/
+theorem support_insert_once (allowed : Nat → Prop) (B p : Nat)
+    (hB : SupportGainBound allowed B) (hp : 5≤p) (hsep : B<p-1)
+    (s : State) (k : Nat) (he : s.x%2=0)
+    (hd : ∀ i : Nat, i<k →
+      winner (evolve s i)=0 ∨ allowed (winner (evolve s i)) ∨ winner (evolve s i)=p)
+    (i j : Nat) (hij : i<j) (hj : j<k)
+    (hiP : winner (evolve s i)=p) (hjP : winner (evolve s j)=p) : False := by
+  let t := evolve s (i+1)
+  let n := j-(i+1)
+  have hjEq : i+1+n=j := by dsimp [n]; omega
+  have hs (a : Nat) : evolve s (i+1+a)=evolve t a := evolve_add s (i+1) a
+  have hex : ∃ a : Nat, a≤n ∧ winner (evolve t a)=p := by
+    refine ⟨n,by omega,?_⟩
+    rw [← hs,hjEq]
+    exact hjP
+  obtain ⟨a,han,ha,hmin⟩ := earliest_le (fun a => winner (evolve t a)=p) n hex
+  have hb := hB t a (evolve_even s (i+1) he) (by
+    intro l hl
+    have hlt : i+1+l<k := by dsimp [n] at han; omega
+    have hh := hd (i+1+l) hlt
+    rw [hs] at hh
+    rcases hh with hz | hrest
+    · exact Or.inl hz
+    · rcases hrest with hold | hnew
+      · exact Or.inr hold
+      · exact False.elim (hmin l hl hnew))
+  have hnext : winner (evolve s (i+1+a))=p := by rw [hs]; exact ha
+  have hr := evolve_repeat_relay s i (i+1+a) p he (by omega) hp hiP hnext
+  rw [hs] at hr
+  change p-1≤gain t (evolve t a) at hr
+  omega
+
+theorem separated_support_insert (allowed : Nat → Prop) (B p : Nat)
+    (hB : SupportGainBound allowed B) (hp : 5≤p) (hsep : B<p-1) :
+    SupportGainBound (fun q => allowed q ∨ q=p) (2*B+p-1) := by
+  classical
+  intro s k he hd
+  by_cases hex : ∃ i : Nat, i<k ∧ winner (evolve s i)=p
+  · obtain ⟨i,hi,hiP⟩ := hex
+    have hno (l : Nat) (hl : l<k) (hne : l≠i) : winner (evolve s l)≠p := by
+      intro hlP
+      by_cases hli : l<i
+      · exact support_insert_once allowed B p hB hp hsep s k he hd l i hli hi hlP hiP
+      · exact support_insert_once allowed B p hB hp hsep s k he hd i l (by omega) hl hiP hlP
+    have hpre := hB s i he (by
+      intro l hl
+      rcases hd l (by omega) with hz | hrest
+      · exact Or.inl hz
+      · rcases hrest with hold | hnew
+        · exact Or.inr hold
+        · exact False.elim (hno l (by omega) (by omega) hnew))
+    let t := evolve s (i+1)
+    let n := k-(i+1)
+    have hk : i+1+n=k := by dsimp [n]; omega
+    have hs (l : Nat) : evolve s (i+1+l)=evolve t l := evolve_add s (i+1) l
+    have hpost := hB t n (evolve_even s (i+1) he) (by
+      intro l hl
+      have hlt : i+1+l<k := by dsimp [n] at hl; omega
+      have hh := hd (i+1+l) hlt
+      rw [hs] at hh
+      rcases hh with hz | hrest
+      · exact Or.inl hz
+      · rcases hrest with hold | hnew
+        · exact Or.inr hold
+        · exact False.elim (hno (i+1+l) hlt (by omega) (by rw [hs]; exact hnew)))
+    have ht := tick_gain_exact (evolve s i)
+    rw [hiP] at ht
+    have hfinish := hs n
+    rw [hk] at hfinish
+    have hm1 := evolve_center_le s i
+    have hm2 := evolve_center_le t n
+    have hm3 := evolve_center_le s k
+    change t.x+(p-1)=(evolve s i).x at ht
+    unfold gain at hpre hpost ⊢
+    rw [← hfinish] at hpost hm2
+    omega
+  · have h := hB s k he (by
+      intro l hl
+      rcases hd l hl with hz | hrest
+      · exact Or.inl hz
+      · rcases hrest with hold | hnew
+        · exact Or.inr hold
+        · exact False.elim (hex ⟨l,hl,hnew⟩))
+    omega
+
+theorem same_box_repeat_gap (R H A i j p : Nat) (hH : 0<H)
+    (hA : A%2=0) (hij : i<j) (hp : 5≤p)
+    (hiP : winner (orbit A i)=p) (hjP : winner (orbit A j)=p)
+    (hb : boxIndex R H A i=boxIndex R H A j) :
+    2*(p-1)<H ∧ j-i<H := by
+  have h := same_box_gap R H A i j hH (by omega) hb
+  have hr := actual_repeat_gap A i j p hA hij hp hiP hjP
+  omega
+
+#print axioms NegativeMIN.support_insert_once
+#print axioms NegativeMIN.separated_support_insert
+#print axioms NegativeMIN.same_box_repeat_gap
+
 end NegativeMIN
