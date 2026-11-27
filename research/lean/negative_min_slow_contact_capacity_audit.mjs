@@ -13,9 +13,9 @@ function audit(){
  for(let R of [12000,48000,192000]){
   const T=Math.ceil(8*Math.sqrt(2*R+1)),U=Math.max(7,Math.floor(R**.25)),Y=Math.max(U,Math.floor(T/40)),D=8;
   let keymap=new Map(),windows=0,localMerge=0,localSlowPair=0,localRough=0,localReset=0;
-  // Fixed absolute-clock windows: sample 4 windows of width 120 in slab.
+  // Fixed absolute-clock windows: sample 4 windows of width 1200 in slab.
   for(let j=0;j<4;j++){
-   const lo=6*Math.ceil((R+j*R/5)/6),hi=lo+120,start=3-lo/2,stop=start+T;
+   const lo=6*Math.ceil((R+j*R/5)/6),hi=lo+1200,start=3-lo/2,stop=start+T;
    let states=new Map();windows++;
    for(let A=lo;A<=hi;A+=6){
     roots++;let x=A,n=3-A/2,entry=n;
@@ -63,6 +63,18 @@ function audit(){
     }
     ok(states.size-nextStates.size===[...bins.values()].reduce((a,b)=>a+b.length-1,0),"exact mass loss");states=nextStates;
    }
+  }
+  // Supplement window samples by actual first arrivals throughout the slab.
+  for(let A=Math.ceil(R/6)*6;A<=2*R;A+=6){
+   let n=3-A/2,e=next(A,n);if(e.w<U||e.w>2*T)continue;
+   let y=A-e.p+1,nn=n+e.w;
+   let rec={x:A,y,p:e.p,s:e.s,n:nn,entry:nn,w:e.w};
+   ok(e.w<=2*qmin(A),"first wait");let h=y/2+nn,b=e.s===1?0:3,c=1-e.s;
+   ok(h>=0&&mod(h-b,e.p)===0&&mod(y-c,e.p)===0,"first arrival pins");
+   let l=literal(A,n,e.w);ok(l&&l.p===e.p&&l.w===e.w&&l.s===e.s,"first literal");
+   const key=y+","+nn;
+   if(!keymap.has(key))keymap.set(key,new Map());let mp=keymap.get(key);
+   if(!mp.has(e.p)||mp.get(e.p).w<rec.w)mp.set(e.p,rec);
   }
   for(let [key,mp] of keymap){
    let arr=[...mp.values()].filter(r=>r.w>=U);keys+=mp.size;
