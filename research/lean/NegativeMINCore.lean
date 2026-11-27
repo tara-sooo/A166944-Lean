@@ -6616,4 +6616,335 @@ theorem finite_support_event_bound (s : State) (K : Nat) (ps : List Nat)
 #print axioms NegativeMIN.supportSignature_no_return
 #print axioms NegativeMIN.finite_support_event_bound
 
+
+/-! History-dependent diversity counters. A chunk ends at a reset
+label or at its (D+1)-st distinct narrow label. All counters refer to
+completed actual ticks; the state is never used to modify MIN. -/
+structure ChunkStats where
+  seen : List Nat
+  saturated : Nat
+  nonempty : Nat
+  total : Nat
+  deriving Repr, DecidableEq
+
+def chunkInit : ChunkStats := ⟨[],0,0,0⟩
+
+def chunkStep (z Y reset D : Nat) (c : ChunkStats) (p : Nat) : ChunkStats :=
+  if reset≤p then {c with seen:=[]}
+  else if z<p ∧ p<Y then
+    let ne := c.nonempty + (if c.seen=[] then 1 else 0)
+    if p∈c.seen then {c with total:=c.total+1,nonempty:=ne}
+    else if D≤c.seen.length then ⟨[],c.saturated+1,ne,c.total+1⟩
+    else ⟨p::c.seen,c.saturated,ne,c.total+1⟩
+  else c
+
+def ChunkInvariant (D : Nat) (c : ChunkStats) : Prop :=
+  c.seen.Nodup ∧ c.seen.length≤D ∧
+    (D+1)*c.saturated+c.seen.length≤c.total ∧ c.nonempty≤c.total
+
+theorem chunkInit_inv (D : Nat) : ChunkInvariant D chunkInit := by
+  simp [ChunkInvariant,chunkInit]
+
+theorem chunkStep_inv (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
+    (hc : ChunkInvariant D c) :
+    ChunkInvariant D (chunkStep z Y reset D c p) := by
+  obtain ⟨hn,hl,hs,ht⟩ := hc
+  unfold chunkStep
+  split
+  next h => simp [ChunkInvariant,hn,hl]; omega
+  next h =>
+    split
+    next hp =>
+      dsimp only
+      by_cases hem : c.seen=[]
+      · have hlen : c.seen.length=0 := by simp [hem]
+        have hnot : p∉c.seen := by simp [hem]
+        by_cases hd : D≤c.seen.length
+        · have hD : D=0 := by omega
+          subst D
+          simp [ChunkInvariant,hem,hs,ht]
+          omega
+        · simp [ChunkInvariant,hem,hnot,hd]
+          omega
+      · have hlen : 0<c.seen.length := List.length_pos_iff.mpr hem
+        by_cases hm : p∈c.seen
+        · simp [ChunkInvariant,hm,hem,hn,hl]
+          omega
+        · by_cases hd : D≤c.seen.length
+          · have he : c.seen.length=D := by omega
+            simp [ChunkInvariant,hm,hd,hem,Nat.mul_add]
+            omega
+          · simp [ChunkInvariant,hm,hd,hem,hn,List.nodup_cons]
+            omega
+    next hp => exact ⟨hn,hl,hs,ht⟩
+
+theorem chunkStep_sat_mono (z Y reset D : Nat) (c : ChunkStats) (p : Nat) :
+    c.saturated≤(chunkStep z Y reset D c p).saturated := by
+  unfold chunkStep
+  split
+  · exact Nat.le_refl _
+  · split
+    · dsimp only
+      split
+      · exact Nat.le_refl _
+      · split <;> simp
+    · exact Nat.le_refl _
+
+theorem chunkStep_nonempty_mono (z Y reset D : Nat) (c : ChunkStats) (p : Nat) :
+    c.nonempty≤(chunkStep z Y reset D c p).nonempty := by
+  unfold chunkStep
+  split
+  · exact Nat.le_refl _
+  · split
+    · dsimp only
+      split
+      · omega
+      · split <;> omega
+    · exact Nat.le_refl _
+
+theorem chunkStep_total (z Y reset D : Nat) (c : ChunkStats) (p : Nat) (hY : Y≤reset) :
+    (chunkStep z Y reset D c p).total=c.total+(if z<p ∧ p<Y then 1 else 0) := by
+  unfold chunkStep
+  split
+  next h =>
+    have hn : ¬(z<p ∧ p<Y) := by omega
+    simp [hn]
+  next h =>
+    split
+    next hp =>
+      dsimp only
+      split
+      · simp [hp]
+      · split <;> simp [hp]
+    next hp => simp [hp]
+
+theorem chunkStep_seen_kept (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
+    (hreset : p<reset) (hs : (chunkStep z Y reset D c p).saturated=c.saturated) :
+    (∀ q∈c.seen,q∈(chunkStep z Y reset D c p).seen) ∧
+      (z<p ∧ p<Y → p∈(chunkStep z Y reset D c p).seen) := by
+  unfold chunkStep at hs ⊢
+  simp only [if_neg (by omega : ¬reset≤p)] at hs ⊢
+  by_cases hp : z<p ∧ p<Y
+  · simp only [if_pos hp] at hs ⊢
+    dsimp only at hs ⊢
+    by_cases hm : p∈c.seen
+    · simp [hm,hp]
+    · by_cases hd : D≤c.seen.length
+      · simp [hm,hd] at hs
+      · simp [hm,hd,hp]
+  · simp [hp]
+
+def chunkFold (z Y reset D : Nat) : ChunkStats → List Nat → ChunkStats
+  | c,[] => c
+  | c,p::ps => chunkFold z Y reset D (chunkStep z Y reset D c p) ps
+
+theorem chunkFold_append (z Y reset D : Nat) (c : ChunkStats) (xs ys : List Nat) :
+    chunkFold z Y reset D c (xs++ys)=
+      chunkFold z Y reset D (chunkFold z Y reset D c xs) ys := by
+  induction xs generalizing c with
+  | nil => rfl
+  | cons a xs ih => exact ih (chunkStep z Y reset D c a)
+
+theorem chunkFold_inv (z Y reset D : Nat) (c : ChunkStats) (xs : List Nat)
+    (h : ChunkInvariant D c) : ChunkInvariant D (chunkFold z Y reset D c xs) := by
+  induction xs generalizing c with
+  | nil => exact h
+  | cons a xs ih => exact ih _ (chunkStep_inv z Y reset D c a h)
+
+theorem chunkFold_sat_mono (z Y reset D : Nat) (c : ChunkStats) (xs : List Nat) :
+    c.saturated≤(chunkFold z Y reset D c xs).saturated := by
+  induction xs generalizing c with
+  | nil => exact Nat.le_refl _
+  | cons a xs ih =>
+    exact Nat.le_trans (chunkStep_sat_mono z Y reset D c a) (ih _)
+
+theorem chunkFold_nonempty_mono (z Y reset D : Nat) (c : ChunkStats) (xs : List Nat) :
+    c.nonempty≤(chunkFold z Y reset D c xs).nonempty := by
+  induction xs generalizing c with
+  | nil => exact Nat.le_refl _
+  | cons a xs ih =>
+    exact Nat.le_trans (chunkStep_nonempty_mono z Y reset D c a) (ih _)
+
+theorem chunkFold_total (z Y reset D : Nat) (c : ChunkStats) (xs : List Nat) (hY : Y≤reset) :
+    (chunkFold z Y reset D c xs).total=
+      c.total+(xs.filter (fun p => decide (z<p ∧ p<Y))).length := by
+  induction xs generalizing c with
+  | nil => simp [chunkFold]
+  | cons p xs ih =>
+    rw [chunkFold,ih,chunkStep_total _ _ _ _ _ _ hY]
+    by_cases hp : z<p ∧ p<Y <;> simp [hp] <;> omega
+
+/-- If a segment contains no reset and causes no saturation, all its
+narrow labels are retained in its final set, even with arbitrary repeats. -/
+theorem chunkFold_no_sat_support (z Y reset D : Nat) (c : ChunkStats) (xs : List Nat)
+    (hr : ∀ p∈xs,p<reset)
+    (hs : (chunkFold z Y reset D c xs).saturated=c.saturated) :
+    (∀ q∈c.seen,q∈(chunkFold z Y reset D c xs).seen) ∧
+      (∀ p∈xs,z<p ∧ p<Y → p∈(chunkFold z Y reset D c xs).seen) := by
+  induction xs generalizing c with
+  | nil => simp [chunkFold]
+  | cons p xs ih =>
+    let c' := chunkStep z Y reset D c p
+    have h1 := chunkStep_sat_mono z Y reset D c p
+    have h2 := chunkFold_sat_mono z Y reset D c' xs
+    change (chunkFold z Y reset D c' xs).saturated=c.saturated at hs
+    change c.saturated≤c'.saturated at h1
+    have he : c'.saturated=c.saturated := by omega
+    have hk := chunkStep_seen_kept z Y reset D c p (hr p (by simp)) he
+    have hf := ih c' (fun q hq => hr q (by simp [hq])) (by omega)
+    constructor
+    · intro q hq
+      exact hf.1 q (hk.1 q hq)
+    · intro q hq hqn
+      rcases List.mem_cons.mp hq with hq | hq
+      · subst q
+        exact hf.1 p (hk.2 hqn)
+      · exact hf.2 q hq hqn
+
+def labelTrace (s : State) (k : Nat) : List Nat :=
+  (List.range k).map (fun i => winner (evolve s i))
+
+def chunkAt (z Y reset D : Nat) (s : State) (k : Nat) : ChunkStats :=
+  chunkFold z Y reset D chunkInit (labelTrace s k)
+
+theorem chunkAt_inv (z Y reset D : Nat) (s : State) (k : Nat) :
+    ChunkInvariant D (chunkAt z Y reset D s k) :=
+  chunkFold_inv z Y reset D chunkInit _ (chunkInit_inv D)
+
+theorem labelTrace_succ (s : State) (k : Nat) :
+    labelTrace s (k+1)=labelTrace s k++[winner (evolve s k)] := by
+  unfold labelTrace
+  rw [List.range_succ,List.map_append]
+  rfl
+
+theorem chunkAt_succ (z Y reset D : Nat) (s : State) (k : Nat) :
+    chunkAt z Y reset D s (k+1)=
+      chunkStep z Y reset D (chunkAt z Y reset D s k) (winner (evolve s k)) := by
+  unfold chunkAt
+  rw [labelTrace_succ,chunkFold_append]
+  rfl
+
+theorem chunkAt_total (z Y reset D : Nat) (s : State) (k : Nat) (hY : Y≤reset) :
+    (chunkAt z Y reset D s k).total=pathCost (narrowInc z Y) s k := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    rw [chunkAt_succ,chunkStep_total _ _ _ _ _ _ hY,ih]
+    rfl
+
+theorem chunkAt_domination (z Y reset D : Nat) (s : State) (k : Nat) (hY : Y≤reset) :
+    (D+1)*(chunkAt z Y reset D s k).saturated≤pathCost (narrowInc z Y) s k ∧
+    (chunkAt z Y reset D s k).nonempty≤pathCost (narrowInc z Y) s k := by
+  have h := chunkAt_inv z Y reset D s k
+  have he := chunkAt_total z Y reset D s k hY
+  unfold ChunkInvariant at h
+  omega
+
+theorem chunkAt_sat_mono (z Y reset D : Nat) (s : State) (i j : Nat) (hij : i≤j) :
+    (chunkAt z Y reset D s i).saturated≤(chunkAt z Y reset D s j).saturated := by
+  induction j with
+  | zero =>
+    have h : i=0 := by omega
+    subst i
+    exact Nat.le_refl _
+  | succ j ih =>
+    by_cases h : i=j+1
+    · subst i; exact Nat.le_refl _
+    · rw [chunkAt_succ]
+      exact Nat.le_trans (ih (by omega)) (chunkStep_sat_mono _ _ _ _ _ _)
+
+theorem chunkAt_nonempty_mono (z Y reset D : Nat) (s : State) (i j : Nat) (hij : i≤j) :
+    (chunkAt z Y reset D s i).nonempty≤(chunkAt z Y reset D s j).nonempty := by
+  induction j with
+  | zero =>
+    have h : i=0 := by omega
+    subst i
+    exact Nat.le_refl _
+  | succ j ih =>
+    by_cases h : i=j+1
+    · subst i; exact Nat.le_refl _
+    · rw [chunkAt_succ]
+      exact Nat.le_trans (ih (by omega)) (chunkStep_nonempty_mono _ _ _ _ _ _)
+
+def historyBudgetDeadline (cost : Nat → Nat → Nat) (R T budget A : Nat) : Nat :=
+  ((List.range (observeAge R T A+T)).filter (fun i => decide (cost A (i+1)≤budget))).length
+
+theorem historyBudgetDeadline_spec (cost : Nat → Nat → Nat) (R T budget A i : Nat)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j) :
+    i<historyBudgetDeadline cost R T budget A ↔ i<observeAge R T A+T ∧ cost A (i+1)≤budget := by
+  unfold historyBudgetDeadline
+  rw [antitone_count_spec]
+  · simp
+  · intro a b hab hb
+    simp only [decide_eq_true_eq] at hb ⊢
+    exact Nat.le_trans (hm A _ _ (by omega)) hb
+
+theorem historyBudgetDeadline_budget (cost : Nat → Nat → Nat) (R T budget A : Nat)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j) (hz : ∀ A,cost A 0=0) :
+    cost A (prefixAge (historyBudgetDeadline cost R T budget) R T A)≤budget := by
+  let d := prefixAge (historyBudgetDeadline cost R T budget) R T A
+  by_cases hd : d=0
+  · change cost A d≤budget
+    rw [hd,hz]
+    omega
+  · have hlt : d-1<historyBudgetDeadline cost R T budget A := by
+      dsimp [d,prefixAge] at hd ⊢
+      omega
+    have h := (historyBudgetDeadline_spec cost R T budget A (d-1) hm).mp hlt
+    have he : d-1+1=d := by omega
+    rw [he] at h
+    exact h.2
+
+def historyBudgetClip (cost : Nat → Nat → Nat) (R T M budget : Nat) : Nat → Nat :=
+  deadlineClip R T M (historyBudgetDeadline cost R T budget)
+
+theorem historyBudgetClip_fullCapped (cost : Nat → Nat → Nat) (R T M budget : Nat) (hT : 6≤T) :
+    FullCapped (historyBudgetClip cost R T M budget) R T M :=
+  deadlineClip_fullCapped _ _ _ _ hT
+
+theorem historyBudgetClip_budget (cost : Nat → Nat → Nat) (R T M budget A : Nat)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j) (hz : ∀ A,cost A 0=0)
+    (hA : A∈roots R) :
+    cost A (prefixAge (historyBudgetClip cost R T M budget) R T A)≤budget :=
+  Nat.le_trans (hm A _ _ (deadlineClip_prefix_le R T M A (historyBudgetDeadline cost R T budget) hA))
+    (historyBudgetDeadline_budget cost R T budget A hm hz)
+
+theorem historyBudgetClip_live_exact (cost : Nat → Nat → Nat) (R T M budget : Nat) (hT : 6≤T) :
+    liveTicks (historyBudgetClip cost R T M budget) R T=
+      ((deadlineMasses R T (historyBudgetDeadline cost R T budget)).map (min M)).sum :=
+  deadlineClip_live_exact _ _ _ _ hT
+
+def diversityCost (z Y reset D wS wL A k : Nat) : Nat :=
+  wS*(chunkAt z Y reset D (birth A) k).saturated+
+    wL*(chunkAt z Y Y D (birth A) k).nonempty
+
+theorem diversityCost_mono (z Y reset D wS wL A i j : Nat) (hij : i≤j) :
+    diversityCost z Y reset D wS wL A i≤diversityCost z Y reset D wS wL A j := by
+  unfold diversityCost
+  have h1 := Nat.mul_le_mul_left wS (chunkAt_sat_mono z Y reset D (birth A) i j hij)
+  have h2 := Nat.mul_le_mul_left wL (chunkAt_nonempty_mono z Y Y D (birth A) i j hij)
+  omega
+
+theorem diversityCost_zero (z Y reset D wS wL A : Nat) :
+    diversityCost z Y reset D wS wL A 0=0 := by
+  simp [diversityCost,chunkAt,labelTrace,chunkFold,chunkInit]
+
+def diversityBudgetClip (R T M budget z Y reset D wS wL : Nat) : Nat → Nat :=
+  historyBudgetClip (diversityCost z Y reset D wS wL) R T M budget
+
+theorem diversityBudgetClip_budget (R T M budget z Y reset D wS wL A : Nat) (hA : A∈roots R) :
+    diversityCost z Y reset D wS wL A
+      (prefixAge (diversityBudgetClip R T M budget z Y reset D wS wL) R T A)≤budget :=
+  historyBudgetClip_budget _ _ _ _ _ A (diversityCost_mono z Y reset D wS wL)
+    (diversityCost_zero z Y reset D wS wL) hA
+
+theorem diversityBudgetClip_fullCapped (R T M budget z Y reset D wS wL : Nat) (hT : 6≤T) :
+    FullCapped (diversityBudgetClip R T M budget z Y reset D wS wL) R T M :=
+  historyBudgetClip_fullCapped _ _ _ _ _ hT
+
+#print axioms NegativeMIN.chunkFold_no_sat_support
+#print axioms NegativeMIN.chunkAt_domination
+#print axioms NegativeMIN.historyBudgetClip_budget
+#print axioms NegativeMIN.diversityBudgetClip_budget
+
 end NegativeMIN
