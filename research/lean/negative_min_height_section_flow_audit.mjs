@@ -36,17 +36,18 @@ function audit(){
     if(diff){changed++;defect+=F[a];b=a+1;if(trueRoute[b]>=0)routeDefect+=F[a]*Math.exp(-2*trueDist[b]*Math.log(L)/H)}
     if(b<0)continue;F[b]=Math.min(1,F[b]+wt(a,b)*F[a]);if(best[a]>=0&&(best[b]<0||best[a]<best[b]))best[b]=best[a];if(!diff&&safe[a]>=0&&(safe[b]<0||safe[a]<safe[b]))safe[b]=safe[a];
    }}
-   let res=0,resRoute=0,positive=0;
-   for(let a=0;a<N;a++){let r=Math.max(0,F[a]-Math.min(1,actualIncoming[a]));if(r<1e-12)continue;res+=r;positive++;if(trueRoute[a]>=0)resRoute+=r*Math.exp(-2*trueDist[a]*Math.log(L)/H);
+   let res=0,resRoute=0,positive=0,bySink=new Float64Array(Nx);
+   for(let a=0;a<N;a++){let r=Math.max(0,F[a]-Math.min(1,actualIncoming[a]));if(r<1e-12)continue;res+=r;positive++;if(trueRoute[a]>=0){let w=r*Math.exp(-2*trueDist[a]*Math.log(L)/H);resRoute+=w;bySink[trueRoute[a]]+=w;}
     let b=a,w=1;for(let k=1;k<=64;k++){if(b%S!==H){let t=to[b];if(t<0){w=0;break}w*=wt(b,t);b=t}if(k===1)look1+=r*w;if(k===8)look8+=r*w;if(k===64)look64+=r*w}
    }
-   let mass=0,sinks=0,good=0,safeSinks=0,safeMass=0,bestMass=0,nonrough=0,nonrough10=0,shortGain=0;for(let i=0;i<Nx;i++){let a=i*S+H;mass+=F[a];if(best[a]>=0){sinks++;let g=2*(best[a]-i);if(g<=4*H){good++;if(qm[i]<=H/2)nonrough++;if(qm[i]<=H/10)nonrough10++;if(g<=H/2)shortGain++}bestMass+=Math.exp(-g*Math.log(L)/H)}if(safe[a]>=0){safeSinks++;safeMass+=Math.exp(-2*(safe[a]-i)*Math.log(L)/H)}}
+   let perSinkLower=0,perSinkPositive=0,mass=0,sinks=0,good=0,safeSinks=0,safeMass=0,bestMass=0,nonrough=0,nonrough10=0,shortGain=0;for(let i=0;i<Nx;i++){let a=i*S+H;mass+=F[a];let lb=Math.max(0,F[a]-bySink[i]);perSinkLower+=lb;if(lb>1e-10)perSinkPositive++;if(best[a]>=0){sinks++;let g=2*(best[a]-i);if(g<=4*H){good++;if(qm[i]<=H/2)nonrough++;if(qm[i]<=H/10)nonrough10++;if(g<=H/2)shortGain++}bestMass+=Math.exp(-g*Math.log(L)/H)}if(safe[a]>=0){safeSinks++;safeMass+=Math.exp(-2*(safe[a]-i)*Math.log(L)/H)}}
    if(z===2*H+3)full={mass,sinks,good,nonrough,nonrough10,shortGain,restricted,literalChecks};
    for(let d of [defect,routeDefect,res,resRoute,look1,look8,look64])ok(full.mass+1e-6>=mass-d,"residual lower");
    ok(res<=defect+1e-6&&resRoute<=routeDefect+1e-6&&resRoute<=look64+1e-6&&look64<=look8+1e-6&&look8<=look1+1e-6&&look1<=res+1e-6,"residual order");
+   ok(perSinkLower<=full.mass+1e-6&&perSinkLower+1e-6>=Math.max(0,mass-resRoute)&&perSinkPositive<=full.sinks,"localized sink bound");
    ok(safeSinks<=full.sinks&&safeMass<=full.mass+1e-6,"safe witnesses");
    let fmt=x=>+x.toFixed(3);
-   rows.push({R,H,z,mass:fmt(mass),sinks,good,bestMass:fmt(bestMass),defect:fmt(defect),localResidual:fmt(res),positive,margin:fmt(mass-defect),localMargin:fmt(mass-res),look8Margin:fmt(mass-look8),look64Margin:fmt(mass-look64),routedMargin:fmt(mass-resRoute),safeSinks,safeMass:fmt(safeMass),changed,occ,full});
+   rows.push({R,H,z,mass:fmt(mass),sinks,good,bestMass:fmt(bestMass),defect:fmt(defect),localResidual:fmt(res),positive,margin:fmt(mass-defect),localMargin:fmt(mass-res),look8Margin:fmt(mass-look8),look64Margin:fmt(mass-look64),routedMargin:fmt(mass-resRoute),perSinkLower:fmt(perSinkLower),perSinkPositive,safeSinks,safeMass:fmt(safeMass),changed,occ,full});
   }
  }
  return rows;
