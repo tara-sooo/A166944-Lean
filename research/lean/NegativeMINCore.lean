@@ -7250,4 +7250,148 @@ theorem twin_above_of_soft_ensemble (cost : Nat → Nat → Nat)
 #print axioms NegativeMIN.ensembleSoftMass_lower
 #print axioms NegativeMIN.twin_above_of_soft_ensemble
 
+
+/-! Exact integer moments of any finite ensemble with pairwise nonpositive
+correlation of its indicator columns. Independent budget coordinates are
+one way to satisfy the hypothesis. -/
+def bit01 (b : Bool) : Nat := if b then 1 else 0
+
+def budgetMarginal {α β : Type} (bs : List β) (p : β → α → Bool) (a : α) : Nat :=
+  (bs.map (fun s => bit01 (p s a))).sum
+
+def budgetJoint {α β : Type} (bs : List β) (p : β → α → Bool) (a b : α) : Nat :=
+  (bs.map (fun s => bit01 (p s a)*bit01 (p s b))).sum
+
+def indicatorCounts {α β : Type} (xs : List α) (bs : List β)
+    (p : β → α → Bool) : List Nat :=
+  bs.map (fun s => (xs.map (fun a => bit01 (p s a))).sum)
+
+theorem budgetJoint_diag {α β : Type} (bs : List β) (p : β → α → Bool) (a : α) :
+    budgetJoint bs p a a=budgetMarginal bs p a := by
+  unfold budgetJoint budgetMarginal
+  congr 1
+  apply List.map_congr_left
+  intro s _
+  cases h : p s a <;> simp [bit01,h]
+
+theorem indicatorCounts_sum {α β : Type} (xs : List α) (bs : List β)
+    (p : β → α → Bool) :
+    (indicatorCounts xs bs p).sum=(xs.map (budgetMarginal bs p)).sum :=
+  sum_map_swap bs xs (fun s a => bit01 (p s a))
+
+theorem sum_product_pairs_core {α : Type} (xs : List α) (f : α → Nat) :
+    (xs.map f).sum*(xs.map f).sum =
+      (xs.map (fun a => (xs.map (fun b => f a*f b)).sum)).sum := by
+  have he : xs.map (fun a => (xs.map (fun b => f a*f b)).sum) =
+      xs.map (fun a => (xs.map f).sum*f a) := by
+    apply List.map_congr_left
+    intro a _
+    rw [sum_map_mul,Nat.mul_comm]
+  rw [he,sum_map_mul]
+
+theorem indicatorCounts_moment2 {α β : Type} (xs : List α) (bs : List β)
+    (p : β → α → Bool) :
+    moment2 (indicatorCounts xs bs p)=
+      (xs.map (fun a => (xs.map (budgetJoint bs p a)).sum)).sum := by
+  unfold moment2 indicatorCounts
+  simp only [List.map_map,Function.comp_def]
+  have he : bs.map (fun s => (xs.map (fun a => bit01 (p s a))).sum*
+        (xs.map (fun a => bit01 (p s a))).sum) =
+      bs.map (fun s => (xs.map (fun a => (xs.map (fun b =>
+        bit01 (p s a)*bit01 (p s b))).sum)).sum) := by
+    apply List.map_congr_left
+    intro s _
+    exact sum_product_pairs_core xs _
+  rw [he,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro a _
+  exact sum_map_swap bs xs (fun s b => bit01 (p s a)*bit01 (p s b))
+
+theorem indicatorCounts_weak_variance {α β : Type} [DecidableEq α]
+    (xs : List α) (bs : List β) (p : β → α → Bool) (hn : xs.Nodup)
+    (hpair : ∀ a∈xs,∀ b∈xs,a≠b →
+      bs.length*budgetJoint bs p a b≤budgetMarginal bs p a*budgetMarginal bs p b) :
+    bs.length*moment2 (indicatorCounts xs bs p)≤
+      bs.length*(indicatorCounts xs bs p).sum+
+      (indicatorCounts xs bs p).sum*(indicatorCounts xs bs p).sum := by
+  let K := bs.length
+  let m := budgetMarginal bs p
+  let S := (xs.map m).sum
+  rw [indicatorCounts_moment2,indicatorCounts_sum]
+  change K*(xs.map (fun a => (xs.map (budgetJoint bs p a)).sum)).sum≤K*S+S*S
+  have hr (a : α) (ha : a∈xs) :
+      K*(xs.map (budgetJoint bs p a)).sum≤K*m a+m a*S := by
+    have h := sum_map_le xs (fun b => K*budgetJoint bs p a b)
+      (fun b => (if a=b then K*m a else 0)+m a*m b) (by
+        intro b hb
+        by_cases he : a=b
+        · subst b
+          rw [budgetJoint_diag]
+          simp [m]
+        · simpa [he,m,K] using hpair a ha b hb he)
+    rw [sum_map_mul,sum_map_add,sum_map_mul] at h
+    have hi : (xs.map (fun b => if a=b then K*m a else 0)).sum=K*m a := by
+      have he : xs.map (fun b => if a=b then K*m a else 0) =
+          xs.map (fun b => (K*m a)*(if a=b then 1 else 0)) := by
+        apply List.map_congr_left
+        intro b _
+        by_cases hb : a=b <;> simp [hb]
+      rw [he,sum_map_mul,indicator_key_sum xs a hn]
+      simp [ha]
+    rw [hi] at h
+    exact h
+  have h := sum_map_le xs (fun a => K*(xs.map (budgetJoint bs p a)).sum)
+    (fun a => K*m a+m a*S) hr
+  rw [sum_map_mul,sum_map_add,sum_map_mul] at h
+  have he : (xs.map (fun a => m a*S)).sum=S*S := by
+    have he : xs.map (fun a => m a*S)=xs.map (fun a => S*m a) := by
+      apply List.map_congr_left
+      intro a _
+      exact Nat.mul_comm _ _
+    rw [he,sum_map_mul]
+  rw [he] at h
+  exact h
+
+def historyBinBit (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (budget : Nat → Nat) (A : Nat) : Bool :=
+  liveAt (individualHistoryDeadline cost R T budget) R T A b.1 &&
+    decide (obsKey R T A b.1=b.2)
+
+theorem historyBinMass_bits (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (budget : Nat → Nat) :
+    historyBinMass cost R T b budget=
+      ((roots R).map (fun A => bit01 (historyBinBit cost R T b budget A))).sum := by
+  unfold historyBinMass obsLiveFiber historyBinBit bit01
+  rw [List.filter_filter,filter_length_indicator]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  rw [Bool.and_comm]
+
+theorem ensembleBinMasses_bits (cost : Nat → Nat → Nat) (R T : Nat)
+    (bs : List (Nat → Nat)) (b : Nat × (Nat × Nat)) :
+    ensembleBinMasses cost R T bs b=
+      indicatorCounts (roots R) bs (historyBinBit cost R T b) := by
+  unfold ensembleBinMasses indicatorCounts
+  congr 1
+  apply List.map_congr_left
+  intro d _
+  exact historyBinMass_bits cost R T b d
+
+theorem ensembleBin_pairwise_variance (cost : Nat → Nat → Nat) (R T : Nat)
+    (bs : List (Nat → Nat)) (b : Nat × (Nat × Nat))
+    (hpair : ∀ A∈roots R,∀ B∈roots R,A≠B →
+      bs.length*budgetJoint bs (historyBinBit cost R T b) A B≤
+        budgetMarginal bs (historyBinBit cost R T b) A*
+        budgetMarginal bs (historyBinBit cost R T b) B) :
+    let xs := ensembleBinMasses cost R T bs b
+    bs.length*moment2 xs≤bs.length*xs.sum+xs.sum*xs.sum := by
+  dsimp only
+  rw [ensembleBinMasses_bits]
+  exact indicatorCounts_weak_variance _ _ _ (roots_nodup R) hpair
+
+#print axioms NegativeMIN.indicatorCounts_weak_variance
+#print axioms NegativeMIN.ensembleBin_pairwise_variance
+
 end NegativeMIN
