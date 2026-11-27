@@ -10019,9 +10019,8 @@ theorem mixedSupport_gain (allowed : Nat → Bool) (B P : Nat)
         intro j hj h
         have hidx : a+j<k := by omega
         have heq : evolve s (a+j)=evolve t j := evolve_add s a j
-        apply hP (a+j) hidx
-        rw [heq]
-        exact h
+        rw [← heq]
+        exact hP (a+j) hidx (by rw [heq]; exact h)
       have htailBound := ih m hm t ht htail
       have hg := gain_evolve_add s a m
       rw [hk] at hg
@@ -10044,12 +10043,13 @@ theorem mixedSupport_gain (allowed : Nat → Bool) (B P : Nat)
       change gain s (evolve s k)=gain s t+gain t (evolve t m) at hg
       change gain s t≤B+P at hga
       rw [hc,hc1]
-      have hEq : (1+exceptionCount allowed t m+1)*B=
-          (exceptionCount allowed t m+1)*B+B := by
-        have h : 1+exceptionCount allowed t m+1=(exceptionCount allowed t m+1)+1 := by omega
-        rw [h,Nat.add_mul,Nat.one_mul]
-      rw [hEq,Nat.add_mul,Nat.one_mul]
-      omega
+      calc
+        gain s (evolve s k) = gain s t+gain t (evolve t m) := hg
+        _ ≤ (B+P)+((exceptionCount allowed t m+1)*B+exceptionCount allowed t m*P) :=
+          Nat.add_le_add hga htailBound
+        _ = (1+exceptionCount allowed t m+1)*B+(1+exceptionCount allowed t m)*P := by
+          simp only [Nat.add_mul,Nat.one_mul]
+          omega
     · have hpre : ∀ j : Nat,j<k → winner (evolve s j)=0 ∨ allowed (winner (evolve s j))=true := by
         intro j hj
         by_cases hz : winner (evolve s j)=0
@@ -10078,7 +10078,7 @@ theorem completed_segment_wait_bound (s : State) (k : Nat)
     let w := j+1
     let p := winner (evolve s j)
     have hw : FirstEvent s w p := by
-      refine ⟨by dsimp [w]; omega,hwin,?_,?_⟩
+      refine ⟨by dsimp [w]; omega,by dsimp [p]; omega,?_,?_⟩
       · have he : w-1=j := by dsimp [w]; omega
         rw [he]
       · intro i hi
