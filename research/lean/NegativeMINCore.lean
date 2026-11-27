@@ -5335,4 +5335,133 @@ theorem deadlineClip_cost_le (R T M : Nat) (d : Nat → Nat) (c : Nat → Nat �
 #print axioms NegativeMIN.deadlineClip_sharp_moment
 #print axioms NegativeMIN.deadlineClip_cost_le
 
+/-! Apply the sharp clip moment to record profit itself, rather than
+to all cheap ticks. Each threshold of each physical bin is one item. -/
+
+def recordMasses (inc : State → Nat) (D R T : Nat) : List Nat :=
+  (obsBins R T).flatMap (fun b => (List.range D).map (fun t =>
+    recordMass inc D R T b.2.1 b.2.2 (obsClock R T b.2.1 b.1) t))
+
+theorem recordMasses_clip (inc : State → Nat) (D R T M : Nat) :
+    ((recordMasses inc D R T).map (min M)).sum=optimalRecordMass inc D R T M := by
+  unfold recordMasses optimalRecordMass
+  rw [sum_map_flatMap]
+  congr 1
+  apply List.map_congr_left
+  intro b _
+  simp only [List.map_map,Function.comp_def]
+
+theorem optimalNet_record_sharp (inc : State → Nat) (D R T M : Nat)
+    (hT : 6≤T) (hM : 0<M) :
+    let xs := recordMasses inc D R T
+    (M*xs.sum*xs.sum:Int)≤
+      policyNet inc D R T (optimalNetDeath inc D R T M) *
+        (((M-1)*xs.sum+moment2 xs : Nat):Int) := by
+  dsimp only
+  rw [optimalNetDeath_formula]
+  have h := clip_sharp (recordMasses inc D R T) M hM
+  rw [recordMasses_clip] at h
+  have hi := Int.ofNat_le.mpr h
+  simpa only [Int.natCast_mul] using hi
+
+/-- Layer-cake identity for the square of threshold multiplicity. -/
+theorem threshold_square_pair {α : Type} (xs : List α) (w : α → Nat) (D : Nat)
+    (hw : ∀ a∈xs,w a≤D) :
+    ((List.range D).map (fun t => let m := (xs.filter (fun a => decide (t<w a))).length
+      m*m)).sum =
+      (xs.map (fun a => (xs.map (fun b => min (w a) (w b))).sum)).sum := by
+  have he : ∀ t : Nat, let m := (xs.filter (fun a => decide (t<w a))).length
+      m*m=(xs.map (fun a => (xs.map (fun b =>
+        if t<w a ∧ t<w b then 1 else 0)).sum)).sum := by
+    intro t
+    dsimp only
+    let f := fun a => if t<w a then 1 else 0
+    have hf : (xs.filter (fun a => decide (t<w a))).length=(xs.map f).sum := by
+      rw [filter_length_indicator]
+      rfl
+    rw [hf]
+    have he1 : (xs.map (fun a => (xs.map (fun b =>
+        if t<w a ∧ t<w b then 1 else 0)).sum)).sum =
+        (xs.map (fun a => f a*(xs.map f).sum)).sum := by
+      congr 1
+      apply List.map_congr_left
+      intro a _
+      rw [← sum_map_mul]
+      congr 1
+      apply List.map_congr_left
+      intro b _
+      unfold f
+      by_cases h1 : t<w a <;> by_cases h2 : t<w b <;> simp [h1,h2]
+    rw [he1]
+    have he2 : xs.map (fun a => f a*(xs.map f).sum) =
+        xs.map (fun a => (xs.map f).sum*f a) := by
+      apply List.map_congr_left
+      intro a _
+      exact Nat.mul_comm _ _
+    rw [he2,sum_map_mul]
+  have hsum : (List.range D).map (fun t => let m := (xs.filter (fun a => decide (t<w a))).length
+      m*m) = (List.range D).map (fun t => (xs.map (fun a => (xs.map (fun b =>
+        if t<w a ∧ t<w b then 1 else 0)).sum)).sum) := by
+    apply List.map_congr_left
+    intro t _
+    exact he t
+  rw [hsum,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro a ha
+  rw [sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  have hh : (List.range D).map (fun t => if t<w a ∧ t<w b then 1 else 0)=
+      (List.range D).map (fun t => if decide (t<min (w a) (w b)) then 1 else 0) := by
+    apply List.map_congr_left
+    intro t _
+    by_cases h1 : t<w a <;> by_cases h2 : t<w b <;> simp [h1,h2, Nat.lt_min]
+  rw [hh,← filter_length_indicator,range_below_length]
+  exact Nat.min_eq_right (Nat.le_trans (Nat.min_le_left _ _) (hw a ha))
+
+/-- The record energy counts ordered pairs, with weight equal to
+their shared profitable increment, not their entire shared time. -/
+def binProfitPairs (inc : State → Nat) (D R T J x : Nat) (n : Int) : Nat :=
+  let xs := fullFiber R T J x n
+  let w := fun A => physicalProfit inc D R T A n
+  (xs.map (fun a => (xs.map (fun b => min (w a) (w b))).sum)).sum
+
+theorem recordEnergy_pairs (inc : State → Nat) (D R T : Nat) :
+    moment2 (recordMasses inc D R T)=
+      ((obsBins R T).map (fun b =>
+        binProfitPairs inc D R T b.2.1 b.2.2 (obsClock R T b.2.1 b.1))).sum := by
+  unfold moment2 recordMasses
+  rw [sum_map_flatMap]
+  congr 1
+  apply List.map_congr_left
+  intro b _
+  simp only [List.map_map,Function.comp_def]
+  unfold binProfitPairs recordMass
+  exact threshold_square_pair _ _ D (fun a _ => profitNat_le inc D R T a _)
+
+theorem recordMasses_sum (inc : State → Nat) (D R T : Nat) :
+    (recordMasses inc D R T).sum=optimalRecordMass inc D R T (roots R).length := by
+  rw [← recordMasses_clip]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  unfold recordMasses at hb
+  obtain ⟨key,_,hk⟩ := List.mem_flatMap.mp hb
+  obtain ⟨t,_,ht⟩ := List.mem_map.mp hk
+  subst b
+  have h1 := List.length_filter_le
+    (fun A => decide (t<physicalProfit inc D R T A (obsClock R T key.2.1 key.1)))
+    (fullFiber R T key.2.1 key.2.2 (obsClock R T key.2.1 key.1))
+  have h2 : (fullFiber R T key.2.1 key.2.2 (obsClock R T key.2.1 key.1)).length≤(roots R).length := by
+    unfold fullFiber
+    exact List.length_filter_le _ _
+  unfold recordMass
+  rw [Nat.min_eq_right (Nat.le_trans h1 h2)]
+
+#print axioms NegativeMIN.optimalNet_record_sharp
+#print axioms NegativeMIN.recordEnergy_pairs
+#print axioms NegativeMIN.recordMasses_sum
+
 end NegativeMIN
