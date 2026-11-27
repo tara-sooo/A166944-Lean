@@ -2521,4 +2521,326 @@ theorem cheapRankDeath_optimal (inc : State → Nat) (R T M budget : Nat)
 #print axioms NegativeMIN.winner_le_age
 #print axioms NegativeMIN.cheapRankDeath_optimal
 
+/-! Exact individualized budget optimization. At a live pre-tick
+state, reserve the cost of the NEXT tick. The offset is fixed per
+root and does not change the physical transition. This pays for
+the killing tick without overshoot. -/
+
+def payScore (inc : State → Nat) (offset : Nat → Nat) (A : Nat) (n : Int) : Nat :=
+  physicalCost inc A (n+1) + offset A
+
+theorem pay_priority_mono (inc : State → Nat) (offset : Nat → Nat)
+    (R T A B : Nat) (n m : Int) (hn : n ≤ m)
+    (hc : Contact R T A B n)
+    (hp : Precedes (fun a => payScore inc offset a n) B A) :
+    Precedes (fun a => payScore inc offset a m) B A := by
+  have hc' := contact_mono R T A B n (n+1) (by omega) hc
+  have hk : n+1+((m-n).toNat : Int) = m+1 := by omega
+  have ha := physicalCost_advance inc A (n+1) (m-n).toNat hc'.1
+  have hb := physicalCost_advance inc B (n+1) (m-n).toNat hc'.2.1
+  rw [hk, hc'.2.2.2] at ha
+  rw [hk] at hb
+  simp only [Precedes, payScore] at hp ⊢
+  omega
+
+def payRank (inc : State → Nat) (offset : Nat → Nat) (R T A : Nat) (n : Int) : Nat :=
+  ((roots R).filter (fun B => decide (Contact R T A B n ∧
+    Precedes (fun a => payScore inc offset a n) B A))).length
+
+theorem payRank_mono (inc : State → Nat) (offset : Nat → Nat) (R T A : Nat) (n m : Int)
+    (h : n ≤ m) : payRank inc offset R T A n ≤ payRank inc offset R T A m := by
+  unfold payRank
+  apply filter_len_mono
+  intro B _ hb
+  simp only [decide_eq_true_eq] at hb ⊢
+  exact ⟨contact_mono R T A B n m h hb.1,
+    pay_priority_mono inc offset R T A B n m h hb.1 hb.2⟩
+
+def payOK (inc : State → Nat) (offset : Nat → Nat) (R T M budget A i : Nat) : Bool :=
+  decide (pathCost inc (birth A) (i+1) + offset A ≤ budget ∧
+    payRank inc offset R T A ((birth A).n + (i : Int)) ≤ M)
+
+theorem payOK_antitone (inc : State → Nat) (offset : Nat → Nat) (R T M budget A i j : Nat)
+    (h : i ≤ j) (hj : payOK inc offset R T M budget A j = true) :
+    payOK inc offset R T M budget A i = true := by
+  simp only [payOK, decide_eq_true_eq] at hj ⊢
+  exact ⟨by have hh := pathCost_mono inc (birth A) (i+1) (j+1) (by omega); omega,
+    Nat.le_trans (payRank_mono inc R T A _ _ (by omega)) hj.2⟩
+
+def payDeath (inc : State → Nat) (offset : Nat → Nat) (R T M budget A : Nat) : Nat :=
+  ((List.range (observeAge R T A + T)).filter
+    (payOK inc offset R T M budget A)).length
+
+theorem payDeath_spec (inc : State → Nat) (offset : Nat → Nat) (R T M budget A i : Nat) :
+    i < payDeath inc offset R T M budget A ↔
+      i < observeAge R T A + T ∧ pathCost inc (birth A) (i+1) + offset A ≤ budget ∧
+        payRank inc offset R T A ((birth A).n + (i : Int)) ≤ M := by
+  unfold payDeath
+  rw [antitone_count_spec _ (payOK_antitone inc R T M budget A)]
+  simp [payOK]
+
+/-- Cheapness and rank characterize actual irreversible survival at any
+physical tick in the window, including all pre-observation births. -/
+theorem payDeath_phys_iff (inc : State → Nat) (offset : Nat → Nat) (R T M budget A : Nat) (n : Int)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0)
+    (hb : (birth A).n ≤ n) (he : n < observeStart R T A + (T : Int)) :
+    physicalLiveAt (payDeath inc offset R T M budget) R T A n = true ↔
+      payScore inc offset A n ≤ budget ∧ payRank inc offset R T A n ≤ M := by
+  have hstart := observeStart_ge_birth R T A hT hR h6
+  have ha : physicalAge A n < observeAge R T A + T := by
+    unfold physicalAge observeAge
+    omega
+  have hclock : (birth A).n + (physicalAge A n : Int) = n := by
+    unfold physicalAge
+    omega
+  have hs : physicalAge A (n+1) = physicalAge A n + 1 := by
+    unfold physicalAge
+    omega
+  simp only [physicalLiveAt, decide_eq_true_eq, hb, he, true_and,
+    payDeath_spec, ha, hclock, payScore, physicalCost, hs]
+
+/-- The full (uncapped) cheap fiber at a physical tick. -/
+def payFiber (inc : State → Nat) (offset : Nat → Nat) (R T budget J x : Nat) (n : Int) : List Nat :=
+  (roots R).filter (fun A => decide ((birth A).n ≤ n ∧
+    n < observeStart R T A + (T : Int) ∧ windowId R T A = J ∧
+    (physicalState A n).x = x ∧ payScore inc offset A n ≤ budget))
+
+theorem payFiber_localRank (inc : State → Nat) (offset : Nat → Nat) (R T budget J x A : Nat) (n : Int)
+    (hA : A ∈ payFiber inc offset R T budget J x n) :
+    localRank (payFiber inc offset R T budget J x n) (fun a => payScore inc offset a n) A =
+      payRank inc offset R T A n := by
+  have ha := (List.mem_filter.mp hA).2
+  simp only [decide_eq_true_eq] at ha
+  unfold localRank payFiber payRank
+  rw [List.filter_filter]
+  apply congrArg List.length
+  apply List.filter_congr
+  intro B _
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true, decide_eq_true_eq]
+  constructor
+  · intro h
+    refine ⟨contact_of_center R T A B n ha.1 h.2.1
+      (ha.2.2.1.trans h.2.2.2.1.symm) (ha.2.2.2.1.trans h.2.2.2.2.1.symm), h.1⟩
+  · intro h
+    have hc := h.1
+    have hobs := contact_same_window_end R T A B hc.2.2.1
+    have hx := congrArg State.x hc.2.2.2
+    have hcost : payScore inc offset B n ≤ payScore inc offset A n := by
+      have hp := h.2
+      simp only [Precedes] at hp
+      omega
+    refine ⟨h.2, hc.2.1, ?_, hc.2.2.1.symm.trans ha.2.2.1,
+      hx.symm.trans ha.2.2.2.1, Nat.le_trans hcost ha.2.2.2.2⟩
+    rw [← hobs]
+    exact ha.2.1
+
+theorem payDeath_fiber_eq (inc : State → Nat) (offset : Nat → Nat) (R T M budget J x : Nat) (n : Int)
+    (hT : 6 ≤ T) :
+    physicalFiber (payDeath inc offset R T M budget) R T J x n =
+      rankClip (payFiber inc offset R T budget J x n) (fun a => payScore inc offset a n) M := by
+  unfold physicalFiber rankClip
+  change _ = (((roots R).filter (fun A => decide ((birth A).n ≤ n ∧
+    n < observeStart R T A + (T : Int) ∧ windowId R T A = J ∧
+    (physicalState A n).x = x ∧ payScore inc offset A n ≤ budget))).filter
+      (fun a => decide (localRank (payFiber inc offset R T budget J x n)
+        (fun a => payScore inc offset a n) a ≤ M)))
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hr
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true, decide_eq_true_eq]
+  constructor
+  · intro h
+    have hp := h.1
+    simp only [physicalLiveAt, decide_eq_true_eq] at hp
+    have hc := (payDeath_phys_iff inc R T M budget A n hT hr.2.1 hr.2.2 hp.1 hp.2.1).mp h.1
+    have hmem : A ∈ payFiber inc offset R T budget J x n :=
+      List.mem_filter.mpr ⟨hA, by simp only [decide_eq_true_eq]; exact
+        ⟨hp.1, hp.2.1, h.2.1, h.2.2, hc.1⟩⟩
+    refine ⟨?_, hp.1, hp.2.1, h.2.1, h.2.2, hc.1⟩
+    rw [payFiber_localRank inc R T budget J x A n hmem]
+    exact hc.2
+  · intro h
+    have hmem : A ∈ payFiber inc offset R T budget J x n :=
+      List.mem_filter.mpr ⟨hA, by simpa only [decide_eq_true_eq] using h.2⟩
+    have hk := h.1
+    rw [payFiber_localRank inc R T budget J x A n hmem] at hk
+    refine ⟨(payDeath_phys_iff inc R T M budget A n hT hr.2.1 hr.2.2
+      h.2.1 h.2.2.1).mpr ⟨h.2.2.2.2.2, hk⟩, h.2.2.2.1, h.2.2.2.2.1⟩
+
+theorem payDeath_exact (inc : State → Nat) (offset : Nat → Nat) (R T M budget J x : Nat) (n : Int)
+    (hT : 6 ≤ T) :
+    (physicalFiber (payDeath inc offset R T M budget) R T J x n).length =
+      min M (payFiber inc offset R T budget J x n).length := by
+  rw [payDeath_fiber_eq inc R T M budget J x n hT, rankClip_length]
+  unfold payFiber
+  exact List.filter_sublist.nodup (roots_nodup R)
+
+theorem payDeath_fullCapped (inc : State → Nat) (offset : Nat → Nat) (R T M budget : Nat)
+    (hT : 6 ≤ T) : FullCapped (payDeath inc offset R T M budget) R T M := by
+  intro J x n
+  rw [payDeath_exact inc R T M budget J x n hT]
+  exact Nat.min_le_left _ _
+
+/-- Completed prefix expense (including death-causing tick) is
+bounded by the individual allowance. No uniform increment bound. -/
+theorem payDeath_budget (inc : State → Nat) (offset : Nat → Nat)
+    (R T M budget A : Nat) :
+    pathCost inc (birth A) (prefixAge (payDeath inc offset R T M budget) R T A)
+      ≤ budget - offset A := by
+  let d := prefixAge (payDeath inc offset R T M budget) R T A
+  by_cases hd : d=0
+  · change pathCost inc (birth A) d ≤ _
+    simp [hd, pathCost]
+  · have hlt : d-1 < payDeath inc offset R T M budget A := by
+      unfold d prefixAge at *
+      omega
+    have hs := (payDeath_spec inc offset R T M budget A (d-1)).mp hlt
+    have he : d-1+1=d := by omega
+    rw [he] at hs
+    change pathCost inc (birth A) d ≤ _
+    omega
+
+def obsPayFiber (inc : State → Nat) (offset : Nat → Nat) (R T budget u : Nat) (key : Nat × Nat) : List Nat :=
+  ((roots R).filter (fun A => decide
+    (pathCost inc (birth A) (observeAge R T A + u + 1) + offset A ≤ budget))).filter
+      (fun A => decide (obsKey R T A u = key))
+
+theorem obsPayFiber_eq (inc : State → Nat) (offset : Nat → Nat) (R T budget J x u : Nat)
+    (hT : 6 ≤ T) (hu : u < T) :
+    obsPayFiber inc offset R T budget u (J,x) =
+      payFiber inc offset R T budget J x (obsClock R T J u) := by
+  unfold obsPayFiber payFiber
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hr
+  by_cases hj : windowId R T A = J
+  · have hg := obsClock_age R T A J u hT hr.2.1 hr.2.2 hj hu
+    have hs : physicalAge A (obsClock R T J u + 1) = observeAge R T A + u + 1 := by
+      have hb := hg.1
+      have he := hg.2.2
+      unfold physicalAge at *
+      omega
+    simp [obsKey, hj, hg.1, hg.2.1, hg.2.2, hs, observedState, physicalState, payScore, physicalCost]
+  · simp [obsKey, hj]
+
+theorem obsPayRank_exact (inc : State → Nat) (offset : Nat → Nat) (R T M budget u : Nat)
+    (key : Nat × Nat) (hT : 6 ≤ T) (hu : u < T) :
+    (obsLiveFiber (payDeath inc offset R T M budget) R T u key).length =
+      min M (obsPayFiber inc offset R T budget u key).length := by
+  obtain ⟨J,x⟩ := key
+  rw [obsLiveFiber_eq _ R T J x u hT hu, obsPayFiber_eq inc R T budget J x u hT hu]
+  exact payDeath_exact inc R T M budget J x (obsClock R T J u) hT
+
+def payMasses (inc : State → Nat) (offset : Nat → Nat) (R T budget : Nat) : List Nat :=
+  (obsBins R T).map (fun b => (obsPayFiber inc offset R T budget b.1 b.2).length)
+
+theorem payDeath_live_exact (inc : State → Nat) (offset : Nat → Nat) (R T M budget : Nat)
+    (hT : 6 ≤ T) :
+    liveTicks (payDeath inc offset R T M budget) R T =
+      ((payMasses inc offset R T budget).map (min M)).sum := by
+  rw [liveTicks_eq_bins]
+  unfold payMasses
+  simp only [List.map_map, Function.comp_def]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  have hmem := List.mem_flatMap.mp hb
+  obtain ⟨u, hu, hku⟩ := hmem
+  obtain ⟨k, _, hk⟩ := List.mem_map.mp hku
+  subst b
+  exact obsPayRank_exact inc offset R T M budget u k hT (List.mem_range.mp hu)
+
+theorem payDeath_optimal (inc : State → Nat) (offset : Nat → Nat) (R T M budget : Nat)
+    (hT : 6≤T) (deathAge : Nat → Nat)
+    (hcap : FullCapped deathAge R T M)
+    (hb : ∀ A ∈ roots R, pathCost inc (birth A) (prefixAge deathAge R T A) + offset A ≤ budget) :
+    liveTicks deathAge R T ≤ liveTicks (payDeath inc offset R T M budget) R T := by
+  rw [liveTicks_eq_bins, payDeath_live_exact inc R T M budget hT]
+  unfold payMasses
+  simp only [List.map_map, Function.comp_def]
+  apply sum_map_le
+  intro b hb'
+  obtain ⟨u,hu,hku⟩ := List.mem_flatMap.mp hb'
+  obtain ⟨k,_,hk⟩ := List.mem_map.mp hku
+  subst b
+  obtain ⟨J,x⟩ := k
+  have ht := List.mem_range.mp hu
+  apply Nat.le_min.mpr
+  constructor
+  · rw [obsLiveFiber_eq deathAge R T J x u hT ht]
+    exact hcap J x (obsClock R T J u)
+  · unfold obsLiveFiber obsPayFiber
+    rw [List.filter_filter,List.filter_filter]
+    apply filter_len_mono
+    intro A hA ha
+    simp only [Bool.and_eq_true,decide_eq_true_eq] at ha ⊢
+    refine ⟨ha.1,?_⟩
+    have hl := ha.2
+    unfold liveAt at hl
+    simp only [decide_eq_true_eq] at hl
+    have hle : observeAge R T A+u+1 ≤ prefixAge deathAge R T A := by
+      unfold prefixAge
+      omega
+    have hcost := pathCost_mono inc (birth A) _ _ hle
+    have hbudget := hb A hA
+    omega
+
+
+theorem member_le_sum (xs : List Nat) (x : Nat) (h : x ∈ xs) : x ≤ xs.sum := by
+  induction xs with
+  | nil => simp at h
+  | cons a xs ih =>
+    simp only [List.mem_cons] at h
+    simp only [List.sum_cons]
+    rcases h with rfl | h
+    · omega
+    · have hh := ih h
+      omega
+
+def totalExpense (inc : State → Nat) (R T : Nat) (d : Nat → Nat) : Nat :=
+  ((roots R).map (fun A => pathCost inc (birth A) (prefixAge d R T A))).sum
+
+def individualOffset (inc : State → Nat) (R T : Nat) (d : Nat → Nat) (A : Nat) : Nat :=
+  totalExpense inc R T d - pathCost inc (birth A) (prefixAge d R T A)
+
+theorem individualOffset_eq (inc : State → Nat) (R T : Nat) (d : Nat → Nat) (A : Nat)
+    (hA : A ∈ roots R) :
+    pathCost inc (birth A) (prefixAge d R T A) + individualOffset inc R T d A =
+      totalExpense inc R T d := by
+  have h := member_le_sum ((roots R).map (fun B => pathCost inc (birth B) (prefixAge d R T B)))
+    (pathCost inc (birth A) (prefixAge d R T A)) (List.mem_map.mpr ⟨A,hA,rfl⟩)
+  unfold individualOffset totalExpense
+  omega
+
+/-- Every existing admissible policy has an individualized reserve
+policy that dominates its lifetime at no greater aggregate expense.
+In fact each individual completed prefix expense is no larger. -/
+theorem payDeath_dominates (inc : State → Nat) (R T M : Nat)
+    (hT : 6≤T) (d : Nat → Nat) (hc : FullCapped d R T M) :
+    let e := payDeath inc (individualOffset inc R T d) R T M (totalExpense inc R T d)
+    FullCapped e R T M ∧ liveTicks d R T ≤ liveTicks e R T ∧
+      totalExpense inc R T e ≤ totalExpense inc R T d := by
+  dsimp only
+  refine ⟨payDeath_fullCapped inc _ R T M _ hT, ?_, ?_⟩
+  · apply payDeath_optimal inc _ R T M _ hT d hc
+    intro A hA
+    exact Nat.le_of_eq (individualOffset_eq inc R T d A hA)
+  · unfold totalExpense
+    apply sum_map_le
+    intro A hA
+    have h := payDeath_budget inc (individualOffset inc R T d) R T M (totalExpense inc R T d) A
+    have he := individualOffset_eq inc R T d A hA
+    omega
+
+#print axioms NegativeMIN.payDeath_fullCapped
+#print axioms NegativeMIN.payDeath_budget
+#print axioms NegativeMIN.payDeath_live_exact
+#print axioms NegativeMIN.payDeath_dominates
+
 end NegativeMIN
