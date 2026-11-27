@@ -9497,12 +9497,14 @@ theorem jointBlockScore_append (z Y Yb D K : Nat) (xs ys : List Nat) :
   · split
     · rename_i hp
       have ht : K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) := by omega
-      simp [ht]
+      rw [if_pos ht]
+      exact Nat.le_refl _
     · omega
   · split
     · rename_i hp
       have ht : K<((xs++ys).filter f).length ∧ D<distinctFilteredCount g (xs++ys) := by omega
-      simp [ht]
+      rw [if_pos ht]
+      exact Nat.le_refl _
     · omega
 
 def jointWordCount (z Y Yb reset D K : Nat) : List Nat → Nat :=
@@ -9571,9 +9573,11 @@ theorem jointDiversityHistory_mono (z Y Yb reset D K wS wL A i j : Nat) (hij : i
   | zero =>
     have he : i=0 := by omega
     rw [he]
+    exact Nat.le_refl _
   | succ j ih =>
     by_cases he : i=j+1
     · rw [he]
+      exact Nat.le_refl _
     · exact Nat.le_trans (ih (by omega)) (h j)
 
 #print axioms NegativeMIN.jointWordCount_defect
