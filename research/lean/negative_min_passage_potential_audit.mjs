@@ -74,7 +74,7 @@ function run(){
   return {accepted,rejected,cand};
  }
  function brute(rs,ends,M,T,cand){
-  let best=[];for(let mask=0;mask<(1<<cand.length);mask++){
+  let best=[];for(let mask=(1<<cand.length)-1;mask>=0;mask--){
    let sel=cand.filter((_,j)=>(mask>>j)&1);
    if(sel.length>best.length&&feasible(rs,ends,sel,M,T))best=sel;
   }return best;
@@ -128,6 +128,15 @@ function run(){
   }
   thresholds++;return {n,accepted:accepted.length,fullBound,rankBound,pairCount,entryWitnesses};
  }
+ let syntheticChecks=0;
+ // Coalescing trees independent of the arithmetic simulation.
+ let rng=123456789;const rand=n=>{rng=(Math.imul(rng,1664525)+1013904223)>>>0;return rng%n};
+ for(let test=0;test<400;test++){
+  let n=4+rand(7),T=2+rand(7),M=1+rand(3),rs=Array.from({length:n},(_,i)=>({x:[i]}));
+  for(let u=1;u<T;u++){let map=new Map();for(let r of rs){let a=r.x[u-1];if(!map.has(a))map.set(a,rand(n));r.x.push(map.get(a))}}
+  let ends=rs.map(()=>1+rand(T)),{accepted,cand}=greedy(rs,ends,M,T),opt=brute(rs,ends,M,T,cand);
+  ck(accepted.length===opt.length,"synthetic exact greedy");testExchange(rs,ends,M,T,cand,opt,accepted);syntheticChecks++;
+ }
  let results=[];
  for(let cfg of [{R:600,T:18,M:1,W:18,sample:34},{R:2400,T:36,M:2,W:36,sample:50},{R:12000,T:72,M:4,W:72,sample:40},{R:48000,T:144,M:8,W:144,sample:20}]){
   let {R,T,M,W,sample}=cfg,sc=Math.max(1,T/18),nW=Math.ceil((R/6+1)/(W/6)),row={...cfg,N:0,thresholds:[],layerSum:0,maxProduct:0};
@@ -148,6 +157,6 @@ function run(){
   for(let q=1;q<=T;q++){row.layerSum+=total[q];row.maxProduct=Math.max(row.maxProduct,q*total[q]);if(q>1)ck(total[q]<=total[q-1],"threshold optimum monotone")}
   row.layerSum/=row.N*T;row.maxProduct/=row.N*T;row.thresholds=[...th.values()];results.push(row);
  }
- return {checks,words,splits,roots,windows,ticks,thresholds,bruteChecks,potentialChecks,greedyExchangeChecks,results}
+ return {checks,words,splits,roots,windows,ticks,thresholds,bruteChecks,potentialChecks,greedyExchangeChecks,syntheticChecks,results}
 }
 console.log(JSON.stringify(run()));
