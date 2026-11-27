@@ -1281,14 +1281,16 @@ def pairWeight (R T : Nat) (select : Nat → Bool) : Nat :=
 theorem strictRank_sum (R T A : Nat) (select : Nat → Bool) (n : Int) :
     strictRank R T A select n =
       ((cohort R select).map (fun B => if B < A ∧ Contact R T A B n then 1 else 0)).sum := by
-  unfold strictRank cohort
-  change _ = (((roots R).filter select).map (fun B => if decide (B < A ∧ Contact R T A B n) then 1 else 0)).sum
-  rw [← filter_length_indicator]
-  rw [List.filter_filter]
-  apply congrArg List.length
-  apply List.filter_congr
-  intro B _
-  by_cases hs : select B = true <;> by_cases h : B < A ∧ Contact R T A B n <;> simp [hs, h]
+  calc
+    strictRank R T A select n =
+        ((cohort R select).filter (fun B => decide (B < A ∧ Contact R T A B n))).length := by
+      unfold strictRank cohort
+      rw [List.filter_filter]
+      apply congrArg List.length
+      apply List.filter_congr
+      intro B _
+      by_cases hs : select B = true <;> by_cases h : B < A ∧ Contact R T A B n <;> simp [hs, h]
+    _ = _ := by rw [filter_length_indicator]; simp only [decide_eq_true_eq]
 
 theorem strictRank_integral (R T A : Nat) (select : Nat → Bool) :
     ((List.range T).map (fun u : Nat =>
