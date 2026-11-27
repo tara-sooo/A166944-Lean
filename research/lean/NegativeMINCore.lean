@@ -3938,7 +3938,7 @@ theorem debtDeath_fiber_profit_formula (inc : State → Nat) (D R T M J x : Nat)
     ((physicalFiber (debtDeath inc D R T M) R T J x n).map
       (fun A => physicalProfit inc D R T A n)).sum=
       ((List.range D).map (fun t => min M (recordMass inc D R T J x n t))).sum := by
-  rw [threshold_weight_sum _ _ D (fun a _ => profitNat_le inc D R T a _)]
+  rw [threshold_weight_sum _ (fun A => physicalProfit inc D R T A n) D (fun a _ => profitNat_le inc D R T a _)]
   congr 1
   apply List.map_congr_left
   intro t _
