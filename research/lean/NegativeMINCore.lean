@@ -10079,8 +10079,7 @@ theorem completed_segment_wait_bound (s : State) (k : Nat)
     let p := winner (evolve s j)
     have hw : FirstEvent s w p := by
       refine ⟨by dsimp [w]; omega,by dsimp [p]; omega,?_,?_⟩
-      · have he : w-1=j := by dsimp [w]; omega
-        rw [he]
+      · rfl
       · intro i hi
         have ht : i<j := by dsimp [w] at hi; omega
         by_cases h : winner (evolve s i)=0
