@@ -9,7 +9,7 @@ function audit(){
  function hits(x,n,fs){let s=mod(n,2)===0?1:-1;return fs[s===1?0:1].filter(p=>mod(n,2*p)===(s===1?0:p+2)).map(p=>({p,s,b:s===1?0:3}))}
  function literal(x,n,T){let fs=[trial(x+1),trial(x-1)];ok(sp[x+1]===fs[0][0]&&sp[x-1]===fs[1][0],"SPF oracle");for(let i=1;i<=T;i++){let hh=hits(x,n+i,fs);if(hh.length)return{w:i,...hh[0]}}return null}
  function next(x,n){let w=Infinity,p=0,s=0;for(let e of [-1,1])for(let q of fac(x+e)){let t=mod((e===1?0:q+2)-n,2*q)||2*q;if(t<w||t===w&&q<p){w=t;p=q;s=e}}return{w,p,s}}
- let rows=[],sourceCount=0,rawKeys=0,preBad=0,postBad=0,goodKeys=0,prePins=0,postPins=0,preTicks=0,postTicks=0,nearPairs=0,pairControls=0,localStates=0,canonicalRoots=0,canonicalEvents=0,canonicalHitRoots=0,canonicalKeys=0,canonicalFullKeys=0,canonicalHitChecks=0,gatewayChecks=0,entryPorts=0,entryPinChecks=0,forcedSmallSourceKeys=0,canonicalEntryChecks=0,canonicalFirstTop=0,canonicalFirstTopRoughChecks=0;
+ let rows=[],sourceCount=0,rawKeys=0,preBad=0,postBad=0,goodKeys=0,prePins=0,postPins=0,preTicks=0,postTicks=0,nearPairs=0,pairControls=0,localStates=0,canonicalRoots=0,canonicalEvents=0,canonicalHitRoots=0,canonicalKeys=0,canonicalFullKeys=0,canonicalHitChecks=0,gatewayChecks=0,entryPorts=0,entryPinChecks=0,forcedSmallSourceKeys=0,canonicalEntryChecks=0,canonicalFirstTop=0,canonicalFirstTopRoughChecks=0,rapidPairs=0,rapidPairKeys=new Set(),rapidSameSign=0,rapidOppositeSign=0;
  for(let R of [12000,48000,192000]){
   let L=Math.log(R),T=Math.ceil(8*Math.sqrt(2*R+1)),P=Math.max(13,Math.floor(T/(L*L))),K=7,K0=7,U=8,H=3,D=6,W=12;
   let lo=Math.ceil(T/(4*P)),hi=Math.floor(T/(3*P));let arr=[],sources=0,raw=0,pb=0,qb=0;
@@ -76,7 +76,7 @@ function audit(){
   }
   let hitRoots=0,hitKeys=0,fullKeys=0,ev=0;
   for(let A=Math.ceil(R/6)*6;A<=2*R;A+=6){
-   canonicalRoots++;let x=A,n=3-A/2,t=0,seen=false,depth=0;
+   canonicalRoots++;let x=A,n=3-A/2,t=0,seen=false,depth=0,previousTop=null;
    while(t<2*T){
     let e=next(x,n);if(t+e.w>2*T)break;
     let y=x-e.p+1,nn=n+e.w,k=y+","+nn+","+e.p,rec=keymap.get(k);
@@ -85,6 +85,21 @@ function audit(){
      canonicalFirstTop++;let qm=Math.min(sp[A-1],sp[A+1]);ok(e.p<=4*qm+7,"canonical first top rough bound");canonicalFirstTopRoughChecks++;
     }
     depth++;
+    if(e.p>=Math.max(P,41)){
+     let h=y/2+nn,b=e.s===1?0:3,m=(h-b)/e.p;
+     ok(Number.isInteger(m)&&m>=0,"top height coefficient");
+     if(previousTop){
+      let d=previousTop.y-x,u=nn-previousTop.n;
+      if(d<=6&&u<=8){
+       let q=previousTop.p,j=previousTop.m,bb=previousTop.b;
+       ok(d>=0&&e.p!==q&&j>0,"rapid return distinct label and nonreset");
+       ok((2*m+1)*e.p-2*j*q===2*u+1-d+2*bb-2*b,"rapid return height relation");
+       rapidPairs++;rapidPairKeys.add([previousTop.y,previousTop.n,q,y,nn,e.p].join(","));
+       if(previousTop.s===e.s)rapidSameSign++;else rapidOppositeSign++;
+      }
+     }
+     previousTop={y,n:nn,p:e.p,m,b,s:e.s};
+    }
     if(rec){
      ok(x===rec.a&&nn===rec.n,"canonical anchor equality");
      let l=literal(x,n,e.w);ok(l&&l.w===e.w&&l.p===e.p,"canonical match literal");canonicalHitChecks++;
@@ -98,6 +113,6 @@ function audit(){
   for(let a of keymap.values()){if(a.seen){hitKeys++;canonicalKeys++}if(a.full){fullKeys++;canonicalFullKeys++}}
   rows.push({R,T,P,lo,hi,sources,raw,preBad:pb,postBad:qb,localKeys:arr.length,nearPairs:localNear,kept:keep.length,states:owner.size,canonicalEvents:ev,hitRoots,hitKeys,fullKeys});
  }
- return {sourceCount,rawKeys,preBad,postBad,goodKeys,prePins,postPins,preTicks,postTicks,nearPairs,pairControls,localStates,canonicalRoots,canonicalEvents,canonicalHitRoots,canonicalKeys,canonicalFullKeys,canonicalHitChecks,gatewayChecks,entryPorts,entryPinChecks,forcedSmallSourceKeys,canonicalEntryChecks,canonicalFirstTop,canonicalFirstTopRoughChecks,rows}
+ return {sourceCount,rawKeys,preBad,postBad,goodKeys,prePins,postPins,preTicks,postTicks,nearPairs,pairControls,localStates,canonicalRoots,canonicalEvents,canonicalHitRoots,canonicalKeys,canonicalFullKeys,canonicalHitChecks,gatewayChecks,entryPorts,entryPinChecks,forcedSmallSourceKeys,canonicalEntryChecks,canonicalFirstTop,canonicalFirstTopRoughChecks,rapidPairs,distinctRapidPairs:rapidPairKeys.size,rapidSameSign,rapidOppositeSign,rows}
 }
 console.log(JSON.stringify(audit(),null,2));
