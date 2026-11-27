@@ -4363,4 +4363,186 @@ theorem removedExpense_bound (z Y0 Y1 U wN wQ A k : Nat)
 #print axioms NegativeMIN.residualExpense_partition
 #print axioms NegativeMIN.removedExpense_bound
 
+/-! Sensitivity of record profits to removing nonnegative charges.
+The reduced profiles may be history-dependent: we do NOT claim their
+debt ranks satisfy the same coalescence theorem. -/
+
+theorem firstExpense_append_le (inc : State → Nat) (xs ys : List State) (unused : List Nat) :
+    firstExpense inc xs unused≤firstExpense inc (xs++ys) unused := by
+  induction xs generalizing unused with
+  | nil => simp [firstExpense]
+  | cons a xs ih =>
+    have h := ih (unused.erase (winner a))
+    simp only [List.cons_append,firstExpense]
+    omega
+
+theorem repeatExpense_append_le (inc : State → Nat) (xs ys : List State) (unused : List Nat) :
+    repeatExpense inc xs unused≤repeatExpense inc (xs++ys) unused := by
+  induction xs generalizing unused with
+  | nil => simp [repeatExpense]
+  | cons a xs ih =>
+    have h := ih (unused.erase (winner a))
+    simp only [List.cons_append,repeatExpense]
+    omega
+
+theorem chargedStates_succ (inc : State → Nat) (A k : Nat) :
+    chargedStates inc A (k+1)=chargedStates inc A k++
+      ([orbit A k].filter (fun s => decide (0<inc s))) := by
+  unfold chargedStates prefixStates
+  rw [List.range_succ,List.map_append,List.filter_append]
+  rfl
+
+theorem firstPositiveExpense_step (inc : State → Nat) (Y A k : Nat) :
+    firstPositiveExpense inc Y A k≤firstPositiveExpense inc Y A (k+1) := by
+  unfold firstPositiveExpense
+  rw [chargedStates_succ]
+  exact firstExpense_append_le inc _ _ _
+
+theorem repeatPositiveExpense_step (inc : State → Nat) (Y A k : Nat) :
+    repeatPositiveExpense inc Y A k≤repeatPositiveExpense inc Y A (k+1) := by
+  unfold repeatPositiveExpense
+  rw [chargedStates_succ]
+  exact repeatExpense_append_le inc _ _ _
+
+theorem removedExpense_step (z Y0 Y1 U wN wQ A k : Nat) :
+    removedExpense z Y0 Y1 U wN wQ A k≤removedExpense z Y0 Y1 U wN wQ A (k+1) := by
+  unfold removedExpense
+  have h1 := Nat.mul_le_mul_left wN (firstPositiveExpense_step (narrowInc z Y0) Y0 A k)
+  have h2 := firstPositiveExpense_step (balancedMedium Y0 Y1 U) Y1 A k
+  have h3 := pathCost_mono (imbalancedMedium Y0 Y1 U) (birth A) k (k+1) (by omega)
+  have h4 := Nat.mul_le_mul_left wQ (show
+    firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k +
+      pathCost (imbalancedMedium Y0 Y1 U) (birth A) k ≤
+    firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A (k+1) +
+      pathCost (imbalancedMedium Y0 Y1 U) (birth A) (k+1) by omega)
+  omega
+
+theorem residualExpense_step (z Y0 Y1 U wN wQ A k : Nat) :
+    residualExpense z Y0 Y1 U wN wQ A k≤residualExpense z Y0 Y1 U wN wQ A (k+1) := by
+  unfold residualExpense
+  have h1 := Nat.mul_le_mul_left wN (repeatPositiveExpense_step (narrowInc z Y0) Y0 A k)
+  have h2 := Nat.mul_le_mul_left wQ (repeatPositiveExpense_step (balancedMedium Y0 Y1 U) Y1 A k)
+  omega
+
+theorem int_max_mono_zero (a b : Int) (h : a≤b) : max 0 a≤max 0 b := by
+  by_cases ha : a≤0
+  · rw [Int.max_eq_left ha]
+    exact Int.le_max_left _ _
+  · rw [Int.max_eq_right (by omega : 0≤a),Int.max_eq_right (by omega : 0≤b)]
+    exact h
+
+theorem recordDebt_antitone_increment (f g : Nat → Int)
+    (h : ∀ i : Nat, f (i+1)-f i≤g (i+1)-g i) (k : Nat) :
+    recordDebt g k≤recordDebt f k := by
+  induction k with
+  | zero => simp [recordDebt,runningPeak]
+  | succ k ih =>
+    rw [recordDebt_succ,recordDebt_succ]
+    apply int_max_mono_zero
+    have hh := h k
+    omega
+
+theorem recordProfit_mono_increment (f g : Nat → Int)
+    (h : ∀ i : Nat, f (i+1)-f i≤g (i+1)-g i) (k : Nat) :
+    recordProfit f k≤recordProfit g k := by
+  rw [recordProfit_eq,recordProfit_eq]
+  apply int_max_mono_zero
+  have hd := recordDebt_antitone_increment f g h k
+  have hi := h k
+  omega
+
+theorem increment_diff_mono (f g : Nat → Int)
+    (h : ∀ i : Nat, f (i+1)-f i≤g (i+1)-g i) (i k : Nat) (hik : i≤k) :
+    g i-f i≤g k-f k := by
+  induction k with
+  | zero =>
+    have he : i=0 := by omega
+    rw [he]
+    exact Int.le_refl _
+  | succ k ih =>
+    by_cases he : i=k+1
+    · rw [he]
+      exact Int.le_refl _
+    · have h1 := ih (by omega)
+      have h2 := h k
+      omega
+
+theorem recordProfit_sum_perturb (f g : Nat → Int)
+    (h : ∀ i : Nat, f (i+1)-f i≤g (i+1)-g i) (k : Nat) :
+    ((List.range k).map (recordProfit g)).sum≤
+      ((List.range k).map (recordProfit f)).sum+(g k-f k)-(g 0-f 0) := by
+  rw [recordProfit_sum,recordProfit_sum]
+  have he := bestPrefix_peak g k
+  have hh := runningPeak_ge_of_le f (bestPrefix g k) k (bestPrefix_le g k)
+  have hd := increment_diff_mono f g h (bestPrefix g k) k (bestPrefix_le g k)
+  omega
+
+def residualNet (z Y0 Y1 U wN wQ D R T A k : Nat) : Int :=
+  (D:Int)*(min T (k-observeAge R T A):Nat) -
+    (residualExpense z Y0 Y1 U wN wQ A k:Int)
+
+theorem residualNet_eq (z Y0 Y1 U wN wQ D R T A k : Nat) :
+    residualNet z Y0 Y1 U wN wQ D R T A k =
+      rootNet (weightedInc z Y0 Y1 wN wQ) D R T A k+
+      (removedExpense z Y0 Y1 U wN wQ A k:Int) := by
+  have h := residualExpense_partition z Y0 Y1 U wN wQ A k
+  unfold residualNet rootNet
+  omega
+
+theorem residualNet_increment_ge (z Y0 Y1 U wN wQ D R T A k : Nat) :
+    rootNet (weightedInc z Y0 Y1 wN wQ) D R T A (k+1)-
+      rootNet (weightedInc z Y0 Y1 wN wQ) D R T A k≤
+    residualNet z Y0 Y1 U wN wQ D R T A (k+1)-
+      residualNet z Y0 Y1 U wN wQ D R T A k := by
+  rw [residualNet_eq,residualNet_eq]
+  have h := removedExpense_step z Y0 Y1 U wN wQ A k
+  omega
+
+theorem residualNet_increment_le (z Y0 Y1 U wN wQ D R T A k : Nat) :
+    residualNet z Y0 Y1 U wN wQ D R T A (k+1)-
+      residualNet z Y0 Y1 U wN wQ D R T A k≤
+      (D:Int)*(observedReward R T A k:Nat) := by
+  unfold residualNet
+  rw [observation_increment,Int.natCast_add,Int.mul_add]
+  have h := residualExpense_step z Y0 Y1 U wN wQ A k
+  omega
+
+def residualProfit (z Y0 Y1 U wN wQ D R T A k : Nat) : Nat :=
+  (recordProfit (residualNet z Y0 Y1 U wN wQ D R T A) k).toNat
+
+theorem residualProfit_ge (z Y0 Y1 U wN wQ D R T A k : Nat) :
+    profitNat (weightedInc z Y0 Y1 wN wQ) D R T A k≤
+      residualProfit z Y0 Y1 U wN wQ D R T A k := by
+  have h := recordProfit_mono_increment (rootNet (weightedInc z Y0 Y1 wN wQ) D R T A)
+    (residualNet z Y0 Y1 U wN wQ D R T A)
+    (residualNet_increment_ge z Y0 Y1 U wN wQ D R T A) k
+  unfold profitNat residualProfit
+  omega
+
+theorem residualProfit_le (z Y0 Y1 U wN wQ D R T A k : Nat) :
+    residualProfit z Y0 Y1 U wN wQ D R T A k≤D := by
+  have h := residualNet_increment_le z Y0 Y1 U wN wQ D R T A k
+  have hr : observedReward R T A k≤1 := by unfold observedReward; split <;> omega
+  have hm := Nat.mul_le_mul_left D hr
+  simp only [Nat.mul_one] at hm
+  have he : (D:Int)*(observedReward R T A k:Nat)≤D := by
+    have hh := Int.ofNat_le.mpr hm
+    simpa only [Int.natCast_mul] using hh
+  have hd := recordDebt_nonneg (residualNet z Y0 Y1 U wN wQ D R T A) k
+  unfold residualProfit
+  rw [recordProfit_eq]
+  by_cases hz : residualNet z Y0 Y1 U wN wQ D R T A (k+1)-
+    residualNet z Y0 Y1 U wN wQ D R T A k-
+      recordDebt (residualNet z Y0 Y1 U wN wQ D R T A) k≤0
+  · rw [Int.max_eq_left hz]
+    omega
+  · rw [Int.max_eq_right (by omega : 0≤residualNet z Y0 Y1 U wN wQ D R T A (k+1)-
+      residualNet z Y0 Y1 U wN wQ D R T A k-
+      recordDebt (residualNet z Y0 Y1 U wN wQ D R T A) k)]
+    omega
+
+#print axioms NegativeMIN.recordProfit_sum_perturb
+#print axioms NegativeMIN.residualProfit_ge
+#print axioms NegativeMIN.residualProfit_le
+
 end NegativeMIN
