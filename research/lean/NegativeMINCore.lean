@@ -8341,7 +8341,6 @@ theorem endpointRankGain_exact (R T M D : Nat) (cost : Nat → Nat → Nat)
   unfold life prefixAge endpointRankDeath endpointRankGain
   split
   · rename_i h
-    simp only [if_pos h]
     have h1 : min T (observeAge R T A+l A-observeAge R T A)=l A := by omega
     have h2 : min (observeAge R T A+l A) (observeAge R T A+T)=observeAge R T A+l A := by omega
     rw [h1,h2]
@@ -8433,7 +8432,8 @@ theorem nativeObsFiber_bound (R T Q : Nat) (b : DualBin)
     have hq : A/Q=B/Q := (hA A ha).2.trans (hA B hb).2.symm
     have hra := Nat.div_add_mod (A%Q) 6
     have hrb := Nat.div_add_mod (B%Q) 6
-    rw [hrem A ha,hrem B hb,Nat.add_zero,Nat.add_zero] at hra hrb
+    rw [hrem A ha,Nat.add_zero] at hra
+    rw [hrem B hb,Nat.add_zero] at hrb
     have hf : A%Q/6=B%Q/6 := he
     have hr : A%Q=B%Q := by omega
     have hda := Nat.div_add_mod A Q
