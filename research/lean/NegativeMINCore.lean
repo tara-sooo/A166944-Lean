@@ -8489,4 +8489,255 @@ theorem foreignObsRoot_entry (R T Q : Nat) (b : DualBin) (A : Nat)
 #print axioms NegativeMIN.nativeObsFiber_bound
 #print axioms NegativeMIN.foreignObsRoot_entry
 
+
+/-! First profitable passage: stop a root at its earliest attainment of a
+fixed positive net-profit threshold. Only other successful prefixes can
+conflict with it; roots that never reach the threshold are discarded. -/
+def passageProfit (cost : Nat → Nat → Nat) (R T D A l : Nat) : Nat :=
+  if l=0 then 0 else D*l-cost A (observeAge R T A+l)
+
+def firstPositiveIndex (f : Nat → Bool) : Nat → Nat
+  | 0 => 0
+  | k+1 =>
+    let j := firstPositiveIndex f k
+    if j≠0 then j else if f (k+1) then k+1 else 0
+
+theorem firstPositiveIndex_spec (f : Nat → Bool) (k : Nat) :
+    let j := firstPositiveIndex f k
+    (j=0 ∧ ∀ i : Nat,0<i → i≤k → f i=false) ∨
+    (0<j ∧ j≤k ∧ f j=true ∧ ∀ i : Nat,0<i → i<j → f i=false) := by
+  induction k with
+  | zero => simp [firstPositiveIndex]
+  | succ k ih =>
+    dsimp only at ih ⊢
+    rcases ih with ⟨hz,hn⟩ | ⟨hp,hk,hf,hn⟩
+    · by_cases h : f (k+1)=true
+      · simp only [firstPositiveIndex,hz,ne_eq,not_true_eq_false,if_false,h,if_true]
+        right
+        exact ⟨by omega,by omega,h,fun i hi hj => hn i hi (by omega)⟩
+      · have h' : f (k+1)=false := by cases he : f (k+1) <;> simp_all
+        simp only [firstPositiveIndex,hz,ne_eq,not_true_eq_false,if_false,h',Bool.false_eq_true]
+        left
+        refine ⟨rfl,?_⟩
+        intro i hi hj
+        by_cases he : i=k+1
+        · simpa [he] using h'
+        · exact hn i hi (by omega)
+    · have hne : firstPositiveIndex f k≠0 := by omega
+      simp only [firstPositiveIndex,hne,if_true]
+      exact Or.inr ⟨hp,by omega,hf,hn⟩
+
+def firstPassage (cost : Nat → Nat → Nat) (R T D q A : Nat) : Nat :=
+  firstPositiveIndex (fun l => decide (q≤passageProfit cost R T D A l)) T
+
+theorem firstPassage_sound (cost : Nat → Nat → Nat) (R T D q A : Nat)
+    (h : 0<firstPassage cost R T D q A) :
+    firstPassage cost R T D q A≤T ∧
+      q≤passageProfit cost R T D A (firstPassage cost R T D q A) := by
+  have hh := firstPositiveIndex_spec
+    (fun l => decide (q≤passageProfit cost R T D A l)) T
+  change 0<firstPositiveIndex _ T at h
+  rcases hh with ⟨hz,_⟩ | ⟨_,hk,hf,_⟩
+  · omega
+  · exact ⟨hk,of_decide_eq_true hf⟩
+
+theorem firstPassage_earliest (cost : Nat → Nat → Nat) (R T D q A l : Nat)
+    (hl : 0<l) (hT : l≤T) (hq : q≤passageProfit cost R T D A l) :
+    0<firstPassage cost R T D q A ∧ firstPassage cost R T D q A≤l := by
+  have hh := firstPositiveIndex_spec
+    (fun l => decide (q≤passageProfit cost R T D A l)) T
+  rcases hh with ⟨_,hn⟩ | ⟨hp,_,_,hn⟩
+  · have hf := hn l hl hT
+    simp [hq] at hf
+  · refine ⟨hp,?_⟩
+    by_cases h : l<firstPassage cost R T D q A
+    · have hf := hn l hl h
+      simp [hq] at hf
+    · omega
+
+theorem firstPassage_no_earlier (cost : Nat → Nat → Nat) (R T D q A l : Nat)
+    (hl : 0<l) (h : l<firstPassage cost R T D q A) :
+    passageProfit cost R T D A l<q := by
+  have hh := firstPositiveIndex_spec
+    (fun l => decide (q≤passageProfit cost R T D A l)) T
+  rcases hh with ⟨hz,_⟩ | ⟨_,_,_,hn⟩
+  · unfold firstPassage at h
+    omega
+  · have hf := hn l hl h
+    simp only [decide_eq_false_iff_not] at hf
+    omega
+
+theorem firstPassage_overshoot (cost : Nat → Nat → Nat) (R T D q A : Nat)
+    (hq : 0<q) (hp : 0<firstPassage cost R T D q A)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j) :
+    passageProfit cost R T D A (firstPassage cost R T D q A)<q+D := by
+  let l := firstPassage cost R T D q A
+  change 0<l at hp
+  change passageProfit cost R T D A l<q+D
+  by_cases h : l=1
+  · rw [h]
+    simp [passageProfit]
+    omega
+  · have hprev : 0<l-1 := by omega
+    have hh := firstPassage_no_earlier cost R T D q A (l-1) hprev (by change l-1<l; omega)
+    have hc := hm A (observeAge R T A+(l-1)) (observeAge R T A+l) (by omega)
+    simp only [passageProfit,if_neg (by omega : l≠0)]
+    simp only [passageProfit,if_neg (by omega : l-1≠0)] at hh
+    have he : D*l=D*(l-1)+D := by
+      have h1 : l-1+1=l := by omega
+      rw [← Nat.mul_succ,h1]
+    omega
+
+theorem endpointMass_mono (R T A l k : Nat) (ha : A∈roots R)
+    (hT : 6≤T) (hl : 0<l) (hlk : l≤k) (hk : k≤T) :
+    endpointMass R T A l≤endpointMass R T A k :=
+  endpointMass_ge_earlier R T A k (endpointBin R T A l) hT hk
+    (by unfold endpointBin; simp only; omega)
+    ((fullObsFiber_mem R T _ A).mpr ⟨ha,rfl⟩)
+
+theorem firstPassage_mass_min (cost : Nat → Nat → Nat) (R T D q A l : Nat)
+    (hT : 6≤T) (ha : A∈roots R) (hl : 0<l) (ht : l≤T)
+    (hq : q≤passageProfit cost R T D A l) :
+    endpointMass R T A (firstPassage cost R T D q A)≤endpointMass R T A l := by
+  have hh := firstPassage_earliest cost R T D q A l hl ht hq
+  exact endpointMass_mono R T A _ l ha hT hh.1 hh.2 ht
+
+def passageConflict (R T : Nat) (l : Nat → Nat) (A B : Nat) : Prop :=
+  0<l A ∧ l A≤T ∧ 0<l B ∧ l B≤T ∧
+    obsKey R T A (min (l A) (l B)-1)=obsKey R T B (min (l A) (l B)-1)
+
+instance (R T : Nat) (l : Nat → Nat) (A B : Nat) :
+    Decidable (passageConflict R T l A B) := by unfold passageConflict; infer_instance
+
+def passageNeighbors (R T : Nat) (l : Nat → Nat) (A : Nat) : List Nat :=
+  (roots R).filter (fun B => decide (passageConflict R T l A B))
+
+theorem passageConflict_symm (R T : Nat) (l : Nat → Nat) (A B : Nat)
+    (h : passageConflict R T l A B) : passageConflict R T l B A := by
+  unfold passageConflict at h ⊢
+  rw [Nat.min_comm]
+  exact ⟨h.2.2.1,h.2.2.2.1,h.1,h.2.1,h.2.2.2.2.symm⟩
+
+theorem passageConflict_of_common_bin (R T : Nat) (l : Nat → Nat) (A B : Nat)
+    (b : DualBin) (hT : 6≤T) (ha : A∈fullObsFiber R T b)
+    (hb : B∈fullObsFiber R T b) (hla : b.1<l A) (hlb : b.1<l B)
+    (hta : l A≤T) (htb : l B≤T) :
+    passageConflict R T l A B := by
+  have ha' := (fullObsFiber_mem R T b A).mp ha
+  have hb' := (fullObsFiber_mem R T b B).mp hb
+  have hmin : min (l A) (l B)>b.1 := by omega
+  have hv : min (l A) (l B)-1<T := by omega
+  exact ⟨by omega,hta,by omega,htb,
+    obsKey_contact_mono R T A B b.1 _ hT ha'.1 hb'.1 (by omega) hv
+      (ha'.2.trans hb'.2.symm)⟩
+
+theorem passageConflict_has_common_bin (R T : Nat) (l : Nat → Nat) (A B : Nat)
+    (ha : A∈roots R) (hb : B∈roots R) (h : passageConflict R T l A B) :
+    ∃ b∈obsBins R T,A∈fullObsFiber R T b ∧ B∈fullObsFiber R T b ∧
+      b.1<l A ∧ b.1<l B := by
+  let u := min (l A) (l B)-1
+  let b : DualBin := (u,obsKey R T A u)
+  unfold passageConflict at h
+  have hu : u<T := by dsimp [u]; omega
+  exact ⟨b,obsBin_of_root R T A u ha hu,
+    (fullObsFiber_mem R T b A).mpr ⟨ha,rfl⟩,
+    (fullObsFiber_mem R T b B).mpr ⟨hb,h.2.2.2.2.symm⟩,
+    by dsimp [b,u]; omega,by dsimp [b,u]; omega⟩
+
+def passageRankDeath (cost : Nat → Nat → Nat) (R T M D q : Nat)
+    (score : Nat → Nat) (A : Nat) : Nat :=
+  let l := firstPassage cost R T D q
+  if 0<l A ∧ localRank (passageNeighbors R T l A) score A≤M
+  then observeAge R T A+l A else 0
+
+theorem passageRankDeath_observedCap (cost : Nat → Nat → Nat) (R T M D q : Nat)
+    (score : Nat → Nat) (hT : 6≤T) :
+    ObservedCap (passageRankDeath cost R T M D q score) R T M := by
+  intro b hb
+  let d := passageRankDeath cost R T M D q score
+  let l := firstPassage cost R T D q
+  let xs := obsLiveFiber d R T b.1 b.2
+  have hs (A : Nat) (ha : A∈xs) :
+      A∈fullObsFiber R T b ∧ b.1<l A ∧ l A≤T ∧
+      localRank (passageNeighbors R T l A) score A≤M := by
+    have ho := List.mem_filter.mp ha
+    have hi := List.mem_filter.mp ho.1
+    have hl : observeAge R T A+b.1<d A := of_decide_eq_true hi.2
+    have hm : A∈fullObsFiber R T b :=
+      (fullObsFiber_mem R T b A).mpr ⟨hi.1,of_decide_eq_true ho.2⟩
+    unfold d passageRankDeath at hl
+    dsimp only at hl
+    split at hl
+    · rename_i hp
+      exact ⟨hm,by omega,(firstPassage_sound cost R T D q A hp.1).1,hp.2⟩
+    · omega
+  have hn : xs.Nodup := by
+    unfold xs obsLiveFiber
+    exact List.filter_sublist.nodup (List.filter_sublist.nodup (roots_nodup R))
+  by_cases he : xs=[]
+  · change xs.length≤M
+    simp [he]
+  · obtain ⟨A,ha,hmax⟩ := extreme_mem xs (Precedes score)
+      (precedes_total score) (precedes_trans score) he
+    have hA := hs A ha
+    have hsub : ∀ B∈xs,B∈(passageNeighbors R T l A).filter (fun B => decide (Precedes score B A)) := by
+      intro B hb'
+      have hB := hs B hb'
+      have hcon := passageConflict_of_common_bin R T l A B b hT hA.1 hB.1
+        hA.2.1 hB.2.1 hA.2.2.1 hB.2.2.1
+      have hbr := ((fullObsFiber_mem R T b B).mp hB.1).1
+      exact List.mem_filter.mpr ⟨List.mem_filter.mpr ⟨hbr,decide_eq_true hcon⟩,
+        decide_eq_true (hmax B hb')⟩
+    have hh := nodup_subset_length_core xs _ hn hsub
+    exact Nat.le_trans hh hA.2.2.2
+
+def passageAccepted (cost : Nat → Nat → Nat) (R T M D q : Nat)
+    (score : Nat → Nat) : List Nat :=
+  (roots R).filter (fun A => decide (0<firstPassage cost R T D q A ∧
+    localRank (passageNeighbors R T (firstPassage cost R T D q) A) score A≤M))
+
+theorem passageRankDeath_net_lower (cost : Nat → Nat → Nat) (R T M D q : Nat)
+    (score : Nat → Nat) (hz : ∀ A,cost A 0=0) :
+    historyExpense cost R T (passageRankDeath cost R T M D q score)+
+      q*(passageAccepted cost R T M D q score).length≤
+      D*liveTicks (passageRankDeath cost R T M D q score) R T := by
+  unfold passageAccepted
+  rw [filter_length_indicator,← sum_map_mul]
+  unfold historyExpense liveTicks
+  rw [← sum_map_add,← sum_map_mul]
+  apply sum_map_le
+  intro A _
+  let l := firstPassage cost R T D q
+  unfold passageRankDeath
+  dsimp only
+  by_cases h : 0<l A ∧ localRank (passageNeighbors R T l A) score A≤M
+  · simp only [h,decide_true,if_true]
+    have hp := firstPassage_sound cost R T D q A h.1
+    have hc := hp.2
+    simp only [passageProfit,if_neg (by omega : l A≠0)] at hc
+    unfold life prefixAge
+    have he : min (observeAge R T A+l A) (observeAge R T A+T)=observeAge R T A+l A := by omega
+    have hl : min T (observeAge R T A+l A-observeAge R T A)=l A := by omega
+    rw [he,hl]
+    simp only [Nat.mul_one]
+    omega
+  · simp [h,life,prefixAge,hz]
+
+theorem passageAccepted_upper (cost : Nat → Nat → Nat) (R T M B0 D q err : Nat)
+    (score : Nat → Nat) (hT : 6≤T) (hz : ∀ A,cost A 0=0)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
+    (he : HistoryLiveEstimate cost R T M B0 D err) :
+    q*(passageAccepted cost R T M D q score).length≤
+      D*B0*M*T*twinCount R T+err := by
+  have h := observedCap_history_upper cost (passageRankDeath cost R T M D q score)
+    R T M B0 D err hT hm he (passageRankDeath_observedCap cost R T M D q score hT)
+  have hh := passageRankDeath_net_lower cost R T M D q score hz
+  omega
+
+#print axioms NegativeMIN.firstPassage_earliest
+#print axioms NegativeMIN.firstPassage_mass_min
+#print axioms NegativeMIN.passageConflict_of_common_bin
+#print axioms NegativeMIN.passageRankDeath_observedCap
+#print axioms NegativeMIN.passageAccepted_upper
+
 end NegativeMIN
