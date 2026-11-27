@@ -2974,4 +2974,193 @@ theorem payDeath_sharp_moment (inc : State → Nat) (offset : Nat → Nat)
 #print axioms NegativeMIN.clip_sharp
 #print axioms NegativeMIN.payDeath_sharp_moment
 
+/-! Running maximum and reflected-debt identities for exact signed
+net prefix reward. These one-path statements are the kernel-checked
+basis of the merging-forest optimizer, not its unproved asymptotics. -/
+def runningPeak (f : Nat → Int) : Nat → Int
+  | 0 => f 0
+  | k+1 => max (runningPeak f k) (f (k+1))
+
+def recordDebt (f : Nat → Int) (k : Nat) : Int :=
+  runningPeak f k-f k
+
+def recordProfit (f : Nat → Int) (k : Nat) : Int :=
+  runningPeak f (k+1)-runningPeak f k
+
+theorem runningPeak_ge (f : Nat → Int) (k : Nat) : f k≤runningPeak f k := by
+  cases k with
+  | zero => rfl
+  | succ k => exact le_max_right _ _
+
+theorem recordDebt_nonneg (f : Nat → Int) (k : Nat) : 0≤recordDebt f k := by
+  have h := runningPeak_ge f k
+  unfold recordDebt
+  omega
+
+theorem recordProfit_nonneg (f : Nat → Int) (k : Nat) : 0≤recordProfit f k := by
+  unfold recordProfit
+  change 0≤max (runningPeak f k) (f (k+1))-runningPeak f k
+  have h := le_max_left (runningPeak f k) (f (k+1))
+  omega
+
+theorem recordDebt_succ (f : Nat → Int) (k : Nat) :
+    recordDebt f (k+1) = max 0 (recordDebt f k-(f (k+1)-f k)) := by
+  unfold recordDebt
+  simp only [runningPeak]
+  by_cases h : runningPeak f k ≤ f (k+1)
+  · rw [max_eq_right h, max_eq_left (by omega : runningPeak f k-f k-(f (k+1)-f k)≤0)]
+    omega
+  · rw [max_eq_left (by omega : f (k+1)≤runningPeak f k),
+      max_eq_right (by omega : 0≤runningPeak f k-f k-(f (k+1)-f k))]
+    omega
+
+theorem recordProfit_eq (f : Nat → Int) (k : Nat) :
+    recordProfit f k = max 0 (f (k+1)-f k-recordDebt f k) := by
+  unfold recordProfit recordDebt
+  simp only [runningPeak]
+  by_cases h : runningPeak f k ≤ f (k+1)
+  · rw [max_eq_right h, max_eq_right (by omega : 0≤f (k+1)-f k-(runningPeak f k-f k))]
+    omega
+  · rw [max_eq_left (by omega : f (k+1)≤runningPeak f k),
+      max_eq_left (by omega : f (k+1)-f k-(runningPeak f k-f k)≤0)]
+    omega
+
+theorem runningPeak_ge_of_le (f : Nat → Int) (i k : Nat) (h : i≤k) :
+    f i≤runningPeak f k := by
+  induction k with
+  | zero => have hi : i=0 := by omega; subst i; exact runningPeak_ge f 0
+  | succ k ih =>
+    by_cases he : i=k+1
+    · subst i; exact runningPeak_ge f (k+1)
+    · exact le_trans (ih (by omega)) (le_max_left _ _)
+
+def bestPrefix (f : Nat → Int) : Nat → Nat
+  | 0 => 0
+  | k+1 => if runningPeak f k≤f (k+1) then k+1 else bestPrefix f k
+
+theorem bestPrefix_le (f : Nat → Int) (k : Nat) : bestPrefix f k≤k := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    simp only [bestPrefix]
+    split <;> omega
+
+theorem bestPrefix_peak (f : Nat → Int) (k : Nat) :
+    f (bestPrefix f k)=runningPeak f k := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    simp only [bestPrefix,runningPeak]
+    split
+    next h => rw [max_eq_right h]
+    next h => rw [ih,max_eq_left (by omega : f (k+1)≤runningPeak f k)]
+
+theorem recordProfit_sum (f : Nat → Int) (k : Nat) :
+    ((List.range k).map (recordProfit f)).sum = runningPeak f k-f 0 := by
+  induction k with
+  | zero => simp [runningPeak]
+  | succ k ih =>
+    rw [List.range_succ,List.map_append,List.sum_append]
+    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Int.add_zero,ih,recordProfit]
+    omega
+
+/-- A debt-free state is exactly a nonpositive charge excess on every
+previous suffix. This is a local-in-time rather than a total-cost test. -/
+theorem recordDebt_zero_iff (f : Nat → Int) (k : Nat) :
+    recordDebt f k=0 ↔ ∀ i : Nat, i≤k → f i≤f k := by
+  constructor
+  · intro h i hi
+    have h1 := runningPeak_ge_of_le f i k hi
+    unfold recordDebt at h
+    omega
+  · intro h
+    have hi := bestPrefix_le f k
+    have he := bestPrefix_peak f k
+    have hh := h (bestPrefix f k) hi
+    have hg := runningPeak_ge f k
+    unfold recordDebt
+    omega
+
+theorem recordDebt_suffix_upper (f : Nat → Int) (k : Nat) (b : Int)
+    (h : ∀ i : Nat, i≤k → f i-f k≤b) :
+    recordDebt f k≤b := by
+  have he := bestPrefix_peak f k
+  have hh := h (bestPrefix f k) (bestPrefix_le f k)
+  unfold recordDebt
+  omega
+
+def rootNet (inc : State → Nat) (D R T A k : Nat) : Int :=
+  (D : Int)*(min T (k-observeAge R T A) : Nat) -
+    (pathCost inc (birth A) k : Int)
+
+theorem rootNet_zero (inc : State → Nat) (D R T A : Nat) :
+    rootNet inc D R T A 0=0 := by simp [rootNet,pathCost]
+
+def observedReward (R T A k : Nat) : Nat :=
+  if observeAge R T A≤k ∧ k<observeAge R T A+T then 1 else 0
+
+theorem observation_increment (R T A k : Nat) :
+    min T (k+1-observeAge R T A) =
+      min T (k-observeAge R T A)+observedReward R T A k := by
+  unfold observedReward
+  split <;> omega
+
+theorem rootNet_increment (inc : State → Nat) (D R T A k : Nat) :
+    rootNet inc D R T A (k+1)-rootNet inc D R T A k =
+      (D : Int)*(observedReward R T A k : Nat)-(inc (orbit A k) : Int) := by
+  unfold rootNet
+  rw [observation_increment]
+  simp only [Int.natCast_add,Int.mul_add,pathCost,orbit]
+  omega
+
+def peakTruncate (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) : Nat :=
+  bestPrefix (rootNet inc D R T A) (prefixAge d R T A)
+
+theorem peakTruncate_le (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) :
+    peakTruncate inc D R T d A≤d A := by
+  have h := bestPrefix_le (rootNet inc D R T A) (prefixAge d R T A)
+  unfold peakTruncate prefixAge at *
+  omega
+
+theorem peakTruncate_fullCapped (inc : State → Nat) (D R T M : Nat)
+    (d : Nat → Nat) (hc : FullCapped d R T M) :
+    FullCapped (peakTruncate inc D R T d) R T M := by
+  intro J x n
+  apply Nat.le_trans _ (hc J x n)
+  unfold physicalFiber
+  apply filter_len_mono
+  intro A _ h
+  simp only [Bool.and_eq_true,physicalLiveAt,decide_eq_true_eq] at h ⊢
+  have hp := peakTruncate_le inc D R T d A
+  exact ⟨⟨h.1.1,h.1.2.1,by omega⟩,h.2⟩
+
+theorem peakTruncate_prefix (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) :
+    prefixAge (peakTruncate inc D R T d) R T A=peakTruncate inc D R T d A := by
+  have h := bestPrefix_le (rootNet inc D R T A) (prefixAge d R T A)
+  unfold peakTruncate prefixAge at *
+  omega
+
+theorem peakTruncate_net (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) :
+    rootNet inc D R T A (prefixAge (peakTruncate inc D R T d) R T A)=
+      ((List.range (prefixAge d R T A)).map (recordProfit (rootNet inc D R T A))).sum := by
+  rw [peakTruncate_prefix,peakTruncate,bestPrefix_peak,recordProfit_sum,rootNet_zero,Int.sub_zero]
+
+/-- Integer-weighted signed net prefix objective of an actual policy. -/
+def policyNet (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) : Int :=
+  ((roots R).map (fun A => rootNet inc D R T A (prefixAge d R T A))).sum
+
+theorem peakTruncate_policyNet (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) :
+    policyNet inc D R T (peakTruncate inc D R T d)=
+      ((roots R).map (fun A => ((List.range (prefixAge d R T A)).map
+        (recordProfit (rootNet inc D R T A))).sum)).sum := by
+  unfold policyNet
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  exact peakTruncate_net inc D R T d A
+
+#print axioms NegativeMIN.recordDebt_zero_iff
+#print axioms NegativeMIN.peakTruncate_fullCapped
+#print axioms NegativeMIN.peakTruncate_policyNet
+
 end NegativeMIN
