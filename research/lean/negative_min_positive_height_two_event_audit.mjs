@@ -9,7 +9,7 @@ function audit(){
  function inv(a,q){a=mod(a,q);for(let i=1;i<q;i++)if(mod(a*i,q)===1)return i;throw Error("inverse")}
  function plan(q){
   let out=[];
-  for(let u=q+2;u<=2*q;u++)if(u%2===0){
+  for(let u=q+2;u<=2*q;u++)if(u%2===0&&u%6!==4){
    let r=mod(-u-inv(2,q),q),w=3*q+2-u;
    if([0,1,3,q-1].includes(r)||w<q||w>2*q)continue;
    out.push({q,u,w,r,v:mod(1-inv(r,q),q)});
@@ -18,7 +18,7 @@ function audit(){
  }
  let localPlans=0,clockControls=0,sourceClassControls=0,averageControls=0;
  for(let q of primes.filter(q=>q>=11&&q<=997&&q%3===2)){
-  let ps=plan(q);ok(ps.length>=q/2-5,"many choices");
+  let ps=plan(q);ok(ps.length>=Math.max(1,q/3-5),"many choices");
   ok(new Set(ps.map(a=>a.v)).size===ps.length,"injective choices");
   for(let a of ps){
    localPlans++;
@@ -31,7 +31,7 @@ function audit(){
      let u=plus?a.u:a.w,b=plus?0:3;
      ok(u>=q&&u<=2*q&&u%2===(plus?0:1)&&mod(2*p+2*u+1-2*b,q)===0,"clock pin");
      let first=0;for(let t=1;t<=2*q;t++)if(t%2===(plus?0:1)&&mod(2*p+2*t+1-2*b,q)===0){first=t;break}
-     ok(first===u,"first calendar");clockControls++;
+     ok(first===u,"first calendar");let w3=mod(-(4+u),6)||6;ok(w3>=2&&w3<=6,"strict following three-clock increment");clockControls++;
     }else if(source)sourceClassControls++;
    }
   }
@@ -41,7 +41,7 @@ function audit(){
  }
  function next(x,n){let w=Infinity,p=0,s=0;for(let e of [-1,1])for(let q of fac(x+e)){let t=mod((e===1?0:q+2)-n,2*q)||2*q;if(t<w||t===w&&q<p){w=t;p=q;s=e}}return{w,p,s}}
  function literal(x,n,T){let f=[fac(x+1),fac(x-1)];for(let t=1;t<=T;t++){let nn=n+t,s=mod(nn,2)?-1:1,qs=f[s===1?0:1].filter(q=>mod(nn,2*q)===(s===1?0:q+2));if(qs.length)return{w:t,p:Math.min(...qs),s}}return null}
- let pairs=0,matched=0,firstControls=0,firstOutside=0,secondPositive=0,thirdTooLarge=0,thirdPositiveNet=0,bothNonTwin=0,netMin=Infinity,examples=[],tickChecks=0;
+ let pairs=0,matched=0,firstControls=0,firstOutside=0,secondPositive=0,thirdTooLarge=0,thirdPositiveNet=0,bothNonTwin=0,netMin=Infinity,threePositive=0,threePositiveNonTwin=0,threeWaits={},otherAfterSelected=0,examples=[],tickChecks=0;
  // Finite proxies: K=12, a single selected prime 11, fixed progression on v.
  // No claim of asymptotic density from this sample.
  const q=11,B=4620,ps=plan(q);
@@ -65,14 +65,20 @@ function audit(){
     ok(y%3===2&&(y+1)%3===0,"three clock after selected prime");
     let g=next(y,nn),lg=literal(y,nn,g.w);ok(lg&&lg.p===g.p&&lg.w===g.w&&g.w<=6,"third literal");tickChecks+=g.w;
     let b=g.s===1?0:3;ok(mod(2*p+2*(u+g.w)-(q-1)+1-2*b,g.p)===0,"third height pin");
+    if(g.p===3){ok(g.w>=2&&g.s===1&&y%3===2,"positive three firing");threePositive++;threeWaits[g.w]=(threeWaits[g.w]||0)+1;}else{otherAfterSelected++;ok(g.p!==q&&g.p>3,"other third label");if(g.p<12){ok(g.p!==5&&mod(q-2,g.p)===0,"nonselected small competitor divisor");}}
     if(g.p>=q/2){thirdTooLarge++;continue}
     let z=y-g.p+1,hn=z/2+nn+g.w,inc=hn-p;ok(inc>=q/4,"retained net increase");thirdPositiveNet++;netMin=Math.min(netMin,inc);
     let nt=!(fac(z-1).length===1&&fac(z-1)[0]===z-1&&fac(z+1).length===1&&fac(z+1)[0]===z+1);
-    if(nt)bothNonTwin++;
+    if(nt)bothNonTwin++;if(nt&&g.p===3)threePositiveNonTwin++;
     if(examples.length<6)examples.push({A,p,v,second:{q,w:u,s,h},third:{q:g.p,w:g.w,h:hn},net:inc,nonTwin:nt});
    }
   }
  }
- return{localPlans,clockControls,sourceClassControls,averageControls,pairs,matched,firstControls,firstOutside,secondPositive,thirdTooLarge,thirdPositiveNet,bothNonTwin,netMin:netMin===Infinity?null:netMin,tickChecks,examples}
+ let smallBlockControls=0,divisorControls=0;
+ for(let q of primes.filter(q=>q>=31&&q<=100000&&q%3===2&&q%5===1&&q%7===1)){
+  for(let r of [5,7]){ok((q-1)%r===0&&mod(-(q-1)-1,r)!==0&&mod(-(q-1)+1,r)!==0,"blocked small labels");smallBlockControls++}
+  for(let r of fac(q-2)){ok(r!==q&&mod(-(q-1)+1,r)===0,"unselected competitor divisor");divisorControls++}
+ }
+ return{smallBlockControls,divisorControls,threePositive,threePositiveNonTwin,threeWaits,otherAfterSelected,localPlans,clockControls,sourceClassControls,averageControls,pairs,matched,firstControls,firstOutside,secondPositive,thirdTooLarge,thirdPositiveNet,bothNonTwin,netMin:netMin===Infinity?null:netMin,tickChecks,examples}
 }
 console.log(JSON.stringify(audit(),null,2));
