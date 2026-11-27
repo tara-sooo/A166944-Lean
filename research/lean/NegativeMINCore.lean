@@ -2844,4 +2844,134 @@ theorem payDeath_dominates (inc : State → Nat) (R T M : Nat)
 #print axioms NegativeMIN.payDeath_live_exact
 #print axioms NegativeMIN.payDeath_dominates
 
+/-! A sharper integer moment inequality, with no division or
+real-number imports. It is the cross-multiplied Cauchy bound. -/
+
+def clipDen (M m : Nat) : Nat := (M-1)*m+m*m
+
+theorem nat_two_mul_le_squares (a b : Nat) : 2*a*b ≤ a*a+b*b := by
+  by_cases h : a ≤ b
+  · have e : b-a+a=b := by omega
+    have h1 : (b-a)*a+a*a=b*a := by rw [← Nat.add_mul,e]
+    have h2 : (b-a)*b+a*b=b*b := by rw [← Nat.add_mul,e]
+    have h3 := Nat.mul_le_mul_left (b-a) h
+    rw [Nat.mul_comm b a] at h1
+    rw [Nat.mul_assoc] 
+    omega
+  · have e : a-b+b=a := by omega
+    have h1 : (a-b)*b+b*b=a*b := by rw [← Nat.add_mul,e]
+    have h2 : (a-b)*a+b*a=a*a := by rw [← Nat.add_mul,e]
+    have h3 := Nat.mul_le_mul_left (a-b) (by omega : b≤a)
+    rw [Nat.mul_comm b a] at h2
+    rw [Nat.mul_assoc]
+    omega
+
+theorem clipDen_lower (M m : Nat) (hm : 0<m) : M*m ≤ clipDen M m := by
+  unfold clipDen
+  rw [← Nat.add_mul]
+  exact Nat.mul_le_mul_right m (by omega)
+
+theorem clipDen_large (M m : Nat) (h : M<m) : 2*M*m ≤ clipDen M m := by
+  unfold clipDen
+  rw [← Nat.add_mul]
+  exact Nat.mul_le_mul_right m (by omega)
+
+theorem clip_cross (M a b : Nat) (hM : 0<M) :
+    2*M*a*b ≤ min M a*clipDen M b + min M b*clipDen M a := by
+  by_cases ha0 : a=0
+  · simp [ha0, clipDen]
+  by_cases hb0 : b=0
+  · simp [hb0, clipDen]
+  by_cases ha : a≤M
+  · rw [Nat.min_eq_right ha]
+    by_cases hb : b≤M
+    · rw [Nat.min_eq_right hb]
+      have h1 := Nat.mul_le_mul_left a (clipDen_lower M b (by omega))
+      have h2 := Nat.mul_le_mul_left b (clipDen_lower M a (by omega))
+      have e1 : a*(M*b)=M*a*b := by ac_rfl
+      have e2 : b*(M*a)=M*a*b := by ac_rfl
+      rw [e1] at h1
+      rw [e2] at h2
+      have e : 2*M*a*b = M*a*b+M*a*b := by rw [show 2=1+1 by rfl, Nat.add_mul,Nat.add_mul,Nat.add_mul,Nat.one_mul]
+      rw [e]
+      omega
+    · have h := Nat.mul_le_mul_left a (clipDen_large M b (by omega))
+      have e : a*(2*M*b)=2*M*a*b := by ac_rfl
+      rw [e] at h
+      omega
+  · by_cases hb : b≤M
+    · rw [Nat.min_eq_right hb]
+      have h := Nat.mul_le_mul_left b (clipDen_large M a (by omega))
+      have e : b*(2*M*a)=2*M*a*b := by ac_rfl
+      rw [e] at h
+      omega
+    · rw [Nat.min_eq_left (by omega : M≤a), Nat.min_eq_left (by omega : M≤b)]
+      have h := Nat.mul_le_mul_left M (nat_two_mul_le_squares a b)
+      have e : M*(2*a*b)=2*M*a*b := by ac_rfl
+      rw [e,Nat.mul_add] at h
+      unfold clipDen
+      simp only [Nat.mul_add]
+      omega
+
+theorem sum_self_map (xs : List Nat) : (xs.map (fun m : Nat => m)).sum=xs.sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih => simp [ih]
+
+theorem clip_cross_row (xs : List Nat) (M a : Nat) (hM : 0<M) :
+    2*M*a*xs.sum ≤ min M a*(xs.map (clipDen M)).sum +
+      (xs.map (min M)).sum*clipDen M a := by
+  have h := sum_map_le xs (fun b => 2*M*a*b)
+    (fun b => min M a*clipDen M b + min M b*clipDen M a)
+    (fun b _ => clip_cross M a b hM)
+  have hr : (xs.map (fun b => min M b*clipDen M a)).sum =
+      clipDen M a*(xs.map (min M)).sum := by
+    have he : xs.map (fun b => min M b*clipDen M a) =
+        xs.map (fun b => clipDen M a*min M b) := by
+      apply List.map_congr_left
+      intro b _
+      exact Nat.mul_comm _ _
+    rw [he, sum_map_mul]
+  rw [sum_map_mul,sum_self_map,sum_map_add,sum_map_mul,hr] at h
+  rwa [Nat.mul_comm (clipDen M a)] at h
+
+theorem clip_sharp (xs : List Nat) (M : Nat) (hM : 0<M) :
+    M*xs.sum*xs.sum ≤ (xs.map (min M)).sum*((M-1)*xs.sum+moment2 xs) := by
+  have h := sum_map_le xs (fun a => 2*M*a*xs.sum)
+    (fun a => min M a*(xs.map (clipDen M)).sum+
+      (xs.map (min M)).sum*clipDen M a)
+    (fun a _ => clip_cross_row xs M a hM)
+  have hl : (xs.map (fun a => 2*M*a*xs.sum)).sum = 2*(M*xs.sum*xs.sum) := by
+    have he : xs.map (fun a => 2*M*a*xs.sum) = xs.map (fun a => (2*M*xs.sum)*a) := by
+      apply List.map_congr_left
+      intro a _
+      ac_rfl
+    rw [he,sum_map_mul,sum_self_map]
+    ac_rfl
+  have hr : (xs.map (fun a => min M a*(xs.map (clipDen M)).sum)).sum =
+      (xs.map (min M)).sum*(xs.map (clipDen M)).sum := by
+    have he : xs.map (fun a => min M a*(xs.map (clipDen M)).sum) =
+        xs.map (fun a => (xs.map (clipDen M)).sum*min M a) := by
+      apply List.map_congr_left
+      intro a _
+      exact Nat.mul_comm _ _
+    rw [he,sum_map_mul,Nat.mul_comm]
+  have hd : (xs.map (clipDen M)).sum=(M-1)*xs.sum+moment2 xs := by
+    unfold clipDen moment2
+    rw [sum_map_add,sum_map_mul,sum_self_map]
+  rw [hl,sum_map_add,hr,sum_map_mul,hd] at h
+  omega
+
+theorem payDeath_sharp_moment (inc : State → Nat) (offset : Nat → Nat)
+    (R T M budget : Nat) (hT : 6≤T) (hM : 0<M) :
+    let xs := payMasses inc offset R T budget
+    M*xs.sum*xs.sum ≤ liveTicks (payDeath inc offset R T M budget) R T *
+      ((M-1)*xs.sum+moment2 xs) := by
+  dsimp only
+  rw [payDeath_live_exact inc offset R T M budget hT]
+  exact clip_sharp _ M hM
+
+#print axioms NegativeMIN.clip_sharp
+#print axioms NegativeMIN.payDeath_sharp_moment
+
 end NegativeMIN
