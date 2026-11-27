@@ -7869,8 +7869,11 @@ theorem dualCharge_sum (d : Nat → Nat) (R T : Nat) (ps : List DualPrice)
     split <;> simp
   rw [he,sum_map_mul,← filter_length_indicator]
   unfold obsLiveFiber
-  rw [List.filter_filter,Bool.and_comm]
-  rfl
+  rw [List.filter_filter]
+  congr 2
+  apply List.filter_congr
+  intro A _
+  exact Bool.and_comm _ _
 
 theorem dualCharge_cap (d : Nat → Nat) (R T M : Nat) (ps : List DualPrice)
     (hp : ∀ p∈ps,p.1∈obsBins R T) (hc : ObservedCap d R T M) :
