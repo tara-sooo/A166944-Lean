@@ -7539,4 +7539,161 @@ theorem productHistoryBudget_variance (cost : Nat → Nat → Nat) (R T : Nat)
 #print axioms NegativeMIN.productBudget_pairwise
 #print axioms NegativeMIN.productHistoryBudget_variance
 
+
+/-- Compression: a common number H of equally weighted budget slots per
+root suffices; the exponentially large product ensemble need not be
+computed in the sufficient inequality. -/
+theorem productBudgetValue_scaled (choices : Nat → List Nat) (xs : List Nat)
+    (H A : Nat) (f : Nat → Nat) (hn : xs.Nodup)
+    (hH : ∀ a∈xs,(choices a).length=H) (ha : A∈xs) :
+    H*((productBudgetEnsemble choices xs).map (fun d => f (d A))).sum =
+      (productBudgetEnsemble choices xs).length*((choices A).map f).sum := by
+  induction xs with
+  | nil => simp at ha
+  | cons a as ih =>
+    have hnd := List.nodup_cons.mp hn
+    have hlen := hH a (by simp)
+    rw [productBudgetEnsemble_length_cons,hlen,productBudgetEnsemble_sum_cons]
+    by_cases he : A=a
+    · subst A
+      simp only [budgetAssign,if_true,sum_const_nat]
+      rw [sum_map_mul]
+      ac_rfl
+    · have hat : A∈as := by simpa [he] using ha
+      simp only [budgetAssign,if_neg he,sum_const_nat,hlen]
+      have hh := ih hnd.2 (fun b hb => hH b (by simp [hb])) hat
+      calc
+        _ = H*(H*((productBudgetEnsemble choices as).map (fun d => f (d A))).sum) := rfl
+        _ = H*((productBudgetEnsemble choices as).length*((choices A).map f).sum) := by rw [hh]
+        _ = _ := by ac_rfl
+
+theorem productBudgetEnsemble_positive (choices : Nat → List Nat)
+    (xs : List Nat) (H : Nat) (hp : 0<H)
+    (hH : ∀ a∈xs,(choices a).length=H) :
+    0<(productBudgetEnsemble choices xs).length := by
+  induction xs with
+  | nil => simp [productBudgetEnsemble]
+  | cons a as ih =>
+    rw [productBudgetEnsemble_length_cons,hH a (by simp)]
+    exact Nat.mul_pos hp (ih (fun b hb => hH b (by simp [hb])))
+
+def compressedRootWeight (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (choices : Nat → List Nat) (A : Nat) : Nat :=
+  ((choices A).map (fun j => bit01 (historyBinBit cost R T b (fun _ => j) A))).sum
+
+def compressedBinWeight (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (choices : Nat → List Nat) : Nat :=
+  ((roots R).map (compressedRootWeight cost R T b choices)).sum
+
+def compressedSoftMass (cost : Nat → Nat → Nat) (R T M H : Nat)
+    (choices : Nat → List Nat) : Nat :=
+  ((obsBins R T).map (fun b => min (M*H) (compressedBinWeight cost R T b choices))).sum
+
+def compressedBudgetSum (R : Nat) (choices : Nat → List Nat) : Nat :=
+  ((roots R).map (fun A => (choices A).sum)).sum
+
+theorem compressedBinWeight_exact (cost : Nat → Nat → Nat) (R T H : Nat)
+    (b : Nat × (Nat × Nat)) (choices : Nat → List Nat)
+    (hH : ∀ A∈roots R,(choices A).length=H) :
+    let bs := productBudgetEnsemble choices (roots R)
+    H*(ensembleBinMasses cost R T bs b).sum=bs.length*compressedBinWeight cost R T b choices := by
+  dsimp only
+  rw [ensembleBinMasses_bits,indicatorCounts_sum]
+  unfold compressedBinWeight
+  rw [← sum_map_mul,← sum_map_mul]
+  congr 1
+  apply List.map_congr_left
+  intro A ha
+  have hh := productBudgetValue_scaled choices (roots R) H A
+    (fun j => bit01 (historyBinBit cost R T b (fun _ => j) A))
+    (roots_nodup R) hH ha
+  unfold budgetMarginal compressedRootWeight
+  have he : ((productBudgetEnsemble choices (roots R)).map
+      (fun d => bit01 (historyBinBit cost R T b d A))) =
+      ((productBudgetEnsemble choices (roots R)).map
+      (fun d => bit01 (historyBinBit cost R T b (fun _ => d A) A))) := by
+    apply List.map_congr_left
+    intro d _
+    rw [historyBinBit_local cost R T b d A]
+  rw [he]
+  exact hh
+
+theorem mul_min_core (k a b : Nat) : k*min a b=min (k*a) (k*b) := by
+  by_cases h : a≤b
+  · rw [Nat.min_eq_left h,Nat.min_eq_left (Nat.mul_le_mul_left k h)]
+  · have hb : b≤a := by omega
+    rw [Nat.min_eq_right hb,Nat.min_eq_right (Nat.mul_le_mul_left k hb)]
+
+theorem compressedSoftMass_exact (cost : Nat → Nat → Nat) (R T M H : Nat)
+    (choices : Nat → List Nat) (hH : ∀ A∈roots R,(choices A).length=H) :
+    let bs := productBudgetEnsemble choices (roots R)
+    H*ensembleSoftMass cost R T M bs=bs.length*compressedSoftMass cost R T M H choices := by
+  dsimp only
+  unfold ensembleSoftMass compressedSoftMass
+  rw [← sum_map_mul,← sum_map_mul]
+  congr 1
+  apply List.map_congr_left
+  intro b _
+  rw [mul_min_core,mul_min_core,compressedBinWeight_exact cost R T H b choices hH]
+  have he : H*(M*(productBudgetEnsemble choices (roots R)).length)=
+      (productBudgetEnsemble choices (roots R)).length*(M*H) := by ac_rfl
+  rw [he]
+
+theorem compressedBudgetSum_exact (R H : Nat) (choices : Nat → List Nat)
+    (hH : ∀ A∈roots R,(choices A).length=H) :
+    let bs := productBudgetEnsemble choices (roots R)
+    H*(bs.map (budgetTotal R)).sum=bs.length*compressedBudgetSum R choices := by
+  dsimp only
+  unfold budgetTotal compressedBudgetSum
+  rw [sum_map_swap,← sum_map_mul,← sum_map_mul]
+  congr 1
+  apply List.map_congr_left
+  intro A ha
+  have hh := productBudgetValue_scaled choices (roots R) H A (fun j => j)
+    (roots_nodup R) hH ha
+  simpa only [List.map_id_fun] using hh
+
+/-- The finite soft survival certificate uses only individual choice lists
+and observation bins. The analytic HistoryLiveEstimate remains OPEN. -/
+theorem twin_above_of_compressed_soft (cost : Nat → Nat → Nat)
+    (R T M B0 D err B H : Nat) (choices : Nat → List Nat)
+    (hT : 6≤T) (hM : 0<M) (hHp : 0<H) (hlarge : B+3*T+6<R)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hEst : HistoryLiveEstimate cost R T M B0 D err)
+    (hH : ∀ A∈roots R,(choices A).length=H)
+    (hgap : 2*(H*err+compressedBudgetSum R choices) <
+      D*compressedSoftMass cost R T M H choices) :
+    ∃ x : Nat, B<x ∧ TwinCenter x := by
+  let bs := productBudgetEnsemble choices (roots R)
+  have hK : 0<bs.length := productBudgetEnsemble_positive choices (roots R) H hHp hH
+  have hS := compressedSoftMass_exact cost R T M H choices hH
+  have hC := compressedBudgetSum_exact R H choices hH
+  change H*ensembleSoftMass cost R T M bs=bs.length*compressedSoftMass cost R T M H choices at hS
+  change H*(bs.map (budgetTotal R)).sum=bs.length*compressedBudgetSum R choices at hC
+  have hg : 2*(bs.length*err+(bs.map (budgetTotal R)).sum) <
+      D*ensembleSoftMass cost R T M bs := by
+    by_contra hn
+    have hh : D*ensembleSoftMass cost R T M bs≤2*(bs.length*err+(bs.map (budgetTotal R)).sum) := by omega
+    have h1 : H*(D*ensembleSoftMass cost R T M bs) =
+        bs.length*(D*compressedSoftMass cost R T M H choices) := by
+      calc
+        _ = D*(H*ensembleSoftMass cost R T M bs) := by ac_rfl
+        _ = _ := by rw [hS]; ac_rfl
+    have h2 : H*(2*(bs.length*err+(bs.map (budgetTotal R)).sum)) =
+        bs.length*(2*(H*err+compressedBudgetSum R choices)) := by
+      calc
+        _ = 2*(H*(bs.length*err)+H*(bs.map (budgetTotal R)).sum) := by
+          simp only [Nat.mul_add]; ac_rfl
+        _ = _ := by rw [hC]; simp only [Nat.mul_add]; ac_rfl
+    have hmul := Nat.mul_le_mul_left H hh
+    rw [h1,h2] at hmul
+    have hbad := Nat.le_of_mul_le_mul_left hmul hK
+    omega
+  exact twin_above_of_soft_ensemble cost R T M B0 D err B bs hT hM hlarge hm hz hEst
+    (fun b _ => productHistoryBudget_variance cost R T choices b) hg
+
+#print axioms NegativeMIN.compressedSoftMass_exact
+#print axioms NegativeMIN.compressedBudgetSum_exact
+#print axioms NegativeMIN.twin_above_of_compressed_soft
+
 end NegativeMIN
