@@ -1859,8 +1859,20 @@ theorem weightedCost_root (deathAge : Nat → Nat) (R T A z Y0 Y1 wN wQ : Nat) :
         if Y0 ≤ p ∧ p < Y1 ∧ p^3 ≤ (2*q)^5 then 2*q else 0)).sum := by
   rw [pathCost_sum]
   simp only [weightedInc]
-  rw [sum_map_add, sum_map_mul, sum_map_mul, filter_length_indicator]
-  simp only [narrowInc, mediumInc, decide_eq_true_eq, orbit]
+  rw [sum_map_add, sum_map_mul, sum_map_mul]
+  have hn : ((List.range (prefixAge deathAge R T A)).map
+      (fun i => narrowInc z Y0 (evolve (birth A) i))).sum =
+        ((List.range (prefixAge deathAge R T A)).filter (fun i =>
+          decide (z < winner (orbit A i) ∧ winner (orbit A i) < Y0))).length := by
+    rw [filter_length_indicator]
+    congr 1
+    apply List.map_congr_left
+    intro i _
+    unfold narrowInc orbit
+    by_cases h : z < winner (evolve (birth A) i) ∧ winner (evolve (birth A) i) < Y0 <;>
+      simp [h]
+  rw [hn]
+  rfl
 
 theorem weightedCost_sum (deathAge : Nat → Nat) (R T z Y0 Y1 wN wQ : Nat) :
     ((roots R).map (fun A =>
@@ -2107,5 +2119,70 @@ theorem cheapRankDeath_live_exact (inc : State → Nat) (R T M budget : Nat)
 
 #print axioms NegativeMIN.liveTicks_eq_bins
 #print axioms NegativeMIN.cheapRankDeath_live_exact
+
+/-! Moment lower bounds without Mathlib imports. The finite inequality
+is a proof of survival for the exact policy, not a bound on the moments. -/
+
+def moment2 (xs : List Nat) : Nat := (xs.map (fun m => m*m)).sum
+
+theorem clip_pointwise (M K m : Nat) (hMK : M ≤ K) :
+    M*K*m ≤ K*K*min M m + M*(m*m) := by
+  by_cases hm : m ≤ K
+  · have hclip : M*m ≤ K*min M m := by
+      by_cases h : m ≤ M
+      · rw [Nat.min_eq_right h]
+        exact Nat.mul_le_mul_right m hMK
+      · rw [Nat.min_eq_left (by omega : M ≤ m), Nat.mul_comm K M]
+        exact Nat.mul_le_mul_left M hm
+    calc
+      M*K*m = K*(M*m) := by ac_rfl
+      _ ≤ K*(K*min M m) := Nat.mul_le_mul_left K hclip
+      _ ≤ K*K*min M m + M*(m*m) := by rw [← Nat.mul_assoc]; omega
+  · have h : M*K*m ≤ M*m*m :=
+      Nat.mul_le_mul_right m (Nat.mul_le_mul_left M (by omega : K ≤ m))
+    rw [Nat.mul_assoc M m m] at h
+    omega
+
+theorem clip_moment_lower (xs : List Nat) (M K : Nat) (hMK : M ≤ K) :
+    M*K*xs.sum ≤ K*K*(xs.map (min M)).sum + M*moment2 xs := by
+  have h := sum_map_le xs (fun m => (M*K)*m)
+    (fun m => (K*K)*min M m + M*(m*m)) (fun m _ => clip_pointwise M K m hMK)
+  rw [sum_map_mul, sum_map_add, sum_map_mul, sum_map_mul] at h
+  induction xs with
+  | nil => simp [moment2]
+  | cons a xs ih =>
+    simpa only [moment2, List.map_cons, List.sum_cons, Nat.mul_add, Nat.add_mul] using h
+
+/-- A simple explicit threshold version of the moment criterion,
+valid even when the total untruncated pair loss bound exceeds the
+cohort mass. No positive denominator division is hidden. -/
+theorem clip_moment_half (xs : List Nat) (M K : Nat) (hMK : M ≤ K)
+    (hK : 0 < K) (hQ : 2*moment2 xs ≤ K*xs.sum) :
+    M*xs.sum ≤ 2*K*(xs.map (min M)).sum := by
+  have h := clip_moment_lower xs M K hMK
+  have h1 := Nat.mul_le_mul_left M hQ
+  have h2 := Nat.mul_le_mul_left 2 h
+  have ha : 2*(M*K*xs.sum) = 2*(K*(M*xs.sum)) := by ac_rfl
+  have hb : M*(2*moment2 xs) = 2*(M*moment2 xs) := by ac_rfl
+  have hc : M*(K*xs.sum) = K*(M*xs.sum) := by ac_rfl
+  have hd : 2*(K*K*(xs.map (min M)).sum) =
+      K*(2*K*(xs.map (min M)).sum) := by ac_rfl
+  rw [Nat.mul_add, ha, hd] at h2
+  rw [hb, hc] at h1
+  have hlast : K*(M*xs.sum) ≤ K*(2*K*(xs.map (min M)).sum) := by omega
+  exact Nat.le_of_mul_le_mul_left hlast hK
+
+/-- The policy is constructive; only the stated actual moment bound
+is an external hypothesis. -/
+theorem cheapRankDeath_moment_lower (inc : State → Nat) (R T M budget K : Nat)
+    (hT : 6 ≤ T) (hMK : M ≤ K) (hK : 0 < K)
+    (hQ : 2*moment2 (cheapMasses inc R T budget) ≤ K*(cheapMasses inc R T budget).sum) :
+    M*(cheapMasses inc R T budget).sum ≤
+      2*K*liveTicks (cheapRankDeath inc R T M budget) R T := by
+  rw [cheapRankDeath_live_exact inc R T M budget hT]
+  exact clip_moment_half _ M K hMK hK hQ
+
+#print axioms NegativeMIN.clip_moment_lower
+#print axioms NegativeMIN.cheapRankDeath_moment_lower
 
 end NegativeMIN
