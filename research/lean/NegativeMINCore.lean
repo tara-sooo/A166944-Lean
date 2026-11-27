@@ -4893,4 +4893,140 @@ theorem medium_forward_reduction (z Y0 Y1 U A k : Nat)
 #print axioms NegativeMIN.badForward_sum_bound
 #print axioms NegativeMIN.medium_forward_reduction
 
+/-! Aggregate forward ledger and comparison of the ORIGINAL net
+objective with an increased narrow-only price. -/
+
+theorem total_narrow_eq (R T z Y0 : Nat) (d : Nat → Nat) :
+    totalExpense (narrowInc z Y0) R T d=narrowCount d R T z Y0 := by
+  have h := weightedCost_sum d R T z Y0 Y0 1 0
+  change totalExpense (weightedInc z Y0 Y0 1 0) R T d = _ at h
+  have he : weightedInc z Y0 Y0 1 0=narrowInc z Y0 := by
+    funext s
+    simp [weightedInc]
+  rw [he,Nat.one_mul,Nat.zero_mul,Nat.add_zero] at h
+  exact h
+
+theorem total_medium_eq (R T Y0 Y1 : Nat) (d : Nat → Nat) :
+    totalExpense (mediumInc Y0 Y1) R T d=mediumCharge d R T Y0 Y1 := by
+  have h := weightedCost_sum d R T 0 Y0 Y1 0 1
+  change totalExpense (weightedInc 0 Y0 Y1 0 1) R T d = _ at h
+  have he : weightedInc 0 Y0 Y1 0 1=mediumInc Y0 Y1 := by
+    funext s
+    simp [weightedInc]
+  rw [he,Nat.one_mul,Nat.zero_mul,Nat.zero_add] at h
+  exact h
+
+theorem prefixGain_le (R T A : Nat) (d : Nat → Nat)
+    (hT : 6≤T) (hA : A∈roots R) :
+    gain (birth A) (orbit A (prefixAge d R T A))≤3*T+6 := by
+  have hr := hA
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+  have ha := observeAge_le_half R T A hT hr.2.1 hr.2.2
+  have he : A%2=0 := by omega
+  have hg := canonical_gain_bound A (prefixAge d R T A) he
+  unfold prefixAge at hg
+  omega
+
+def forwardCleanCharge (R T z Y0 Y1 U : Nat) (d : Nat → Nat) : Nat :=
+  ((roots R).map (fun A => forwardCleanExpense z Y0 Y1 U A (prefixAge d R T A))).sum
+
+theorem medium_forward_total (R T z Y0 Y1 U : Nat) (d : Nat → Nat)
+    (hT : 6≤T) (hY : 3≤Y0) :
+    U*mediumCharge d R T Y0 Y1≤
+      U*forwardCleanCharge R T z Y0 Y1 U d+
+      4*(U*Y1)*((roots R).length+narrowCount d R T z Y0)+
+      6*((roots R).length*(3*T+6)) := by
+  let xs := roots R
+  let k := prefixAge d R T
+  let m := fun A => pathCost (mediumInc Y0 Y1) (birth A) (k A)
+  let n := fun A => pathCost (narrowInc z Y0) (birth A) (k A)
+  let f := fun A => forwardCleanExpense z Y0 Y1 U A (k A)
+  have h := sum_map_le xs (fun A => U*m A)
+    (fun A => U*f A+4*(U*Y1)*(1+n A)+6*(3*T+6)) (by
+      intro A hA
+      have h1 := medium_forward_reduction z Y0 Y1 U A (k A) hY
+      have h2 := Nat.mul_le_mul_left 6 (prefixGain_le R T A d hT hA)
+      change U*m A≤U*f A+4*(U*Y1)*(1+n A)+6*gain (birth A) (orbit A (k A)) at h1
+      omega)
+  rw [sum_map_mul,sum_map_add,sum_map_add,sum_map_mul,sum_map_mul,sum_map_mul,
+    sum_map_add,sum_const_nat,Nat.mul_one,sum_const_nat] at h
+  change U*totalExpense (mediumInc Y0 Y1) R T d≤
+    U*forwardCleanCharge R T z Y0 Y1 U d+
+    4*(U*Y1)*(xs.length+totalExpense (narrowInc z Y0) R T d)+
+    6*(xs.length*(3*T+6)) at h
+  rw [total_narrow_eq,total_medium_eq] at h
+  exact h
+
+def boostedNarrow (z Y0 Y1 wN wQ : Nat) (s : State) : Nat :=
+  (wN+4*wQ*Y1)*narrowInc z Y0 s
+
+theorem boostedNarrow_expense (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat) :
+    totalExpense (boostedNarrow z Y0 Y1 wN wQ) R T d=
+      (wN+4*wQ*Y1)*narrowCount d R T z Y0 := by
+  unfold totalExpense boostedNarrow
+  have h : ((roots R).map (fun A =>
+      pathCost (fun s => (wN+4*wQ*Y1)*narrowInc z Y0 s) (birth A) (prefixAge d R T A))) =
+      (roots R).map (fun A => (wN+4*wQ*Y1)*pathCost (narrowInc z Y0) (birth A) (prefixAge d R T A)) := by
+    apply List.map_congr_left
+    intro A _
+    exact pathCost_mul_inc (narrowInc z Y0) _ _ _
+  rw [h,sum_map_mul]
+  change _=(wN+4*wQ*Y1)*narrowCount d R T z Y0
+  change (wN+4*wQ*Y1)*totalExpense (narrowInc z Y0) R T d=_
+  rw [total_narrow_eq]
+
+def forwardError (R T z Y0 Y1 U wQ : Nat) (d : Nat → Nat) : Nat :=
+  wQ*(U*forwardCleanCharge R T z Y0 Y1 U d+
+    4*(U*Y1)*(roots R).length+6*((roots R).length*(3*T+6)))
+
+theorem boostedNarrow_comparison (R T D z Y0 Y1 U wN wQ : Nat) (d : Nat → Nat)
+    (hT : 6≤T) (hY : 3≤Y0) :
+    (U:Int)*policyNet (boostedNarrow z Y0 Y1 wN wQ) D R T d≤
+      (U:Int)*policyNet (weightedInc z Y0 Y1 wN wQ) D R T d+
+        (forwardError R T z Y0 Y1 U wQ d:Int) := by
+  have h := medium_forward_total R T z Y0 Y1 U d hT hY
+  have hm := Nat.mul_le_mul_left wQ h
+  have he := weightedCost_sum d R T z Y0 Y1 wN wQ
+  change totalExpense (weightedInc z Y0 Y1 wN wQ) R T d = _ at he
+  rw [policyNet_eq,policyNet_eq,boostedNarrow_expense,he]
+  have hnat : U*(wN*narrowCount d R T z Y0+wQ*mediumCharge d R T Y0 Y1)≤
+      U*((wN+4*wQ*Y1)*narrowCount d R T z Y0)+forwardError R T z Y0 Y1 U wQ d := by
+    let n := narrowCount d R T z Y0
+    let m := mediumCharge d R T Y0 Y1
+    let f := forwardCleanCharge R T z Y0 Y1 U d
+    let N := (roots R).length
+    change wQ*(U*m)≤wQ*(U*f+4*(U*Y1)*(N+n)+6*(N*(3*T+6))) at hm
+    change U*(wN*n+wQ*m)≤U*((wN+4*wQ*Y1)*n)+wQ*(U*f+4*(U*Y1)*N+6*(N*(3*T+6)))
+    calc
+      U*(wN*n+wQ*m)=U*(wN*n)+wQ*(U*m) := by rw [Nat.mul_add]; ac_rfl
+      _ ≤ U*(wN*n)+wQ*(U*f+4*(U*Y1)*(N+n)+6*(N*(3*T+6))) := by omega
+      _ = _ := by simp only [Nat.mul_add,Nat.add_mul]; ac_rfl
+  have hi := Int.ofNat_le.mpr hnat
+  simp only [Int.natCast_add,Int.natCast_mul] at hi ⊢
+  rw [Int.mul_sub,Int.mul_sub]
+  omega
+
+theorem optimalNet_boostedNarrow_comparison (R T M D z Y0 Y1 U wN wQ : Nat)
+    (hT : 6≤T) (hY : 3≤Y0) :
+    let inc := boostedNarrow z Y0 Y1 wN wQ
+    let d := optimalNetDeath inc D R T M
+    (U:Int)*policyNet inc D R T d≤
+      (U:Int)*policyNet (weightedInc z Y0 Y1 wN wQ) D R T
+        (optimalNetDeath (weightedInc z Y0 Y1 wN wQ) D R T M)+
+      (forwardError R T z Y0 Y1 U wQ d:Int) := by
+  dsimp only
+  let inc := boostedNarrow z Y0 Y1 wN wQ
+  let d := optimalNetDeath inc D R T M
+  have h := boostedNarrow_comparison R T D z Y0 Y1 U wN wQ d hT hY
+  have hc := optimalNetDeath_fullCapped inc D R T M hT
+  have ho := optimalNetDeath_optimal (weightedInc z Y0 Y1 wN wQ) D R T M hT d hc
+  have hm := Int.mul_le_mul_of_nonneg_left ho (show 0≤(U:Int) by omega)
+  change (U:Int)*policyNet inc D R T d≤_ at h
+  change (U:Int)*policyNet inc D R T d≤_
+  omega
+
+#print axioms NegativeMIN.medium_forward_total
+#print axioms NegativeMIN.boostedNarrow_comparison
+#print axioms NegativeMIN.optimalNet_boostedNarrow_comparison
+
 end NegativeMIN
