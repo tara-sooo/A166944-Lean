@@ -7,7 +7,7 @@ function audit(){
  const log2ceil=n=>n<=1?0:Math.ceil(Math.log2(n));
  function table(N){const sp=new Int32Array(N+1),ps=[];for(let p=2;p<=N;p++)if(!sp[p]){sp[p]=p;ps.push(p);if(p*p<=N)for(let n=p*p;n<=N;n+=p)if(!sp[n])sp[n]=p}return {sp,ps}}
  const runs=[];
- for(const [R,T,Q,Y] of [[12000,96,6,30],[48000,192,30,60],[96000,288,210,90]]){
+ for(const mode of ['cell','base'])for(const [R,T,Q,Y] of [[12000,96,6,30],[48000,192,30,60],[96000,288,210,90]]){
   const {sp}=table(2*R+1);
   const fac=n=>{let f=[];while(n>1){let p=sp[n];ok(p>0,"factor domain");f.push(p);while(n%p===0)n/=p}return f};
   const cell=x=>Math.floor(x/Q),q=log2ceil(Q);
@@ -15,7 +15,7 @@ function audit(){
   const D=x=>1+fac(x-2).length+fac(x-1).length+fac(x).length+fac(x+1).length;
   let K=2;for(let x=R-3*T-6;x<=2*R;x+=2)K=Math.max(K,D(x));
   const w=log2ceil(K);
-  const type=e=>cell(e.x)===cell(e.y)?0:e.p>=Y?2:1;
+  const type=e=>(mode==='cell'?cell(e.x)===cell(e.y):Q%e.p===0)?0:e.p>=Y?2:1;
   let codeChecks=0,splitChecks=0,ticks=0,events=0,repeatBlocks=0,highBlocks=0,encodedBits=0,phases=0;
   function encode(word,start,dir){
    let arr=dir===1?word:word.slice().reverse(),pos=start,bits="",formula=0,lo=0,nh=0,nm=0,blocks=0;
@@ -32,7 +32,7 @@ function audit(){
     for(const e of a){
      ok(pos===(dir===1?e.x:e.y),"event continuity");
      let t=type(e);
-     if(!t){base+=e.p-1;ok(e.p<=Q+1,"in cell label bound")}
+     if(!t){base+=e.p-1;ok(e.p<=Q+1&&cell(e.x)===cell(e.y),"base run stays in cell")}
      else{let j=seen.indexOf(e.p);
       if(j>=0)counts[j]++;
       else{chunk();let choices=cand(pos,dir,false);ok(choices.length<=K,"medium degree");put(choices.indexOf(e.p),w);seen.push(e.p);counts.push(0)}
@@ -59,10 +59,10 @@ function audit(){
     for(let j=0;j<=k;j++){
      let g=0;for(const p of seen)g+=read(b)*(p-1);
      g+=read(b+q);move(g);
-     if(j<k){let ps=cand(x,dir,false),p=ps[read(w)];ok(p!==undefined&&!seen.includes(p),"valid first medium");let y=x+(dir===1?-(p-1):p-1);ok(cell(x)!==cell(y),"medium crossing");seen.push(p);move(p-1)}
+     if(j<k){let ps=cand(x,dir,false),p=ps[read(w)];ok(p!==undefined&&!seen.includes(p),"valid first medium");let y=x+(dir===1?-(p-1):p-1);ok(type({x,y,p})===1,"medium class");seen.push(p);move(p-1)}
     }
     if(!more)break;
-    const p=cand(x,dir,true)[read(2)];ok(p!==undefined,"high pin");ok(cell(x)!==cell(x+(dir===1?-(p-1):p-1)),"high crossing");move(p-1)
+    const p=cand(x,dir,true)[read(2)];ok(p!==undefined,"high pin");ok(type({x,y:x+(dir===1?-(p-1):p-1),p})===2,"high class");move(p-1)
    }
    ok(i===bits.length,"complete code");return x
   }
@@ -87,7 +87,7 @@ function audit(){
     ok(a.formula<=f.formula&&b.formula<=f.formula,"contiguous subpath monotonicity");ok(decode(a.bits,A,1)===v&&decode(b.bits,x,-1)===v,"split reconstruction");splitChecks++;
    }
   }
-  runs.push({R,T,Q,Y,K,roots:rootCount,ticks,events,phases,codeChecks,splitChecks,repeatBlocks,highBlocks,encodedBits,maxMultiplicity});
+  runs.push({mode,R,T,Q,Y,K,roots:rootCount,ticks,events,phases,codeChecks,splitChecks,repeatBlocks,highBlocks,encodedBits,maxMultiplicity});
  }
  // Independent small Selberg weight audit: direct Mobius inversion, then quadratic form and pointwise majorant.
  const sieve=[];const {ps}=table(400);
