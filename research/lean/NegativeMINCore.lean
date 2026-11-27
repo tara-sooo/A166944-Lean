@@ -7415,7 +7415,7 @@ theorem productBudgetEnsemble_sum_cons (choices : Nat → List Nat)
     ((productBudgetEnsemble choices (a::as)).map f).sum=
       ((choices a).map (fun b =>
         ((productBudgetEnsemble choices as).map (fun d => f (budgetAssign a b d))).sum)).sum := by
-  unfold productBudgetEnsemble
+  change (((choices a).flatMap (fun b => (productBudgetEnsemble choices as).map (budgetAssign a b))).map f).sum = _
   rw [sum_map_flatMap]
   simp only [List.map_map,Function.comp_def]
 
@@ -7426,7 +7426,7 @@ theorem productBudgetMarginal_head (choices : Nat → List Nat)
         ((choices a).map (fun b => bit01 (p a b))).sum := by
   unfold budgetMarginal
   rw [productBudgetEnsemble_sum_cons]
-  simp only [budgetAssign,if_pos rfl,sum_const_nat]
+  simp only [budgetAssign,if_true,sum_const_nat]
   rw [← sum_map_mul]
 
 theorem productBudgetMarginal_tail (choices : Nat → List Nat)
@@ -7445,7 +7445,7 @@ theorem productBudgetJoint_head (choices : Nat → List Nat)
         budgetMarginal (productBudgetEnsemble choices as) (fun d x => p x (d x)) x := by
   unfold budgetJoint budgetMarginal
   rw [productBudgetEnsemble_sum_cons]
-  simp only [budgetAssign,if_pos rfl,if_neg h,sum_map_mul]
+  simp only [budgetAssign,if_true,if_neg h,sum_map_mul]
   have he : (choices a).map (fun b => bit01 (p a b)*
         ((productBudgetEnsemble choices as).map (fun d => bit01 (p x (d x)))).sum) =
       (choices a).map (fun b =>
