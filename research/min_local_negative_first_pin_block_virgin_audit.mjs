@@ -14,7 +14,7 @@ function audit(){
  function add(m,k,v=1){m.set(k,(m.get(k)||0)+v)}
  for(let H of [16,32,64])for(let p of [5,7,11,13]){
   const old=P.filter(q=>q!==p),m=M/p,l=6*m;
-  let S=new Map(),B=new Map(),Bs=new Map(),actualS=new Map(),actualB=new Map(),actualFirst=new Map(),predFirst=new Map(),predVirgin=new Map(),raw=0,distinct=0,blocks=0,pruned=0,fullN=0,deletedN=0,actualRepeat=0,firstTotal=0,repeatBound=0,sourcePoint=0,basePoint=0,entropy=0,unprunedEntropy=0,prunedEntropy=0;
+  let S=new Map(),B=new Map(),Bs=new Map(),actualS=new Map(),actualB=new Map(),actualFirst=new Map(),predFirst=new Map(),predVirgin=new Map(),raw=0,distinct=0,blocks=0,pruned=0,fullN=0,deletedN=0,actualRepeat=0,firstTotal=0,repeatBound=0,sourcePoint=0,basePoint=0,predS=new Map(),entropy=0,unprunedEntropy=0,prunedEntropy=0;
   function lift(a,r){let k=0;while(mod(a+k*l-r,p))k++;ck(k<p,"lift");return a+k*l}
   const key=(a,h)=>mod(a,L)+":"+h;
   for(let j=0;j<m;j++){
@@ -27,7 +27,7 @@ function audit(){
     if(v.v%p===0&&(v.q===1||v.q>p)){
      raw++;z.sourceTests++;let r=mod(v.G+v.s,p);
      if(!seen.has(r)){seen.add(r);distinct++;z.firstPins++;
-      let a=lift(v.a,v.s),root=mod(a+v.G,L);predFirst.set(root,{a:mod(a-p+1,L),h:v.b-(p-1)/2,G:v.G});firstTotal++;
+      let a=lift(v.a,v.s),root=mod(a+v.G,L);predFirst.set(root,{a:mod(a-p+1,L),h:v.b-(p-1)/2,G:v.G});firstTotal++;let target=a-p+1,h=v.b-(p-1)/2,n=h-target/2,w=Infinity;for(let q of old)for(let e of [-1,1])if(mod(target-e,q)===0){let t=mod((e===-1?0:q+2)-n,2*q)||2*q;w=Math.min(w,t)}add(predS,key(target,Math.min(H,h+w-1)));z.massChecks++;
      }
     }
     if(v.q!==1){entryA=v.a-v.q+1;entryG=v.G+v.q-1;entryH=v.b-(v.q-1)/2;entrySeen=new Set(seen)}
@@ -43,18 +43,19 @@ function audit(){
      endBlock(v.h);
      firstEntry=virgin&&v.q===p;entryP=v.q;entryA=v.a-v.q+1;
      if(v.q===p){
-      np++;if(previous!==null){let gap=v.G-previous-(p-1);ck(gap>=p-3,"repeat gap");z.repeatChecks++}previous=v.G;
+      np++;if(previous!==null){let gap=v.G-previous-(p-1);ck(gap>=p-1,"repeat gap");z.repeatChecks++}previous=v.G;
       if(virgin){let x={a:mod(entryA,L),h:v.b-(p-1)/2,G:v.G};actualFirst.set(A,x);virgin=false}
      }
      entryVirgin=virgin;
     }
    });
    endBlock(H);fullN+=ret.count;actualRepeat+=Math.max(0,np-1);
-   if(np){repeatBound+=Math.floor(Math.max(0,ret.G-(p-1))/(2*p-4));ck(np-1<=Math.floor(Math.max(0,ret.G-(p-1))/(2*p-4)),"repeat budget")}
+   if(np){repeatBound+=Math.floor(Math.max(0,ret.G-(p-1))/(2*p-2));ck(np-1<=Math.floor(Math.max(0,ret.G-(p-1))/(2*p-2)),"repeat budget")}
    z.fullRoots++;
   }
   for(let j=0;j<M;j++){let A=6*j;ck(JSON.stringify(actualFirst.get(A))===JSON.stringify(predFirst.get(A)),{H,p,A,actual:actualFirst.get(A),pred:predFirst.get(A)});z.firstChecks++}
   for(let k of new Set([...actualB.keys(),...Bs.keys(),...B.keys()])){ck((actualB.get(k)||0)===(Bs.get(k)||0)&& (Bs.get(k)||0)<=(B.get(k)||0),{H,p,k,a:actualB.get(k),b:Bs.get(k)});z.blockChecks++}
+  for(let k of new Set([...predS.keys(),...actualS.keys()])){ck((predS.get(k)||0)===(actualS.get(k)||0),'source block equality');z.blockChecks++}
   for(let [k,a] of actualS){let b=actualB.get(k)||0;entropy+=phi(a,b);if(b){sourcePoint+=a;basePoint+=b}unprunedEntropy+=phi(a,B.get(k)||0);prunedEntropy+=phi(a,Bs.get(k)||0);z.massChecks++}
   ck([...actualS.values()].reduce((a,b)=>a+b,0)===firstTotal,"source count");ck(entropy<=phi(firstTotal,pruned)+1e-6&&prunedEntropy<=unprunedEntropy+1e-6&&actualRepeat<=repeatBound,"bounds");z.entropyChecks++;
   z.rows.push({H,p,period:M,oldPeriod:m,rawTests:raw/m,distinctPins:distinct/m,firstFraction:firstTotal/M,oldBlocks:blocks/m,prunedVirginBlocks:pruned/M,unprunedVirginBlocks:2*blocks/M,fullEvents:fullN/M,oldEvents:deletedN/m,repeat:actualRepeat/M,repeatBound:repeatBound/M,matchedSource:sourcePoint/M,matchedBase:basePoint/M,entropy:entropy/M,unprunedPointBound:unprunedEntropy/M,prunedAggregate:phi(firstTotal,pruned)/M,unprunedAggregate:phi(firstTotal,2*blocks)/M})
