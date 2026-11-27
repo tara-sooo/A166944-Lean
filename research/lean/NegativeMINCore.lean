@@ -1243,7 +1243,7 @@ theorem firstContact_spec (R T A B u : Nat) (hu : u < T) :
       (!decide (Contact R T A B (observeStart R T A + (i : Int)))) = true := by
     intro i j hij hj
     by_cases hi : Contact R T A B (observeStart R T A + (i : Int))
-    · have h := contact_mono R T A B _ _ (by omega) hi
+    · have h := contact_mono R T A B (observeStart R T A + (i : Int)) (observeStart R T A + (j : Int)) (by omega) hi
       simp [h] at hj
     · simp [hi]
   have h := antitone_count_spec _ hant T u
@@ -1282,6 +1282,7 @@ theorem strictRank_sum (R T A : Nat) (select : Nat → Bool) (n : Int) :
     strictRank R T A select n =
       ((cohort R select).map (fun B => if B < A ∧ Contact R T A B n then 1 else 0)).sum := by
   unfold strictRank cohort
+  change _ = (((roots R).filter select).map (fun B => if decide (B < A ∧ Contact R T A B n) then 1 else 0)).sum
   rw [← filter_length_indicator]
   rw [List.filter_filter]
   apply congrArg List.length
@@ -1314,7 +1315,11 @@ theorem strictRank_integral (R T A : Nat) (select : Nat → Bool) :
     apply List.map_congr_left
     intro u _
     by_cases hc : Contact R T A B (observeStart R T A + (u : Int)) <;> simp [hc]
-  · simp [hb]
+  · simp only [hb, false_and, if_false]
+    generalize List.range T = xs
+    induction xs with
+    | nil => rfl
+    | cons a xs ih => simp only [List.map_cons, List.sum_cons, Nat.zero_add, ih]
 
 /-- Integrated first-contact inequality for a single selected root. -/
 theorem rankDeath_root_loss (R T M A : Nat) (select : Nat → Bool)
@@ -1328,7 +1333,8 @@ theorem rankDeath_root_loss (R T M A : Nat) (select : Nat → Bool)
   rw [List.length_range, hcount] at hcompl
   have heq : T - life (rankDeath R T M select) R T A =
       ((List.range T).map (fun u => if f u then 0 else 1)).sum := by
-    rw [← hcompl, Nat.add_sub_cancel_left, filter_length_indicator]
+    have hsub : T - life (rankDeath R T M select) R T A = ((List.range T).filter (fun a => !f a)).length := by omega
+    rw [hsub, filter_length_indicator]
     congr 1
     apply List.map_congr_left
     intro u _
