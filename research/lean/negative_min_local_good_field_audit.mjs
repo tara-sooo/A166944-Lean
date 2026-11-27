@@ -1,7 +1,7 @@
 // Reverse charge locality, history-only contact energy, and good-phase mask.
 // Reproduce: node research/lean/negative_min_local_good_field_audit.mjs
 function audit(){
- let checks=0,ticks=0,roots=0,windows=0,pairs=0,localTests=0,maskTests=0,prefixTests=0,supportTests=0,bruteTests=0;
+ let checks=0,ticks=0,roots=0,windows=0,pairs=0,localTests=0,maskTests=0,prefixTests=0,supportTests=0,phaseTests=0;
  const ck=(b,s)=>{checks++;if(!b)throw Error(s)};
  function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b)[a,b]=[b,a%b];return a}
  function lpf(n){if(n<2)return 0;for(let p=2;p*p<=n;p++)if(n%p===0)return p;return n}
@@ -102,7 +102,7 @@ function audit(){
   return {A,age,ps,xs,C,F,H,f,g,h,cl};
  }
  function runWindow(rs,T,M,c){
-  let E=c.wS+c.wL,N=rs.length,row={N,S:0,Q:0,Qlo:0,Qhi:0,Qraw:0,zeroPairs:0,excludedPairs:0,recordV:0,good:0,clippedGood:0,clippedAll:0,classes:{},contactPairs:0,maskDominatesActualCost:0};
+  let E=c.wS+c.wL,N=rs.length,row={N,phaseCount:0,goodPhaseCount:0,clippedInteriorGood:0,clippedTerminal:0,clippedNear:0,goodRawEnergy:0,S:0,Q:0,Qlo:0,Qhi:0,Qraw:0,zeroPairs:0,excludedPairs:0,recordV:0,good:0,clippedGood:0,clippedAll:0,classes:{},contactPairs:0,maskDominatesActualCost:0};
   let cohorts=[],first=Array.from({length:N},()=>Array(N).fill(-1)),alive=new Set(),dead=new Set(),lastAge=Math.max(...rs.map(r=>r.age));
   // Process all absolute ticks, including births. Fixed ascending A priority.
   for(let u=-lastAge;u<T;u++){
@@ -119,7 +119,7 @@ function audit(){
     let types=ids.map(i=>rs[i].cl.phase[rs[i].age+u]);ck(types.every(t=>t===types[0]),"mask is shared physical-bin field");
     let type=types[0],good=isGood(type);
     row.classes[type]=(row.classes[type]||0)+ids.length;
-    row.clippedAll+=m;if(good){row.good+=ids.length;row.clippedGood+=m}
+    row.clippedAll+=m;if(good){row.good+=ids.length;row.clippedGood+=m;row.goodRawEnergy+=ids.length**2;if(type==="terminal")row.clippedTerminal+=m;else if(type==="near")row.clippedNear+=m;else row.clippedInteriorGood+=m}
     let gains=ids.map(i=>{let r=rs[i],k=r.age+u;return r.g[k+1]-r.g[k]});
     ck(gains.every(g=>g===0||g===1),"record increments binary at D=1");
     let mass=gains.reduce((a,b)=>a+b,0);row.S+=mass;row.Q+=mass*mass;row.Qraw+=ids.length**2;row.recordV+=Math.min(M,mass);
@@ -128,6 +128,32 @@ function audit(){
    }
    ck([...alive].every(i=>!dead.has(i)),"no resurrection");
   }
+  // Independent phase integral: no tick-by-tick mass sum. A root enters
+  // each stationary phase once, then remains until its common end.
+  let phaseMap=new Map();
+  for(let i=0;i<N;i++){
+   let r=rs[i];
+   for(let u=0;u<T;){
+    let k=r.age+u,x=r.xs[k],end=Math.min(T-1,r.cl.end[k]-r.age),key=x+":"+end,type=r.cl.phase[k];
+    ck(end>=u,"phase time order");
+    if(!phaseMap.has(key))phaseMap.set(key,{end,type,entries:[]});
+    let p=phaseMap.get(key);ck(p.type===type,"shared phase flag");p.entries.push({i,u});
+    for(let t=u;t<=end;t++)ck(r.xs[r.age+t]===x&&r.cl.phase[r.age+t]===type,"constant stationary phase");
+    u=end+1;
+   }
+  }
+  let all=0,good=0,uncapped=0,energy=0,goodEnergy=0;
+  for(let p of phaseMap.values()){
+   p.entries.sort((a,b)=>a.u-b.u||a.i-b.i);
+   ck(new Set(p.entries.map(a=>a.i)).size===p.entries.length,"one arrival per root per phase");
+   let times=p.entries.map(a=>p.end-a.u+1);
+   let v=times.slice(0,M).reduce((s,x)=>s+x,0),mass=times.reduce((s,x)=>s+x,0),q=0;
+   for(let x of times)for(let y of times)q+=Math.min(x,y);
+   all+=v;energy+=q;
+   if(isGood(p.type)){good+=v;uncapped+=mass;goodEnergy+=q;row.goodPhaseCount++}
+   row.phaseCount++;phaseTests++;
+  }
+  ck(all===row.clippedAll&&good===row.clippedGood&&uncapped===row.good&&energy===row.Qraw&&goodEnergy===row.goodRawEnergy,"phase integral equals tick integral");
   let q=0,lo=0,hi=0,suffixCache=new Map();
   for(let i=0;i<N;i++)for(let j=0;j<N;j++){
    let u=first[i][j];if(u<0)continue;let a=rs[i],b=rs[j],ka=a.age+u,kb=b.age+u;
@@ -163,16 +189,16 @@ function audit(){
  }
  let results=[];
  for(let cfg of [{R:600,T:18,M:1,sample:34},{R:2400,T:36,M:2,sample:50},{R:12000,T:72,M:4,sample:40},{R:48000,T:144,M:8,sample:20},{R:192000,T:288,M:16,sample:15}]){
-  let {R,T,M,sample}=cfg,W=T,c={z:3,Y0:13,Yb:23,Ystar:31,Y1:47,Pmax:Math.max(48,Math.floor(T*.75)),K:2,div:1,h:2,U:4,wS:2,wL:1},count=Math.ceil((R/6+1)/(W/6)),total={...cfg,N:0,S:0,Q:0,Qlo:0,Qhi:0,Qraw:0,zeroPairs:0,excludedPairs:0,recordV:0,good:0,clippedGood:0,clippedAll:0,contactPairs:0,maskDominatesActualCost:0,classes:{}};
+  let {R,T,M,sample}=cfg,W=T,c={z:3,Y0:13,Yb:23,Ystar:31,Y1:47,Pmax:Math.max(48,Math.floor(T*.75)),K:2,div:1,h:2,U:4,wS:2,wL:1},count=Math.ceil((R/6+1)/(W/6)),total={...cfg,N:0,phaseCount:0,goodPhaseCount:0,clippedInteriorGood:0,clippedTerminal:0,clippedNear:0,goodRawEnergy:0,S:0,Q:0,Qlo:0,Qhi:0,Qraw:0,zeroPairs:0,excludedPairs:0,recordV:0,good:0,clippedGood:0,clippedAll:0,contactPairs:0,maskDominatesActualCost:0,classes:{}};
   for(let j=0;j<Math.min(sample,count);j++){
    let base=R+Math.floor(j*count/Math.min(sample,count))*W,start=3-base/2,rs=[];
    for(let A=base;A<base+W&&A<=2*R;A+=6)rs.push(trace(A,start,T,c,R===600));
    if(!rs.length)continue;windows++;roots+=rs.length;
    let row=runWindow(rs,T,M,c);for(let [k,v] of Object.entries(row)){if(k==="classes"){for(let [t,n] of Object.entries(v))total.classes[t]=(total.classes[t]||0)+n}else total[k]+=v}
   }
-  let NT=total.N*T;total.normalized={s:total.S/NT,e:total.Q/NT,elo:total.Qlo/NT,ehi:total.Qhi/NT,raw:total.Qraw/NT,v:total.recordV/NT,good:total.good/NT,clippedGood:total.clippedGood/NT,clippedAll:total.clippedAll/NT};
+  let NT=total.N*T;total.normalized={s:total.S/NT,e:total.Q/NT,elo:total.Qlo/NT,ehi:total.Qhi/NT,raw:total.Qraw/NT,v:total.recordV/NT,good:total.good/NT,clippedGood:total.clippedGood/NT,clippedAll:total.clippedAll/NT,clippedInteriorGood:total.clippedInteriorGood/NT,clippedTerminal:total.clippedTerminal/NT,clippedNear:total.clippedNear/NT,goodRawEnergy:total.goodRawEnergy/NT};
   results.push(total)
  }
- return {checks,ticks,roots,windows,pairs,localTests,maskTests,prefixTests,supportTests,results}
+ return {checks,ticks,roots,windows,pairs,localTests,maskTests,prefixTests,supportTests,phaseTests,results}
 }
 console.log(JSON.stringify(audit()));
