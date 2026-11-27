@@ -10303,7 +10303,8 @@ theorem actual_reverseParent (s : State) (U : Nat)
   have he := winner_sound s hp
   have hprime : oddPrime p=true := by
     change eligible s.x (s.n+1) p=true at he
-    exact (Bool.and_eq_true.mp he).1
+    simp only [eligible,Bool.and_eq_true] at he
+    exact he.1
   have hpl := tick_incoming_label_le s hp hx
   have hpin := tick_incoming_spatial_pin s hp hx
   have hg := tick_gain_exact s
@@ -10422,6 +10423,11 @@ theorem shallowObsFiber_bound (R T d B : Nat) (b : DualBin)
 #print axioms NegativeMIN.shallowObsFiber_bound
 
 
+theorem state_eq_coords (s t : State) (hx : s.x=t.x) (hn : s.n=t.n) : s=t := by
+  cases s
+  cases t
+  simp_all
+
 /-! Explicit direct canonical arrivals into height-zero resets.
 A spatial roughness certificate is sufficient for an actual first
 event; it does not merely assert that its clock is eligible. -/
@@ -10513,7 +10519,7 @@ theorem shortReset_direct (x p : Nat) (hp : oddPrime p=true)
     rfl
   change orbit A w=_
   rw [hstep]
-  apply State.ext
+  apply state_eq_coords
   · have hg := tick_gain_exact t
     rw [hwp,ht] at hg
     dsimp [A] at hg
@@ -10526,7 +10532,7 @@ theorem shortReset_to_birth (x : Nat) (hx : x%2=0) (hr : RoughAt x 11) :
   have hh : height2 s=0 := by simp [height2,s]; omega
   have hq := rough_quiet s 11 3 hx (by omega) hr (by omega)
   change evolve s 3=birth x
-  apply State.ext
+  apply state_eq_coords
   · exact quiet_center s 3 hq
   · rw [evolve_clock]
     simp [s,birth]
@@ -10604,7 +10610,7 @@ theorem stationary_birth_fan_bound (R T x M P : Nat) (ps : List Nat)
   have hsub : ∀ A∈fan,A∈fullObsFiber R T (u,(windowId R T x,x)) := by
     intro A ha
     rcases List.mem_cons.mp ha with rfl | hm
-    · exact (fullObsFiber_mem R T _ x).mpr ⟨hx,hk⟩
+    · exact (fullObsFiber_mem R T _ A).mpr ⟨hx,hk⟩
     · obtain ⟨p,hp,rfl⟩ := List.mem_map.mp hm
       obtain ⟨h11,hpr,hdiv,hcal,hr,hA,hJ⟩ := hps p hp
       have hrx : RoughAt x 11 := by
