@@ -9,7 +9,7 @@ function audit(){
  function next(x,n){let w=Infinity,p=0,s=0;for(let e of [-1,1])for(let q of fac(x+e)){let t=mod((e===1?0:q+2)-n,2*q)||2*q;if(t<w||t===w&&q<p){w=t;p=q;s=e}}return {w,p,s}}
  function literal(x,n,T){let a=trial(x-1),b=trial(x+1);for(let i=1;i<=T;i++){let nn=n+i,fs=nn%2===0?b:a,ps=fs.filter(p=>mod(nn,2*p)===(nn%2===0?0:p+2));if(ps.length)return {w:i,p:Math.min(...ps),s:nn%2===0?1:-1}}return null}
  const qmin=x=>Math.min(sp[x-1],sp[x+1]);
- let roots=0,firstTicks=0,pairs=0,pairPins=0,roughChecks=0,detChecks=0,mixedChecks=0,wordChecks=0,shortTicks=0,shortEvents=0,crossEvents=0,crossTicks=0,uniqueCuts=0,sourceChecks=0,stationaryChecks=0,rows=[];
+ let roots=0,firstTicks=0,pairs=0,pairPins=0,roughChecks=0,detChecks=0,mixedChecks=0,wordChecks=0,shortTicks=0,shortEvents=0,crossEvents=0,crossTicks=0,uniqueCuts=0,sourceChecks=0,stationaryChecks=0,squarePairs=0,squareSameLabelPairs=0,squareRoots=0,squareTicks=0,squareEvents=0,squarePositionChecks=0,rows=[];
  function forms(x,p,low,shifts,divs,mixed=false){
   let M=[...new Set([p,...low])].reduce((a,r)=>a*BigInt(r),1n);
   let f=shifts.map((d,i)=>{let r=BigInt(divs[i]);ok(M%r===0n&&BigInt(x+d)%r===0n,"integer forms");return [M/r,BigInt(x+d)/r]});
@@ -32,6 +32,25 @@ function audit(){
   }
   arr.sort((a,b)=>a.x-b.x);
   let near=0,roughBad=0;
+  const T=Math.ceil(8*Math.sqrt(2*R+1)),D=4*T+20;let E=0,same=0;
+  for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length&&arr[j].x-arr[i].x<=D;j++){
+   let a=arr[i],b=arr[j],d=b.x-a.x;E++;squarePairs++;
+   if(a.p===b.p){ok(d%a.p===0&&d>0,"same-label far pin");same++;squareSameLabelPairs++}
+   else forms(a.x,a.p,[b.p],[a.p,a.p-2,d+b.p,d+b.p-2],[a.p,1,b.p,1]);
+  }
+  let sep=[];for(let a of arr)if(!sep.length||a.x-sep[sep.length-1].x>D)sep.push(a);
+  ok(sep.length*(arr.length+2*E)>=arr.length**2,"independent set lower");
+  let visited=new Map(),sqEvents=0;
+  for(let a of sep){
+   let x=a.A,n=3-x/2,t=0;squareRoots++;
+   while(true){
+    ok(x>=a.A-2*t-6&&x<=a.A&&x>=a.x-2*T-6&&x<=a.x+a.p-1,"square horizon envelope");
+    if(visited.has(x))ok(visited.get(x)===a.A,"square horizon spatial separation");else visited.set(x,a.A);
+    squarePositionChecks++;
+    let e=next(x,n);if(t+e.w>T){ok(literal(x,n,T-t)===null,"square literal tail");squareTicks+=T-t;break}
+    let l=literal(x,n,e.w);ok(l&&l.p===e.p&&l.w===e.w&&l.s===e.s,"square literal event");t+=e.w;n+=e.w;x-=e.p-1;squareTicks+=e.w;squareEvents++;sqEvents++;
+   }
+  }
   for(let i=0;i<arr.length;i++){
    let a=arr[i];for(let j=i+1;j<arr.length&&arr[j].x-a.x<=4*J;j++){
     let b=arr[j],d=b.x-a.x;ok(a.p!==b.p&&a.x%a.p===0&&b.x%b.p===0,"near pair pins");pairPins+=2;
@@ -66,7 +85,7 @@ function audit(){
    ok(t<=2*K*(Math.floor(J/2)+1),"crossing time");maxCross=Math.max(maxCross,t);
   }
   ok(cuts.size===good.length*J,"all assigned unit cuts swept");
-  rows.push({R,J,K,H,roots:arr.length,near,roughBad,retained:good.length,lowEvents,zero,distinctVisited:owner.size,assignedCuts:cuts.size,maxCross});
+  rows.push({R,J,K,H,roots:arr.length,near,roughBad,retained:good.length,lowEvents,zero,distinctVisited:owner.size,assignedCuts:cuts.size,maxCross,squareHorizon:T,squarePairCount:E,sameLabelPairs:same,squareSelected:sep.length,squareEvents:sqEvents});
  }
  // Check expansion majorant at individual small integer differences.
  let expansionChecks=0;
@@ -76,6 +95,6 @@ function audit(){
   for(let p of ps){num*=BigInt(p);den*=BigInt(p-4);numU*=BigInt(p+8);denU*=BigInt(p);}
   ok(num*denU<=numU*den,"bad factor expansion majorant");expansionChecks++;
  }
- return {roots,firstTicks,pairs,pairPins,roughChecks,detChecks,mixedChecks,wordChecks,shortTicks,shortEvents,crossEvents,crossTicks,uniqueCuts,sourceChecks,stationaryChecks,expansionChecks,rows}
+ return {roots,firstTicks,pairs,pairPins,roughChecks,detChecks,mixedChecks,wordChecks,shortTicks,shortEvents,crossEvents,crossTicks,uniqueCuts,sourceChecks,stationaryChecks,expansionChecks,squarePairs,squareSameLabelPairs,squareRoots,squareTicks,squareEvents,squarePositionChecks,rows}
 }
 console.log(JSON.stringify(audit(),null,2));
