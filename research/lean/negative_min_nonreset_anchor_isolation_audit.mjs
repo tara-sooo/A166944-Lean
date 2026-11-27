@@ -77,6 +77,26 @@ function audit(){
   }
   rows.push({R,T,U,Y,H,D,anchors:arr.length,resets:localReset,near:localPairs,good:good.length,full:localFull,exit:localExit,sources:localSources,idle:localIdle,fast:localFast});
  }
- return {events,literalTicks,anchorCount,resetCount,nearPairs,nonresetPairs,sameLabelNear,ratioChecks,connectorStates,connectorEvents,connectorExits,connectorFull,sourceCount,forcedComposite,idleCount,fastCount,fastPins,localResidues,sourceTicks,sourceNear,sourceConnectorStates,rows};
+ // Nonvacuous arithmetic-only near-pair controls with exact clock pins.
+ let pinPairs=0,oppositeSignPinPairs=0,example=null;
+ for(let p of [41,43,47,53,59,61])for(let q of [41,43,47,53,59,61])for(let s of [-1,1])for(let t of [-1,1])for(let m=0;m<=3;m++)for(let k=0;k<=3;k++){
+  let h=m*p+(s===1?0:3),hh=k*q+(t===1?0:3);
+  if(Math.abs(h-hh)>13)continue;
+  // n pin: x/2=h-n; n residue 0 or p+2 mod2p.
+  let x0=mod(2*(h-(s===1?0:p+2)),4*p);
+  for(let d=-10;d<=10;d+=2){
+   let e=hh-h-d/2;if(Math.abs(e)>8)continue;
+   for(let x=x0+4*p;x<=x0+4*p*q;x+=4*p){
+    let y=x+d,n=h-x/2,nn=hh-y/2;if(mod(nn,2*q)!==(t===1?0:q+2))continue;
+    let a=record(x,n,p,s,1),b=record(y,nn,q,t,1);
+    if(a.x===b.x&&a.n===b.n&&p===q)continue;
+    ok(p!==q&&(m===0)===(k===0),"arithmetic near-key exclusion");
+    if(m&&k){ok(Math.abs(m*p-k*q)<=13+3,"ratio bound");pinPairs++;if(s!==t)oppositeSignPinPairs++;if(!example)example={a,b,d,e};}
+    break;
+   }
+  }
+ }
+ ok(pinPairs>0&&oppositeSignPinPairs>0,"nonvacuous pin pair controls");
+ return {pinPairs,oppositeSignPinPairs,example,events,literalTicks,anchorCount,resetCount,nearPairs,nonresetPairs,sameLabelNear,ratioChecks,connectorStates,connectorEvents,connectorExits,connectorFull,sourceCount,forcedComposite,idleCount,fastCount,fastPins,localResidues,sourceTicks,sourceNear,sourceConnectorStates,rows};
 }
 console.log(JSON.stringify(audit(),null,2));
