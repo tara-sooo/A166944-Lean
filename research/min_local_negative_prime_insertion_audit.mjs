@@ -21,8 +21,8 @@ function audit(){
  function init(ps){
   let F=4*ps.reduce((a,b)=>a*b,1),N=F/2,keep=new Uint8Array(N).fill(1);return {ps,F,keep};
  }
- function add(old,p,zero=false){
-  const {ps,F,keep}=old,qs=[...ps,p],F1=F*p,N=F/2,N1=F1/2,B=zero?0:Math.min(p-3,Math.floor(Math.log(p)**2),F/2);
+ function add(old,p,zero=false,fixedB=null){
+  const {ps,F,keep}=old,qs=[...ps,p],F1=F*p,N=F/2,N1=F1/2,B=fixedB!==null?fixedB:zero?0:Math.min(p-3,Math.floor(Math.log(p)**2),F/2);
   const oldMass=new Uint32Array(F/2),baseFull=new Uint32Array(F/2),newMass=new Uint32Array(F1/2),goodMass=new Uint32Array(F1/2),badMass=new Uint32Array(F1/2),newKeep=new Uint8Array(N1),regD=new Int32Array(F1/2),badD=new Int32Array(F1/2);
   const goodArrival=new Map(),moved=new Map(),targetBase=new Map(),gainOld=new Uint32Array(N),endOld=new Uint32Array(N),gainNew=new Uint32Array(N1),endNew=new Uint32Array(N1);
   let early=0,terminal=0,unchanged=0,repeat=0,regular=0,highHeight=0,postLong=0,oldTailEvents=0,oldHeightBad=0,eligibleTerminal=0,retOld=0,retNew=0,keptBad=0,keptReg=0,keptIdle=0,checks=0,events=0,oldEvents=0;
@@ -141,6 +141,29 @@ function audit(){
  let a=init([3]),rows=[];for(let p of [5,7,11,13,17]){a=add(a,p);rows.push(a.out)}
  let b=init([3,5]),sparse=[];for(let p of [101,103]){b=add(b,p);sparse.push(b.out)}
  let c=init([3]),zero=[];for(let p of [5,7,11,13,17]){c=add(c,p,true);zero.push(c.out)}
- return {rows,sparse,zero};
+ // Exact relaxed maximum gain on the spatial DAG, independent of clock.
+ function relaxed(ps){
+  let Q=2*ps.reduce((a,p)=>a*p,1),d=new Uint32Array(Q/2),max=0,edges=0;
+  for(let x=0;x<Q;x+=2){
+   for(let p of ps)if(mod(x-1,p)===0||mod(x+1,p)===0){
+    let y=x-p+1;ck(y>=0&&y<x,"relaxed barrier");d[x/2]=Math.max(d[x/2],p-1+d[y/2]);edges++;
+   }
+   max=Math.max(max,d[x/2]);
+  }
+  return {Q,max,edges};
+ }
+ let separated=[];
+ for(let chain of [[37,607],[59,953]]){
+  let a=init([3]),H=relaxed(a.ps).max,rs=[];
+  for(let p of chain){
+   ck(p>6*H+9,"singular old path too short to be interrupted");
+   let oldH=H,oldF=a.F;a=add(a,p,false,H);
+   let q=relaxed(a.ps);ck(q.max<=2*H+p-1,"all-clock separated gain bound");
+   ck(a.out.early===0&&a.out.repeat===0&&a.out.highHeight===0&&a.out.postLong===0&&a.out.retNew===1&&a.out.defect===0,"all histories regular on separated alphabet");
+   rs.push({...a.out,oldH,newH:q.max,relaxedEdges:q.edges});H=q.max;
+  }
+  separated.push({chain,rows:rs});
+ }
+ return {rows,sparse,zero,separated};
 }
 if(typeof console!=="undefined")console.log(JSON.stringify(audit(),null,2));
