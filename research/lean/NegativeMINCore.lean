@@ -983,7 +983,10 @@ theorem sum_map_swap {α β : Type} (xs : List α) (ys : List β) (f : α → β
     (xs.map (fun a => (ys.map (f a)).sum)).sum =
       (ys.map (fun b => (xs.map (fun a => f a b)).sum)).sum := by
   induction xs with
-  | nil => induction ys <;> simp_all
+  | nil =>
+    induction ys with
+    | nil => rfl
+    | cons b ys ih => simpa only [List.map_nil, List.sum_nil, List.map_cons, List.sum_cons, Nat.zero_add] using ih
   | cons a xs ih =>
     simp only [List.map_cons, List.sum_cons]
     rw [ih, ← sum_map_add]
@@ -1145,7 +1148,11 @@ theorem rankDeath_observed_iff (R T M A u : Nat) (select : Nat → Bool)
     unfold observeAge
     omega
   simp only [liveAt, decide_eq_true_eq, rankDeath_spec, hc]
-  omega
+  constructor
+  · intro h
+    exact ⟨h.1, h.2.2⟩
+  · intro h
+    exact ⟨h.1, by omega, h.2⟩
 
 /-- Count distinct, higher-priority contacts, not the diagonal. -/
 def strictRank (R T A : Nat) (select : Nat → Bool) (n : Int) : Nat :=
@@ -1166,14 +1173,18 @@ theorem rank_le_strict_add_one_list (xs : List Nat) (A : Nat) (f : Nat → Bool)
         apply List.filter_congr
         intro b hb
         have hne : b ≠ A := fun e => hn'.1 (e ▸ hb)
-        have heq : (b ≤ A) = (b < A) := propext (by omega)
-        rw [heq]
+        by_cases hlt : b < A
+        · simp [hlt, Nat.le_of_lt hlt]
+        · have hle : ¬ b ≤ A := by omega
+          simp [hlt, hle]
       rw [List.filter_cons, List.filter_cons, eqf]
       cases h : f A <;> simp [h]
     · have hi := ih hn'.2
-      have hx : (x ≤ A) = (x < A) := propext (by omega)
-      simp only [List.filter_cons, hx]
-      cases h : f x && decide (x < A) <;> simp [h] <;> omega
+      by_cases hlt : x < A
+      · have hle := Nat.le_of_lt hlt
+        cases h : f x <;> simp [List.filter_cons, hlt, hle, h] <;> omega
+      · have hle : ¬ x ≤ A := by omega
+        simp [List.filter_cons, hlt, hle, hi]
 
 theorem rank_le_strict_add_one (R T A : Nat) (select : Nat → Bool) (n : Int) :
     rank R T A select n ≤ strictRank R T A select n + 1 := by
@@ -1218,11 +1229,11 @@ theorem rankDeath_pointwise_loss (R T M A u : Nat) (select : Nat → Bool)
 monotone, so this is exactly T minus the clipped first contact offset. -/
 def contactTicks (R T A B : Nat) : Nat :=
   ((List.range T).filter
-    (fun u => decide (Contact R T A B (observeStart R T A + (u : Int))))).length
+    (fun u : Nat => decide (Contact R T A B (observeStart R T A + (u : Int))))).length
 
 def firstContactOffset (R T A B : Nat) : Nat :=
   ((List.range T).filter
-    (fun u => !decide (Contact R T A B (observeStart R T A + (u : Int))))).length
+    (fun u : Nat => !decide (Contact R T A B (observeStart R T A + (u : Int))))).length
 
 theorem firstContact_spec (R T A B u : Nat) (hu : u < T) :
     firstContactOffset R T A B ≤ u ↔
@@ -1231,29 +1242,150 @@ theorem firstContact_spec (R T A B u : Nat) (hu : u < T) :
       (!decide (Contact R T A B (observeStart R T A + (j : Int)))) = true →
       (!decide (Contact R T A B (observeStart R T A + (i : Int)))) = true := by
     intro i j hij hj
-    simp only [Bool.not_eq_true, decide_eq_false_iff_not] at hj ⊢
-    exact fun hi => hj (contact_mono R T A B _ _ (by omega) hi)
+    by_cases hi : Contact R T A B (observeStart R T A + (i : Int))
+    · have h := contact_mono R T A B _ _ (by omega) hi
+      simp [h] at hj
+    · simp [hi]
   have h := antitone_count_spec _ hant T u
   change u < firstContactOffset R T A B ↔ _ at h
-  simp only [Bool.not_eq_true, decide_eq_false_iff_not, hu, true_and] at h
-  by_cases hc : Contact R T A B (observeStart R T A + (u : Int)) <;> simp_all <;> omega
+  by_cases hc : Contact R T A B (observeStart R T A + (u : Int))
+  · simp [hc] at h ⊢
+    omega
+  · simp [hc, hu] at h ⊢
+    omega
+
+theorem filter_complement_length {α : Type} (xs : List α) (f : α → Bool) :
+    (xs.filter f).length + (xs.filter (fun a => !f a)).length = xs.length := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    cases h : f a <;> simp [List.filter_cons, h] <;> omega
 
 theorem contactTicks_add_offset (R T A B : Nat) :
     contactTicks R T A B + firstContactOffset R T A B = T := by
   unfold contactTicks firstContactOffset
-  generalize List.range T = xs
-  have h : xs.length = T := by simp_all
-  rw [← h]
-  clear h
-  induction xs with
-  | nil => simp
-  | cons a xs ih =>
-    cases hc : decide (Contact R T A B (observeStart R T A + (a : Int))) <;>
-      simp [hc] <;> omega
+  rw [filter_complement_length, List.length_range]
 
 #print axioms NegativeMIN.rankDeath_fullCapped
 #print axioms NegativeMIN.rankDeath_pointwise_loss
 #print axioms NegativeMIN.firstContact_spec
 #print axioms NegativeMIN.contactTicks_add_offset
+
+/-- Total pair weight over the fixed selected cohort, each unordered
+pair counted once by its larger root ID. -/
+def pairWeight (R T : Nat) (select : Nat → Bool) : Nat :=
+  ((cohort R select).map (fun A =>
+    ((cohort R select).map (fun B =>
+      if B < A then contactTicks R T A B else 0)).sum)).sum
+
+theorem strictRank_sum (R T A : Nat) (select : Nat → Bool) (n : Int) :
+    strictRank R T A select n =
+      ((cohort R select).map (fun B => if B < A ∧ Contact R T A B n then 1 else 0)).sum := by
+  unfold strictRank cohort
+  rw [← filter_length_indicator]
+  rw [List.filter_filter]
+  apply congrArg List.length
+  apply List.filter_congr
+  intro B _
+  by_cases hs : select B = true <;> by_cases h : B < A ∧ Contact R T A B n <;> simp [hs, h]
+
+theorem strictRank_integral (R T A : Nat) (select : Nat → Bool) :
+    ((List.range T).map (fun u : Nat =>
+      strictRank R T A select (observeStart R T A + (u : Int)))).sum =
+      ((cohort R select).map (fun B =>
+        if B < A then contactTicks R T A B else 0)).sum := by
+  have h : ((List.range T).map (fun u : Nat =>
+      strictRank R T A select (observeStart R T A + (u : Int)))).sum =
+      ((List.range T).map (fun u : Nat => ((cohort R select).map
+        (fun B => if B < A ∧ Contact R T A B (observeStart R T A + (u : Int))
+          then 1 else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro u _
+    exact strictRank_sum R T A select _
+  rw [h, sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro B _
+  by_cases hb : B < A
+  · simp only [hb, true_and, if_true, contactTicks]
+    rw [filter_length_indicator]
+    congr 1
+    apply List.map_congr_left
+    intro u _
+    by_cases hc : Contact R T A B (observeStart R T A + (u : Int)) <;> simp [hc]
+  · simp [hb]
+
+/-- Integrated first-contact inequality for a single selected root. -/
+theorem rankDeath_root_loss (R T M A : Nat) (select : Nat → Bool)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0) (hs : select A = true) :
+    M * (T - life (rankDeath R T M select) R T A) ≤
+      ((cohort R select).map (fun B => if B < A then contactTicks R T A B else 0)).sum := by
+  let f := fun u : Nat => liveAt (rankDeath R T M select) R T A u
+  have hcount := life_integral (rankDeath R T M select) R T A
+  change ((List.range T).filter f).length = _ at hcount
+  have hcompl := filter_complement_length (List.range T) f
+  rw [List.length_range, hcount] at hcompl
+  have heq : T - life (rankDeath R T M select) R T A =
+      ((List.range T).map (fun u => if f u then 0 else 1)).sum := by
+    rw [← hcompl, Nat.add_sub_cancel_left, filter_length_indicator]
+    congr 1
+    apply List.map_congr_left
+    intro u _
+    cases h : f u <;> simp [h]
+  rw [heq, ← sum_map_mul, ← strictRank_integral]
+  apply sum_map_le
+  intro u hu
+  exact rankDeath_pointwise_loss R T M A u select hT hR h6 (List.mem_range.mp hu) hs
+
+def cohortLiveTicks (R T M : Nat) (select : Nat → Bool) : Nat :=
+  ((cohort R select).map (life (rankDeath R T M select) R T)).sum
+
+theorem cohortLive_eq_live (R T M : Nat) (select : Nat → Bool) :
+    cohortLiveTicks R T M select = liveTicks (rankDeath R T M select) R T := by
+  unfold cohortLiveTicks cohort liveTicks
+  generalize (roots R) = xs
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    cases h : select a
+    · have hz : life (rankDeath R T M select) R T a = 0 := by simp [life, rankDeath, h]
+      simp [List.filter_cons, h, hz, ih]
+    · simp [List.filter_cons, h, ih]
+
+theorem cohort_loss_identity (R T M : Nat) (select : Nat → Bool) :
+    cohortLiveTicks R T M select +
+      ((cohort R select).map (fun A => T - life (rankDeath R T M select) R T A)).sum =
+        (cohort R select).length * T := by
+  unfold cohortLiveTicks
+  rw [← sum_map_add]
+  generalize cohort R select = xs
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    have h := life_le (rankDeath R T M select) R T a
+    simp only [List.map_cons, List.sum_cons, List.length_cons]
+    rw [Nat.succ_mul, ← ih]
+    omega
+
+/-- Exact finite survival lower bound using weighted first contacts.
+It is an unconditional inequality for any fixed cohort of actual roots. -/
+theorem rankDeath_integrated_loss (R T M : Nat) (select : Nat → Bool)
+    (hT : 6 ≤ T) :
+    M * ((cohort R select).length * T -
+      liveTicks (rankDeath R T M select) R T) ≤ pairWeight R T select := by
+  have heq := cohort_loss_identity R T M select
+  rw [cohortLive_eq_live] at heq
+  have hsub : (cohort R select).length * T -
+      liveTicks (rankDeath R T M select) R T =
+      ((cohort R select).map (fun A => T - life (rankDeath R T M select) R T A)).sum := by omega
+  rw [hsub, ← sum_map_mul]
+  unfold pairWeight
+  apply sum_map_le
+  intro A hA
+  simp only [cohort, roots, List.mem_filter, decide_eq_true_eq] at hA
+  exact rankDeath_root_loss R T M A select hT hA.1.2.1 hA.1.2.2 hA.2
+
+#print axioms NegativeMIN.rankDeath_integrated_loss
 
 end NegativeMIN
