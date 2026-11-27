@@ -9118,4 +9118,246 @@ theorem twin_above_of_wordPotential_records (C : List Nat → Nat) (endClock : I
 #print axioms NegativeMIN.wordPolicyNet_near_optimal
 #print axioms NegativeMIN.twin_above_of_wordPotential_records
 
+
+/-! Nonempty-chunk costs have the opposite one-sided defect. The first
+reset synchronizes the seen sets; before it, starts and saturations
+alternate exactly. -/
+
+def seenBit (a : ChunkStats) : Nat := if a.seen=[] then 0 else 1
+
+theorem seenBit_le_one (a : ChunkStats) : seenBit a≤1 := by
+  unfold seenBit
+  split <;> omega
+
+theorem seenBit_subset (a b : ChunkStats) (h : SeenSub a b) :
+    seenBit a≤seenBit b := by
+  unfold seenBit
+  by_cases ha : a.seen=[]
+  · simp [ha]
+  · have hb : b.seen≠[] := by
+      intro hb
+      cases he : a.seen with
+      | nil => exact ha he
+      | cons p ps =>
+        have hp := h p (by simp [he])
+        simp [hb] at hp
+    simp [ha,hb]
+
+theorem chunkStep_nonempty_balance (z Y reset D : Nat) (a : ChunkStats) (p : Nat)
+    (hr : p<reset) :
+    (chunkStep z Y reset D a p).nonempty+a.saturated+seenBit a=
+      a.nonempty+(chunkStep z Y reset D a p).saturated+
+        seenBit (chunkStep z Y reset D a p) := by
+  have hnr : ¬reset≤p := by omega
+  by_cases hp : z<p ∧ p<Y
+  · by_cases he : a.seen=[]
+    · have hmem : p∉a.seen := by simp [he]
+      by_cases hd : D≤a.seen.length
+      · simp [chunkStep,hnr,hp,he,hmem,hd,seenBit]
+        omega
+      · simp [chunkStep,hnr,hp,he,hmem,hd,seenBit]
+        omega
+    · by_cases hm : p∈a.seen
+      · simp [chunkStep,hnr,hp,he,hm,seenBit]
+      · by_cases hd : D≤a.seen.length
+        · simp [chunkStep,hnr,hp,he,hm,hd,seenBit]
+          omega
+        · simp [chunkStep,hnr,hp,he,hm,hd,seenBit]
+  · simp [chunkStep,hnr,hp]
+
+theorem chunkFold_nonempty_balance (z Y reset D : Nat) (a : ChunkStats) (xs : List Nat)
+    (hr : ∀ p∈xs,p<reset) :
+    (chunkFold z Y reset D a xs).nonempty+a.saturated+seenBit a=
+      a.nonempty+(chunkFold z Y reset D a xs).saturated+
+        seenBit (chunkFold z Y reset D a xs) := by
+  induction xs generalizing a with
+  | nil => simp [chunkFold]
+  | cons p xs ih =>
+    have h1 := chunkStep_nonempty_balance z Y reset D a p (hr p (by simp))
+    have h2 := ih (chunkStep z Y reset D a p) (fun q hq => hr q (by simp [hq]))
+    change (chunkFold z Y reset D (chunkStep z Y reset D a p) xs).nonempty+
+      a.saturated+seenBit a=a.nonempty+
+      (chunkFold z Y reset D (chunkStep z Y reset D a p) xs).saturated+
+      seenBit (chunkFold z Y reset D (chunkStep z Y reset D a p) xs)
+    omega
+
+theorem chunkStep_sameSeen (z Y reset D : Nat) (a b : ChunkStats) (p : Nat)
+    (hs : a.seen=b.seen) :
+    (chunkStep z Y reset D a p).seen=(chunkStep z Y reset D b p).seen ∧
+      (chunkStep z Y reset D a p).nonempty+b.nonempty=
+        (chunkStep z Y reset D b p).nonempty+a.nonempty := by
+  by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+    by_cases he : b.seen=[] <;> by_cases hm : p∈b.seen <;>
+    by_cases hd : D≤b.seen.length <;>
+    simp [chunkStep,hr,hp,he,hm,hd,hs] <;> omega
+
+theorem chunkFold_sameSeen_nonempty (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
+    (hs : a.seen=b.seen) :
+    (chunkFold z Y reset D a xs).nonempty+b.nonempty=
+      (chunkFold z Y reset D b xs).nonempty+a.nonempty := by
+  induction xs generalizing a b with
+  | nil => simp [chunkFold,Nat.add_comm]
+  | cons p xs ih =>
+    have h1 := chunkStep_sameSeen z Y reset D a b p hs
+    have h2 := ih _ _ h1.1
+    simp only [chunkFold]
+    omega
+
+theorem reset_split (reset : Nat) (xs : List Nat) :
+    (∀ p∈xs,p<reset) ∨
+      ∃ pre p post,xs=pre++p::post ∧ reset≤p ∧ ∀ q∈pre,q<reset := by
+  induction xs with
+  | nil => simp
+  | cons p xs ih =>
+    by_cases hr : reset≤p
+    · exact Or.inr ⟨[],p,xs,rfl,hr,by simp⟩
+    · rcases ih with h | ⟨pre,q,post,he,hq,hpre⟩
+      · left
+        intro q hq
+        rcases List.mem_cons.mp hq with rfl | hq
+        · omega
+        · exact h q hq
+      · right
+        refine ⟨p::pre,q,post,by rw [he]; rfl,hq,?_⟩
+        intro r hr'
+        rcases List.mem_cons.mp hr' with rfl | hr'
+        · omega
+        · exact hpre r hr'
+
+theorem chunkFold_nonempty_resetFree (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
+    (ha : ChunkInvariant D a) (hb : ChunkInvariant D b)
+    (hs : b.seen=[]) (he : a.saturated=b.saturated)
+    (hr : ∀ p∈xs,p<reset) :
+    (chunkFold z Y reset D a xs).nonempty+b.nonempty≤
+      (chunkFold z Y reset D b xs).nonempty+a.nonempty ∧
+    (chunkFold z Y reset D b xs).nonempty+a.nonempty≤
+      (chunkFold z Y reset D a xs).nonempty+b.nonempty+1 := by
+  by_cases hzero : a.seen=[]
+  · have hh := chunkFold_sameSeen_nonempty z Y reset D a b xs (hzero.trans hs.symm)
+    omega
+  · have h1 := chunkFold_nonempty_balance z Y reset D a xs hr
+    have h2 := chunkFold_nonempty_balance z Y reset D b xs hr
+    have hba : seenBit a=1 := by simp [seenBit,hzero]
+    have hbb : seenBit b=0 := by simp [seenBit,hs]
+    have hi : SaturationInterlace a b := Or.inl ⟨he,by simp [SeenSub,hs]⟩
+    have hh := chunkFold_interlace z Y reset D a b xs ha hb hi
+    have hua := seenBit_le_one (chunkFold z Y reset D a xs)
+    have hub := seenBit_le_one (chunkFold z Y reset D b xs)
+    rcases hh with ⟨hEq,hSub⟩ | ⟨hEq,hSub⟩
+    · have hBit := seenBit_subset _ _ hSub
+      omega
+    · have hBit := seenBit_subset _ _ hSub
+      omega
+
+theorem chunkFold_nonempty_bounded (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
+    (ha : ChunkInvariant D a) (hb : ChunkInvariant D b)
+    (hs : b.seen=[]) (he : a.saturated=b.saturated) :
+    (chunkFold z Y reset D a xs).nonempty+b.nonempty≤
+      (chunkFold z Y reset D b xs).nonempty+a.nonempty ∧
+    (chunkFold z Y reset D b xs).nonempty+a.nonempty≤
+      (chunkFold z Y reset D a xs).nonempty+b.nonempty+1 := by
+  rcases reset_split reset xs with h | ⟨pre,p,post,hxs,hp,hpre⟩
+  · exact chunkFold_nonempty_resetFree z Y reset D a b xs ha hb hs he h
+  · let a' := chunkFold z Y reset D a pre
+    let b' := chunkFold z Y reset D b pre
+    have hh := chunkFold_nonempty_resetFree z Y reset D a b pre ha hb hs he hpre
+    let a'' := chunkStep z Y reset D a' p
+    let b'' := chunkStep z Y reset D b' p
+    have hseen : a''.seen=b''.seen := by simp [a'',b'',chunkStep,hp]
+    have h1 : a''.nonempty=a'.nonempty := by simp [a'',chunkStep,hp]
+    have h2 : b''.nonempty=b'.nonempty := by simp [b'',chunkStep,hp]
+    have hdelta := chunkFold_sameSeen_nonempty z Y reset D a'' b'' post hseen
+    rw [hxs,chunkFold_append,chunkFold_append]
+    change (chunkFold z Y reset D a'' post).nonempty+b.nonempty≤
+      (chunkFold z Y reset D b'' post).nonempty+a.nonempty ∧
+      (chunkFold z Y reset D b'' post).nonempty+a.nonempty≤
+      (chunkFold z Y reset D a'' post).nonempty+b.nonempty+1
+    change a'.nonempty+b.nonempty≤b'.nonempty+a.nonempty ∧
+      b'.nonempty+a.nonempty≤a'.nonempty+b.nonempty+1 at hh
+    omega
+
+def nonemptyChunkCount (z Y reset D : Nat) (xs : List Nat) : Nat :=
+  (chunkFold z Y reset D chunkInit xs).nonempty
+
+theorem nonemptyChunk_append_bounds (z Y reset D : Nat) (xs ys : List Nat) :
+    nonemptyChunkCount z Y reset D (xs++ys)≤
+      nonemptyChunkCount z Y reset D xs+nonemptyChunkCount z Y reset D ys ∧
+    nonemptyChunkCount z Y reset D xs+nonemptyChunkCount z Y reset D ys≤
+      nonemptyChunkCount z Y reset D (xs++ys)+1 := by
+  let a := chunkFold z Y reset D chunkInit xs
+  let b : ChunkStats := ⟨[],a.saturated,0,(D+1)*a.saturated⟩
+  have ha := chunkFold_inv z Y reset D chunkInit xs (chunkInit_inv D)
+  have hb : ChunkInvariant D b := by simp [ChunkInvariant,b]
+  have hh := chunkFold_nonempty_bounded z Y reset D a b ys ha hb rfl rfl
+  have hdelta := chunkFold_sameSeen_nonempty z Y reset D b chunkInit ys rfl
+  have hbzero : b.nonempty=0 := rfl
+  have hczero : chunkInit.nonempty=0 := rfl
+  rw [hbzero,hczero,Nat.add_zero,Nat.add_zero] at hdelta
+  rw [hbzero,Nat.add_zero,Nat.add_zero,hdelta] at hh
+  unfold nonemptyChunkCount
+  rw [chunkFold_append]
+  change (chunkFold z Y reset D a ys).nonempty≤a.nonempty+(chunkFold z Y reset D chunkInit ys).nonempty ∧
+    a.nonempty+(chunkFold z Y reset D chunkInit ys).nonempty≤(chunkFold z Y reset D a ys).nonempty+1
+  omega
+
+theorem nonemptyChunk_suffix_mono (z Y reset D : Nat) :
+    WordSuffixMono (nonemptyChunkCount z Y reset D) := by
+  intro p xs
+  by_cases hr : reset≤p
+  · unfold nonemptyChunkCount
+    change (chunkFold z Y reset D chunkInit xs).nonempty≤
+      (chunkFold z Y reset D (chunkStep z Y reset D chunkInit p) xs).nonempty
+    simp [chunkStep,hr,chunkInit]
+  · by_cases hp : z<p ∧ p<Y
+    · have h1 : nonemptyChunkCount z Y reset D [p]=1 := by
+        unfold nonemptyChunkCount
+        by_cases hd : D=0 <;>
+          simp [chunkFold,chunkStep,hr,hp,chunkInit,hd]
+      have hh := (nonemptyChunk_append_bounds z Y reset D [p] xs).2
+      change nonemptyChunkCount z Y reset D [p]+nonemptyChunkCount z Y reset D xs≤
+        nonemptyChunkCount z Y reset D (p::xs)+1 at hh
+      omega
+    · unfold nonemptyChunkCount
+      change (chunkFold z Y reset D chunkInit xs).nonempty≤
+        (chunkFold z Y reset D (chunkStep z Y reset D chunkInit p) xs).nonempty
+      simp [chunkStep,hr,hp]
+
+theorem nonemptyChunk_defect (z Y reset D : Nat) :
+    WordCostDefect (nonemptyChunkCount z Y reset D) 1 := by
+  intro xs ys
+  have h := nonemptyChunk_append_bounds z Y reset D xs ys
+  omega
+
+def diversityWordCost (z Y reset D wS wL : Nat) (xs : List Nat) : Nat :=
+  wS*satCount z Y reset D xs+wL*nonemptyChunkCount z Y Y D xs
+
+theorem diversityWordCost_defect (z Y reset D wS wL : Nat) :
+    WordCostDefect (diversityWordCost z Y reset D wS wL) (wS+wL) := by
+  intro xs ys
+  have hs := satCount_append_bounds z Y reset D xs ys
+  have hn := nonemptyChunk_append_bounds z Y Y D xs ys
+  have h1 := Nat.mul_le_mul_left wS hs.1
+  have h2 := Nat.mul_le_mul_left wS hs.2
+  have h3 := Nat.mul_le_mul_left wL hn.1
+  have h4 := Nat.mul_le_mul_left wL hn.2
+  simp only [Nat.mul_add,Nat.mul_one] at h1 h2 h3 h4
+  unfold diversityWordCost
+  omega
+
+theorem diversityWordCost_suffix_mono (z Y reset D wS wL : Nat) :
+    WordSuffixMono (diversityWordCost z Y reset D wS wL) := by
+  intro p xs
+  have h1 := Nat.mul_le_mul_left wS (satCount_suffix_mono z Y reset D p xs)
+  have h2 := Nat.mul_le_mul_left wL (nonemptyChunk_suffix_mono z Y Y D p xs)
+  unfold diversityWordCost
+  omega
+
+theorem diversityWordCost_history (z Y reset D wS wL A k : Nat) :
+    wordHistoryCost (diversityWordCost z Y reset D wS wL) A k=
+      diversityCost z Y reset D wS wL A k := rfl
+
+#print axioms NegativeMIN.nonemptyChunk_append_bounds
+#print axioms NegativeMIN.diversityWordCost_defect
+#print axioms NegativeMIN.diversityWordCost_suffix_mono
+
 end NegativeMIN
