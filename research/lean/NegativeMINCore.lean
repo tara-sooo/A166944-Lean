@@ -2989,8 +2989,8 @@ def recordProfit (f : Nat → Int) (k : Nat) : Int :=
 
 theorem runningPeak_ge (f : Nat → Int) (k : Nat) : f k≤runningPeak f k := by
   cases k with
-  | zero => rfl
-  | succ k => exact le_max_right _ _
+  | zero => exact Int.le_refl _
+  | succ k => exact Int.le_max_right _ _
 
 theorem recordDebt_nonneg (f : Nat → Int) (k : Nat) : 0≤recordDebt f k := by
   have h := runningPeak_ge f k
@@ -3000,7 +3000,7 @@ theorem recordDebt_nonneg (f : Nat → Int) (k : Nat) : 0≤recordDebt f k := by
 theorem recordProfit_nonneg (f : Nat → Int) (k : Nat) : 0≤recordProfit f k := by
   unfold recordProfit
   change 0≤max (runningPeak f k) (f (k+1))-runningPeak f k
-  have h := le_max_left (runningPeak f k) (f (k+1))
+  have h := Int.le_max_left (runningPeak f k) (f (k+1))
   omega
 
 theorem recordDebt_succ (f : Nat → Int) (k : Nat) :
@@ -3008,10 +3008,10 @@ theorem recordDebt_succ (f : Nat → Int) (k : Nat) :
   unfold recordDebt
   simp only [runningPeak]
   by_cases h : runningPeak f k ≤ f (k+1)
-  · rw [max_eq_right h, max_eq_left (by omega : runningPeak f k-f k-(f (k+1)-f k)≤0)]
+  · rw [Int.max_eq_right h, Int.max_eq_left (by omega : runningPeak f k-f k-(f (k+1)-f k)≤0)]
     omega
-  · rw [max_eq_left (by omega : f (k+1)≤runningPeak f k),
-      max_eq_right (by omega : 0≤runningPeak f k-f k-(f (k+1)-f k))]
+  · rw [Int.max_eq_left (by omega : f (k+1)≤runningPeak f k),
+      Int.max_eq_right (by omega : 0≤runningPeak f k-f k-(f (k+1)-f k))]
     omega
 
 theorem recordProfit_eq (f : Nat → Int) (k : Nat) :
@@ -3019,20 +3019,23 @@ theorem recordProfit_eq (f : Nat → Int) (k : Nat) :
   unfold recordProfit recordDebt
   simp only [runningPeak]
   by_cases h : runningPeak f k ≤ f (k+1)
-  · rw [max_eq_right h, max_eq_right (by omega : 0≤f (k+1)-f k-(runningPeak f k-f k))]
+  · rw [Int.max_eq_right h, Int.max_eq_right (by omega : 0≤f (k+1)-f k-(runningPeak f k-f k))]
     omega
-  · rw [max_eq_left (by omega : f (k+1)≤runningPeak f k),
-      max_eq_left (by omega : f (k+1)-f k-(runningPeak f k-f k)≤0)]
+  · rw [Int.max_eq_left (by omega : f (k+1)≤runningPeak f k),
+      Int.max_eq_left (by omega : f (k+1)-f k-(runningPeak f k-f k)≤0)]
     omega
 
 theorem runningPeak_ge_of_le (f : Nat → Int) (i k : Nat) (h : i≤k) :
     f i≤runningPeak f k := by
   induction k with
-  | zero => have hi : i=0 := by omega; subst i; exact runningPeak_ge f 0
+  | zero =>
+    have hi : i=0 := by omega
+    rw [hi]
+    exact runningPeak_ge f 0
   | succ k ih =>
     by_cases he : i=k+1
     · subst i; exact runningPeak_ge f (k+1)
-    · exact le_trans (ih (by omega)) (le_max_left _ _)
+    · exact Int.le_trans (ih (by omega)) (Int.le_max_left _ _)
 
 def bestPrefix (f : Nat → Int) : Nat → Nat
   | 0 => 0
@@ -3040,7 +3043,7 @@ def bestPrefix (f : Nat → Int) : Nat → Nat
 
 theorem bestPrefix_le (f : Nat → Int) (k : Nat) : bestPrefix f k≤k := by
   induction k with
-  | zero => rfl
+  | zero => exact Nat.le_refl _
   | succ k ih =>
     simp only [bestPrefix]
     split <;> omega
@@ -3052,8 +3055,8 @@ theorem bestPrefix_peak (f : Nat → Int) (k : Nat) :
   | succ k ih =>
     simp only [bestPrefix,runningPeak]
     split
-    next h => rw [max_eq_right h]
-    next h => rw [ih,max_eq_left (by omega : f (k+1)≤runningPeak f k)]
+    next h => rw [Int.max_eq_right h]
+    next h => rw [ih,Int.max_eq_left (by omega : f (k+1)≤runningPeak f k)]
 
 theorem recordProfit_sum (f : Nat → Int) (k : Nat) :
     ((List.range k).map (recordProfit f)).sum = runningPeak f k-f 0 := by
@@ -3137,13 +3140,13 @@ theorem peakTruncate_fullCapped (inc : State → Nat) (D R T M : Nat)
 theorem peakTruncate_prefix (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) :
     prefixAge (peakTruncate inc D R T d) R T A=peakTruncate inc D R T d A := by
   have h := bestPrefix_le (rootNet inc D R T A) (prefixAge d R T A)
-  unfold peakTruncate prefixAge at *
+  simp only [peakTruncate,prefixAge] at h ⊢
   omega
 
 theorem peakTruncate_net (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) (A : Nat) :
     rootNet inc D R T A (prefixAge (peakTruncate inc D R T d) R T A)=
       ((List.range (prefixAge d R T A)).map (recordProfit (rootNet inc D R T A))).sum := by
-  rw [peakTruncate_prefix,peakTruncate,bestPrefix_peak,recordProfit_sum,rootNet_zero,Int.sub_zero]
+  rw [peakTruncate_prefix,peakTruncate,bestPrefix_peak (rootNet inc D R T A),recordProfit_sum,rootNet_zero,Int.sub_zero]
 
 /-- Integer-weighted signed net prefix objective of an actual policy. -/
 def policyNet (inc : State → Nat) (D R T : Nat) (d : Nat → Nat) : Int :=
