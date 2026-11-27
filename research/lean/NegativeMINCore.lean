@@ -6327,7 +6327,7 @@ theorem winner_residue (s : State) (p : Nat) (hp : p≠0) (hw : winner s=p) :
     · have hh : (s.x%p+1)/p=1 := by
         have hh := Nat.div_le_div_right (c:=p) (show s.x%p+1≤p by omega)
         rw [Nat.div_self (show 0<p by omega)] at hh
-        omega
+        exact Nat.le_antisymm hh (Nat.pos_of_ne_zero hd)
       rw [hh,Nat.mul_one] at h2
       omega
   · simp only [eligible,Bool.and_eq_true,if_neg hpar,decide_eq_true_eq] at h
@@ -6608,6 +6608,7 @@ theorem finite_support_event_bound (s : State) (K : Nat) (ps : List Nat)
       rw [List.length_append,← eventCount_filter]
       rfl
     rw [hxlen] at hBound
+    change eventCount s K+1≤(2+2*(B+2)^(n+1))^(n+1) at hBound
     unfold finiteSupportLimit
     change eventCount s K≤(2+2*(B+2)^(n+1))^(n+1)-1
     omega
