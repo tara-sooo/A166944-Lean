@@ -1761,4 +1761,145 @@ theorem cheapRankDeath_budget (inc : State → Nat) (R T M budget A delta : Nat)
 #print axioms NegativeMIN.cheapRankDeath_fullCapped
 #print axioms NegativeMIN.cheapRankDeath_budget
 
+/-! Connect the generic budget policy to the exact narrow/medium charges
+in ScaledLiveEstimate. No auxiliary surrogate cost is used. -/
+
+theorem range_find_le (f : Nat → Bool) (b p : Nat) (hb : p < b) (hp : f p = true) :
+    ∃ q : Nat, q ≤ p ∧ (List.range b).find? f = some q := by
+  induction b with
+  | zero => omega
+  | succ b ih =>
+    by_cases hpb : p < b
+    · obtain ⟨q, hq, he⟩ := ih hpb
+      refine ⟨q, hq, ?_⟩
+      rw [List.range_succ, List.find?_append, he]
+      rfl
+    · have heq : p = b := by omega
+      subst p
+      cases he : (List.range b).find? f with
+      | none =>
+        refine ⟨b, by omega, ?_⟩
+        simp [List.range_succ, List.find?_append, he, hp]
+      | some q =>
+        have hq := List.mem_range.mp (List.mem_of_find?_eq_some he)
+        refine ⟨q, by omega, ?_⟩
+        rw [List.range_succ, List.find?_append, he]
+        rfl
+
+theorem leastOddFactor_le (n p : Nat) (hp : oddPrime p = true)
+    (hdiv : n % p = 0) (hpn : p ≤ n) :
+    leastOddFactor n ≤ p := by
+  obtain ⟨q, hq, he⟩ := range_find_le
+    (fun r => oddPrime r && decide (n % r = 0)) (n+1) p (by omega) (by simp [hp, hdiv])
+  unfold leastOddFactor
+  rw [he]
+  exact hq
+
+theorem qmin_le_winner (s : State) (hw : winner s ≠ 0) : qmin s.x ≤ winner s := by
+  have he := winner_sound s hw
+  have hb := winner_le s
+  have h3 := eligible_three_le s.x (s.n+1) (winner s) he
+  unfold qmin
+  by_cases hpar : (s.n+1) % 2 = 0
+  · simp only [eligible, Bool.and_eq_true, if_pos hpar, decide_eq_true_eq] at he
+    exact Nat.le_trans (Nat.min_le_right _ _) (leastOddFactor_le _ _ he.1 he.2.1 hb)
+  · simp only [eligible, Bool.and_eq_true, if_neg hpar, decide_eq_true_eq] at he
+    have hbound : winner s ≤ s.x-1 := by
+      by_cases h : s.x-1 < winner s
+      · rw [Nat.mod_eq_of_lt h] at he
+        omega
+      · omega
+    exact Nat.le_trans (Nat.min_le_left _ _) (leastOddFactor_le _ _ he.1 he.2.2.1 hbound)
+
+def narrowInc (z Y0 : Nat) (s : State) : Nat :=
+  if z < winner s ∧ winner s < Y0 then 1 else 0
+
+def mediumInc (Y0 Y1 : Nat) (s : State) : Nat :=
+  if Y0 ≤ winner s ∧ winner s < Y1 ∧ (winner s)^3 ≤ (2*qmin s.x)^5
+    then 2*qmin s.x else 0
+
+def weightedInc (z Y0 Y1 wN wQ : Nat) (s : State) : Nat :=
+  wN*narrowInc z Y0 s + wQ*mediumInc Y0 Y1 s
+
+theorem weightedInc_le (z Y0 Y1 wN wQ : Nat) (s : State) (hY : 0 < Y0) :
+    weightedInc z Y0 Y1 wN wQ s ≤ wN + wQ*(2*Y1) := by
+  have hn : narrowInc z Y0 s ≤ 1 := by unfold narrowInc; split <;> omega
+  have hm : mediumInc Y0 Y1 s ≤ 2*Y1 := by
+    unfold mediumInc
+    split
+    next h =>
+      have hw : winner s ≠ 0 := by omega
+      have hq := qmin_le_winner s hw
+      omega
+    next _ => omega
+  unfold weightedInc
+  have h1 := Nat.mul_le_mul_left wN hn
+  have h2 := Nat.mul_le_mul_left wQ hm
+  simp only [Nat.mul_one] at h1
+  omega
+
+theorem pathCost_sum (inc : State → Nat) (s : State) (k : Nat) :
+    pathCost inc s k = ((List.range k).map (fun i => inc (evolve s i))).sum := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    rw [List.range_succ, List.map_append, List.sum_append]
+    simp only [pathCost, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil,
+      Nat.add_zero, ih]
+
+theorem weightedCost_root (deathAge : Nat → Nat) (R T A z Y0 Y1 wN wQ : Nat) :
+    pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) (prefixAge deathAge R T A) =
+      wN * ((List.range (prefixAge deathAge R T A)).filter (fun i =>
+        let p := winner (orbit A i)
+        decide (z < p ∧ p < Y0))).length +
+      wQ * ((List.range (prefixAge deathAge R T A)).map (fun i =>
+        let s := orbit A i
+        let p := winner s
+        let q := qmin s.x
+        if Y0 ≤ p ∧ p < Y1 ∧ p^3 ≤ (2*q)^5 then 2*q else 0)).sum := by
+  rw [pathCost_sum]
+  simp only [weightedInc, ← orbit]
+  rw [sum_map_add, sum_map_mul, sum_map_mul, filter_length_indicator]
+  simp only [narrowInc, mediumInc, decide_eq_true_eq]
+
+theorem weightedCost_sum (deathAge : Nat → Nat) (R T z Y0 Y1 wN wQ : Nat) :
+    ((roots R).map (fun A =>
+      pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) (prefixAge deathAge R T A))).sum =
+        wN*narrowCount deathAge R T z Y0 + wQ*mediumCharge deathAge R T Y0 Y1 := by
+  unfold narrowCount mediumCharge
+  rw [← sum_map_mul, ← sum_map_mul, ← sum_map_add]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  exact weightedCost_root deathAge R T A z Y0 Y1 wN wQ
+
+theorem sum_const_nat {α : Type} (xs : List α) (c : Nat) :
+    (xs.map (fun _ => c)).sum = xs.length*c := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    simp only [List.map_cons, List.sum_cons, List.length_cons, ih, Nat.succ_mul]
+    omega
+
+/-- Actual aggregate prefix expense, including the killing event. -/
+theorem cheapRankDeath_weightedBudget (R T M budget z Y0 Y1 wN wQ : Nat)
+    (hY : 0 < Y0) :
+    let d := cheapRankDeath (weightedInc z Y0 Y1 wN wQ) R T M budget
+    wN*narrowCount d R T z Y0 + wQ*mediumCharge d R T Y0 Y1 ≤
+      (roots R).length*(budget + wN + wQ*(2*Y1)) := by
+  dsimp only
+  let d := cheapRankDeath (weightedInc z Y0 Y1 wN wQ) R T M budget
+  change wN*narrowCount d R T z Y0 + wQ*mediumCharge d R T Y0 Y1 ≤ _
+  rw [← weightedCost_sum, ← sum_const_nat]
+  apply sum_map_le
+  intro A _
+  have h := cheapRankDeath_budget (weightedInc z Y0 Y1 wN wQ) R T M budget A
+    (wN+wQ*(2*Y1)) (fun s => weightedInc_le z Y0 Y1 wN wQ s hY)
+  change pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) (prefixAge d R T A) ≤ _ at h
+  omega
+
+#print axioms NegativeMIN.qmin_le_winner
+#print axioms NegativeMIN.weightedCost_sum
+#print axioms NegativeMIN.cheapRankDeath_weightedBudget
+
 end NegativeMIN
