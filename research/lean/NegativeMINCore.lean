@@ -2505,7 +2505,7 @@ theorem cheapRankDeath_optimal (inc : State → Nat) (R T M budget : Nat)
     exact hcap J x (obsClock R T J u)
   · unfold obsLiveFiber obsCheapFiber
     rw [List.filter_filter,List.filter_filter]
-    apply filter_length_mono
+    apply filter_len_mono
     intro A hA ha
     simp only [Bool.and_eq_true,decide_eq_true_eq] at ha ⊢
     refine ⟨ha.1,?_⟩
