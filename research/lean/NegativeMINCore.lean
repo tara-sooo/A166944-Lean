@@ -3928,4 +3928,120 @@ theorem twin_above_of_optimal_net
 #print axioms NegativeMIN.optimalNetDeath_fullCapped
 #print axioms NegativeMIN.twin_above_of_optimal_net
 
+/-- Exact full-root threshold count: no selected history or unknown
+policy is part of this definition. -/
+def recordMass (inc : State → Nat) (D R T J x : Nat) (n : Int) (t : Nat) : Nat :=
+  ((fullFiber R T J x n).filter (fun A => decide (t<physicalProfit inc D R T A n))).length
+
+theorem debtDeath_fiber_profit_formula (inc : State → Nat) (D R T M J x : Nat)
+    (n : Int) (hT : 6≤T) :
+    ((physicalFiber (debtDeath inc D R T M) R T J x n).map
+      (fun A => physicalProfit inc D R T A n)).sum=
+      ((List.range D).map (fun t => min M (recordMass inc D R T J x n t))).sum := by
+  rw [threshold_weight_sum _ _ D (fun a _ => profitNat_le inc D R T a _)]
+  congr 1
+  apply List.map_congr_left
+  intro t _
+  rw [debtDeath_fiber_eq inc D R T M J x n hT]
+  unfold recordMass
+  apply rankClip_filter_length
+  · unfold fullFiber
+    exact List.filter_sublist.nodup (roots_nodup R)
+  · intro a ha b hb hf hp
+    have h := physicalProfit_priority inc D R T J x a b n hT ha hb hp
+    simp only [decide_eq_true_eq] at hf ⊢
+    omega
+
+def optimalRecordMass (inc : State → Nat) (D R T M : Nat) : Nat :=
+  ((obsBins R T).map (fun b =>
+    ((List.range D).map (fun t => min M
+      (recordMass inc D R T b.2.1 b.2.2 (obsClock R T b.2.1 b.1) t))).sum)).sum
+
+theorem optimalNetDeath_formula (inc : State → Nat) (D R T M : Nat) (hT : 6≤T) :
+    policyNet inc D R T (optimalNetDeath inc D R T M)=(optimalRecordMass inc D R T M:Int) := by
+  unfold optimalNetDeath optimalRecordMass
+  rw [peakTruncate_policyGain,policyGain_eq_obsBins]
+  apply congrArg (fun a : Nat => (a:Int))
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  obtain ⟨u,hu,hku⟩ := List.mem_flatMap.mp hb
+  obtain ⟨k,_,hk⟩ := List.mem_map.mp hku
+  subst b
+  obtain ⟨J,x⟩ := k
+  rw [obsFiber_profit_eq inc D R T J x u (debtDeath inc D R T M) hT (List.mem_range.mp hu)]
+  exact debtDeath_fiber_profit_formula inc D R T M J x (obsClock R T J u) hT
+
+/-- Exact repeated-source parametrization, including the even quotient
+difference, which supplies four linear forms for upper sieving. -/
+theorem repeat_source_forms (A i j p : Nat) (hA : A%2=0)
+    (hij : i<j) (hp : 5≤p) (h1 : winner (orbit A i)=p)
+    (h2 : winner (orbit A j)=p) :
+    ∃ u k e f : Int, 1≤k ∧ (e= -1 ∨ e=1) ∧ (f= -1 ∨ f=1) ∧
+      ((orbit A i).x:Int)=(p:Int)*u+e ∧
+      ((orbit A j).x:Int)=(p:Int)*(u-2*k)+f := by
+  let a := orbit A i
+  let b := orbit A j
+  have ha : a.x%2=0 := evolve_even (birth A) i hA
+  have hb : b.x%2=0 := evolve_even (birth A) j hA
+  change winner a=p at h1
+  change winner b=p at h2
+  obtain ⟨u,e,hu,he⟩ := winner_source_pin a (by omega)
+  obtain ⟨v,f,hv,hf⟩ := winner_source_pin b (by omega)
+  have hodd := eligible_three_le a.x (a.n+1) (winner a) (winner_sound a (by omega))
+  rw [h1] at hu hodd
+  rw [h2] at hv
+  have hgap := actual_repeat_gap A i j p hA hij hp h1 h2
+  change 2*(p-1)≤a.x-b.x at hgap
+  have hdiff : (a.x:Int)-(b.x:Int)=(p:Int)*(u-v)+(e-f) := by rw [Int.mul_sub]; omega
+  have hpar : ((a.x:Int)-(b.x:Int))%2=0 := by omega
+  have hop : (p:Int)%2=1 := by omega
+  rw [hdiff,Int.add_emod,Int.mul_emod,hop] at hpar
+  have hmod : (u-v)%2=0 := by
+    rcases he with rfl|rfl <;> rcases hf with rfl|rfl <;> omega
+  have hpos : 0<u-v := by
+    by_cases h : 0<u-v
+    · exact h
+    · have hm := Int.mul_le_mul_of_nonneg_left (show u-v≤0 by omega)
+        (show 0≤(p:Int) by omega)
+      simp only [Int.mul_zero] at hm
+      omega
+  let k := (u-v)/2
+  have hk : u-v=2*k := by
+    unfold k
+    omega
+  refine ⟨u,k,e,f,by omega,he,hf,hu,?_⟩
+  have hve : v=u-2*k := by omega
+  rw [← hve]
+  exact hv
+
+/-- Distinct or equal labels separated by their exact relay gain. -/
+theorem two_source_forms (A i j p r : Nat) (hij : i<j)
+    (hp : 0<p) (hr : 0<r) (h1 : winner (orbit A i)=p)
+    (h2 : winner (orbit A j)=r) :
+    ∃ u v e f : Int, (e= -1 ∨ e=1) ∧ (f= -1 ∨ f=1) ∧
+      ((orbit A i).x:Int)=(p:Int)*u+e ∧
+      ((orbit A j).x:Int)=(r:Int)*v+f ∧
+      (p:Int)*u+e-((p:Int)-1)-
+        (((orbit A (i+1)).x-(orbit A j).x:Nat):Int)=(r:Int)*v+f := by
+  let a := orbit A i
+  let b := orbit A j
+  change winner a=p at h1
+  change winner b=r at h2
+  obtain ⟨u,e,hu,he⟩ := winner_source_pin a (by omega)
+  obtain ⟨v,f,hv,hf⟩ := winner_source_pin b (by omega)
+  rw [h1] at hu
+  rw [h2] at hv
+  have ht := tick_gain_exact a
+  rw [h1] at ht
+  have hm := orbit_center_mono A (i+1) j (by omega)
+  change b.x≤(tick a).x at hm
+  refine ⟨u,v,e,f,he,hf,hu,hv,?_⟩
+  change (p:Int)*u+e-((p:Int)-1)-(((tick a).x-b.x:Nat):Int)=(r:Int)*v+f
+  omega
+
+#print axioms NegativeMIN.optimalNetDeath_formula
+#print axioms NegativeMIN.repeat_source_forms
+#print axioms NegativeMIN.two_source_forms
+
 end NegativeMIN
