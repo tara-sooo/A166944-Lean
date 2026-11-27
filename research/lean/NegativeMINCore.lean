@@ -2438,4 +2438,87 @@ theorem evolve_wall_gain (s : State) (Q k : Nat) (hQ : 0<Q) (hQe : Q%2=0)
 #print axioms NegativeMIN.repeat_relay_gain
 #print axioms NegativeMIN.evolve_wall_gain
 
+
+/-- A repeated p>=5 cannot be relayed solely by divisors of an even
+modulus Q<=p-1. This conclusion is about actual firing ages. -/
+theorem repeat_forces_escape (A i j p Q : Nat) (hA : A%2=0)
+    (hij : i<j) (hp : 5≤p) (h1 : winner (orbit A i)=p)
+    (h2 : winner (orbit A j)=p) (hQ : 0<Q) (hQe : Q%2=0)
+    (hsmall : Q≤p-1) :
+    ∃ r : Nat, i<r ∧ r<j ∧ winner (orbit A r)≠0 ∧ Q%winner (orbit A r)≠0 := by
+  classical
+  by_cases hex : ∃ r : Nat, i<r ∧ r<j ∧ winner (orbit A r)≠0 ∧ Q%winner (orbit A r)≠0
+  · exact hex
+  · exfalso
+    let s := orbit A (i+1)
+    let k := j-(i+1)
+    have hs (t : Nat) : orbit A (i+1+t) = evolve s t :=
+      evolve_add (birth A) (i+1) t
+    have hd : ∀ t : Nat, t<k → winner (evolve s t)=0 ∨ Q%winner (evolve s t)=0 := by
+      intro t ht
+      rw [← hs]
+      by_cases h0 : winner (orbit A (i+1+t))=0
+      · exact Or.inl h0
+      · by_cases hdiv : Q%winner (orbit A (i+1+t))=0
+        · exact Or.inr hdiv
+        · exact False.elim (hex ⟨i+1+t, by omega, by dsimp [k] at ht; omega, h0, hdiv⟩)
+    have h := evolve_wall_gain s Q k hQ hQe (evolve_even (birth A) (i+1) hA) hd
+    have hk : i+1+k=j := by dsimp [k]; omega
+    have hh := hs k
+    rw [hk] at hh
+    rw [← hh] at h
+    have hg := repeat_relay_gain A i j p hA hij hp h1 h2
+    change (orbit A (i+1)).x-(orbit A j).x<Q at h
+    omega
+
+/-- Early interruption bound for an actual firing. Here k is the
+age immediately before the tick. -/
+theorem winner_le_age (A k : Nat) (he : A%2=0) :
+    winner (orbit A k) ≤ 2*(k+1)+7 := by
+  have hg := canonical_gain_bound A (k+1) he
+  have hm := evolve_center_le (birth A) k
+  have ht := tick_gain_exact (orbit A k)
+  change (orbit A k).x ≤ A at hm
+  change ((A-(tick (orbit A k)).x : Nat) : Int) ≤ _ at hg
+  omega
+
+/-- Any full-capped policy obeying the same uniform prefix budget is
+dominated in cumulative observation time by cheapRankDeath. -/
+theorem cheapRankDeath_optimal (inc : State → Nat) (R T M budget : Nat)
+    (hT : 6≤T) (deathAge : Nat → Nat)
+    (hcap : FullCapped deathAge R T M)
+    (hb : ∀ A ∈ roots R, pathCost inc (birth A) (prefixAge deathAge R T A) ≤ budget) :
+    liveTicks deathAge R T ≤ liveTicks (cheapRankDeath inc R T M budget) R T := by
+  rw [liveTicks_eq_bins, cheapRankDeath_live_exact inc R T M budget hT]
+  unfold cheapMasses
+  simp only [List.map_map, Function.comp_def]
+  apply sum_map_le
+  intro b hb'
+  obtain ⟨u,hu,hku⟩ := List.mem_flatMap.mp hb'
+  obtain ⟨k,_,hk⟩ := List.mem_map.mp hku
+  subst b
+  obtain ⟨J,x⟩ := k
+  have ht := List.mem_range.mp hu
+  apply Nat.le_min.mpr
+  constructor
+  · rw [obsLiveFiber_eq deathAge R T J x u hT ht]
+    exact hcap J x (obsClock R T J u)
+  · unfold obsLiveFiber obsCheapFiber
+    rw [List.filter_filter,List.filter_filter]
+    apply filter_length_mono
+    intro A hA ha
+    simp only [Bool.and_eq_true,decide_eq_true_eq] at ha ⊢
+    refine ⟨ha.1,?_⟩
+    have hl := ha.2
+    unfold liveAt at hl
+    simp only [decide_eq_true_eq] at hl
+    have hle : observeAge R T A+u ≤ prefixAge deathAge R T A := by
+      unfold prefixAge
+      omega
+    exact Nat.le_trans (pathCost_mono inc (birth A) _ _ hle) (hb A hA)
+
+#print axioms NegativeMIN.repeat_forces_escape
+#print axioms NegativeMIN.winner_le_age
+#print axioms NegativeMIN.cheapRankDeath_optimal
+
 end NegativeMIN
