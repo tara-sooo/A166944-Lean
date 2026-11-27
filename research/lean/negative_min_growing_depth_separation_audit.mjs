@@ -9,13 +9,13 @@ function audit(){
  function trial(n){let a=[];for(let p=3;p*p<=n;p+=2)if(n%p===0){a.push(p);while(n%p===0)n/=p}if(n>1)a.push(n);return a}
  function literal(x,n,T){const a=trial(x-1),b=trial(x+1);for(let i=1;i<=T;i++){let nn=n+i,qs=nn%2===0?b:a;let hits=qs.filter(p=>mod(nn,2*p)===(nn%2===0?0:p+2));if(hits.length)return {w:i,p:Math.min(...hits),s:nn%2===0?1:-1}}return null}
  function modulus(ps){return [...new Set(ps)].reduce((m,p)=>m*BigInt(p),1n)}
- let first=0,firstTicks=0,suffix=0,suffixTicks=0,rough=0,fast=0,pin=0,det=0,pair=0,allVisited=0,repeats=0,sourceCross=0,primeSources=0,rows=[];
+ let first=0,firstTicks=0,suffix=0,suffixTicks=0,rough=0,fast=0,pin=0,det=0,pair=0,allVisited=0,repeats=0,sourceCross=0,primeSources=0,shiftedPairs=0,shiftedRough=0,rows=[];
  function pins(v){ok((v.x+v.g)%v.p===0,"first label pin");pin++;for(const e of v.word){ok(mod(v.x+v.g-e.g-(1-e.s),e.p)===0,"suffix incoming pin");pin++}return [v.p,...v.word.map(e=>e.p)]}
- function forms(x,records,end){
+ function forms(x,records,end,offset=0){
   let ps=records.flatMap(pins),M=modulus(ps),forms=[];
   const add=(shift,div)=>{let b=BigInt(x+shift),d=BigInt(div);ok(b%d===0n&&M%d===0n,"integral progression forms");forms.push([M/d,b/d])};
-  for(const v of records){ok(v.A===x+v.g+v.p-1,"source identity");add(v.g+v.p,v.p);add(v.g+v.p-2,1)}
-  if(end){add(-1,1);add(1,1)}
+  for(const v of records){ok(v.A===v.x+v.g+v.p-1,"source identity");let d=v.x-x;add(d+v.g+v.p,v.p);add(d+v.g+v.p-2,1)}
+  if(end){add(offset-1,1);add(offset+1,1)}
   for(let i=0;i<forms.length;i++)for(let j=i+1;j<forms.length;j++){ok(forms[i][0]*forms[j][1]!==forms[j][0]*forms[i][1],"nonzero determinant");det++}
  }
  for(const [R,k,Z,K] of [[12000,2,11,7],[48000,3,13,11],[192000,4,17,11],[768000,5,19,13]]){
@@ -47,6 +47,10 @@ function audit(){
   for(let arr of states.values())for(let i=0;i<arr.length;i++)for(let j=i+1;j<arr.length;j++){
    let a=arr[i],b=arr[j];ok(a.A!==b.A,"strict movement");ok(a.p!==b.p,"same label collision");forms(a.x,[a,b],false);pair++;localPairs++;
   }
+  for(let [x,arr] of states)for(let d=2;d<=6;d+=2)for(let a of arr)for(let b of (states.get(x+d)||[])){
+   if(a.A===b.A||a.p<=k*Z+6||b.p<=k*Z+6)continue;ok(a.p!==b.p,"nearby same-label distinct roots");forms(x,[a,b],false);shiftedPairs++;
+  }
+  for(let [x,arr] of states)for(let d=-6;d<=6;d+=2)if(d!==0&&Math.min(sp[x+d-1],sp[x+d+1])>=K)for(let a of arr){forms(x,[a],true,d);shiftedRough++}
   for(let s of survivors)for(let v of s.visited){ok(!roots.has(v.x),"rough initial roots excluded");sourceCross++}
   let kept=survivors.filter(s=>s.visited.every(v=>states.get(v.x).length===1));
   rows.push({R,k,Z,K,N,highHeight,rough:Brough,fast:Bfast,complete:C,visited:vis,pairs:localPairs,isolated:kept.length});
@@ -56,6 +60,6 @@ function audit(){
   let sum=0n;function go(a){if(a.length===m){sum+=Q/modulus(a);wordChecks++;return}for(let p of ps)go([...a,p])}go([]);
   let harmonic=ps.reduce((s,p)=>s+Q/BigInt(p),0n);ok(m===0?sum===Q:sum*Q**BigInt(m-1)<=(harmonic+BigInt(m)*Q)**BigInt(m),"weighted word bound");
  }
- return {rows,first,firstTicks,suffix,suffixTicks,rough,fast,pin,det,pair,allVisited,repeats,sourceCross,primeSources,wordChecks}
+ return {rows,first,firstTicks,suffix,suffixTicks,rough,fast,pin,det,pair,allVisited,repeats,sourceCross,primeSources,shiftedPairs,shiftedRough,wordChecks}
 }
 console.log(JSON.stringify(audit(),null,2));
