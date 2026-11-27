@@ -8322,4 +8322,171 @@ theorem endpointRankDeath_observedCap (R T M D : Nat) (cost : Nat → Nat → Na
 #print axioms NegativeMIN.endpointWeights_dual_lower
 #print axioms NegativeMIN.endpointRankDeath_observedCap
 
+
+def endpointRankGain (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (A : Nat) : Nat :=
+  if 0<l A ∧ l A≤T ∧ cost A (observeAge R T A+l A)≤D*l A ∧
+    localRank (fullObsFiber R T (endpointBin R T A (l A))) score A≤M
+  then D*l A-cost A (observeAge R T A+l A) else 0
+
+def endpointNet (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) : Nat :=
+  ((roots R).map (endpointRankGain R T M D cost l score)).sum
+
+theorem endpointRankGain_exact (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (A : Nat) (hz : ∀ A,cost A 0=0) :
+    D*life (endpointRankDeath R T M D cost l score) R T A =
+      cost A (prefixAge (endpointRankDeath R T M D cost l score) R T A)+
+        endpointRankGain R T M D cost l score A := by
+  unfold life prefixAge endpointRankDeath endpointRankGain
+  split
+  · rename_i h
+    simp only [if_pos h]
+    have h1 : min T (observeAge R T A+l A-observeAge R T A)=l A := by omega
+    have h2 : min (observeAge R T A+l A) (observeAge R T A+T)=observeAge R T A+l A := by omega
+    rw [h1,h2]
+    omega
+  · rename_i h
+    simp [h,hz]
+
+theorem endpointNet_exact (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (hz : ∀ A,cost A 0=0) :
+    D*liveTicks (endpointRankDeath R T M D cost l score) R T=
+      historyExpense cost R T (endpointRankDeath R T M D cost l score)+
+        endpointNet R T M D cost l score := by
+  unfold liveTicks historyExpense endpointNet
+  rw [← sum_map_mul,← sum_map_add]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  exact endpointRankGain_exact R T M D cost l score A hz
+
+theorem endpointNet_upper (R T M B0 D err : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (hT : 6≤T)
+    (hz : ∀ A,cost A 0=0) (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
+    (he : HistoryLiveEstimate cost R T M B0 D err) :
+    endpointNet R T M D cost l score≤D*B0*M*T*twinCount R T+err := by
+  have hh := observedCap_history_upper cost (endpointRankDeath R T M D cost l score)
+    R T M B0 D err hT hm he (endpointRankDeath_observedCap R T M D cost l score hT)
+  rw [endpointNet_exact R T M D cost l score hz] at hh
+  omega
+
+theorem endpointNet_ensemble_upper (R T M B0 D err : Nat) (cost : Nat → Nat → Nat)
+    (l : Nat → Nat) (scores : List (Nat → Nat)) (hT : 6≤T)
+    (hz : ∀ A,cost A 0=0) (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
+    (he : HistoryLiveEstimate cost R T M B0 D err) :
+    (scores.map (endpointNet R T M D cost l)).sum≤
+      scores.length*(D*B0*M*T*twinCount R T+err) := by
+  have hh := sum_map_le scores (endpointNet R T M D cost l)
+    (fun _ => D*B0*M*T*twinCount R T+err)
+    (fun s _ => endpointNet_upper R T M B0 D err cost l s hT hz hm he)
+  rw [sum_const_nat] at hh
+  exact hh
+
+theorem twin_above_of_endpoint_ensemble (R T M B0 D err B : Nat)
+    (cost : Nat → Nat → Nat) (l : Nat → Nat) (scores : List (Nat → Nat))
+    (hT : 6≤T) (hlarge : B+3*T+6<R)
+    (hz : ∀ A,cost A 0=0) (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
+    (he : HistoryLiveEstimate cost R T M B0 D err)
+    (hgap : scores.length*err<(scores.map (endpointNet R T M D cost l)).sum) :
+    ∃ x : Nat,B<x ∧ TwinCenter x := by
+  have hh := endpointNet_ensemble_upper R T M B0 D err cost l scores hT hz hm he
+  have hc : 0<twinCount R T := by
+    by_cases hzero : twinCount R T=0
+    · rw [hzero,Nat.mul_zero,Nat.zero_add] at hh
+      omega
+    · omega
+  unfold twinCount at hc
+  generalize hsites : twinSites R T=xs at hc
+  cases xs with
+  | nil => simp at hc
+  | cons x xs =>
+    have hmem : x∈twinSites R T := by rw [hsites]; simp
+    simp only [twinSites,List.mem_filter,decide_eq_true_eq] at hmem
+    exact ⟨x,by have := hmem.2.1; omega,hmem.2.2⟩
+
+/-! Arithmetic restriction on ancestry of a priced cell.
+If Q is a positive multiple of six, the native canonical births
+in any Q-cell are at most Q/6. Every other ancestor has a genuine
+boundary-crossing label not dividing Q. -/
+def nativeObsFiber (R T Q : Nat) (b : DualBin) : List Nat :=
+  (fullObsFiber R T b).filter (fun A => decide (A/Q=b.2.2/Q))
+
+theorem nativeObsFiber_bound (R T Q : Nat) (b : DualBin)
+    (hQ : 0<Q) (h6 : Q%6=0) :
+    (nativeObsFiber R T Q b).length≤Q/6 := by
+  let xs := nativeObsFiber R T Q b
+  let f := fun A : Nat => (A%Q)/6
+  have hA (A : Nat) (ha : A∈xs) : A%6=0 ∧ A/Q=b.2.2/Q := by
+    have h := List.mem_filter.mp ha
+    have hr := ((fullObsFiber_mem R T b A).mp h.1).1
+    simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+    exact ⟨hr.2.2,of_decide_eq_true h.2⟩
+  have hrem (A : Nat) (ha : A∈xs) : A%Q%6=0 := by
+    have hd := Nat.div_add_mod A Q
+    have hh := congrArg (fun a : Nat => a%6) hd
+    rw [Nat.add_mod,Nat.mul_mod,h6,Nat.zero_mul,Nat.zero_mod,Nat.zero_add,
+      Nat.mod_mod,(hA A ha).1] at hh
+    exact hh
+  have hinj : ∀ A∈xs,∀ B∈xs,f A=f B → A=B := by
+    intro A ha B hb he
+    have hq : A/Q=B/Q := (hA A ha).2.trans (hA B hb).2.symm
+    have hra := Nat.div_add_mod (A%Q) 6
+    have hrb := Nat.div_add_mod (B%Q) 6
+    rw [hrem A ha,hrem B hb,Nat.add_zero,Nat.add_zero] at hra hrb
+    have hf : A%Q/6=B%Q/6 := he
+    have hr : A%Q=B%Q := by omega
+    have hda := Nat.div_add_mod A Q
+    have hdb := Nat.div_add_mod B Q
+    rw [hq,hr] at hda
+    omega
+  have hnd : xs.Nodup := List.filter_sublist.nodup (fullObsFiber_nodup R T b)
+  have hnd' := map_nodup_of_inj_core xs f hnd hinj
+  have hsub : ∀ x∈xs.map f,x∈List.range (Q/6) := by
+    intro x hx
+    obtain ⟨A,ha,rfl⟩ := List.mem_map.mp hx
+    have hm := Nat.mod_lt A hQ
+    apply List.mem_range.mpr
+    unfold f
+    omega
+  have hh := nodup_subset_length_core (xs.map f) (List.range (Q/6)) hnd' hsub
+  simpa [xs] using hh
+
+theorem foreignObsRoot_entry (R T Q : Nat) (b : DualBin) (A : Nat)
+    (hQ : 0<Q) (hQe : Q%2=0) (ha : A∈fullObsFiber R T b)
+    (hf : A/Q≠b.2.2/Q) :
+    ∃ i : Nat,i<observeAge R T A+b.1 ∧
+      (orbit A i).x/Q≠b.2.2/Q ∧ (orbit A (i+1)).x/Q=b.2.2/Q ∧
+      winner (orbit A i)≠0 ∧ Q%winner (orbit A i)≠0 := by
+  have har := ((fullObsFiber_mem R T b A).mp ha).1
+  have hkey := ((fullObsFiber_mem R T b A).mp ha).2
+  have hx := congrArg Prod.snd hkey
+  change (orbit A (observeAge R T A+b.1)).x=b.2.2 at hx
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at har
+  have hAe : A%2=0 := by have := har.2.2; omega
+  obtain ⟨j,hj,hcell,hmin⟩ := earliest_le
+    (fun i => (orbit A i).x/Q=b.2.2/Q) (observeAge R T A+b.1)
+    ⟨_,Nat.le_refl _,by rw [hx]⟩
+  have hjp : 0<j := by
+    by_cases hz : j=0
+    · subst j
+      exact False.elim (hf (by simpa [orbit,evolve,birth] using hcell))
+    · omega
+  let i := j-1
+  have hi : i<j := by dsimp [i]; omega
+  have he : i+1=j := by dsimp [i]; omega
+  have hne := hmin i hi
+  have hn : (orbit A (i+1)).x/Q=b.2.2/Q := by rw [he]; exact hcell
+  have hpar : (orbit A i).x%2=0 := evolve_even (birth A) i hAe
+  have hw : ¬ (winner (orbit A i)=0 ∨ Q%winner (orbit A i)=0) := by
+    intro hh
+    have hwall := tick_wall (orbit A i) Q hQ hQe hpar hh
+    change (orbit A (i+1)).x/Q=(orbit A i).x/Q at hwall
+    exact hne (hwall.symm.trans hn)
+  exact ⟨i,by omega,hne,hn,fun h => hw (Or.inl h),fun h => hw (Or.inr h)⟩
+
+#print axioms NegativeMIN.twin_above_of_endpoint_ensemble
+#print axioms NegativeMIN.nativeObsFiber_bound
+#print axioms NegativeMIN.foreignObsRoot_entry
+
 end NegativeMIN
