@@ -2,11 +2,11 @@
 // node research/lean/negative_min_core_comparator.mjs
 function audit(){
  const mod=(x,n)=>(x%n+n)%n,ck=(v,m)=>{if(!v)throw Error(JSON.stringify(m))};
- const prime=p=>p>=3&&p%2===1&&Array.from({length:Math.max(0,p-2)},(_,i)=>i+2).every(d=>p%d!==0);
+ const primes=[];for(let p=3;p<=1201;p+=2){let yes=true;for(let d=2;d<p;d++)if(p%d===0){yes=false;break}if(yes)primes.push(p);}
  function factors(n){let a=[];for(let p=2;p*p<=n;p++)if(n%p===0){a.push(p);while(n%p===0)n/=p}if(n>1)a.push(n);return a}
  function tick(x,n){
   let t=n+1;
-  for(let p=3;p<=x+1;p+=2)if(prime(p)&&(mod(t,2)===0?(x+1)%p===0&&mod(t,2*p)===0:x>=2&&(x-1)%p===0&&mod(t,2*p)===p+2))return [x-p+1,t,p];
+  for(let p of primes)if(p<=x+1&&(mod(t,2)===0?(x+1)%p===0&&mod(t,2*p)===0:x>=2&&(x-1)%p===0&&mod(t,2*p)===p+2))return [x-p+1,t,p];
   return [x,t,0];
  }
  function event(x,n){
