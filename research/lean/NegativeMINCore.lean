@@ -1396,4 +1396,360 @@ theorem rankDeath_integrated_loss (R T M : Nat) (select : Nat → Bool)
 
 #print axioms NegativeMIN.rankDeath_integrated_loss
 
+/-! Additive cost priority, and exact optimal simultaneous retention.
+The finite counting result below uses no probabilistic distribution model. -/
+
+def Precedes (score : Nat → Nat) (a b : Nat) : Prop :=
+  score a < score b ∨ (score a = score b ∧ a ≤ b)
+
+instance (score : Nat → Nat) (a b : Nat) : Decidable (Precedes score a b) := by
+  unfold Precedes
+  infer_instance
+
+theorem precedes_total (score : Nat → Nat) (a b : Nat) :
+    Precedes score a b ∨ Precedes score b a := by
+  unfold Precedes
+  omega
+
+theorem precedes_trans (score : Nat → Nat) (a b c : Nat)
+    (hab : Precedes score a b) (hbc : Precedes score b c) :
+    Precedes score a c := by
+  unfold Precedes at *
+  omega
+
+theorem precedes_antisymm (score : Nat → Nat) (a b : Nat)
+    (hab : Precedes score a b) (hba : Precedes score b a) : a = b := by
+  unfold Precedes at *
+  omega
+
+theorem extreme_mem (xs : List Nat) (rel : Nat → Nat → Prop)
+    (htotal : ∀ a b, rel a b ∨ rel b a)
+    (htrans : ∀ a b c, rel a b → rel b c → rel a c) (hne : xs ≠ []) :
+    ∃ a ∈ xs, ∀ b ∈ xs, rel b a := by
+  induction xs with
+  | nil => contradiction
+  | cons x xs ih =>
+    by_cases he : xs = []
+    · subst xs
+      refine ⟨x, by simp, ?_⟩
+      intro b hb
+      have he : b = x := by simpa using hb
+      subst b
+      exact (htotal x x).elim id id
+    · obtain ⟨a, ha, hmax⟩ := ih he
+      rcases htotal x a with hx | hx
+      · refine ⟨a, by simp [ha], ?_⟩
+        intro b hb
+        simp only [List.mem_cons] at hb
+        rcases hb with rfl | hb
+        · exact hx
+        · exact hmax b hb
+      · refine ⟨x, by simp, ?_⟩
+        intro b hb
+        simp only [List.mem_cons] at hb
+        rcases hb with rfl | hb
+        · exact (htotal x x).elim id id
+        · exact htrans b a x (hmax b hb) hx
+
+theorem filter_len_exception {α : Type} [DecidableEq α] (xs : List α)
+    (f g : α → Bool) (a : α) (hn : xs.Nodup)
+    (h : ∀ b ∈ xs, f b = true → b ≠ a → g b = true) :
+    (xs.filter f).length ≤ (xs.filter g).length + 1 := by
+  induction xs with
+  | nil => simp
+  | cons x xs ih =>
+    have hnd := List.nodup_cons.mp hn
+    by_cases he : x = a
+    · subst x
+      have hsub := filter_len_mono xs f g (fun b hb hf =>
+        h b (by simp [hb]) hf (fun he => hnd.1 (he ▸ hb)))
+      cases hf : f a <;> cases hg : g a <;> simp [hf, hg] <;> omega
+    · have hs := ih hnd.2 (fun b hb => h b (by simp [hb]))
+      by_cases hf : f x = true
+      · have hg := h x (by simp) hf he
+        simp [hf, hg]
+        omega
+      · cases hg : g x <;> simp [hf, hg] <;> omega
+
+def localRank (xs : List Nat) (score : Nat → Nat) (a : Nat) : Nat :=
+  (xs.filter (fun b => decide (Precedes score b a))).length
+
+def rankClip (xs : List Nat) (score : Nat → Nat) (M : Nat) : List Nat :=
+  xs.filter (fun a => decide (localRank xs score a ≤ M))
+
+/-- Every rank from 1 through the fiber size is represented, expressed
+as an exact cardinality of a clipped list. -/
+theorem rankClip_length (xs : List Nat) (score : Nat → Nat) (M : Nat)
+    (hn : xs.Nodup) : (rankClip xs score M).length = min M xs.length := by
+  let good := rankClip xs score M
+  have hsize : good.length ≤ xs.length := List.length_filter_le _ _
+  have hcap : good.length ≤ M := by
+    by_cases hz : good = []
+    · simp [hz]
+    · obtain ⟨a, ha, hmax⟩ := extreme_mem good (Precedes score)
+        (precedes_total score) (precedes_trans score) hz
+      have har : localRank xs score a ≤ M := by
+        have hh := (List.mem_filter.mp ha).2
+        simpa using hh
+      apply Nat.le_trans (filter_len_mono xs _ _ ?_) har
+      intro b hb hgb
+      have hp := hmax b (List.mem_filter.mpr ⟨hb, hgb⟩)
+      simpa using hp
+  have hupper : good.length ≤ min M xs.length := Nat.le_min.mpr ⟨hcap, hsize⟩
+  apply Nat.le_antisymm hupper
+  by_cases hall : ∀ a ∈ xs, localRank xs score a ≤ M
+  · have he : good = xs := by
+      unfold good rankClip
+      apply List.filter_eq_self.mpr
+      intro a ha
+      simpa using hall a ha
+    rw [he]
+    exact Nat.min_le_right _ _
+  · let bad := xs.filter (fun a => decide (M < localRank xs score a))
+    have hbad : bad ≠ [] := by
+      intro hz
+      apply hall
+      intro a ha
+      have h := List.filter_eq_nil_iff.mp hz a ha
+      simp only [decide_eq_true_eq] at h
+      omega
+    obtain ⟨a, ha, hmin⟩ := extreme_mem bad (fun a b => Precedes score b a)
+      (fun a b => precedes_total score b a)
+      (fun a b c h1 h2 => precedes_trans score c b a h2 h1) hbad
+    have har : M < localRank xs score a := by
+      have hh := (List.mem_filter.mp ha).2
+      simpa using hh
+    have hsub := filter_len_exception xs (fun b => decide (Precedes score b a))
+      (fun b => decide (localRank xs score b ≤ M)) a hn (by
+        intro b hb hp hne
+        have hp' : Precedes score b a := by simpa using hp
+        by_cases hr : localRank xs score b ≤ M
+        · simpa using hr
+        · have hb' : b ∈ bad := by
+            apply List.mem_filter.mpr
+            exact ⟨hb, by simp; omega⟩
+          exact False.elim (hne (precedes_antisymm score b a hp' (hmin b hb'))))
+    change localRank xs score a ≤ good.length + 1 at hsub
+    omega
+
+/-- Additive nonnegative cost of the actual completed ticks.
+A zero cost may be assigned to an idle tick. -/
+def pathCost (inc : State → Nat) (s : State) : Nat → Nat
+  | 0 => 0
+  | k+1 => pathCost inc s k + inc (evolve s k)
+
+theorem pathCost_add (inc : State → Nat) (s : State) (a b : Nat) :
+    pathCost inc s (a+b) = pathCost inc s a + pathCost inc (evolve s a) b := by
+  induction b with
+  | zero => simp [pathCost]
+  | succ b ih =>
+    simp only [Nat.add_succ, pathCost, ih, evolve_add]
+    omega
+
+theorem pathCost_mono (inc : State → Nat) (s : State) (a b : Nat) (h : a ≤ b) :
+    pathCost inc s a ≤ pathCost inc s b := by
+  have he : a + (b-a) = b := by omega
+  have hc := pathCost_add inc s a (b-a)
+  rw [he] at hc
+  omega
+
+def physicalCost (inc : State → Nat) (A : Nat) (n : Int) : Nat :=
+  pathCost inc (birth A) (physicalAge A n)
+
+theorem physicalCost_advance (inc : State → Nat) (A : Nat) (n : Int) (k : Nat)
+    (hb : (birth A).n ≤ n) :
+    physicalCost inc A (n+(k : Int)) =
+      physicalCost inc A n + pathCost inc (physicalState A n) k := by
+  have ha : physicalAge A (n+(k : Int)) = physicalAge A n + k := by
+    unfold physicalAge
+    omega
+  simp only [physicalCost, ha, pathCost_add, physicalState, orbit]
+
+theorem contact_priority_mono (inc : State → Nat) (R T A B : Nat) (n m : Int)
+    (hn : n ≤ m) (hc : Contact R T A B n)
+    (hp : Precedes (fun a => physicalCost inc a n) B A) :
+    Precedes (fun a => physicalCost inc a m) B A := by
+  have hk : n+((m-n).toNat : Int) = m := by omega
+  have ha := physicalCost_advance inc A n (m-n).toNat hc.1
+  have hb := physicalCost_advance inc B n (m-n).toNat hc.2.1
+  rw [hk, hc.2.2.2] at ha
+  rw [hk] at hb
+  unfold Precedes at *
+  omega
+
+def costRank (inc : State → Nat) (R T A : Nat) (n : Int) : Nat :=
+  ((roots R).filter (fun B => decide (Contact R T A B n ∧
+    Precedes (fun a => physicalCost inc a n) B A))).length
+
+theorem costRank_mono (inc : State → Nat) (R T A : Nat) (n m : Int)
+    (h : n ≤ m) : costRank inc R T A n ≤ costRank inc R T A m := by
+  unfold costRank
+  apply filter_len_mono
+  intro B _ hb
+  simp only [decide_eq_true_eq] at hb ⊢
+  exact ⟨contact_mono R T A B n m h hb.1,
+    contact_priority_mono inc R T A B n m h hb.1 hb.2⟩
+
+def cheapRankOK (inc : State → Nat) (R T M budget A i : Nat) : Bool :=
+  decide (pathCost inc (birth A) i ≤ budget ∧
+    costRank inc R T A ((birth A).n + (i : Int)) ≤ M)
+
+theorem cheapRankOK_antitone (inc : State → Nat) (R T M budget A i j : Nat)
+    (h : i ≤ j) (hj : cheapRankOK inc R T M budget A j = true) :
+    cheapRankOK inc R T M budget A i = true := by
+  simp only [cheapRankOK, decide_eq_true_eq] at hj ⊢
+  exact ⟨Nat.le_trans (pathCost_mono inc (birth A) i j h) hj.1,
+    Nat.le_trans (costRank_mono inc R T A _ _ (by omega)) hj.2⟩
+
+def cheapRankDeath (inc : State → Nat) (R T M budget A : Nat) : Nat :=
+  ((List.range (observeAge R T A + T)).filter
+    (cheapRankOK inc R T M budget A)).length
+
+theorem cheapRankDeath_spec (inc : State → Nat) (R T M budget A i : Nat) :
+    i < cheapRankDeath inc R T M budget A ↔
+      i < observeAge R T A + T ∧ pathCost inc (birth A) i ≤ budget ∧
+        costRank inc R T A ((birth A).n + (i : Int)) ≤ M := by
+  unfold cheapRankDeath
+  rw [antitone_count_spec _ (cheapRankOK_antitone inc R T M budget A)]
+  simp [cheapRankOK]
+
+/-- Cheapness and rank characterize actual irreversible survival at any
+physical tick in the window, including all pre-observation births. -/
+theorem cheapRankDeath_phys_iff (inc : State → Nat) (R T M budget A : Nat) (n : Int)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0)
+    (hb : (birth A).n ≤ n) (he : n < observeStart R T A + (T : Int)) :
+    physicalLiveAt (cheapRankDeath inc R T M budget) R T A n = true ↔
+      physicalCost inc A n ≤ budget ∧ costRank inc R T A n ≤ M := by
+  have hstart := observeStart_ge_birth R T A hT hR h6
+  have ha : physicalAge A n < observeAge R T A + T := by
+    unfold physicalAge observeAge
+    omega
+  have hclock : (birth A).n + (physicalAge A n : Int) = n := by
+    unfold physicalAge
+    omega
+  simp only [physicalLiveAt, decide_eq_true_eq, hb, he, true_and,
+    cheapRankDeath_spec, ha, hclock, physicalCost]
+
+/-- The full (uncapped) cheap fiber at a physical tick. -/
+def cheapFiber (inc : State → Nat) (R T budget J x : Nat) (n : Int) : List Nat :=
+  (roots R).filter (fun A => decide ((birth A).n ≤ n ∧
+    n < observeStart R T A + (T : Int) ∧ windowId R T A = J ∧
+    (physicalState A n).x = x ∧ physicalCost inc A n ≤ budget))
+
+theorem contact_same_window_end (R T A B : Nat) (h : windowId R T A = windowId R T B) :
+    observeStart R T A = observeStart R T B := by
+  unfold observeStart
+  rw [h]
+
+theorem cheapFiber_localRank (inc : State → Nat) (R T budget J x A : Nat) (n : Int)
+    (hA : A ∈ cheapFiber inc R T budget J x n) :
+    localRank (cheapFiber inc R T budget J x n) (fun a => physicalCost inc a n) A =
+      costRank inc R T A n := by
+  have ha := (List.mem_filter.mp hA).2
+  simp only [decide_eq_true_eq] at ha
+  unfold localRank cheapFiber costRank
+  rw [List.filter_filter]
+  apply congrArg List.length
+  apply List.filter_congr
+  intro B _
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true, decide_eq_true_eq]
+  constructor
+  · intro h
+    refine ⟨contact_of_center R T A B n ha.1 h.2.1
+      (ha.2.2.1.trans h.2.2.2.1.symm) (ha.2.2.2.1.trans h.2.2.2.2.1.symm), h.1⟩
+  · intro h
+    have hc := h.1
+    have hobs := contact_same_window_end R T A B hc.2.2.1
+    have hx := congrArg State.x hc.2.2.2
+    have hcost : physicalCost inc B n ≤ physicalCost inc A n := by
+      have hp := h.2
+      unfold Precedes at hp
+      omega
+    refine ⟨h.2, hc.2.1, ?_, hc.2.2.1.symm.trans ha.2.2.1,
+      hx.symm.trans ha.2.2.2.1, Nat.le_trans hcost ha.2.2.2.2⟩
+    rw [← hobs]
+    exact ha.2.1
+
+theorem cheapRankDeath_fiber_eq (inc : State → Nat) (R T M budget J x : Nat) (n : Int)
+    (hT : 6 ≤ T) :
+    physicalFiber (cheapRankDeath inc R T M budget) R T J x n =
+      rankClip (cheapFiber inc R T budget J x n) (fun a => physicalCost inc a n) M := by
+  unfold physicalFiber rankClip
+  conv_rhs => unfold cheapFiber; rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hr
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true, decide_eq_true_eq]
+  constructor
+  · intro h
+    have hp := h.1
+    simp only [physicalLiveAt, decide_eq_true_eq] at hp
+    have hc := (cheapRankDeath_phys_iff inc R T M budget A n hT hr.2.1 hr.2.2 hp.1 hp.2.1).mp h.1
+    have hmem : A ∈ cheapFiber inc R T budget J x n :=
+      List.mem_filter.mpr ⟨hA, by simp only [decide_eq_true_eq]; exact
+        ⟨hp.1, hp.2.1, h.2.1, h.2.2, hc.1⟩⟩
+    refine ⟨?_, hp.1, hp.2.1, h.2.1, h.2.2, hc.1⟩
+    rw [cheapFiber_localRank inc R T budget J x A n hmem]
+    exact hc.2
+  · intro h
+    have hmem : A ∈ cheapFiber inc R T budget J x n :=
+      List.mem_filter.mpr ⟨hA, by simpa only [decide_eq_true_eq] using h.2⟩
+    have hk := h.1
+    rw [cheapFiber_localRank inc R T budget J x A n hmem] at hk
+    refine ⟨(cheapRankDeath_phys_iff inc R T M budget A n hT hr.2.1 hr.2.2
+      h.2.1 h.2.2.1).mpr ⟨h.2.2.2.2.2, hk⟩, h.2.2.2.1, h.2.2.2.2.1⟩
+
+theorem roots_nodup (R : Nat) : (roots R).Nodup := by
+  unfold roots
+  exact (List.filter_sublist (p := fun A => decide (R ≤ A ∧ A % 6 = 0))).nodup List.nodup_range
+
+/-- Exact optimal count in EVERY cheap physical fiber. Past deletions
+do not reduce this count, despite birth, merge and budget deaths. -/
+theorem cheapRankDeath_exact (inc : State → Nat) (R T M budget J x : Nat) (n : Int)
+    (hT : 6 ≤ T) :
+    (physicalFiber (cheapRankDeath inc R T M budget) R T J x n).length =
+      min M (cheapFiber inc R T budget J x n).length := by
+  rw [cheapRankDeath_fiber_eq inc R T M budget J x n hT, rankClip_length]
+  unfold cheapFiber
+  exact List.filter_sublist.nodup (roots_nodup R)
+
+theorem cheapRankDeath_fullCapped (inc : State → Nat) (R T M budget : Nat)
+    (hT : 6 ≤ T) : FullCapped (cheapRankDeath inc R T M budget) R T M := by
+  intro J x n
+  rw [cheapRankDeath_exact inc R T M budget J x n hT]
+  exact Nat.min_le_left _ _
+
+/-- Uniform budget overshoot: charges include the deletion-causing
+event, so budget alone is insufficient without the one-tick increment. -/
+theorem cheapRankDeath_budget (inc : State → Nat) (R T M budget A delta : Nat)
+    (hinc : ∀ s, inc s ≤ delta) :
+    pathCost inc (birth A) (prefixAge (cheapRankDeath inc R T M budget) R T A)
+      ≤ budget + delta := by
+  let d := prefixAge (cheapRankDeath inc R T M budget) R T A
+  by_cases hd : d = 0
+  · change pathCost inc (birth A) d ≤ _
+    simp [hd, pathCost]
+  · have hlt : d-1 < cheapRankDeath inc R T M budget A := by
+      unfold d prefixAge at *
+      omega
+    have hs := (cheapRankDeath_spec inc R T M budget A (d-1)).mp hlt
+    have he : d = (d-1)+1 := by omega
+    have hh := hinc (evolve (birth A) (d-1))
+    change pathCost inc (birth A) d ≤ _
+    calc
+      pathCost inc (birth A) d = pathCost inc (birth A) (d-1) +
+          inc (evolve (birth A) (d-1)) := by
+        conv_lhs => rw [he]
+        rfl
+      _ ≤ budget + delta := by omega
+
+#print axioms NegativeMIN.rankClip_length
+#print axioms NegativeMIN.contact_priority_mono
+#print axioms NegativeMIN.cheapRankDeath_exact
+#print axioms NegativeMIN.cheapRankDeath_fullCapped
+#print axioms NegativeMIN.cheapRankDeath_budget
+
 end NegativeMIN
