@@ -4080,8 +4080,9 @@ theorem firstExpense_le (inc : State → Nat) (ss : List State) (unused : List N
       have he : unused.length=(unused.length-1)+1 := by omega
       rw [hl] at h
       have hc : C*unused.length=C*(unused.length-1)+C := by
-        conv_lhs => rw [he]
-        rw [Nat.mul_add,Nat.mul_one]
+        have hh := congrArg (fun n : Nat => C*n) he
+        rw [Nat.mul_add,Nat.mul_one] at hh
+        exact hh
       simp only [firstExpense,hm,if_true]
       have ha := hinc a
       omega
@@ -4143,7 +4144,6 @@ theorem weightedExpense_partition (z Y0 Y1 wN wQ A k : Nat) :
   rw [sum_map_add,sum_map_mul,sum_map_mul,← first_repeat_partition (narrowInc z Y0) (prefixStates A k) (List.range Y0),
     ← first_repeat_partition (mediumInc Y0 Y1) (prefixStates A k) (List.range Y1)]
   unfold firstWeightedExpense repeatedWeightedExpense
-  simp only [Nat.mul_add]
   omega
 
 theorem total_firstWeightedExpense_le (R T z Y0 Y1 wN wQ : Nat) (d : Nat → Nat)
