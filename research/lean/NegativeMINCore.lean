@@ -9584,4 +9584,174 @@ theorem jointDiversityHistory_mono (z Y Yb reset D K wS wL A i j : Nat) (hij : i
 #print axioms NegativeMIN.jointDiversityWordCost_defect
 #print axioms NegativeMIN.jointDiversityHistory_mono
 
+
+/-! Exact reverse charge support. The next reset is sufficient to
+determine the joint-counter decrement; no long terminal suffix or
+probabilistic independence is needed. -/
+def resetHead (reset : Nat) : List Nat → List Nat
+  | [] => []
+  | p::ps => if reset≤p then [] else p::resetHead reset ps
+
+theorem resetBlockScan_head_difference (reset : Nat) (P : List Nat → Nat)
+    (a b xs : List Nat) :
+    resetBlockScan reset P a xs+P (b++resetHead reset xs)=
+      resetBlockScan reset P b xs+P (a++resetHead reset xs) := by
+  induction xs generalizing a b with
+  | nil => simp [resetBlockScan,resetHead,Nat.add_comm]
+  | cons p xs ih =>
+    by_cases hp : reset≤p
+    · simp [resetBlockScan,resetHead,hp]
+      omega
+    · simp only [resetBlockScan,resetHead,if_neg hp]
+      have h := ih (a++[p]) (b++[p])
+      simpa [List.append_assoc] using h
+
+theorem resetBlockCost_cons_exact (reset : Nat) (P : List Nat → Nat)
+    (hz : P []=0) (p : Nat) (xs : List Nat) :
+    resetBlockCost reset P (p::xs)+P (resetHead reset xs)=
+      resetBlockCost reset P xs+P (resetHead reset (p::xs)) := by
+  unfold resetBlockCost
+  by_cases hp : reset≤p
+  · simp [resetBlockScan,resetHead,hp,hz]
+  · simp only [resetBlockScan,resetHead,if_neg hp,List.nil_append]
+    have h := resetBlockScan_head_difference reset P [p] [] xs
+    simpa using h
+
+theorem jointBlockScore_empty (z Y Yb D K : Nat) :
+    jointBlockScore z Y Yb D K []=0 := by
+  simp [jointBlockScore]
+
+theorem jointWordCount_cons_exact (z Y Yb reset D K p : Nat) (xs : List Nat) :
+    jointWordCount z Y Yb reset D K (p::xs)+
+      jointBlockScore z Y Yb D K (resetHead reset xs)=
+    jointWordCount z Y Yb reset D K xs+
+      jointBlockScore z Y Yb D K (resetHead reset (p::xs)) :=
+  resetBlockCost_cons_exact reset _ (jointBlockScore_empty z Y Yb D K) p xs
+
+theorem distinctFilteredCount_cons (f : Nat → Bool) (p : Nat) (xs : List Nat) :
+    distinctFilteredCount f (p::xs)=distinctFilteredCount f xs+
+      (if f p=true ∧ p∉xs then 1 else 0) := by
+  unfold distinctFilteredCount
+  by_cases hp : f p=true
+  · have hm : p∈xs.filter f ↔ p∈xs := by simp [hp]
+    by_cases hx : p∈xs
+    · have hf := hm.mpr hx
+      simp [List.filter_cons,hp,uniqueKeys,hf,hx]
+    · have hf : p∉xs.filter f := fun h => hx (hm.mp h)
+      simp [List.filter_cons,hp,uniqueKeys,hf,hx]
+  · have hf : f p=false := by cases h : f p <;> simp_all
+    simp [List.filter_cons,hf]
+
+theorem jointBlockScore_cons_threshold (z Y Yb D K p : Nat) (xs : List Nat)
+    (h : jointBlockScore z Y Yb D K xs<jointBlockScore z Y Yb D K (p::xs)) :
+    (z<p ∧ p<Yb ∧ (xs.filter (fun r => decide (z<r ∧ r<Yb))).length=K) ∨
+    (z<p ∧ p<Y ∧ p∉xs ∧ distinctFilteredCount (fun r => decide (z<r ∧ r<Y)) xs=D) := by
+  let f := fun r => decide (z<r ∧ r<Yb)
+  let g := fun r => decide (z<r ∧ r<Y)
+  have hb : ((p::xs).filter f).length=(xs.filter f).length+(if f p=true then 1 else 0) := by
+    cases hp : f p <;> simp [hp,Nat.add_comm]
+  have hd := distinctFilteredCount_cons g p xs
+  unfold jointBlockScore at h
+  change (if K<(xs.filter f).length ∧ D<distinctFilteredCount g xs then 1 else 0) <
+    (if K<((p::xs).filter f).length ∧ D<distinctFilteredCount g (p::xs) then 1 else 0) at h
+  rw [hb,hd] at h
+  by_cases hf : z<p ∧ p<Yb <;> by_cases hg : z<p ∧ p<Y <;> by_cases hm : p∈xs
+  all_goals
+    simp [f,g,hf,hg,hm] at h
+    simp [hf,hg,hm]
+    split at h <;> split at h <;> omega
+
+theorem jointWordCount_cons_charge (z Y Yb reset D K p : Nat) (xs : List Nat)
+    (h : jointWordCount z Y Yb reset D K xs<jointWordCount z Y Yb reset D K (p::xs)) :
+    p<reset ∧
+      ((z<p ∧ p<Yb ∧ ((resetHead reset xs).filter (fun r => decide (z<r ∧ r<Yb))).length=K) ∨
+       (z<p ∧ p<Y ∧ p∉resetHead reset xs ∧
+         distinctFilteredCount (fun r => decide (z<r ∧ r<Y)) (resetHead reset xs)=D)) := by
+  have he := jointWordCount_cons_exact z Y Yb reset D K p xs
+  by_cases hp : reset≤p
+  · simp [resetHead,hp,jointBlockScore_empty] at he
+    omega
+  · have hlt : p<reset := by omega
+    have hh : jointBlockScore z Y Yb D K (resetHead reset xs)<
+        jointBlockScore z Y Yb D K (p::resetHead reset xs) := by
+      simp only [resetHead,if_neg hp] at he
+      omega
+    exact ⟨hlt,jointBlockScore_cons_threshold z Y Yb D K p _ hh⟩
+
+/-! Uniform prefix and interval stability of reflected records.
+These bounds control common-suffix pair energy without evaluating the
+potential through the global terminal clock. -/
+def PrefixClose (f g : Nat → Int) (E : Int) (k : Nat) : Prop :=
+  ∀ i≤k,f i≤g i+E ∧ g i≤f i+E
+
+theorem runningPeak_close (f g : Nat → Int) (E : Int) (k : Nat)
+    (h : PrefixClose f g E k) :
+    runningPeak f k≤runningPeak g k+E ∧ runningPeak g k≤runningPeak f k+E := by
+  have hf := bestPrefix_le f k
+  have hg := bestPrefix_le g k
+  have h1 := (h (bestPrefix f k) hf).1
+  have h2 := (h (bestPrefix g k) hg).2
+  rw [bestPrefix_peak] at h1 h2
+  have h3 := runningPeak_ge_of_le g (bestPrefix f k) k hf
+  have h4 := runningPeak_ge_of_le f (bestPrefix g k) k hg
+  omega
+
+theorem recordDebt_close (f g : Nat → Int) (E : Int) (k : Nat)
+    (h : PrefixClose f g E k) :
+    recordDebt f k≤recordDebt g k+2*E ∧ recordDebt g k≤recordDebt f k+2*E := by
+  have hp := runningPeak_close f g E k h
+  have hk := h k (Nat.le_refl _)
+  unfold recordDebt
+  omega
+
+theorem positive_gap_bounds (a b c d E H : Int)
+    (ha : a≤b+E) (hb : c≤d+H) :
+    max 0 (a-d)≤max 0 (b-c+E+H) := by
+  apply int_max_mono_zero
+  omega
+
+theorem common_suffix_pair_profit_local_upper (f g u v w : Nat → Int)
+    (a b k : Nat) (E H : Int)
+    (hc : netSuffix f a=netSuffix g b)
+    (hu : PrefixClose f u E a) (hv : PrefixClose g v E b)
+    (hw : PrefixClose (netSuffix f a) w H k) :
+    ((List.range k).map (fun i => min (recordProfit f (a+i)) (recordProfit g (b+i)))).sum≤
+      max 0 (runningPeak w k-max (recordDebt u a) (recordDebt v b)+H+2*E) := by
+  rw [common_suffix_pair_profit f g a b k hc]
+  have hp := (runningPeak_close _ _ _ _ hw).1
+  have h1 := (recordDebt_close f u E a hu).2
+  have h2 := (recordDebt_close g v E b hv).2
+  have hh : max (recordDebt u a) (recordDebt v b)≤
+      max (recordDebt f a) (recordDebt g b)+2*E := by
+    have h3 := Int.le_max_left (recordDebt f a) (recordDebt g b)
+    have h4 := Int.le_max_right (recordDebt f a) (recordDebt g b)
+    rw [Int.max_le]
+    omega
+  exact positive_gap_bounds _ _ _ _ H (2*E) hp hh
+
+theorem common_suffix_pair_profit_local_lower (f g u v w : Nat → Int)
+    (a b k : Nat) (E H : Int)
+    (hc : netSuffix f a=netSuffix g b)
+    (hu : PrefixClose f u E a) (hv : PrefixClose g v E b)
+    (hw : PrefixClose (netSuffix f a) w H k) :
+    max 0 (runningPeak w k-max (recordDebt u a) (recordDebt v b)-H-2*E)≤
+      ((List.range k).map (fun i => min (recordProfit f (a+i)) (recordProfit g (b+i)))).sum := by
+  rw [common_suffix_pair_profit f g a b k hc]
+  have hp := (runningPeak_close _ _ _ _ hw).2
+  have h1 := (recordDebt_close f u E a hu).1
+  have h2 := (recordDebt_close g v E b hv).1
+  have hh : max (recordDebt f a) (recordDebt g b)≤
+      max (recordDebt u a) (recordDebt v b)+2*E := by
+    have h3 := Int.le_max_left (recordDebt u a) (recordDebt v b)
+    have h4 := Int.le_max_right (recordDebt u a) (recordDebt v b)
+    rw [Int.max_le]
+    omega
+  apply int_max_mono_zero
+  omega
+
+#print axioms NegativeMIN.jointWordCount_cons_exact
+#print axioms NegativeMIN.jointWordCount_cons_charge
+#print axioms NegativeMIN.common_suffix_pair_profit_local_upper
+#print axioms NegativeMIN.common_suffix_pair_profit_local_lower
+
 end NegativeMIN
