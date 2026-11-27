@@ -17,7 +17,7 @@ function audit(){
   if(sp[x-1]===x-1){sourceChecks++;let H=Math.min(100,Math.floor((least(x)-8)/2));if(H>0)ok(literal(x,3-x/2,H)===null,"prime rough target stationary")}
  }
  for(let R of [12000,48000,192000,384000]){
-  let z=Math.floor(R**.285),eta=Math.floor(R**.15),rough=0,primeRough=0,twins=0,exit=0,successorRough=0,fast=0,avgGain=0,smallest=0,noRoughNeighborhood=0,smallNeighborhoodBound=0;
+  let z=Math.floor(R**.285),eta=Math.max(31,Math.floor(R**.15)),rough=0,primeRough=0,twins=0,exit=0,successorRough=0,fast=0,avgGain=0,smallest=0,noRoughNeighborhood=0,smallNeighborhoodBound=0;
   for(let x=Math.ceil(R/6)*6;x<=2*R;x+=6){
    let q=least(x);if(q<z||q<11)continue;rough++;
    let one=sp[x-1]===x-1,other=sp[x+1]===x+1;if(!one&&!other)continue;primeRough++;
