@@ -5626,4 +5626,148 @@ theorem actual_contact_pair_profit (inc : State → Nat) (D R T A B k : Nat) (n 
 #print axioms NegativeMIN.common_suffix_pair_profit
 #print axioms NegativeMIN.actual_contact_pair_profit
 
+/-! Local repeat accounting on actual space-time boxes.
+The index is root-relative only by subtraction of its starting box.
+Its increments are nonnegative, and it changes exactly when either
+physical box coordinate changes. -/
+
+theorem div_span_mul_le (a b H : Nat) (hab : a≤b) (hH : 0<H) :
+    H*(b/H-a/H)≤b-a+H := by
+  have hq : a/H≤b/H := Nat.div_le_div_right hab
+  have ha := Nat.div_add_mod a H
+  have hb := Nat.div_add_mod b H
+  have hr := Nat.mod_lt a hH
+  have he : a/H+(b/H-a/H)=b/H := by omega
+  have hh := congrArg (fun u : Nat => H*u) he
+  rw [Nat.mul_add] at hh
+  omega
+
+def clockBox (R H A i : Nat) : Nat :=
+  (absoluteAge R (birth A).n+i)/H-absoluteAge R (birth A).n/H
+
+def spatialBox (H A i : Nat) : Nat :=
+  A/H-(orbit A i).x/H
+
+def boxIndex (R H A i : Nat) : Nat := clockBox R H A i+spatialBox H A i
+
+theorem boxIndex_mono (R H A i j : Nat) (hij : i≤j) :
+    boxIndex R H A i≤boxIndex R H A j := by
+  have ht := Nat.div_le_div_right (c := H)
+    (show absoluteAge R (birth A).n+i≤absoluteAge R (birth A).n+j by omega)
+  have hx := Nat.div_le_div_right (c := H) (orbit_center_mono A i j hij)
+  unfold boxIndex clockBox spatialBox
+  omega
+
+theorem boxIndex_bound (R H A k : Nat) (hH : 0<H) :
+    H*boxIndex R H A k≤k+gain (birth A) (orbit A k)+2*H := by
+  have ht := div_span_mul_le (absoluteAge R (birth A).n)
+    (absoluteAge R (birth A).n+k) H (by omega) hH
+  have hx := evolve_center_le (birth A) k
+  change (orbit A k).x≤A at hx
+  have hs := div_span_mul_le (orbit A k).x A H hx hH
+  unfold boxIndex clockBox spatialBox gain
+  change H*((absoluteAge R (birth A).n+k)/H-absoluteAge R (birth A).n/H+
+    (A/H-(orbit A k).x/H))≤k+(A-(orbit A k).x)+2*H
+  rw [Nat.mul_add]
+  omega
+
+theorem boxIndex_prefix_bound (R H A k : Nat) (hH : 0<H) (hA : A%2=0) :
+    H*(boxIndex R H A k+1)≤3*k+6+3*H := by
+  have hb := boxIndex_bound R H A k hH
+  have hg := canonical_gain_bound A k hA
+  rw [Nat.mul_add,Nat.mul_one]
+  omega
+
+def boxStates (R H A k b : Nat) : List State :=
+  ((List.range k).filter (fun i => decide (boxIndex R H A i=b))).map (orbit A)
+
+def boxFirstCost (inc : State → Nat) (Y R H A k : Nat) : Nat :=
+  ((List.range (boxIndex R H A k+1)).map (fun b =>
+    firstExpense inc (boxStates R H A k b) (List.range Y))).sum
+
+def boxRepeatCost (inc : State → Nat) (Y R H A k : Nat) : Nat :=
+  ((List.range (boxIndex R H A k+1)).map (fun b =>
+    repeatExpense inc (boxStates R H A k b) (List.range Y))).sum
+
+theorem box_cost_partition (inc : State → Nat) (Y R H A k : Nat) :
+    boxFirstCost inc Y R H A k+boxRepeatCost inc Y R H A k=
+      pathCost inc (birth A) k := by
+  unfold boxFirstCost boxRepeatCost
+  rw [← sum_map_add]
+  have he : (List.range (boxIndex R H A k+1)).map (fun b =>
+      firstExpense inc (boxStates R H A k b) (List.range Y)+
+        repeatExpense inc (boxStates R H A k b) (List.range Y)) =
+      (List.range (boxIndex R H A k+1)).map (fun b =>
+        (((List.range k).filter (fun i => decide (boxIndex R H A i=b))).map
+          (fun i => inc (orbit A i))).sum) := by
+    apply List.map_congr_left
+    intro b _
+    rw [first_repeat_partition]
+    simp only [boxStates,List.map_map,Function.comp_def]
+  rw [he,sum_fiber_weight _ _ (boxIndex R H A) (fun i => inc (orbit A i))
+    List.nodup_range]
+  · exact prefixStates_cost inc A k |> (fun h => by simpa only [prefixStates,List.map_map,Function.comp_def] using h)
+  · intro i hi
+    apply List.mem_range.mpr
+    have hm := boxIndex_mono R H A i k (by have hh := List.mem_range.mp hi; omega)
+    omega
+
+theorem box_first_bound (inc : State → Nat) (Y R H A k C : Nat)
+    (hc : ∀ s : State, inc s≤C) :
+    boxFirstCost inc Y R H A k≤(boxIndex R H A k+1)*(C*Y) := by
+  unfold boxFirstCost
+  have h := sum_map_le (List.range (boxIndex R H A k+1))
+    (fun b => firstExpense inc (boxStates R H A k b) (List.range Y))
+    (fun _ => C*Y) (fun b _ => by
+      have h := firstExpense_le inc (boxStates R H A k b) (List.range Y) C hc
+      simpa only [List.length_range] using h)
+  rw [sum_const_nat,List.length_range] at h
+  exact h
+
+theorem narrow_box_error (z Y0 R H A k : Nat)
+    (hH : 0<H) (hA : A%2=0) :
+    H*boxFirstCost (narrowInc z Y0) Y0 R H A k≤
+      Y0*(3*k+6+3*H) := by
+  have h := box_first_bound (narrowInc z Y0) Y0 R H A k 1 (narrowInc_le_one z Y0)
+  rw [Nat.one_mul] at h
+  have h1 := Nat.mul_le_mul_left H h
+  have h2 := Nat.mul_le_mul_left Y0 (boxIndex_prefix_bound R H A k hH hA)
+  have he : H*((boxIndex R H A k+1)*Y0)=Y0*(H*(boxIndex R H A k+1)) := by ac_rfl
+  rw [he] at h1
+  exact Nat.le_trans h1 h2
+
+/-- Same physical box iff same local index along the actual orbit.
+Use the equality direction to preserve the spatial and clock pins. -/
+theorem boxIndex_eq_coords (R H A i j : Nat) (hij : i≤j)
+    (he : boxIndex R H A i=boxIndex R H A j) :
+    (absoluteAge R (birth A).n+i)/H=(absoluteAge R (birth A).n+j)/H ∧
+      (orbit A i).x/H=(orbit A j).x/H := by
+  have ht := Nat.div_le_div_right (c := H)
+    (show absoluteAge R (birth A).n+i≤absoluteAge R (birth A).n+j by omega)
+  have hstart := Nat.div_le_div_right (c := H)
+    (show absoluteAge R (birth A).n≤absoluteAge R (birth A).n+i by omega)
+  have hx := Nat.div_le_div_right (c := H) (orbit_center_mono A i j hij)
+  have hcenter : (orbit A i).x≤A := evolve_center_le (birth A) i
+  have hroot := Nat.div_le_div_right (c := H) hcenter
+  unfold boxIndex clockBox spatialBox at he
+  omega
+
+theorem same_box_gap (R H A i j : Nat) (hH : 0<H) (hij : i≤j)
+    (he : boxIndex R H A i=boxIndex R H A j) :
+    j-i<H ∧ (orbit A i).x-(orbit A j).x<H := by
+  obtain ⟨ht,hx⟩ := boxIndex_eq_coords R H A i j hij he
+  have h1 := Nat.div_add_mod (absoluteAge R (birth A).n+i) H
+  have h2 := Nat.div_add_mod (absoluteAge R (birth A).n+j) H
+  have h3 := Nat.div_add_mod (orbit A i).x H
+  have h4 := Nat.div_add_mod (orbit A j).x H
+  have hr1 := Nat.mod_lt (absoluteAge R (birth A).n+j) hH
+  have hr2 := Nat.mod_lt (orbit A i).x hH
+  rw [ht] at h1
+  rw [hx] at h3
+  omega
+
+#print axioms NegativeMIN.box_cost_partition
+#print axioms NegativeMIN.narrow_box_error
+#print axioms NegativeMIN.same_box_gap
+
 end NegativeMIN
