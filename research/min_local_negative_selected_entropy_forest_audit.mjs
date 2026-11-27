@@ -26,15 +26,16 @@ function audit(){
    let sum=0;for(let e of er){let m=levels[e.b],v=m.get(e.a)||{...e,m:0};ck(v.c===e.c&&v.p===e.p&&v.s===e.s,"map");v.m++;m.set(e.a,v);sum+=e.D}ck(sum===G,"gain");
   }
   function u(a,b){let ar=sites.get(a)||[],m=0;for(let i=0;i<ar.length;i+=2)m+=+(ar[i]<=b&&b<=ar[i+1]);return m}
-  let sum=0,base=0,branch=0,bin=0,bc=0,alpha=0,beta=0,globalCross=0,globalLabel=0,globalShell=0,bandRows=[],bands=new Map(),cutL=0;
+  let sum=0,base=0,branch=0,bin=0,bc=0,alpha=0,beta=0,globalCross=0,globalLabel=0,globalShell=0,bandRows=[],bands=new Map(),cutL=0,baseTouch=0,labelTouch=0,shellTouch=0,tightCross=0,tightLabel=0,tightShell=0;
   for(let b=4;b<H;b++){
-   let map=levels[b],incoming=new Map(),mass=0,B=0,actualBase=0,actualBranch=0,labelMass=new Map(),shellSum=new Map(),labelActual=0,shellActual=0;
+   let map=levels[b],incoming=new Map(),mass=0,B=0,actualBase=0,actualBranch=0,labelMass=new Map(),shellSum=new Map(),labelActual=0,shellActual=0,A1=0,C1=0,C2=0,label1=new Map(),shell1=new Map(),shell2=new Map();
    for(let [a,e] of map){let v=incoming.get(e.c)||[];v.push(e);incoming.set(e.c,v);mass+=e.m;let k=e.p+":"+e.s;labelMass.set(k,(labelMass.get(k)||0)+e.m);shellSum.set(k,(shellSum.get(k)||0)+e.m*Math.floor(e.D/(4*e.p)));z.edgeKeys++}
    for(let a of new Set([...map.keys(),...incoming.keys()])){
     let v=incoming.get(a)||[],I=v.reduce((s,x)=>s+x.m,0),m=u(a,b),F=m+I;ck(map.has(a)?map.get(a).m===F:u(a,b+1)===F,"traffic");z.trafficChecks++;
-    if(I){B+=m;actualBase+=mix(m,I);actualBranch+=f(I)-v.reduce((s,x)=>s+f(x.m),0);
+    if(I){B+=m;if(m)A1+=I;actualBase+=mix(m,I);actualBranch+=f(I)-v.reduce((s,x)=>s+f(x.m),0);
      let byLabel=new Map(),keys=new Set();
      for(let e of v){let k=e.p+":"+e.s,i=Math.floor(e.D/(4*e.p)),key=k+":"+i;ck(!keys.has(key),"shell injective");keys.add(key);let l=byLabel.get(k)||[];l.push(e);byLabel.set(k,l);z.shellChecks++}
+     if(byLabel.size>1){C1+=I;for(let [k,l] of byLabel)label1.set(k,(label1.get(k)||0)+l.reduce((s,e)=>s+e.m,0))}for(let [k,l] of byLabel)if(l.length>1){for(let e of l){C2+=e.m;shell1.set(k,(shell1.get(k)||0)+e.m);shell2.set(k,(shell2.get(k)||0)+e.m*Math.floor(e.D/(4*e.p)))}}
      labelActual+=f(I)-[...byLabel.values()].reduce((s,l)=>s+f(l.reduce((q,x)=>q+x.m,0)),0);
      for(let l of byLabel.values())shellActual+=f(l.reduce((s,x)=>s+x.m,0))-l.reduce((s,x)=>s+f(x.m),0)
     }
@@ -42,6 +43,7 @@ function audit(){
    let lb=f(mass)-[...labelMass.values()].reduce((s,m)=>s+f(m),0),sb=0;for(let [k,m] of labelMass)sb+=m*g(shellSum.get(k)/m);
    ck(Math.abs(actualBranch-labelActual-shellActual)<1e-6,"decomposition");
    ck(actualBase<=mix(mass,B)+1e-6&&labelActual<=lb+1e-6&&shellActual<=sb+1e-6,"entropy bound");z.entropyChecks++;
+   let l1=f(C1)-[...label1.values()].reduce((s,m)=>s+f(m),0),s1=0;for(let [k,m] of shell1)s1+=m*g(shell2.get(k)/m);ck(actualBase<=mix(A1,B)+1e-6&&labelActual<=l1+1e-6&&shellActual<=s1+1e-6,'collision-conditioned bounds');baseTouch+=A1;labelTouch+=C1;shellTouch+=C2;tightCross+=mix(A1,B);tightLabel+=l1;tightShell+=s1;
    sum+=actualBase+actualBranch;base+=actualBase;branch+=actualBranch;bin+=labelActual;bc+=shellActual;alpha+=mass;beta+=B;globalCross+=mix(mass,B);globalLabel+=lb;globalShell+=sb;cutL=sum/ns;
    let h=2**Math.floor(Math.log2(b)),r=bands.get(h)||{h,mass:0,B:0,delta:0,cross:0,label:0,shell:0,boundCross:0,boundLabel:0,boundShell:0,collidingMass:0};
    r.mass+=mass;r.B+=B;r.delta+=actualBase+actualBranch;r.cross+=actualBase;r.label+=labelActual;r.shell+=shellActual;r.boundCross+=mix(mass,B);r.boundLabel+=lb;r.boundShell+=sb;
@@ -59,7 +61,7 @@ function audit(){
   }
   let L=[...endpoints.values()].reduce((s,m)=>s+f(m),0)/ns;ck(Math.abs(sum/ns-L)<1e-8,"global entropy");z.entropyChecks++;
   let bs=[...bands.values()].map(r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[k,k==="h"?v:v/ns])));
-  z.rows.push({R,K,T,J,H,nr,ns,selection:ns/nr,L,base:base/ns,branch:branch/ns,label:bin/ns,shell:bc/ns,traffic:alpha/ns,baseTraffic:beta/ns,crossUpper:globalCross/ns,labelUpper:globalLabel/ns,shellUpper:globalShell/ns,bands:bs,tail:bandRows})
+  z.rows.push({R,K,T,J,H,nr,ns,selection:ns/nr,L,base:base/ns,branch:branch/ns,label:bin/ns,shell:bc/ns,traffic:alpha/ns,baseTraffic:beta/ns,crossUpper:globalCross/ns,labelUpper:globalLabel/ns,shellUpper:globalShell/ns,baseTouch:baseTouch/ns,labelTouch:labelTouch/ns,shellTouch:shellTouch/ns,tightCross:tightCross/ns,tightLabel:tightLabel/ns,tightShell:tightShell/ns,bands:bs,tail:bandRows})
  }
  return z
 }
