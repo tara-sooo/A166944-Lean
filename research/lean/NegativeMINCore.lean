@@ -5951,13 +5951,21 @@ theorem boxRepeatCost_step (inc : State → Nat) (Y R H A k : Nat) :
     (fun q => repeatExpense inc (boxStates R H A (k+1) q) (List.range Y))
     (by intro q _; rw [boxStates_succ]; exact repeatExpense_append_le _ _ _ _)
   change ((List.range b).map _).sum≤((List.range c).map _).sum
-  rw [← he,List.range_add,List.map_append,List.sum_append]
+  apply Nat.le_trans h1
+  have hh : List.range c=List.range b++(List.range (c-b)).map (fun i => b+i) := by
+    calc
+      List.range c=List.range (b+(c-b)) := congrArg List.range he.symm
+      _ = _ := List.range_add
+  rw [hh,List.map_append,List.sum_append]
   omega
 
 theorem boxRepeatCost_mono (inc : State → Nat) (Y R H A i j : Nat) (hij : i≤j) :
     boxRepeatCost inc Y R H A i≤boxRepeatCost inc Y R H A j := by
   induction j with
-  | zero => have h : i=0 := by omega; simp [h]
+  | zero =>
+    have h : i=0 := by omega
+    subst i
+    exact Nat.le_refl _
   | succ j ih =>
     by_cases h : i=j+1
     · subst i; exact Nat.le_refl _
@@ -5981,7 +5989,10 @@ theorem boxRepeatCost_zero (inc : State → Nat) (Y R H A : Nat) :
     boxRepeatCost inc Y R H A 0=0 := by
   unfold boxRepeatCost
   have h : ∀ b : Nat, boxStates R H A 0 b=[] := by intro b; simp [boxStates]
-  simp [h,repeatExpense]
+  rw [show (List.range (boxIndex R H A 0+1)).map (fun b => repeatExpense inc (boxStates R H A 0 b) (List.range Y)) = (List.range (boxIndex R H A 0+1)).map (fun _ => 0) by apply List.map_congr_left; intro b _; rw [h]; rfl]
+  induction (List.range (boxIndex R H A 0+1)) with
+  | nil => rfl
+  | cons a l ih => simp [ih]
 
 theorem boxBudgetDeadline_budget (R T z Y H budget A : Nat) :
     boxRepeatCost (narrowInc z Y) Y R H A
@@ -5992,7 +6003,7 @@ theorem boxBudgetDeadline_budget (R T z Y H budget A : Nat) :
     rw [hd,boxRepeatCost_zero]
     omega
   · have hlt : d-1<boxBudgetDeadline R T z Y H budget A := by
-      unfold d prefixAge
+      dsimp [d,prefixAge] at hd ⊢
       omega
     have h := (boxBudgetDeadline_spec R T z Y H budget A (d-1)).mp hlt
     have he : d-1+1=d := by omega
