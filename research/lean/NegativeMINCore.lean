@@ -10112,4 +10112,131 @@ theorem completed_segment_wait_bound (s : State) (k : Nat)
 #print axioms NegativeMIN.mixedSupport_gain
 #print axioms NegativeMIN.completed_segment_wait_bound
 
+
+/-! A stationary phase with common end and irreversible arrivals has
+an exact cap integral. Select the earliest M arrivals, not the last
+M and not an average occupancy. Times are relative to phase start. -/
+
+def arrivalMass (xs : List Nat) (entry : Nat → Nat) (u : Nat) : Nat :=
+  (xs.filter (fun A => decide (entry A≤u))).length
+
+theorem arrivalMass_sum (xs : List Nat) (entry : Nat → Nat) (H : Nat) :
+    ((List.range H).map (arrivalMass xs entry)).sum=
+      (xs.map (fun A => H-entry A)).sum := by
+  unfold arrivalMass
+  have he : (List.range H).map (fun u => (xs.filter (fun A => decide (entry A≤u))).length)=
+      (List.range H).map (fun u => (xs.map (fun A => if decide (entry A≤u) then 1 else 0)).sum) := by
+    apply List.map_congr_left
+    intro u _
+    exact filter_length_indicator xs _
+  rw [he,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  rw [← filter_length_indicator]
+  let e := min H (entry A)
+  have he : e≤H := Nat.min_le_left _ _
+  have hpre := range_filter_prefix H e he
+  have hcomp := filter_complement_length (List.range H) (fun u => decide (u<e))
+  rw [hpre,List.length_range,List.length_range] at hcomp
+  have hf : (List.range H).filter (fun u => decide (entry A≤u))=
+      (List.range H).filter (fun u => !decide (u<e)) := by
+    apply List.filter_congr
+    intro u hu
+    have h := List.mem_range.mp hu
+    apply Bool.eq_iff_iff.mpr
+    simp only [decide_eq_true_eq,Bool.not_eq_true',decide_eq_false_iff_not]
+    dsimp [e]
+    omega
+  rw [hf]
+  dsimp [e] at hcomp
+  omega
+
+theorem arrivalMass_clip (xs : List Nat) (entry : Nat → Nat) (M u : Nat)
+    (hn : xs.Nodup) :
+    arrivalMass (rankClip xs entry M) entry u=min M (arrivalMass xs entry u) := by
+  unfold arrivalMass
+  apply rankClip_filter_length _ _ _ _ hn
+  intro a _ b _ ha hp
+  simp only [decide_eq_true_eq] at ha ⊢
+  unfold Precedes at hp
+  omega
+
+theorem stationaryPhase_clip_integral (xs : List Nat) (entry : Nat → Nat) (M H : Nat)
+    (hn : xs.Nodup) :
+    ((List.range H).map (fun u => min M (arrivalMass xs entry u))).sum=
+      ((rankClip xs entry M).map (fun A => H-entry A)).sum := by
+  rw [← arrivalMass_sum]
+  congr 1
+  apply List.map_congr_left
+  intro u _
+  exact (arrivalMass_clip xs entry M u hn).symm
+
+theorem stationaryPhase_pair_integral (xs : List Nat) (entry : Nat → Nat) (H : Nat) :
+    ((List.range H).map (fun u => arrivalMass xs entry u*arrivalMass xs entry u)).sum=
+      (xs.map (fun A => (xs.map (fun B => H-max (entry A) (entry B))).sum)).sum := by
+  have he (u : Nat) :
+      arrivalMass xs entry u*arrivalMass xs entry u=
+        (xs.map (fun A => (xs.map (fun B =>
+          if decide (max (entry A) (entry B)≤u) then 1 else 0)).sum)).sum := by
+    have hh : ∀ A : Nat, (xs.map (fun B =>
+        if decide (max (entry A) (entry B)≤u) then 1 else 0)).sum=
+          (if entry A≤u then arrivalMass xs entry u else 0) := by
+      intro A
+      by_cases ha : entry A≤u
+      · rw [if_pos ha]
+        unfold arrivalMass
+        rw [filter_length_indicator]
+        congr 1
+        apply List.map_congr_left
+        intro B _
+        have he : (max (entry A) (entry B)≤u) ↔ entry B≤u := by omega
+        simp [he]
+      · rw [if_neg ha]
+        have hm : xs.map (fun B => if decide (max (entry A) (entry B)≤u) then 1 else 0)=xs.map (fun _ => 0) := by
+          apply List.map_congr_left
+          intro B _
+          have h : ¬max (entry A) (entry B)≤u := by omega
+          simp [h]
+        rw [hm,sum_const_nat,Nat.mul_zero]
+    have hm : xs.map (fun A => (xs.map (fun B =>
+      if decide (max (entry A) (entry B)≤u) then 1 else 0)).sum)=
+      xs.map (fun A => arrivalMass xs entry u*(if decide (entry A≤u) then 1 else 0)) := by
+      apply List.map_congr_left
+      intro A _
+      rw [hh]
+      by_cases h : entry A≤u <;> simp [h]
+    rw [hm,sum_map_mul,← filter_length_indicator]
+    rfl
+  have hmap : (List.range H).map (fun u => arrivalMass xs entry u*arrivalMass xs entry u)=
+    (List.range H).map (fun u => (xs.map (fun A => (xs.map (fun B =>
+      if decide (max (entry A) (entry B)≤u) then 1 else 0)).sum)).sum) := by
+    apply List.map_congr_left
+    intro u _
+    exact he u
+  rw [hmap,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  rw [sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro B _
+  rw [← filter_length_indicator]
+  have hh := arrivalMass_sum [0] (fun _ => max (entry A) (entry B)) H
+  unfold arrivalMass at hh
+  simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Nat.add_zero] at hh
+  -- Convert the singleton arrivals at each tick into its indicator.
+  have hmap' : (List.range H).map (fun u => ([0].filter (fun _ => decide (max (entry A) (entry B)≤u))).length)=
+      (List.range H).map (fun u => if decide (max (entry A) (entry B)≤u) then 1 else 0) := by
+    apply List.map_congr_left
+    intro u _
+    by_cases h : max (entry A) (entry B)≤u <;> simp [h]
+  rw [hmap'] at hh
+  rw [filter_length_indicator]
+  exact hh
+
+#print axioms NegativeMIN.stationaryPhase_clip_integral
+#print axioms NegativeMIN.stationaryPhase_pair_integral
+
 end NegativeMIN
