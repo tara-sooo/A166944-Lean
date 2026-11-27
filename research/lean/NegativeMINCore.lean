@@ -3374,4 +3374,148 @@ theorem debtRank_mono (inc : State → Nat) (D R T A i j : Nat)
 #print axioms NegativeMIN.contact_debt_step
 #print axioms NegativeMIN.debtRank_mono
 
+def debtOK (inc : State → Nat) (D R T M A i : Nat) : Bool :=
+  decide (debtRank inc D R T A (absoluteAge R (birth A).n+i)≤M)
+
+def debtDeath (inc : State → Nat) (D R T M A : Nat) : Nat :=
+  ((List.range (observeAge R T A+T)).filter (debtOK inc D R T M A)).length
+
+theorem debtDeath_spec (inc : State → Nat) (D R T M A i : Nat)
+    (hT : 6≤T) (hA : A∈roots R) :
+    i<debtDeath inc D R T M A ↔
+      i<observeAge R T A+T ∧ debtRank inc D R T A (absoluteAge R (birth A).n+i)≤M := by
+  unfold debtDeath
+  have hmono : ∀ j k : Nat, j≤k → debtOK inc D R T M A k=true →
+      debtOK inc D R T M A j=true := by
+    intro j k hj hk
+    simp only [debtOK,decide_eq_true_eq] at hk ⊢
+    exact Nat.le_trans (debtRank_mono inc D R T A _ _ hT hA (by omega)) hk
+  rw [antitone_count_spec _ hmono]
+  simp [debtOK]
+
+theorem debtDeath_phys_iff (inc : State → Nat) (D R T M A : Nat) (n : Int)
+    (hT : 6≤T) (hA : A∈roots R) (hb : (birth A).n≤n)
+    (he : n<observeStart R T A+(T:Int)) :
+    physicalLiveAt (debtDeath inc D R T M) R T A n=true ↔
+      debtRank inc D R T A (absoluteAge R n)≤M := by
+  have hr := hA
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+  have hstart := observeStart_ge_birth R T A hT hr.2.1 hr.2.2
+  have hep := epoch_le_birth R A hA
+  have ha : physicalAge A n<observeAge R T A+T := by
+    unfold physicalAge observeAge
+    omega
+  have ht : absoluteAge R (birth A).n+physicalAge A n=absoluteAge R n := by
+    unfold absoluteAge physicalAge
+    omega
+  simp only [physicalLiveAt,decide_eq_true_eq,hb,he,true_and,
+    debtDeath_spec inc D R T M A _ hT hA,ha,ht]
+
+def fullFiber (R T J x : Nat) (n : Int) : List Nat :=
+  (roots R).filter (fun A => decide ((birth A).n≤n ∧
+    n<observeStart R T A+(T:Int) ∧ windowId R T A=J ∧
+      (physicalState A n).x=x))
+
+theorem fullFiber_rank (inc : State → Nat) (D R T J x A : Nat) (n : Int)
+    (hA : A∈fullFiber R T J x n) :
+    localRank (fullFiber R T J x n) (fun B => debtScore inc D R T B (absoluteAge R n)) A =
+      debtRank inc D R T A (absoluteAge R n) := by
+  have ha := (List.mem_filter.mp hA).2
+  simp only [decide_eq_true_eq] at ha
+  have hb := epoch_le_birth R A (List.mem_filter.mp hA).1
+  have ht := absoluteTick_age R n (Int.le_trans hb ha.1)
+  unfold localRank fullFiber debtRank
+  rw [List.filter_filter,ht]
+  apply congrArg List.length
+  apply List.filter_congr
+  intro B _
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true,decide_eq_true_eq]
+  constructor
+  · intro h
+    exact ⟨contact_of_center R T A B n ha.1 h.2.1
+      (ha.2.2.1.trans h.2.2.2.1.symm) (ha.2.2.2.trans h.2.2.2.2.symm),h.1⟩
+  · intro h
+    have hc := h.1
+    have he := contact_same_window_end R T A B hc.2.2.1
+    have hx := congrArg State.x hc.2.2.2
+    refine ⟨h.2,hc.2.1,?_,hc.2.2.1.symm.trans ha.2.2.1,
+      hx.symm.trans ha.2.2.2⟩
+    rw [← he]
+    exact ha.2.1
+
+theorem debtDeath_fiber_eq (inc : State → Nat) (D R T M J x : Nat) (n : Int)
+    (hT : 6≤T) :
+    physicalFiber (debtDeath inc D R T M) R T J x n =
+      rankClip (fullFiber R T J x n) (fun B => debtScore inc D R T B (absoluteAge R n)) M := by
+  unfold physicalFiber rankClip
+  change _ = (((roots R).filter (fun A => decide ((birth A).n≤n ∧
+    n<observeStart R T A+(T:Int) ∧ windowId R T A=J ∧
+    (physicalState A n).x=x))).filter (fun A => decide
+      (localRank (fullFiber R T J x n) (fun B => debtScore inc D R T B (absoluteAge R n)) A≤M)))
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true,decide_eq_true_eq]
+  constructor
+  · intro h
+    have hp := h.1
+    simp only [physicalLiveAt,decide_eq_true_eq] at hp
+    have hm : A∈fullFiber R T J x n := List.mem_filter.mpr ⟨hA,by
+      simp only [decide_eq_true_eq]
+      exact ⟨hp.1,hp.2.1,h.2.1,h.2.2⟩⟩
+    refine ⟨?_,hp.1,hp.2.1,h.2.1,h.2.2⟩
+    rw [fullFiber_rank inc D R T J x A n hm]
+    exact (debtDeath_phys_iff inc D R T M A n hT hA hp.1 hp.2.1).mp h.1
+  · intro h
+    have hm : A∈fullFiber R T J x n := List.mem_filter.mpr ⟨hA,by
+      simpa only [decide_eq_true_eq] using h.2⟩
+    have hr := h.1
+    rw [fullFiber_rank inc D R T J x A n hm] at hr
+    exact ⟨(debtDeath_phys_iff inc D R T M A n hT hA h.2.1 h.2.2.1).mpr hr,
+      h.2.2.2.1,h.2.2.2.2⟩
+
+theorem debtDeath_fullCapped (inc : State → Nat) (D R T M : Nat) (hT : 6≤T) :
+    FullCapped (debtDeath inc D R T M) R T M := by
+  intro J x n
+  rw [debtDeath_fiber_eq inc D R T M J x n hT,rankClip_length]
+  · exact Nat.min_le_left _ _
+  · unfold fullFiber
+    exact List.filter_sublist.nodup (roots_nodup R)
+
+/-- Downward-closed predicates commute with the initial rank clip. -/
+theorem rankClip_filter_eq (xs : List Nat) (score : Nat → Nat) (M : Nat) (f : Nat → Bool)
+    (hdown : ∀ a∈xs, ∀ b∈xs, f a=true → Precedes score b a → f b=true) :
+    (rankClip xs score M).filter f=rankClip (xs.filter f) score M := by
+  have he (a : Nat) (ha : a∈xs) (hf : f a=true) :
+      localRank (xs.filter f) score a=localRank xs score a := by
+    unfold localRank
+    rw [List.filter_filter]
+    apply congrArg List.length
+    apply List.filter_congr
+    intro b hb
+    apply Bool.eq_iff_iff.mpr
+    simp only [Bool.and_eq_true,decide_eq_true_eq]
+    exact ⟨fun h => h.1,fun h => ⟨h,hdown a ha b hb hf h⟩⟩
+  unfold rankClip
+  rw [List.filter_filter,List.filter_filter]
+  apply List.filter_congr
+  intro a ha
+  by_cases hf : f a=true
+  · simp [hf,he a ha hf]
+  · have hfalse : f a=false := by cases h : f a <;> simp_all
+    simp [hfalse]
+
+theorem rankClip_filter_length (xs : List Nat) (score : Nat → Nat) (M : Nat) (f : Nat → Bool)
+    (hn : xs.Nodup)
+    (hdown : ∀ a∈xs, ∀ b∈xs, f a=true → Precedes score b a → f b=true) :
+    ((rankClip xs score M).filter f).length=min M (xs.filter f).length := by
+  rw [rankClip_filter_eq xs score M f hdown,rankClip_length]
+  exact List.filter_sublist.nodup hn
+
+#print axioms NegativeMIN.debtDeath_fiber_eq
+#print axioms NegativeMIN.debtDeath_fullCapped
+#print axioms NegativeMIN.rankClip_filter_length
+
 end NegativeMIN
