@@ -10523,6 +10523,7 @@ theorem shortReset_direct (x p : Nat) (hp : oddPrime p=true)
   · have hg := tick_gain_exact t
     rw [hwp,ht] at hg
     dsimp [A] at hg
+    change (tick t).x=x
     omega
   · rw [tick_clock,hc]
 
