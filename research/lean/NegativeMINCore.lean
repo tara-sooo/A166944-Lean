@@ -5199,4 +5199,140 @@ theorem actual_repeat_third_middle (A i j k p r : Nat) (hA : A%2=0)
 #print axioms NegativeMIN.actual_two_clock_gap
 #print axioms NegativeMIN.actual_repeat_third_middle
 
+/-! A deadline may depend on the entire individual history. The unit
+cost and individualized offsets reduce deadline priority to payDeath.
+No state-additivity is assumed of the history-dependent budget. -/
+
+theorem unit_pathCost (s : State) (k : Nat) :
+    pathCost (fun _ => 1) s k=k := by
+  induction k with
+  | zero => rfl
+  | succ k ih => simp [pathCost,ih]
+
+def deadlineClip (R T M : Nat) (d : Nat → Nat) : Nat → Nat :=
+  payDeath (fun _ => 1) (individualOffset (fun _ => 1) R T d) R T M
+    (totalExpense (fun _ => 1) R T d)
+
+theorem deadlineClip_fullCapped (R T M : Nat) (d : Nat → Nat) (hT : 6≤T) :
+    FullCapped (deadlineClip R T M d) R T M :=
+  payDeath_fullCapped _ _ R T M _ hT
+
+theorem deadlineClip_prefix_le (R T M A : Nat) (d : Nat → Nat) (hA : A∈roots R) :
+    prefixAge (deadlineClip R T M d) R T A≤prefixAge d R T A := by
+  have h := payDeath_budget (fun _ => 1) (individualOffset (fun _ => 1) R T d)
+    R T M (totalExpense (fun _ => 1) R T d) A
+  have he := individualOffset_eq (fun _ => 1) R T d A hA
+  rw [unit_pathCost] at h he
+  change prefixAge (deadlineClip R T M d) R T A≤_
+    at h
+  omega
+
+theorem deadlineClip_le (R T M A : Nat) (d : Nat → Nat) (hA : A∈roots R) :
+    deadlineClip R T M d A≤d A := by
+  have h := deadlineClip_prefix_le R T M A d hA
+  have hn : deadlineClip R T M d A≤observeAge R T A+T := by
+    unfold deadlineClip payDeath
+    exact Nat.le_trans (List.length_filter_le _ _) (by simp)
+  unfold prefixAge at h
+  omega
+
+theorem deadline_payFiber_eq (R T J x : Nat) (n : Int) (d : Nat → Nat)
+    (hT : 6≤T) :
+    payFiber (fun _ => 1) (individualOffset (fun _ => 1) R T d) R T
+      (totalExpense (fun _ => 1) R T d) J x n =
+    physicalFiber d R T J x n := by
+  unfold payFiber physicalFiber
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+  have ho := individualOffset_eq (fun _ => 1) R T d A hA
+  rw [unit_pathCost] at ho
+  apply Bool.eq_iff_iff.mpr
+  simp only [Bool.and_eq_true,decide_eq_true_eq,physicalLiveAt]
+  have hstart := observeStart_ge_birth R T A hT hr.2.1 hr.2.2
+  constructor
+  · intro h
+    have hbirth := h.1
+    have hage : physicalAge A (n+1)=physicalAge A n+1 := by
+      unfold physicalAge
+      omega
+    have hscore := h.2.2.2.2
+    unfold payScore physicalCost at hscore
+    rw [unit_pathCost,hage] at hscore
+    have htime := h.2.1
+    have hbound : physicalAge A n<observeAge R T A+T := by
+      unfold physicalAge observeAge
+      omega
+    have hlt : physicalAge A n<d A := by
+      unfold prefixAge at ho
+      omega
+    exact ⟨⟨hbirth,htime,hlt⟩,h.2.2.1,h.2.2.2.1⟩
+  · intro h
+    have hbirth := h.1.1
+    have htime := h.1.2.1
+    have hage : physicalAge A (n+1)=physicalAge A n+1 := by
+      unfold physicalAge
+      omega
+    have hbound : physicalAge A n<observeAge R T A+T := by
+      unfold physicalAge observeAge
+      omega
+    have hscore : payScore (fun _ => 1) (individualOffset (fun _ => 1) R T d) A n≤
+        totalExpense (fun _ => 1) R T d := by
+      unfold payScore physicalCost
+      rw [unit_pathCost,hage]
+      unfold prefixAge at ho
+      have hlt := h.1.2.2
+      omega
+    exact ⟨hbirth,htime,h.2.1,h.2.2,hscore⟩
+
+theorem deadlineClip_exact (R T M J x : Nat) (n : Int) (d : Nat → Nat)
+    (hT : 6≤T) :
+    (physicalFiber (deadlineClip R T M d) R T J x n).length =
+      min M (physicalFiber d R T J x n).length := by
+  unfold deadlineClip
+  rw [payDeath_exact _ _ _ _ _ _ _ _ _ hT,deadline_payFiber_eq _ _ _ _ _ _ hT]
+
+def deadlineMasses (R T : Nat) (d : Nat → Nat) : List Nat :=
+  (obsBins R T).map (fun b => (obsLiveFiber d R T b.1 b.2).length)
+
+theorem deadlineClip_live_exact (R T M : Nat) (d : Nat → Nat) (hT : 6≤T) :
+    liveTicks (deadlineClip R T M d) R T=((deadlineMasses R T d).map (min M)).sum := by
+  rw [liveTicks_eq_bins]
+  unfold deadlineMasses
+  simp only [List.map_map,Function.comp_def]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  obtain ⟨u,hu,hku⟩ := List.mem_flatMap.mp hb
+  obtain ⟨key,_,hk⟩ := List.mem_map.mp hku
+  subst b
+  obtain ⟨J,x⟩ := key
+  have ht := List.mem_range.mp hu
+  rw [obsLiveFiber_eq _ R T J x u hT ht,obsLiveFiber_eq d R T J x u hT ht]
+  exact deadlineClip_exact R T M J x (obsClock R T J u) d hT
+
+theorem deadlineMasses_sum (R T : Nat) (d : Nat → Nat) :
+    (deadlineMasses R T d).sum=liveTicks d R T := (liveTicks_eq_bins d R T).symm
+
+theorem deadlineClip_sharp_moment (R T M : Nat) (d : Nat → Nat)
+    (hT : 6≤T) (hM : 0<M) :
+    M*liveTicks d R T*liveTicks d R T≤
+      liveTicks (deadlineClip R T M d) R T*
+        ((M-1)*liveTicks d R T+moment2 (deadlineMasses R T d)) := by
+  rw [deadlineClip_live_exact R T M d hT,← deadlineMasses_sum R T d]
+  exact clip_sharp _ M hM
+
+theorem deadlineClip_cost_le (R T M : Nat) (d : Nat → Nat) (c : Nat → Nat → Nat)
+    (hc : ∀ A i j : Nat, i≤j → c A i≤c A j) :
+    ((roots R).map (fun A => c A (prefixAge (deadlineClip R T M d) R T A))).sum≤
+      ((roots R).map (fun A => c A (prefixAge d R T A))).sum := by
+  apply sum_map_le
+  intro A hA
+  exact hc A _ _ (deadlineClip_prefix_le R T M A d hA)
+
+#print axioms NegativeMIN.deadlineClip_exact
+#print axioms NegativeMIN.deadlineClip_sharp_moment
+#print axioms NegativeMIN.deadlineClip_cost_le
+
 end NegativeMIN
