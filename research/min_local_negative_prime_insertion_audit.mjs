@@ -23,7 +23,7 @@ function audit(){
  }
  function add(old,p,zero=false){
   const {ps,F,keep}=old,qs=[...ps,p],F1=F*p,N=F/2,N1=F1/2,B=zero?0:Math.min(p-3,Math.floor(Math.log(p)**2),F/2);
-  const oldMass=new Uint32Array(F/2),baseFull=new Uint32Array(F/2),newMass=new Uint32Array(F1/2),goodMass=new Uint32Array(F1/2),badMass=new Uint32Array(F1/2),newKeep=new Uint8Array(N1);
+  const oldMass=new Uint32Array(F/2),baseFull=new Uint32Array(F/2),newMass=new Uint32Array(F1/2),goodMass=new Uint32Array(F1/2),badMass=new Uint32Array(F1/2),newKeep=new Uint8Array(N1),regD=new Int32Array(F1/2),badD=new Int32Array(F1/2);
   const goodArrival=new Map(),moved=new Map(),targetBase=new Map(),gainOld=new Uint32Array(N),endOld=new Uint32Array(N),gainNew=new Uint32Array(N1),endNew=new Uint32Array(N1);
   let early=0,terminal=0,unchanged=0,repeat=0,regular=0,highHeight=0,postLong=0,oldTailEvents=0,oldHeightBad=0,eligibleTerminal=0,retOld=0,retNew=0,keptBad=0,keptReg=0,keptIdle=0,checks=0,events=0,oldEvents=0;
   let predCount=0;
@@ -68,6 +68,7 @@ function audit(){
       }
      }
     }
+    if(first!==-1){let d=good?regD:badD;d[(o.x+shift)/2]--;d[a.x/2]++;}
     if(keep[id]&&(first===-1||good)){
      newKeep[idx]=1;retNew++;goodMass[a.x/2]++;
      if(first===-1)keptIdle++;
@@ -125,7 +126,16 @@ function audit(){
    }
    short.push({D,n0,n1,K0:moment(a)/F,K1:moment(b)/F1});
   }
-  let out={p,F,F1,N1,B,zeroBound,meanSelectedGain:g1/N1,mgfSelected:mg1/N1,maxKept,checks,events,oldEvents,early:early/N1,terminal:terminal/N1,repeat:repeat/N1,regular:regular/N1,highHeight:highHeight/N1,postLong:postLong/N1,earlyBound:2*oldTailEvents/N1,retOld:retOld/N,retNew:retNew/N1,keptIdle:keptIdle/N1,keptReg:keptReg/N1,keptBad:keptBad/N1,Kfull0,K1,K0,Kg,Kb,exactBound,regularBound:K0*factor,short};
+  let KregularFull=0,defect=0,defectPositive=0,defectNegative=0,absFlux=0,s1=0,s2=0;
+  for(let y=0;y<F1/2;y++){
+   let m=baseFull[y%(F/2)]+regD[y],d=badD[y],v=2*m*d+d*d;
+   ck(m>=0&&m+d===newMass[y],"signed full insertion mass");
+   KregularFull+=m*m;defect+=v;defectPositive+=Math.max(v,0);defectNegative+=Math.max(-v,0);absFlux+=Math.abs(d);s1+=regD[y];s2+=d;
+  }
+  ck(s1===0&&s2===0&&KregularFull+defect===moment(newMass),"signed full insertion identity");
+  KregularFull/=F1;defect/=F1;
+  ck(KregularFull<=Kfull0*(zero?1+4/p:factor)+1e-10,"full regular transport bound");
+  let out={p,F,F1,N1,B,KregularFull,defect,defectPositive:defectPositive/F1,defectNegative:defectNegative/F1,absFlux:absFlux/F1,scaledDefect:p*defect/Kfull0,zeroBound,meanSelectedGain:g1/N1,mgfSelected:mg1/N1,maxKept,checks,events,oldEvents,early:early/N1,terminal:terminal/N1,repeat:repeat/N1,regular:regular/N1,highHeight:highHeight/N1,postLong:postLong/N1,earlyBound:2*oldTailEvents/N1,retOld:retOld/N,retNew:retNew/N1,keptIdle:keptIdle/N1,keptReg:keptReg/N1,keptBad:keptBad/N1,Kfull0,K1,K0,Kg,Kb,exactBound,regularBound:K0*factor,short};
   return {ps:qs,F:F1,keep:newKeep,out};
  }
  let a=init([3]),rows=[];for(let p of [5,7,11,13,17]){a=add(a,p);rows.push(a.out)}
