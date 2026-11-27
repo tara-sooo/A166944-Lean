@@ -8704,7 +8704,7 @@ def passageAccepted (cost : Nat → Nat → Nat) (R T M D q : Nat)
     localRank (passageNeighbors R T (firstPassage cost R T D q) A) score A≤M))
 
 theorem passageRankDeath_net_lower (cost : Nat → Nat → Nat) (R T M D q : Nat)
-    (score : Nat → Nat) (hz : ∀ A,cost A 0=0) :
+    (score : Nat → Nat) (hq : 0<q) (hz : ∀ A,cost A 0=0) :
     historyExpense cost R T (passageRankDeath cost R T M D q score)+
       q*(passageAccepted cost R T M D q score).length≤
       D*liveTicks (passageRankDeath cost R T M D q score) R T := by
@@ -8738,14 +8738,14 @@ theorem passageRankDeath_net_lower (cost : Nat → Nat → Nat) (R T M D q : Nat
     simp [h,hz]
 
 theorem passageAccepted_upper (cost : Nat → Nat → Nat) (R T M B0 D q err : Nat)
-    (score : Nat → Nat) (hT : 6≤T) (hz : ∀ A,cost A 0=0)
+    (score : Nat → Nat) (hq : 0<q) (hT : 6≤T) (hz : ∀ A,cost A 0=0)
     (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
     (he : HistoryLiveEstimate cost R T M B0 D err) :
     q*(passageAccepted cost R T M D q score).length≤
       D*B0*M*T*twinCount R T+err := by
   have h := observedCap_history_upper cost (passageRankDeath cost R T M D q score)
     R T M B0 D err hT hm he (passageRankDeath_observedCap cost R T M D q score hT)
-  have hh := passageRankDeath_net_lower cost R T M D q score hz
+  have hh := passageRankDeath_net_lower cost R T M D q score hq hz
   omega
 
 #print axioms NegativeMIN.firstPassage_earliest
@@ -9076,8 +9076,8 @@ theorem wordPolicyNet_near_optimal (C : List Nat → Nat) (endClock : Int)
   change policyNet inc D R T opt≤wordPolicyNet C D R T opt+(((roots R).length*E:Nat):Int) at h2
   change wordPolicyNet C D R T d≤wordPolicyNet C D R T opt+(((roots R).length*(2*E):Nat):Int)
   have he : (roots R).length*(2*E)=(roots R).length*E+(roots R).length*E := by
-    rw [Nat.mul_comm 2 E,Nat.mul_succ]
-    simp
+    have h2 : 2*E=E+E := by omega
+    rw [h2,Nat.mul_add]
   rw [he,Int.natCast_add]
   change policyNet inc D R T d≤policyNet inc D R T opt at h3
   omega
