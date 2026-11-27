@@ -7374,7 +7374,6 @@ theorem ensembleBinMasses_bits (cost : Nat → Nat → Nat) (R T : Nat)
     ensembleBinMasses cost R T bs b=
       indicatorCounts (roots R) bs (historyBinBit cost R T b) := by
   unfold ensembleBinMasses indicatorCounts
-  congr 1
   apply List.map_congr_left
   intro d _
   exact historyBinMass_bits cost R T b d
@@ -7393,5 +7392,151 @@ theorem ensembleBin_pairwise_variance (cost : Nat → Nat → Nat) (R T : Nat)
 
 #print axioms NegativeMIN.indicatorCounts_weak_variance
 #print axioms NegativeMIN.ensembleBin_pairwise_variance
+
+
+/-! Independent finite budget coordinates. The actual MIN orbits are
+fixed; only the exogenous budgets are independently enumerated. -/
+def budgetAssign (a b : Nat) (d : Nat → Nat) : Nat → Nat :=
+  fun x => if x=a then b else d x
+
+def productBudgetEnsemble (choices : Nat → List Nat) : List Nat → List (Nat → Nat)
+  | [] => [fun _ => 0]
+  | a::as => (choices a).flatMap (fun b =>
+      (productBudgetEnsemble choices as).map (budgetAssign a b))
+
+theorem productBudgetEnsemble_length_cons (choices : Nat → List Nat)
+    (a : Nat) (as : List Nat) :
+    (productBudgetEnsemble choices (a::as)).length =
+      (choices a).length*(productBudgetEnsemble choices as).length := by
+  simp only [productBudgetEnsemble,List.length_flatMap,List.length_map,sum_const_nat]
+
+theorem productBudgetEnsemble_sum_cons (choices : Nat → List Nat)
+    (a : Nat) (as : List Nat) (f : (Nat → Nat) → Nat) :
+    ((productBudgetEnsemble choices (a::as)).map f).sum=
+      ((choices a).map (fun b =>
+        ((productBudgetEnsemble choices as).map (fun d => f (budgetAssign a b d))).sum)).sum := by
+  unfold productBudgetEnsemble
+  rw [sum_map_flatMap]
+  simp only [List.map_map,Function.comp_def]
+
+theorem productBudgetMarginal_head (choices : Nat → List Nat)
+    (a : Nat) (as : List Nat) (p : Nat → Nat → Bool) :
+    budgetMarginal (productBudgetEnsemble choices (a::as)) (fun d x => p x (d x)) a =
+      (productBudgetEnsemble choices as).length *
+        ((choices a).map (fun b => bit01 (p a b))).sum := by
+  unfold budgetMarginal
+  rw [productBudgetEnsemble_sum_cons]
+  simp only [budgetAssign,if_pos rfl,sum_const_nat]
+  rw [← sum_map_mul]
+
+theorem productBudgetMarginal_tail (choices : Nat → List Nat)
+    (a x : Nat) (as : List Nat) (p : Nat → Nat → Bool) (h : x≠a) :
+    budgetMarginal (productBudgetEnsemble choices (a::as)) (fun d x => p x (d x)) x =
+      (choices a).length *
+        budgetMarginal (productBudgetEnsemble choices as) (fun d x => p x (d x)) x := by
+  unfold budgetMarginal
+  rw [productBudgetEnsemble_sum_cons]
+  simp only [budgetAssign,if_neg h,sum_const_nat]
+
+theorem productBudgetJoint_head (choices : Nat → List Nat)
+    (a x : Nat) (as : List Nat) (p : Nat → Nat → Bool) (h : x≠a) :
+    budgetJoint (productBudgetEnsemble choices (a::as)) (fun d x => p x (d x)) a x =
+      ((choices a).map (fun b => bit01 (p a b))).sum *
+        budgetMarginal (productBudgetEnsemble choices as) (fun d x => p x (d x)) x := by
+  unfold budgetJoint budgetMarginal
+  rw [productBudgetEnsemble_sum_cons]
+  simp only [budgetAssign,if_pos rfl,if_neg h,sum_map_mul]
+  have he : (choices a).map (fun b => bit01 (p a b)*
+        ((productBudgetEnsemble choices as).map (fun d => bit01 (p x (d x)))).sum) =
+      (choices a).map (fun b =>
+        ((productBudgetEnsemble choices as).map (fun d => bit01 (p x (d x)))).sum*
+          bit01 (p a b)) := by
+    apply List.map_congr_left
+    intro b _
+    exact Nat.mul_comm _ _
+  rw [he,sum_map_mul,Nat.mul_comm]
+
+theorem budgetJoint_symm {α β : Type} (bs : List β) (p : β → α → Bool)
+    (a b : α) : budgetJoint bs p a b=budgetJoint bs p b a := by
+  unfold budgetJoint
+  congr 1
+  apply List.map_congr_left
+  intro d _
+  exact Nat.mul_comm _ _
+
+theorem productBudgetJoint_tail (choices : Nat → List Nat)
+    (a x y : Nat) (as : List Nat) (p : Nat → Nat → Bool)
+    (hx : x≠a) (hy : y≠a) :
+    budgetJoint (productBudgetEnsemble choices (a::as)) (fun d x => p x (d x)) x y =
+      (choices a).length *
+        budgetJoint (productBudgetEnsemble choices as) (fun d x => p x (d x)) x y := by
+  unfold budgetJoint
+  rw [productBudgetEnsemble_sum_cons]
+  simp only [budgetAssign,if_neg hx,if_neg hy,sum_const_nat]
+
+theorem productBudget_pairwise (choices : Nat → List Nat) (xs : List Nat)
+    (p : Nat → Nat → Bool) (hn : xs.Nodup)
+    (x y : Nat) (hx : x∈xs) (hy : y∈xs) (hxy : x≠y) :
+    let bs := productBudgetEnsemble choices xs
+    bs.length*budgetJoint bs (fun d a => p a (d a)) x y =
+      budgetMarginal bs (fun d a => p a (d a)) x*
+      budgetMarginal bs (fun d a => p a (d a)) y := by
+  induction xs with
+  | nil => simp at hx
+  | cons a as ih =>
+    dsimp only
+    have hnd := List.nodup_cons.mp hn
+    rw [productBudgetEnsemble_length_cons]
+    by_cases hxa : x=a
+    · subst x
+      have hya : y≠a := Ne.symm hxy
+      rw [productBudgetJoint_head choices a y as p hya,
+        productBudgetMarginal_head choices a as p,
+        productBudgetMarginal_tail choices a y as p hya]
+      ac_rfl
+    · by_cases hya : y=a
+      · subst y
+        rw [budgetJoint_symm _ _ x a,
+          productBudgetJoint_head choices a x as p hxa,
+          productBudgetMarginal_head choices a as p,
+          productBudgetMarginal_tail choices a x as p hxa]
+        ac_rfl
+      · have hxt : x∈as := by simpa [hxa] using hx
+        have hyt : y∈as := by simpa [hya] using hy
+        have hh := ih hnd.2 hxt hyt
+        dsimp only at hh
+        rw [productBudgetJoint_tail choices a x y as p hxa hya,
+          productBudgetMarginal_tail choices a x as p hxa,
+          productBudgetMarginal_tail choices a y as p hya]
+        calc
+          _ = ((choices a).length*(choices a).length)*
+              ((productBudgetEnsemble choices as).length*
+                budgetJoint (productBudgetEnsemble choices as) (fun d a => p a (d a)) x y) := by ac_rfl
+          _ = _ := by rw [hh]; ac_rfl
+
+theorem historyBinBit_local (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (d : Nat → Nat) (A : Nat) :
+    historyBinBit cost R T b d A =
+      historyBinBit cost R T b (fun _ => d A) A := rfl
+
+theorem productHistoryBudget_variance (cost : Nat → Nat → Nat) (R T : Nat)
+    (choices : Nat → List Nat) (b : Nat × (Nat × Nat)) :
+    let bs := productBudgetEnsemble choices (roots R)
+    let xs := ensembleBinMasses cost R T bs b
+    bs.length*moment2 xs≤bs.length*xs.sum+xs.sum*xs.sum := by
+  dsimp only
+  apply ensembleBin_pairwise_variance
+  intro A hA B hB hne
+  let p := fun A j => historyBinBit cost R T b (fun _ => j) A
+  have hh := productBudget_pairwise choices (roots R) p (roots_nodup R) A B hA hB hne
+  dsimp only at hh
+  have he : (fun d A => p A (d A))=historyBinBit cost R T b := by
+    funext d A
+    exact (historyBinBit_local cost R T b d A).symm
+  rw [he] at hh
+  exact Nat.le_of_eq hh
+
+#print axioms NegativeMIN.productBudget_pairwise
+#print axioms NegativeMIN.productHistoryBudget_variance
 
 end NegativeMIN
