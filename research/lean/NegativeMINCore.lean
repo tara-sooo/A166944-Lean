@@ -6664,8 +6664,8 @@ theorem chunkStep_inv (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
           subst D
           simp [ChunkInvariant,hem,hs,ht]
           omega
-        · simp [ChunkInvariant,hem,hnot,hd,hn,hl]
-          have hD : 0 < D := by omega
+        · have hD : 1 ≤ D := by omega
+          simp [ChunkInvariant,hem,hnot,hd,hn,hl,hD]
           omega
       · have hlen : 0<c.seen.length := List.length_pos_iff.mpr hem
         by_cases hm : p∈c.seen
@@ -6732,6 +6732,8 @@ theorem chunkStep_seen_kept (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
     · by_cases hd : D≤c.seen.length
       · simp [hm,hd] at hs
       · simp [hm,hd,hp]
+        intro q hq
+        exact Or.inr hq
   · simp [hp]
 
 def chunkFold (z Y reset D : Nat) : ChunkStats → List Nat → ChunkStats
