@@ -1749,7 +1749,8 @@ theorem cheapRankDeath_budget (inc : State → Nat) (R T M budget A delta : Nat)
     calc
       pathCost inc (birth A) d = pathCost inc (birth A) (d-1) +
           inc (evolve (birth A) (d-1)) := by
-        have hstep : pathCost inc (birth A) ((d-1)+1) = _ := rfl
+        have hstep : pathCost inc (birth A) ((d-1)+1) =
+            pathCost inc (birth A) (d-1) + inc (evolve (birth A) (d-1)) := rfl
         rw [← he] at hstep
         exact hstep
       _ ≤ budget + delta := by omega
