@@ -7697,4 +7697,257 @@ theorem twin_above_of_compressed_soft (cost : Nat → Nat → Nat)
 #print axioms NegativeMIN.compressedBudgetSum_exact
 #print axioms NegativeMIN.twin_above_of_compressed_soft
 
+
+/-! Observed-only caps and dual prices. Pre-observation deaths can be
+discarded without losing net value for a monotone history expense. -/
+
+def ObservedCap (d : Nat → Nat) (R T M : Nat) : Prop :=
+  ∀ b∈obsBins R T,(obsLiveFiber d R T b.1 b.2).length≤M
+
+theorem obsBin_time (R T : Nat) (b : Nat × (Nat × Nat))
+    (hb : b∈obsBins R T) : b.1<T := by
+  unfold obsBins at hb
+  obtain ⟨u,hu,hb⟩ := List.mem_flatMap.mp hb
+  obtain ⟨k,_,he⟩ := List.mem_map.mp hb
+  subst b
+  exact List.mem_range.mp hu
+
+theorem fullCap_observedCap (d : Nat → Nat) (R T M : Nat)
+    (hT : 6≤T) (h : FullCapped d R T M) : ObservedCap d R T M := by
+  intro b hb
+  obtain ⟨u,J,x⟩ := b
+  have hu := obsBin_time R T (u,J,x) hb
+  rw [obsLiveFiber_eq d R T J x u hT hu]
+  exact h J x (obsClock R T J u)
+
+theorem observedCap_clip_life (d : Nat → Nat) (R T M : Nat)
+    (hT : 6≤T) (h : ObservedCap d R T M) :
+    liveTicks (deadlineClip R T M d) R T=liveTicks d R T := by
+  rw [deadlineClip_live_exact _ _ _ _ hT,← deadlineMasses_sum R T d]
+  unfold deadlineMasses
+  simp only [List.map_map,Function.comp_def]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  exact Nat.min_eq_right (h b hb)
+
+theorem observedCap_clip_expense (cost : Nat → Nat → Nat) (d : Nat → Nat)
+    (R T M : Nat) (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j) :
+    historyExpense cost R T (deadlineClip R T M d)≤historyExpense cost R T d := by
+  unfold historyExpense
+  apply sum_map_le
+  intro A ha
+  exact hm A _ _ (deadlineClip_prefix_le R T M A d ha)
+
+theorem observedCap_history_upper (cost : Nat → Nat → Nat) (d : Nat → Nat)
+    (R T M B0 D err : Nat) (hT : 6≤T)
+    (hm : ∀ A i j : Nat,i≤j → cost A i≤cost A j)
+    (hEst : HistoryLiveEstimate cost R T M B0 D err)
+    (hc : ObservedCap d R T M) :
+    D*liveTicks d R T≤D*B0*M*T*twinCount R T+historyExpense cost R T d+err := by
+  have h := hEst (deadlineClip R T M d) (deadlineClip_fullCapped _ _ _ _ hT)
+  rw [observedCap_clip_life d R T M hT hc] at h
+  have he := observedCap_clip_expense cost d R T M hm
+  omega
+
+abbrev DualBin := Nat × (Nat × Nat)
+abbrev DualPrice := DualBin × Nat
+
+def fullObsFiber (R T : Nat) (b : DualBin) : List Nat :=
+  (roots R).filter (fun A => decide (obsKey R T A b.1=b.2))
+
+theorem obsKey_contact_mono (R T A B u v : Nat) (hT : 6≤T)
+    (ha : A∈roots R) (hb : B∈roots R) (huv : u≤v) (hv : v<T)
+    (hk : obsKey R T A u=obsKey R T B u) :
+    obsKey R T A v=obsKey R T B v := by
+  have hj := congrArg Prod.fst hk
+  change windowId R T A=windowId R T B at hj
+  have hx := congrArg Prod.snd hk
+  change (observedState R T A u).x=(observedState R T B u).x at hx
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at ha hb
+  have ga := obsClock_age R T A (windowId R T A) u hT ha.2.1 ha.2.2 rfl (by omega)
+  have gb := obsClock_age R T B (windowId R T A) u hT hb.2.1 hb.2.2 hj.symm (by omega)
+  have ca := obsClock_age R T A (windowId R T A) v hT ha.2.1 ha.2.2 rfl hv
+  have cb := obsClock_age R T B (windowId R T A) v hT hb.2.1 hb.2.2 hj.symm hv
+  have hcontact := contact_of_center R T A B _ ga.1 gb.1 hj (by
+    simpa only [physicalState,ga.2.2,gb.2.2,observedState] using hx)
+  have hn : obsClock R T (windowId R T A) u≤obsClock R T (windowId R T A) v := by
+    unfold obsClock
+    omega
+  have hc := contact_mono R T A B _ _ hn hcontact
+  have hs := congrArg State.x hc.2.2.2
+  simp only [physicalState,ca.2.2,cb.2.2] at hs
+  exact Prod.ext hj hs
+
+theorem fullObsFiber_mem (R T : Nat) (b : DualBin) (A : Nat) :
+    A∈fullObsFiber R T b ↔ A∈roots R ∧ obsKey R T A b.1=b.2 := by
+  simp [fullObsFiber]
+
+/-- The observation fibers form a laminar family: any intersection between
+two times forces inclusion of the earlier full-root group into the later. -/
+theorem fullObsFiber_nested (R T : Nat) (b c : DualBin) (A : Nat)
+    (hT : 6≤T) (hbc : b.1≤c.1) (hc : c.1<T)
+    (ha : A∈fullObsFiber R T b) (ha' : A∈fullObsFiber R T c) :
+    ∀ B∈fullObsFiber R T b,B∈fullObsFiber R T c := by
+  intro B hb
+  have ha0 := (fullObsFiber_mem R T b A).mp ha
+  have ha1 := (fullObsFiber_mem R T c A).mp ha'
+  have hb0 := (fullObsFiber_mem R T b B).mp hb
+  have hh := obsKey_contact_mono R T B A b.1 c.1 hT hb0.1 ha0.1 hbc hc
+    (hb0.2.trans ha0.2.symm)
+  exact (fullObsFiber_mem R T c B).mpr ⟨hb0.1,hh.trans ha1.2⟩
+
+theorem obsBin_full_nonempty (R T : Nat) (b : DualBin) (hb : b∈obsBins R T) :
+    ∃ A : Nat,A∈fullObsFiber R T b := by
+  unfold obsBins at hb
+  obtain ⟨u,_,h⟩ := List.mem_flatMap.mp hb
+  obtain ⟨k,hk,he⟩ := List.mem_map.mp h
+  subst b
+  unfold obsKeys at hk
+  obtain ⟨A,ha,hak⟩ := List.mem_map.mp ((mem_uniqueKeys _ _).mp hk)
+  exact ⟨A,(fullObsFiber_mem R T (u,k) A).mpr ⟨ha,hak⟩⟩
+
+theorem obsBin_of_root (R T A u : Nat) (ha : A∈roots R) (hu : u<T) :
+    (u,obsKey R T A u)∈obsBins R T := by
+  unfold obsBins
+  apply List.mem_flatMap.mpr
+  exact ⟨u,List.mem_range.mpr hu,List.mem_map.mpr ⟨_,obsKeys_cover R T A u ha,rfl⟩⟩
+
+theorem earliest_fullObsFiber (R T : Nat) (b : DualBin) (hb : b∈obsBins R T) :
+    ∃ c : DualBin,c∈obsBins R T ∧ c.1≤b.1 ∧
+      fullObsFiber R T c=fullObsFiber R T b ∧
+      ∀ a∈obsBins R T,a.1<c.1 → fullObsFiber R T a≠fullObsFiber R T b := by
+  obtain ⟨u,hu,hp,hmin⟩ := earliest_le
+    (fun u => ∃ c : DualBin,c∈obsBins R T ∧ c.1=u ∧ fullObsFiber R T c=fullObsFiber R T b)
+    b.1 ⟨b.1,Nat.le_refl _,b,hb,rfl,rfl⟩
+  obtain ⟨c,hc,he,hf⟩ := hp
+  refine ⟨c,hc,by omega,hf,?_⟩
+  intro a ha hlt hEq
+  exact hmin a.1 (by omega) ⟨a,ha,rfl,hEq⟩
+
+def dualPriceTotal (ps : List DualPrice) : Nat := (ps.map Prod.snd).sum
+
+def dualHit (R T A l : Nat) (b : DualBin) : Bool :=
+  decide (b.1<l ∧ obsKey R T A b.1=b.2)
+
+def dualCharge (R T A l : Nat) (ps : List DualPrice) : Nat :=
+  (ps.map (fun p => if dualHit R T A l p.1 then p.2 else 0)).sum
+
+def DualFeasible (cost : Nat → Nat → Nat) (R T D : Nat)
+    (ps : List DualPrice) (slack : Nat → Nat) : Prop :=
+  ∀ A∈roots R,∀ k : Nat,k≤observeAge R T A+T →
+    D*min T (k-observeAge R T A)≤cost A k+
+      dualCharge R T A (min T (k-observeAge R T A)) ps+slack A
+
+def dualObjective (R M : Nat) (ps : List DualPrice) (slack : Nat → Nat) : Nat :=
+  M*dualPriceTotal ps+((roots R).map slack).sum
+
+theorem dualHit_eq_live (d : Nat → Nat) (R T A : Nat) (b : DualBin)
+    (hu : b.1<T) :
+    dualHit R T A (life d R T A) b =
+      (liveAt d R T A b.1 && decide (obsKey R T A b.1=b.2)) := by
+  apply Bool.eq_iff_iff.mpr
+  simp only [dualHit,decide_eq_true_eq,Bool.and_eq_true]
+  rw [liveAt_iff_lt_life d R T A b.1 hu]
+
+theorem dualCharge_sum (d : Nat → Nat) (R T : Nat) (ps : List DualPrice)
+    (hp : ∀ p∈ps,p.1∈obsBins R T) :
+    ((roots R).map (fun A => dualCharge R T A (life d R T A) ps)).sum =
+      (ps.map (fun p => p.2*(obsLiveFiber d R T p.1.1 p.1.2).length)).sum := by
+  unfold dualCharge
+  rw [sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro p hpm
+  have hu := obsBin_time R T p.1 (hp p hpm)
+  have he : (roots R).map (fun A => if dualHit R T A (life d R T A) p.1 then p.2 else 0)=
+      (roots R).map (fun A => p.2*(if liveAt d R T A p.1.1 &&
+        decide (obsKey R T A p.1.1=p.1.2) then 1 else 0)) := by
+    apply List.map_congr_left
+    intro A _
+    rw [dualHit_eq_live d R T A p.1 hu]
+    split <;> simp
+  rw [he,sum_map_mul,← filter_length_indicator]
+  unfold obsLiveFiber
+  rw [List.filter_filter,Bool.and_comm]
+  rfl
+
+theorem dualCharge_cap (d : Nat → Nat) (R T M : Nat) (ps : List DualPrice)
+    (hp : ∀ p∈ps,p.1∈obsBins R T) (hc : ObservedCap d R T M) :
+    ((roots R).map (fun A => dualCharge R T A (life d R T A) ps)).sum≤M*dualPriceTotal ps := by
+  rw [dualCharge_sum d R T ps hp]
+  unfold dualPriceTotal
+  rw [← sum_map_mul]
+  apply sum_map_le
+  intro p hpm
+  rw [Nat.mul_comm p.2]
+  exact Nat.mul_le_mul_right p.2 (hc p.1 (hp p hpm))
+
+theorem dual_weak_bound (cost : Nat → Nat → Nat) (d : Nat → Nat)
+    (R T M D : Nat) (ps : List DualPrice) (slack : Nat → Nat)
+    (hp : ∀ p∈ps,p.1∈obsBins R T) (hc : ObservedCap d R T M)
+    (hf : DualFeasible cost R T D ps slack) :
+    D*liveTicks d R T≤historyExpense cost R T d+dualObjective R M ps slack := by
+  have h := sum_map_le (roots R) (fun A => D*life d R T A)
+    (fun A => cost A (prefixAge d R T A)+dualCharge R T A (life d R T A) ps+slack A) (by
+      intro A ha
+      have h := hf A ha (prefixAge d R T A) (Nat.min_le_right _ _)
+      have he : min T (prefixAge d R T A-observeAge R T A)=life d R T A := by
+        unfold prefixAge life
+        omega
+      rw [he] at h
+      exact h)
+  rw [sum_map_mul,sum_map_add,sum_map_add] at h
+  have ht := dualCharge_cap d R T M ps hp hc
+  unfold liveTicks historyExpense dualObjective
+  omega
+
+/-- Moving a price to an earlier state with the same full-root fiber
+never decreases the charge on an observed prefix of any root. -/
+theorem dualHit_push (R T A l : Nat) (b c : DualBin) (ha : A∈roots R)
+    (hbc : c.1≤b.1) (hf : fullObsFiber R T c=fullObsFiber R T b)
+    (h : dualHit R T A l b=true) : dualHit R T A l c=true := by
+  simp only [dualHit,decide_eq_true_eq] at h ⊢
+  have hm := (fullObsFiber_mem R T b A).mpr ⟨ha,h.2⟩
+  rw [← hf] at hm
+  exact ⟨by omega,((fullObsFiber_mem R T c A).mp hm).2⟩
+
+def pushDualPrices (ps : List DualPrice) (reloc : DualBin → DualBin) : List DualPrice :=
+  ps.map (fun p => (reloc p.1,p.2))
+
+theorem pushDualPrices_total (ps : List DualPrice) (reloc : DualBin → DualBin) :
+    dualPriceTotal (pushDualPrices ps reloc)=dualPriceTotal ps := by
+  simp [dualPriceTotal,pushDualPrices,List.map_map,Function.comp_def]
+
+theorem pushDualPrices_charge (R T A l : Nat) (ps : List DualPrice)
+    (reloc : DualBin → DualBin) (ha : A∈roots R)
+    (hr : ∀ p∈ps,(reloc p.1).1≤p.1.1 ∧
+      fullObsFiber R T (reloc p.1)=fullObsFiber R T p.1) :
+    dualCharge R T A l ps≤dualCharge R T A l (pushDualPrices ps reloc) := by
+  unfold dualCharge pushDualPrices
+  simp only [List.map_map,Function.comp_def]
+  apply sum_map_le
+  intro p hp
+  by_cases h : dualHit R T A l p.1=true
+  · have hh := dualHit_push R T A l p.1 (reloc p.1) ha (hr p hp).1 (hr p hp).2 h
+    simp [h,hh]
+  · simp [h]
+
+theorem pushDualPrices_feasible (cost : Nat → Nat → Nat) (R T D : Nat)
+    (ps : List DualPrice) (slack : Nat → Nat) (reloc : DualBin → DualBin)
+    (hr : ∀ p∈ps,(reloc p.1).1≤p.1.1 ∧
+      fullObsFiber R T (reloc p.1)=fullObsFiber R T p.1)
+    (hf : DualFeasible cost R T D ps slack) :
+    DualFeasible cost R T D (pushDualPrices ps reloc) slack := by
+  intro A ha k hk
+  have h := hf A ha k hk
+  have hh := pushDualPrices_charge R T A (min T (k-observeAge R T A)) ps reloc ha hr
+  omega
+
+#print axioms NegativeMIN.observedCap_history_upper
+#print axioms NegativeMIN.fullObsFiber_nested
+#print axioms NegativeMIN.earliest_fullObsFiber
+#print axioms NegativeMIN.dual_weak_bound
+#print axioms NegativeMIN.pushDualPrices_feasible
+
 end NegativeMIN
