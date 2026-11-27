@@ -8740,4 +8740,174 @@ theorem passageAccepted_upper (cost : Nat → Nat → Nat) (R T M B0 D q err : N
 #print axioms NegativeMIN.passageRankDeath_observedCap
 #print axioms NegativeMIN.passageAccepted_upper
 
+
+/-! A common suffix forgets its incoming diversity history up to one
+saturation. This is a deterministic interlacing invariant, not a
+mixing assumption on the primes. -/
+def SeenSub (a b : ChunkStats) : Prop := ∀ p∈a.seen,p∈b.seen
+
+def SaturationInterlace (a b : ChunkStats) : Prop :=
+  (a.saturated=b.saturated ∧ SeenSub b a) ∨
+    (a.saturated=b.saturated+1 ∧ SeenSub a b)
+
+theorem chunk_seen_len_le (D : Nat) (a b : ChunkStats)
+    (ha : ChunkInvariant D a) (h : SeenSub a b) :
+    a.seen.length≤b.seen.length :=
+  nodup_subset_length_core _ _ ha.1 h
+
+theorem chunkStep_interlace_eq (z Y reset D : Nat) (a b : ChunkStats) (p : Nat)
+    (ha : ChunkInvariant D a) (hb : ChunkInvariant D b)
+    (he : a.saturated=b.saturated) (hs : SeenSub b a) :
+    SaturationInterlace (chunkStep z Y reset D a p) (chunkStep z Y reset D b p) := by
+  have hlen := chunk_seen_len_le D b a hb hs
+  by_cases hr : reset≤p
+  · simp [chunkStep,hr,SaturationInterlace,SeenSub,he]
+  · by_cases hp : z<p ∧ p<Y
+    · by_cases hpa : p∈a.seen
+      · by_cases hpb : p∈b.seen
+        · left
+          simpa [chunkStep,hr,hp,hpa,hpb,he,SeenSub] using hs
+        · have hnb : ¬ D≤b.seen.length := by
+            intro h
+            have h1 : b.seen.length=a.seen.length := by have := ha.2.1; omega
+            have hnd : (p::b.seen).Nodup := List.nodup_cons.mpr ⟨hpb,hb.1⟩
+            have hsub : ∀ q∈p::b.seen,q∈a.seen := by
+              intro q hq
+              rcases List.mem_cons.mp hq with rfl | hq
+              · exact hpa
+              · exact hs q hq
+            have hbad := nodup_subset_length_core _ _ hnd hsub
+            simp only [List.length_cons] at hbad
+            omega
+          left
+          simp only [chunkStep,if_neg hr,if_pos hp,if_pos hpa,if_neg hpb,if_neg hnb,
+            he,SeenSub,true_and]
+          intro q hq
+          rcases List.mem_cons.mp hq with rfl | hq
+          · exact hpa
+          · exact hs q hq
+      · have hpb : p∉b.seen := fun h => hpa (hs p h)
+        by_cases hda : D≤a.seen.length
+        · by_cases hdb : D≤b.seen.length
+          · left
+            simp [chunkStep,hr,hp,hpa,hpb,hda,hdb,he,SeenSub]
+          · right
+            simp [chunkStep,hr,hp,hpa,hpb,hda,hdb,he,SeenSub]
+        · have hdb : ¬ D≤b.seen.length := by omega
+          left
+          simp only [chunkStep,if_neg hr,if_pos hp,if_neg hpa,if_neg hpb,if_neg hda,
+            if_neg hdb,he,SeenSub,true_and]
+          intro q hq
+          rcases List.mem_cons.mp hq with rfl | hq
+          · exact List.mem_cons.mpr (Or.inl rfl)
+          · exact List.mem_cons.mpr (Or.inr (hs q hq))
+    · exact Or.inl (by simpa [chunkStep,hr,hp] using And.intro he hs)
+
+theorem chunkStep_interlace (z Y reset D : Nat) (a b : ChunkStats) (p : Nat)
+    (ha : ChunkInvariant D a) (hb : ChunkInvariant D b)
+    (h : SaturationInterlace a b) :
+    SaturationInterlace (chunkStep z Y reset D a p) (chunkStep z Y reset D b p) := by
+  rcases h with ⟨he,hs⟩ | ⟨he,hs⟩
+  · exact chunkStep_interlace_eq z Y reset D a b p ha hb he hs
+  · let b' : ChunkStats := {b with saturated:=b.saturated+1,total:=b.total+(D+1)}
+    have hb' : ChunkInvariant D b' := by
+      unfold ChunkInvariant at hb ⊢
+      dsimp [b']
+      refine ⟨hb.1,hb.2.1,?_,by have := hb.2.2.2; omega⟩
+      rw [Nat.mul_add,Nat.mul_one]
+      have := hb.2.2.1
+      omega
+    have h' := chunkStep_interlace_eq z Y reset D b' a p hb' ha he.symm hs
+    have he1 : (chunkStep z Y reset D b' p).saturated=
+        (chunkStep z Y reset D b p).saturated+1 := by
+      unfold chunkStep
+      by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+        by_cases hm : p∈b.seen <;> by_cases hd : D≤b.seen.length <;>
+        simp [b',hr,hp,hm,hd] <;> omega
+    have he2 : (chunkStep z Y reset D b' p).seen=(chunkStep z Y reset D b p).seen := by
+      unfold chunkStep
+      by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+        by_cases hm : p∈b.seen <;> by_cases hd : D≤b.seen.length <;>
+        simp [b',hr,hp,hm,hd]
+    rcases h' with ⟨hEq,hSub⟩ | ⟨hEq,hSub⟩
+    · right
+      rw [he1] at hEq
+      unfold SeenSub at hSub
+      rw [he2] at hSub
+      exact ⟨hEq.symm,hSub⟩
+    · left
+      rw [he1] at hEq
+      unfold SeenSub at hSub
+      rw [he2] at hSub
+      exact ⟨by omega,hSub⟩
+
+theorem chunkFold_interlace (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
+    (ha : ChunkInvariant D a) (hb : ChunkInvariant D b)
+    (h : SaturationInterlace a b) :
+    SaturationInterlace (chunkFold z Y reset D a xs) (chunkFold z Y reset D b xs) := by
+  induction xs generalizing a b with
+  | nil => exact h
+  | cons p xs ih =>
+    exact ih _ _ (chunkStep_inv _ _ _ _ _ _ ha) (chunkStep_inv _ _ _ _ _ _ hb)
+      (chunkStep_interlace z Y reset D a b p ha hb h)
+
+def satCount (z Y reset D : Nat) (xs : List Nat) : Nat :=
+  (chunkFold z Y reset D chunkInit xs).saturated
+
+theorem chunkFold_sat_shift (z Y reset D : Nat) (a : ChunkStats) (h : Nat) (xs : List Nat) :
+    (chunkFold z Y reset D {a with saturated:=a.saturated+h} xs).saturated =
+      (chunkFold z Y reset D a xs).saturated+h := by
+  have hstep (c : ChunkStats) (p : Nat) :
+      chunkStep z Y reset D {c with saturated:=c.saturated+h} p =
+        {chunkStep z Y reset D c p with saturated:=(chunkStep z Y reset D c p).saturated+h} := by
+    unfold chunkStep
+    by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+      by_cases hm : p∈c.seen <;> by_cases hd : D≤c.seen.length <;>
+      simp [hr,hp,hm,hd,Nat.add_comm,Nat.add_left_comm,Nat.add_assoc]
+  induction xs generalizing a with
+  | nil => rfl
+  | cons p xs ih =>
+    simp only [chunkFold,hstep]
+    exact ih (chunkStep z Y reset D a p)
+
+theorem satCount_append_bounds (z Y reset D : Nat) (xs ys : List Nat) :
+    satCount z Y reset D xs+satCount z Y reset D ys≤satCount z Y reset D (xs++ys) ∧
+    satCount z Y reset D (xs++ys)≤satCount z Y reset D xs+satCount z Y reset D ys+1 := by
+  let a := chunkFold z Y reset D chunkInit xs
+  let b : ChunkStats := ⟨[],a.saturated,0,(D+1)*a.saturated⟩
+  have ha := chunkFold_inv z Y reset D chunkInit xs (chunkInit_inv D)
+  have hb : ChunkInvariant D b := by simp [ChunkInvariant,b]
+  have hi : SaturationInterlace a b := Or.inl ⟨rfl,by simp [SeenSub,b]⟩
+  have hh := chunkFold_interlace z Y reset D a b ys ha hb hi
+  -- Total and nonempty counters do not affect the seen set or saturation.
+  have he (c d : ChunkStats) (zs : List Nat) (hs : c.seen=d.seen)
+      (hc : c.saturated=d.saturated) :
+      (chunkFold z Y reset D c zs).saturated=(chunkFold z Y reset D d zs).saturated := by
+    induction zs generalizing c d with
+    | nil => exact hc
+    | cons p zs ih =>
+      apply ih
+      · unfold chunkStep
+        by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+          by_cases hm : p∈d.seen <;> by_cases hd : D≤d.seen.length <;>
+          simp [hr,hp,hm,hd,hs]
+      · unfold chunkStep
+        by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
+          by_cases hm : p∈d.seen <;> by_cases hd : D≤d.seen.length <;>
+          simp [hr,hp,hm,hd,hs,hc]
+  have hbEq := he b {chunkInit with saturated:=a.saturated} ys rfl rfl
+  have hs := chunkFold_sat_shift z Y reset D chunkInit a.saturated ys
+  have hbEq' : (chunkFold z Y reset D b ys).saturated=satCount z Y reset D ys+a.saturated := by
+    rw [hbEq]
+    simpa [chunkInit,satCount] using hs
+  unfold satCount
+  rw [chunkFold_append]
+  change a.saturated+(chunkFold z Y reset D chunkInit ys).saturated≤
+    (chunkFold z Y reset D a ys).saturated ∧ _
+  change (chunkFold z Y reset D b ys).saturated=(chunkFold z Y reset D chunkInit ys).saturated+a.saturated at hbEq'
+  rcases hh with ⟨h,_⟩ | ⟨h,_⟩ <;> omega
+
+#print axioms NegativeMIN.chunkFold_interlace
+#print axioms NegativeMIN.satCount_append_bounds
+
 end NegativeMIN
