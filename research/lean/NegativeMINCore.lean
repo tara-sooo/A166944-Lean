@@ -5469,4 +5469,155 @@ theorem recordMasses_sum (inc : State → Nat) (D R T : Nat) :
 #print axioms NegativeMIN.recordEnergy_pairs
 #print axioms NegativeMIN.recordMasses_sum
 
+/-! Common suffix after a merge: exact cumulative collision weight
+depends on the larger initial debt and the common future peak. -/
+
+def netSuffix (f : Nat → Int) (a : Nat) (k : Nat) : Int :=
+  f (a+k)-f a
+
+theorem peak_suffix (f : Nat → Int) (a k : Nat) :
+    runningPeak f (a+k)=max (runningPeak f a) (f a+runningPeak (netSuffix f a) k) := by
+  induction k with
+  | zero =>
+    have h := runningPeak_ge f a
+    simp [runningPeak,netSuffix,Int.max_eq_left h]
+  | succ k ih =>
+    rw [Nat.add_succ,runningPeak,ih,runningPeak]
+    have he : f a+netSuffix f a (k+1)=f (a+k+1) := by
+      unfold netSuffix
+      rw [Nat.add_succ]
+      omega
+    by_cases h : runningPeak (netSuffix f a) k≤netSuffix f a (k+1)
+    · rw [Int.max_eq_right h]
+      have hl : f a+runningPeak (netSuffix f a) k≤f (a+k+1) := by omega
+      by_cases h2 : runningPeak f a≤f (a+k+1)
+      · have hm : max (runningPeak f a) (f a+runningPeak (netSuffix f a) k)≤f (a+k+1) := by
+          by_cases hz : runningPeak f a≤f a+runningPeak (netSuffix f a) k
+          · rw [Int.max_eq_right hz]; exact hl
+          · rw [Int.max_eq_left (by omega)]; exact h2
+        rw [Int.max_eq_right hm,he,Int.max_eq_right h2]
+      · have hm : f a+runningPeak (netSuffix f a) k≤runningPeak f a := by omega
+        rw [Int.max_eq_left hm,Int.max_eq_left (by omega : f (a+k+1)≤runningPeak f a),he,
+          Int.max_eq_left (by omega : f (a+k+1)≤runningPeak f a)]
+    · rw [Int.max_eq_left (by omega : netSuffix f a (k+1)≤runningPeak (netSuffix f a) k)]
+      have hle : f (a+k+1)≤f a+runningPeak (netSuffix f a) k := by omega
+      have hm := Int.le_max_right (runningPeak f a) (f a+runningPeak (netSuffix f a) k)
+      rw [Int.max_eq_left (by omega : f (a+k+1)≤max (runningPeak f a) (f a+runningPeak (netSuffix f a) k))]
+
+theorem suffix_profit_sum (f : Nat → Int) (a k : Nat) :
+    ((List.range k).map (fun i => recordProfit f (a+i))).sum=
+      runningPeak f (a+k)-runningPeak f a := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [List.range_succ,List.map_append,List.sum_append]
+    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Int.add_zero,ih,recordProfit,Nat.add_succ]
+    omega
+
+theorem suffix_profit_peak (f : Nat → Int) (a k : Nat) :
+    ((List.range k).map (fun i => recordProfit f (a+i))).sum=
+      max 0 (runningPeak (netSuffix f a) k-recordDebt f a) := by
+  rw [suffix_profit_sum,peak_suffix]
+  unfold recordDebt
+  by_cases h : runningPeak f a≤f a+runningPeak (netSuffix f a) k
+  · rw [Int.max_eq_right h,Int.max_eq_right (by omega : 0≤runningPeak (netSuffix f a) k-(runningPeak f a-f a))]
+    omega
+  · rw [Int.max_eq_left (by omega : f a+runningPeak (netSuffix f a) k≤runningPeak f a),
+      Int.max_eq_left (by omega : runningPeak (netSuffix f a) k-(runningPeak f a-f a)≤0)]
+    omega
+
+theorem common_suffix_debt_order (f g : Nat → Int) (a b : Nat)
+    (h : netSuffix f a=netSuffix g b) (hd : recordDebt f a≤recordDebt g b)
+    (k : Nat) : recordDebt f (a+k)≤recordDebt g (b+k) := by
+  induction k with
+  | zero => simpa using hd
+  | succ k ih =>
+    rw [Nat.add_succ,Nat.add_succ,recordDebt_succ,recordDebt_succ]
+    apply int_max_mono_zero
+    have h1 := congrFun h k
+    have h2 := congrFun h (k+1)
+    unfold netSuffix at h1 h2
+    rw [Nat.add_succ,Nat.add_succ] at h2
+    omega
+
+theorem common_suffix_profit_order (f g : Nat → Int) (a b : Nat)
+    (h : netSuffix f a=netSuffix g b) (hd : recordDebt f a≤recordDebt g b)
+    (k : Nat) : recordProfit g (b+k)≤recordProfit f (a+k) := by
+  rw [recordProfit_eq,recordProfit_eq]
+  apply int_max_mono_zero
+  have h1 := congrFun h k
+  have h2 := congrFun h (k+1)
+  unfold netSuffix at h1 h2
+  rw [Nat.add_succ,Nat.add_succ] at h2
+  have he := common_suffix_debt_order f g a b h hd k
+  omega
+
+theorem common_suffix_pair_profit (f g : Nat → Int) (a b k : Nat)
+    (h : netSuffix f a=netSuffix g b) :
+    ((List.range k).map (fun i => min (recordProfit f (a+i)) (recordProfit g (b+i)))).sum =
+      max 0 (runningPeak (netSuffix f a) k-max (recordDebt f a) (recordDebt g b)) := by
+  by_cases hd : recordDebt f a≤recordDebt g b
+  · have he : (List.range k).map (fun i => min (recordProfit f (a+i)) (recordProfit g (b+i))) =
+        (List.range k).map (fun i => recordProfit g (b+i)) := by
+      apply List.map_congr_left
+      intro i _
+      rw [Int.min_eq_right (common_suffix_profit_order f g a b h hd i)]
+    rw [he,suffix_profit_peak,← h,Int.max_eq_right hd]
+  · have hd' : recordDebt g b≤recordDebt f a := by omega
+    have he : (List.range k).map (fun i => min (recordProfit f (a+i)) (recordProfit g (b+i))) =
+        (List.range k).map (fun i => recordProfit f (a+i)) := by
+      apply List.map_congr_left
+      intro i _
+      rw [Int.min_eq_left (common_suffix_profit_order g f b a h.symm hd' i)]
+    rw [he,suffix_profit_peak,Int.max_eq_left hd']
+
+/-- The actual suffix increment after contact agrees even when the
+roots have different births and different accumulated costs. -/
+theorem contact_netSuffix (inc : State → Nat) (D R T A B : Nat) (n : Int)
+    (hT : 6≤T) (hA : A∈roots R) (hB : B∈roots R)
+    (hc : Contact R T A B n) :
+    netSuffix (rootNet inc D R T A) (physicalAge A n)=
+      netSuffix (rootNet inc D R T B) (physicalAge B n) := by
+  funext k
+  induction k with
+  | zero => simp [netSuffix]
+  | succ k ih =>
+    let m := n+(k:Int)
+    have hcm := contact_mono R T A B n m (by dsimp [m]; omega) hc
+    have ha : physicalAge A m=physicalAge A n+k := by
+      have hn := hc.1
+      unfold physicalAge m
+      omega
+    have hb : physicalAge B m=physicalAge B n+k := by
+      have hn := hc.2.1
+      unfold physicalAge m
+      omega
+    have hra := observation_reward_clock R T A m hT hA hcm.1
+    have hrb := observation_reward_clock R T B m hT hB hcm.2.1
+    rw [contact_same_window_end R T A B hc.2.2.1] at hra
+    have hrew := hra.trans hrb.symm
+    have hs := hcm.2.2.2
+    change orbit A (physicalAge A m)=orbit B (physicalAge B m) at hs
+    rw [ha,hb] at hrew hs
+    have hfa := rootNet_increment inc D R T A (physicalAge A n+k)
+    have hgb := rootNet_increment inc D R T B (physicalAge B n+k)
+    rw [hrew,hs] at hfa
+    unfold netSuffix at ih ⊢
+    rw [Nat.add_succ,Nat.add_succ]
+    omega
+
+theorem actual_contact_pair_profit (inc : State → Nat) (D R T A B k : Nat) (n : Int)
+    (hT : 6≤T) (hA : A∈roots R) (hB : B∈roots R)
+    (hc : Contact R T A B n) :
+    ((List.range k).map (fun i => min
+      (recordProfit (rootNet inc D R T A) (physicalAge A n+i))
+      (recordProfit (rootNet inc D R T B) (physicalAge B n+i)))).sum=
+      max 0 (runningPeak (netSuffix (rootNet inc D R T A) (physicalAge A n)) k-
+        max (recordDebt (rootNet inc D R T A) (physicalAge A n))
+            (recordDebt (rootNet inc D R T B) (physicalAge B n))) :=
+  common_suffix_pair_profit _ _ _ _ k (contact_netSuffix inc D R T A B n hT hA hB hc)
+
+#print axioms NegativeMIN.common_suffix_pair_profit
+#print axioms NegativeMIN.actual_contact_pair_profit
+
 end NegativeMIN
