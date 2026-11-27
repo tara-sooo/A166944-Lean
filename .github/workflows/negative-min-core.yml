@@ -1,0 +1,36 @@
+name: Negative MIN narrow core check
+on:
+  push:
+    branches: [research/min-negative-lean-live-survival]
+    paths:
+      - 'research/lean/NegativeMINCore.lean'
+      - '.github/workflows/negative-min-core.yml'
+permissions:
+  contents: read
+concurrency:
+  group: negative-min-core-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/cache@v4
+        with:
+          path: ~/.elan
+          key: negative-min-toolchain-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}
+      - name: Pinned Lean toolchain only (no Lake packages)
+        run: |
+          set -eu
+          if [ ! -x "$HOME/.elan/bin/elan" ]; then
+            curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          fi
+          export PATH="$HOME/.elan/bin:$PATH"
+          elan toolchain install "$(cat lean-toolchain)"
+          lean --version
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Check only the independent core
+        run: |
+          set -eu
+          lean research/lean/NegativeMINCore.lean
