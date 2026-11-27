@@ -9151,12 +9151,8 @@ theorem chunkStep_nonempty_balance (z Y reset D : Nat) (a : ChunkStats) (p : Nat
   have hnr : ¬reset≤p := by omega
   by_cases hp : z<p ∧ p<Y
   · by_cases he : a.seen=[]
-    · have hmem : p∉a.seen := by simp [he]
-      by_cases hd : D≤a.seen.length
-      · simp [chunkStep,hnr,hp,he,hmem,hd,seenBit]
-        omega
-      · simp [chunkStep,hnr,hp,he,hmem,hd,seenBit]
-        omega
+    · by_cases hd : D=0 <;>
+        simp [chunkStep,hnr,hp,he,hd,seenBit] <;> omega
     · by_cases hm : p∈a.seen
       · simp [chunkStep,hnr,hp,he,hm,seenBit]
       · by_cases hd : D≤a.seen.length
@@ -9186,10 +9182,14 @@ theorem chunkStep_sameSeen (z Y reset D : Nat) (a b : ChunkStats) (p : Nat)
     (chunkStep z Y reset D a p).seen=(chunkStep z Y reset D b p).seen ∧
       (chunkStep z Y reset D a p).nonempty+b.nonempty=
         (chunkStep z Y reset D b p).nonempty+a.nonempty := by
-  by_cases hr : reset≤p <;> by_cases hp : z<p ∧ p<Y <;>
-    by_cases he : b.seen=[] <;> by_cases hm : p∈b.seen <;>
-    by_cases hd : D≤b.seen.length <;>
-    simp [chunkStep,hr,hp,he,hm,hd,hs] <;> omega
+  by_cases hr : reset≤p
+  · simp [chunkStep,hr]
+  · by_cases hp : z<p ∧ p<Y
+    · by_cases he : b.seen=[]
+      · by_cases hd : D=0 <;> simp [chunkStep,hr,hp,hs,he,hd] <;> omega
+      · by_cases hm : p∈b.seen <;> by_cases hd : D≤b.seen.length <;>
+          simp [chunkStep,hr,hp,hs,he,hm,hd] <;> omega
+    · simp [chunkStep,hr,hp,hs]
 
 theorem chunkFold_sameSeen_nonempty (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
     (hs : a.seen=b.seen) :
