@@ -1858,9 +1858,9 @@ theorem weightedCost_root (deathAge : Nat → Nat) (R T A z Y0 Y1 wN wQ : Nat) :
         let q := qmin s.x
         if Y0 ≤ p ∧ p < Y1 ∧ p^3 ≤ (2*q)^5 then 2*q else 0)).sum := by
   rw [pathCost_sum]
-  simp only [weightedInc, ← orbit]
+  simp only [weightedInc]
   rw [sum_map_add, sum_map_mul, sum_map_mul, filter_length_indicator]
-  simp only [narrowInc, mediumInc, decide_eq_true_eq]
+  simp only [narrowInc, mediumInc, decide_eq_true_eq, orbit]
 
 theorem weightedCost_sum (deathAge : Nat → Nat) (R T z Y0 Y1 wN wQ : Nat) :
     ((roots R).map (fun A =>
@@ -1901,5 +1901,211 @@ theorem cheapRankDeath_weightedBudget (R T M budget z Y0 Y1 wN wQ : Nat)
 #print axioms NegativeMIN.qmin_le_winner
 #print axioms NegativeMIN.weightedCost_sum
 #print axioms NegativeMIN.cheapRankDeath_weightedBudget
+
+/-! Exact integrated clipping over the actual observation fibers. -/
+def uniqueKeys {α : Type} [DecidableEq α] : List α → List α
+  | [] => []
+  | a::as => if a ∈ as then uniqueKeys as else a::uniqueKeys as
+
+theorem mem_uniqueKeys {α : Type} [DecidableEq α] (a : α) (xs : List α) :
+    a ∈ uniqueKeys xs ↔ a ∈ xs := by
+  induction xs with
+  | nil => simp [uniqueKeys]
+  | cons x xs ih =>
+    by_cases hx : x ∈ xs
+    · simp only [uniqueKeys, hx, if_true, ih, List.mem_cons]
+      constructor
+      · exact Or.inr
+      · intro h
+        rcases h with rfl | h
+        · exact hx
+        · exact h
+    · simp [uniqueKeys, hx, ih]
+
+theorem uniqueKeys_nodup {α : Type} [DecidableEq α] (xs : List α) :
+    (uniqueKeys xs).Nodup := by
+  induction xs with
+  | nil => simp [uniqueKeys]
+  | cons x xs ih =>
+    by_cases hx : x ∈ xs
+    · simp [uniqueKeys, hx, ih]
+    · simp [uniqueKeys, hx, ih, mem_uniqueKeys]
+
+theorem indicator_key_sum {α : Type} [DecidableEq α] (keys : List α) (k : α)
+    (hn : keys.Nodup) :
+    (keys.map (fun x => if k = x then 1 else 0)).sum =
+      if k ∈ keys then 1 else 0 := by
+  induction keys with
+  | nil => simp
+  | cons x xs ih =>
+    have hn' := List.nodup_cons.mp hn
+    by_cases he : k = x
+    · subst x
+      simp [hn'.1, ih hn'.2]
+    · simp [he, ih hn'.2]
+
+theorem sum_fiber_counts {α β : Type} [DecidableEq β]
+    (xs : List α) (keys : List β) (key : α → β) (hn : keys.Nodup)
+    (hcover : ∀ a ∈ xs, key a ∈ keys) :
+    (keys.map (fun k => (xs.filter (fun a => decide (key a = k))).length)).sum = xs.length := by
+  have he : (keys.map (fun k => (xs.filter (fun a => decide (key a = k))).length)).sum =
+      (keys.map (fun k => (xs.map (fun a => if key a = k then 1 else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro k _
+    rw [filter_length_indicator]
+    simp only [decide_eq_true_eq]
+  rw [he, sum_map_swap]
+  have heq : xs.map (fun a => (keys.map (fun k => if key a = k then 1 else 0)).sum) =
+      xs.map (fun _ => 1) := by
+    apply List.map_congr_left
+    intro a ha
+    rw [indicator_key_sum keys (key a) hn]
+    simp [hcover a ha]
+  rw [heq, sum_const_nat, Nat.mul_one]
+
+def obsKey (R T A u : Nat) : Nat × Nat :=
+  (windowId R T A, (observedState R T A u).x)
+
+def obsKeys (R T u : Nat) : List (Nat × Nat) :=
+  uniqueKeys ((roots R).map (fun A => obsKey R T A u))
+
+theorem obsKeys_cover (R T A u : Nat) (h : A ∈ roots R) :
+    obsKey R T A u ∈ obsKeys R T u := by
+  unfold obsKeys
+  apply (mem_uniqueKeys _ _).mpr
+  exact List.mem_map.mpr ⟨A, h, rfl⟩
+
+def obsLiveFiber (deathAge : Nat → Nat) (R T u : Nat) (key : Nat × Nat) : List Nat :=
+  ((roots R).filter (fun A => liveAt deathAge R T A u)).filter
+    (fun A => decide (obsKey R T A u = key))
+
+def obsCheapFiber (inc : State → Nat) (R T budget u : Nat) (key : Nat × Nat) : List Nat :=
+  ((roots R).filter (fun A => decide
+    (pathCost inc (birth A) (observeAge R T A + u) ≤ budget))).filter
+      (fun A => decide (obsKey R T A u = key))
+
+def obsClock (R T J u : Nat) : Int :=
+  3 - ((slabLo R + J * windowWidth T : Nat) : Int)/2 + (u : Int)
+
+theorem obsClock_age (R T A J u : Nat) (hT : 6 ≤ T) (hR : R ≤ A)
+    (h6 : A % 6 = 0) (hJ : windowId R T A = J) (hu : u < T) :
+    (birth A).n ≤ obsClock R T J u ∧
+      obsClock R T J u < observeStart R T A + (T : Int) ∧
+      physicalAge A (obsClock R T J u) = observeAge R T A + u := by
+  have hc : obsClock R T J u = observeStart R T A + (u : Int) := by
+    unfold obsClock observeStart
+    rw [hJ]
+  have hb := observeStart_ge_birth R T A hT hR h6
+  rw [hc]
+  unfold physicalAge observeAge
+  omega
+
+theorem obsLiveFiber_eq (deathAge : Nat → Nat) (R T J x u : Nat)
+    (hT : 6 ≤ T) (hu : u < T) :
+    obsLiveFiber deathAge R T u (J,x) =
+      physicalFiber deathAge R T J x (obsClock R T J u) := by
+  unfold obsLiveFiber physicalFiber
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hr
+  by_cases hj : windowId R T A = J
+  · have hg := obsClock_age R T A J u hT hr.2.1 hr.2.2 hj hu
+    simp [obsKey, hj, physicalLiveAt, liveAt, hg.1, hg.2.1, hg.2.2, observedState,
+      Bool.and_comm]
+  · simp [obsKey, hj]
+
+theorem obsCheapFiber_eq (inc : State → Nat) (R T budget J x u : Nat)
+    (hT : 6 ≤ T) (hu : u < T) :
+    obsCheapFiber inc R T budget u (J,x) =
+      cheapFiber inc R T budget J x (obsClock R T J u) := by
+  unfold obsCheapFiber cheapFiber
+  rw [List.filter_filter]
+  apply List.filter_congr
+  intro A hA
+  have hr := hA
+  simp only [roots, List.mem_filter, decide_eq_true_eq] at hr
+  by_cases hj : windowId R T A = J
+  · have hg := obsClock_age R T A J u hT hr.2.1 hr.2.2 hj hu
+    simp [obsKey, hj, hg.1, hg.2.1, hg.2.2, observedState, physicalState, physicalCost,
+      and_comm]
+  · simp [obsKey, hj]
+
+theorem obsCheapRank_exact (inc : State → Nat) (R T M budget u : Nat)
+    (key : Nat × Nat) (hT : 6 ≤ T) (hu : u < T) :
+    (obsLiveFiber (cheapRankDeath inc R T M budget) R T u key).length =
+      min M (obsCheapFiber inc R T budget u key).length := by
+  obtain ⟨J,x⟩ := key
+  rw [obsLiveFiber_eq _ R T J x u hT hu, obsCheapFiber_eq inc R T budget J x u hT hu]
+  exact cheapRankDeath_exact inc R T M budget J x (obsClock R T J u) hT
+
+def obsBins (R T : Nat) : List (Nat × (Nat × Nat)) :=
+  (List.range T).flatMap (fun u => (obsKeys R T u).map (fun k => (u,k)))
+
+theorem sum_map_flatMap {α β : Type} (xs : List α) (g : α → List β) (f : β → Nat) :
+    ((xs.flatMap g).map f).sum = (xs.map (fun x => ((g x).map f).sum)).sum := by
+  induction xs with
+  | nil => rfl
+  | cons a xs ih =>
+    simp [List.flatMap_cons, List.map_append, List.sum_append, ih]
+
+theorem liveTicks_eq_observed_sum (deathAge : Nat → Nat) (R T : Nat) :
+    liveTicks deathAge R T =
+      ((List.range T).map (fun u => ((roots R).filter
+        (fun A => liveAt deathAge R T A u)).length)).sum := by
+  unfold liveTicks
+  have he : ((roots R).map (life deathAge R T)).sum =
+      ((roots R).map (fun A => ((List.range T).map
+        (fun u => if liveAt deathAge R T A u then 1 else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro A _
+    rw [← filter_length_indicator, life_integral]
+  rw [he, sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro u _
+  rw [filter_length_indicator]
+
+theorem liveTicks_eq_bins (deathAge : Nat → Nat) (R T : Nat) :
+    liveTicks deathAge R T =
+      ((obsBins R T).map (fun b => (obsLiveFiber deathAge R T b.1 b.2).length)).sum := by
+  rw [liveTicks_eq_observed_sum]
+  unfold obsBins
+  rw [sum_map_flatMap]
+  congr 1
+  apply List.map_congr_left
+  intro u _
+  simp only [List.map_map, Function.comp_def]
+  symm
+  unfold obsLiveFiber
+  apply sum_fiber_counts
+  · exact uniqueKeys_nodup _
+  · intro a ha
+    exact obsKeys_cover R T a u (List.mem_filter.mp ha).1
+
+def cheapMasses (inc : State → Nat) (R T budget : Nat) : List Nat :=
+  (obsBins R T).map (fun b => (obsCheapFiber inc R T budget b.1 b.2).length)
+
+theorem cheapRankDeath_live_exact (inc : State → Nat) (R T M budget : Nat)
+    (hT : 6 ≤ T) :
+    liveTicks (cheapRankDeath inc R T M budget) R T =
+      ((cheapMasses inc R T budget).map (min M)).sum := by
+  rw [liveTicks_eq_bins]
+  unfold cheapMasses
+  simp only [List.map_map, Function.comp_def]
+  congr 1
+  apply List.map_congr_left
+  intro b hb
+  have hmem := List.mem_flatMap.mp hb
+  obtain ⟨u, hu, hku⟩ := hmem
+  obtain ⟨k, _, hk⟩ := List.mem_map.mp hku
+  subst b
+  exact obsCheapRank_exact inc R T M budget u k hT (List.mem_range.mp hu)
+
+#print axioms NegativeMIN.liveTicks_eq_bins
+#print axioms NegativeMIN.cheapRankDeath_live_exact
 
 end NegativeMIN
