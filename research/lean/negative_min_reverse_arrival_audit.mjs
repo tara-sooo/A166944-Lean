@@ -1,7 +1,7 @@
 // Actual reverse ancestry, shallow occupation and constructive simultaneous reset fans.
 // Reproduce: node research/lean/negative_min_reverse_arrival_audit.mjs
 function run(){
- let checks=0,ticks=0,roots=0,windows=0,reverseTests=0,shallowTicks=0,longPhaseTests=0,fanTicks=0;
+ let checks=0,ticks=0,roots=0,windows=0,reverseTests=0,shallowTicks=0,longPhaseTests=0,fanTicks=0,degreePathTests=0,maxWitnessTests=0;
  const ck=(b,s)=>{checks++;if(!b)throw Error(s)};
  const gcd=(a,b)=>{a=Math.abs(a);b=Math.abs(b);while(b)[a,b]=[b,a%b];return a};
  function sieve(n){let a=new Uint32Array(n+1);for(let p=2;p<=n;p++)if(!a[p]){a[p]=p;if(p*p<=n)for(let k=p*p;k<=n;k+=p)if(!a[k])a[k]=p}return a}
@@ -110,6 +110,38 @@ function run(){
   }
   fans.push({r,primes:a,Z,T,W,roots:r+1,digits:x.toString().length,center:r<=2?x.toString():undefined,modulusDigits:Q.toString().length,minAllowed:Math.min(...localChoices)});
  }
- return {checks,ticks,roots,windows,reverseTests,shallowTicks,longPhaseTests,fanTicks,rows,fans};
+ // Independent relaxed spatial graph. Self-loops pad paths of length <=d.
+ let degreeRows=[];
+ for(let R of [300,1200,6000]){
+  let sp=sieve(2*R+2),V=[];for(let x=4;x<=2*R;x+=2)V.push(x);
+  function fs(n){let a=[];while(n>1){let p=sp[n];a.push(p);while(n%p===0)n/=p}return a}
+  let next=new Map(),prev=new Map(),deg=new Map();
+  for(let x of V){next.set(x,[x]);prev.set(x,[x])}
+  for(let x of V)for(let p of new Set([...fs(x-1),...fs(x+1)])){
+   let y=x-p+1;if(p>2&&y>=4&&y<x){next.get(x).push(y);prev.get(y).push(x)}
+  }
+  for(let x of V){
+   let rr=[x,...[...new Set([...fs(x),...fs(x-2)])].filter(p=>p>2&&x+p-1<=2*R).map(p=>x+p-1)];
+   ck(rr.length===prev.get(x).length&&rr.every(y=>prev.get(x).includes(y)),"exact spatial reverse adjacency");
+   deg.set(x,Math.max(next.get(x).length,prev.get(x).length));
+  }
+  let S=V.filter(x=>Math.min(sp[x-1],sp[x+1])>Math.floor(Math.sqrt(R)/2)),maxDeg=Math.max(...deg.values()),row={R,sites:S.length,maxDeg,tests:0};
+  function paths(start,d,K,adj){
+   let m=new Map([[start,1]]);if(deg.get(start)>K)return 0;
+   for(let j=0;j<d;j++){let n=new Map();for(let [v,k] of m)for(let w of adj.get(v))if(deg.get(w)<=K)n.set(w,(n.get(w)||0)+k);m=n}
+   return [...m.values()].reduce((s,x)=>s+x,0)
+  }
+  for(let d=0;d<=5;d++)for(let K=1;K<=maxDeg;K++){
+   let all=S.reduce((s,x)=>s+paths(x,d,maxDeg,prev),0),good=S.reduce((s,x)=>s+paths(x,d,K,prev),0);
+   let badBound=(d+1)*V.filter(v=>deg.get(v)>K).reduce((s,v)=>s+deg.get(v)**d,0);
+   ck(good<=S.length*K**d&&all-good<=badBound&&all<=S.length*K**d+badBound,"max degree witness bound");degreePathTests++;row.tests++;
+  }
+  for(let v of V.filter((_,i)=>i%19===0))for(let d=0;d<=4;d++)for(let i=0;i<=d;i++){
+   let k=deg.get(v),a=paths(v,i,k,prev),b=paths(v,d-i,k,next);
+   ck(a*b<=k**d,"path through specified maximum-degree vertex");maxWitnessTests++;
+  }
+  degreeRows.push(row)
+ }
+ return {checks,ticks,roots,windows,reverseTests,shallowTicks,longPhaseTests,fanTicks,degreePathTests,maxWitnessTests,rows,fans,degreeRows};
 }
 console.log(JSON.stringify(run()));
