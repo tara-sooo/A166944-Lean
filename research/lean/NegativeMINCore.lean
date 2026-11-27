@@ -3190,7 +3190,7 @@ theorem digit_lt_base (xs : List Nat) (digit : Nat → Nat → Nat) (a t : Nat)
 theorem digitPlace_pos (xs : List Nat) (digit : Nat → Nat → Nat) (t : Nat) :
     0<digitPlace xs digit t := by
   induction t with
-  | zero => decide
+  | zero => simp [digitPlace]
   | succ t ih =>
     simp only [digitPlace]
     apply Nat.mul_pos ih
@@ -3217,14 +3217,15 @@ theorem historyCode_digit_le (xs : List Nat) (digit : Nat → Nat → Nat) (a b 
   cases t with
   | zero => exact h
   | succ t =>
-    by_contra hn
-    have hb := historyCode_bound xs digit a t ha
-    have hm := Nat.mul_le_mul_right (digitPlace xs digit (t+1))
-      (show digit a (t+1)+1≤digit b (t+1) by omega)
-    rw [Nat.add_mul,Nat.one_mul] at hm
-    change digit b (t+1)*digitPlace xs digit (t+1)+historyCode xs digit b t ≤
-      digit a (t+1)*digitPlace xs digit (t+1)+historyCode xs digit a t at h
-    omega
+    by_cases hle : digit b (t+1)≤digit a (t+1)
+    · exact hle
+    · have hb := historyCode_bound xs digit a t ha
+      have hm := Nat.mul_le_mul_right (digitPlace xs digit (t+1))
+        (show digit a (t+1)+1≤digit b (t+1) by omega)
+      rw [Nat.add_mul,Nat.one_mul] at hm
+      change digit b (t+1)*digitPlace xs digit (t+1)+historyCode xs digit b t ≤
+        digit a (t+1)*digitPlace xs digit (t+1)+historyCode xs digit a t at h
+      omega
 
 theorem historyCode_priority_step (xs : List Nat) (digit : Nat → Nat → Nat)
     (a b t : Nat)
@@ -3241,7 +3242,7 @@ def absoluteAge (R : Nat) (n : Int) : Nat := (n-epoch R).toNat
 
 theorem epoch_le_birth (R A : Nat) (hA : A∈roots R) : epoch R≤(birth A).n := by
   simp only [roots,List.mem_filter,List.mem_range,decide_eq_true_eq] at hA
-  unfold epoch birth
+  change 3-(R:Int)≤3-(A:Int)/2
   omega
 
 theorem absoluteTick_age (R : Nat) (n : Int) (hn : epoch R≤n) :
@@ -3264,7 +3265,8 @@ theorem observation_reward_clock (R T A : Nat) (n : Int)
     omega
   by_cases h : observeStart R T A≤n ∧ n<observeStart R T A+(T : Int)
   · simp [h,he.mpr h]
-  · simp [h,fun hh => h (he.mp hh)]
+  · have hneg : ¬(observeAge R T A≤physicalAge A n ∧ physicalAge A n<observeAge R T A+T) := fun hh => h (he.mp hh)
+    rw [if_neg hneg,if_neg h]
 
 def debtDigit (inc : State → Nat) (D R T A t : Nat) : Nat :=
   (recordDebt (rootNet inc D R T A) (physicalAge A (absoluteTick R t))).toNat
@@ -3358,10 +3360,14 @@ theorem debtRank_mono (inc : State → Nat) (D R T A i j : Nat)
     (hT : 6≤T) (hA : A∈roots R) (hij : i≤j) :
     debtRank inc D R T A i≤debtRank inc D R T A j := by
   induction j with
-  | zero => have h : i=0 := by omega; rw [h]; exact Nat.le_refl _
+  | zero =>
+    have h : i=0 := by omega
+    rw [h]
+    exact Nat.le_refl _
   | succ j ih =>
     by_cases h : i=j+1
     · rw [h]
+      exact Nat.le_refl _
     · exact Nat.le_trans (ih (by omega)) (debtRank_step inc D R T A j hT hA)
 
 #print axioms NegativeMIN.historyCode_digit_le
