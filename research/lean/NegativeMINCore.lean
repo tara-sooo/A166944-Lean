@@ -650,6 +650,195 @@ theorem liveAbove_of_slab (deathAge : Nat → Nat) (R T B : Nat)
 #print axioms NegativeMIN.firstEvent_wait_le_three_gain
 #print axioms NegativeMIN.liveAbove_of_slab
 
+/-- The same prime test used by the transition excludes every proper
+nontrivial divisor; this is later bridged to Mathlib Nat.Prime. -/
+theorem oddPrime_no_small_divisor (n p : Nat)
+    (hn : oddPrime n = true) (hp : 2 ≤ p) (hlt : p < n) :
+    n % p ≠ 0 := by
+  simp only [oddPrime, Bool.and_eq_true, decide_eq_true_eq, List.all_eq_true] at hn
+  have h := hn.2 p (List.mem_range.mpr hlt)
+  omega
+
+theorem twin_winner_large (s : State) (ht : TwinCenter s.x)
+    (hw : winner s ≠ 0) : s.x - 1 ≤ winner s := by
+  have he := winner_sound s hw
+  have hp := eligible_three_le s.x (s.n + 1) (winner s) he
+  by_cases hlt : winner s < s.x - 1
+  · exfalso
+    by_cases hc : (s.n + 1) % 2 = 0
+    · simp only [eligible, Bool.and_eq_true, if_pos hc, decide_eq_true_eq] at he
+      exact (oddPrime_no_small_divisor (s.x + 1) (winner s) ht.2.2
+        (by omega) (by omega)) he.2.1
+    · simp only [eligible, Bool.and_eq_true, if_neg hc, decide_eq_true_eq] at he
+      exact (oddPrime_no_small_divisor (s.x - 1) (winner s) ht.2.1
+        (by omega) hlt) he.2.2.1
+  · omega
+
+/-- The actual trajectory cannot leave a visited twin center during the
+square-root sized observation window. This uses the total gain budget,
+not a rule that declares twins artificially absorbing. -/
+theorem observedTwin_next_idle (R T A u : Nat)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0)
+    (hu : u < T) (hlarge : 6 * T + 14 < R)
+    (ht : TwinCenter (observedState R T A u).x) :
+    winner (observedState R T A u) = 0 := by
+  let s := observedState R T A u
+  by_cases hw : winner s = 0
+  · exact hw
+  · have hl := twin_winner_large s ht hw
+    have hage := observeAge_le_half R T A hT hR h6
+    have hloc := observed_center_lower R T A u hT hR h6 hu
+    have hgain := canonical_gain_bound A (observeAge R T A + u + 1) (by omega)
+    have hx := evolve_center_le (birth A) (observeAge R T A + u)
+    have hstep := tick_gain_exact s
+    change R ≤ s.x + 3 * T + 6 at hloc
+    change s.x ≤ A at hx
+    change ((A - (tick s).x : Nat) : Int) ≤ _ at hgain
+    omega
+
+theorem observedTwin_stays (R T A u k : Nat)
+    (hT : 6 ≤ T) (hR : R ≤ A) (h6 : A % 6 = 0)
+    (hend : u + k ≤ T) (hlarge : 6 * T + 14 < R)
+    (ht : TwinCenter (observedState R T A u).x) :
+    (observedState R T A (u + k)).x = (observedState R T A u).x := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    have hpre := ih (by omega)
+    have htw : TwinCenter (observedState R T A (u + k)).x := by rw [hpre]; exact ht
+    have hw := observedTwin_next_idle R T A (u + k) hT hR h6 (by omega) hlarge htw
+    have hnext : observedState R T A (u + (k + 1)) =
+        tick (observedState R T A (u + k)) := by
+      simp only [observedState, orbit, Nat.add_assoc, evolve]
+    rw [hnext]
+    simp [tick, hw, hpre]
+
+/-- Full physical cap, including pre-window births and stationary age
+promotions. This is stronger in scope than the observation-only Capped. -/
+def physicalAge (A : Nat) (n : Int) : Nat := (n - (birth A).n).toNat
+
+def physicalLiveAt (deathAge : Nat → Nat) (R T A : Nat) (n : Int) : Bool :=
+  decide ((birth A).n ≤ n ∧ n < observeStart R T A + (T : Int) ∧
+    physicalAge A n < deathAge A)
+
+def physicalFiber (deathAge : Nat → Nat) (R T J x : Nat) (n : Int) : List Nat :=
+  (roots R).filter (fun A => physicalLiveAt deathAge R T A n &&
+    decide (windowId R T A = J ∧ (orbit A (physicalAge A n)).x = x))
+
+def FullCapped (deathAge : Nat → Nat) (R T M : Nat) : Prop :=
+  ∀ (J x : Nat) (n : Int), (physicalFiber deathAge R T J x n).length ≤ M
+
+/-- Exact tick-integral form of each lifetime. -/
+theorem range_below_length (T l : Nat) :
+    ((List.range T).filter (fun u => decide (u < l))).length = min T l := by
+  induction T with
+  | zero => simp
+  | succ T ih =>
+    rw [List.range_succ, List.filter_append, List.length_append, ih]
+    by_cases h : T < l <;> simp [h] <;> omega
+
+theorem life_integral (deathAge : Nat → Nat) (R T A : Nat) :
+    ((List.range T).filter (fun u => liveAt deathAge R T A u)).length =
+      life deathAge R T A := by
+  have hfilter : (List.range T).filter (fun u => liveAt deathAge R T A u) =
+      (List.range T).filter (fun u => decide (u < life deathAge R T A)) := by
+    apply List.filter_congr
+    intro u hu
+    have ht := List.mem_range.mp hu
+    have h := liveAt_iff_lt_life deathAge R T A u ht
+    by_cases hh : u < life deathAge R T A
+    · simp [hh, h.mpr hh]
+    · have hfalse : liveAt deathAge R T A u = false := by
+        cases he : liveAt deathAge R T A u
+        · rfl
+        · exact False.elim (hh (h.mp he))
+      simp [hh, hfalse]
+  rw [hfilter, range_below_length]
+  omega [life_le deathAge R T A]
+
+/-- Prefix events include the event on whose arrival a budget death occurs;
+pre-window events also count. Only observation time is truncated below. -/
+def prefixAge (deathAge : Nat → Nat) (R T A : Nat) : Nat :=
+  min (deathAge A) (observeAge R T A + T)
+
+def leastOddFactor (n : Nat) : Nat :=
+  ((List.range (n + 1)).find? (fun p => oddPrime p && decide (n % p = 0))).getD n
+
+def qmin (x : Nat) : Nat := min (leastOddFactor (x - 1)) (leastOddFactor (x + 1))
+
+def narrowCount (deathAge : Nat → Nat) (R T z Y0 : Nat) : Nat :=
+  ((roots R).map (fun A =>
+    ((List.range (prefixAge deathAge R T A)).filter (fun i =>
+      let p := winner (orbit A i)
+      decide (z < p ∧ p < Y0))).length)).sum
+
+/-- This is the exact rough medium charge for the selected d=3/5:
+q>=p^(3/5)/2 iff (2q)^5>=p^3, with no floating-point approximation. -/
+def mediumCharge (deathAge : Nat → Nat) (R T Y0 Y1 : Nat) : Nat :=
+  ((roots R).map (fun A =>
+    ((List.range (prefixAge deathAge R T A)).map (fun i =>
+      let s := orbit A i
+      let p := winner s
+      let q := qmin s.x
+      if Y0 ≤ p ∧ p < Y1 ∧ p^3 ≤ (2*q)^5 then 2*q else 0)).sum)).sum
+
+def twinSites (R T : Nat) : List Nat :=
+  (List.range (2 * R + 1)).filter (fun x =>
+    decide (R ≤ x + 3 * T + 6 ∧ TwinCenter x))
+
+def twinCount (R T : Nat) : Nat := (twinSites R T).length
+
+/-- Integer-scaled form of the actual paper's live-time upper estimate:
+multiply eta <= B0 M twinCount/N + C E*cost + Err by D*N*T.
+The coefficient wN scales C*T*exp(-L^alpha)/(k+1), wQ scales C,
+and err scales Err*N*T. This predicate is an OPEN analytic obligation,
+not a proved bound. No proof is hidden in its definition. -/
+def ScaledLiveEstimate (deathAge : Nat → Nat) (R T M B0 z Y0 Y1 D wN wQ err : Nat) : Prop :=
+  D * liveTicks deathAge R T ≤
+    D * B0 * M * T * twinCount R T +
+    wN * narrowCount deathAge R T z Y0 +
+    wQ * mediumCharge deathAge R T Y0 Y1 + err
+
+/-- The exact finite quantitative implication of the paper estimate,
+separate from the unresolved estimate and survival bound. -/
+theorem scaled_twin_count_lower (deathAge : Nat → Nat)
+    (R T M B0 z Y0 Y1 D wN wQ err : Nat)
+    (h : ScaledLiveEstimate deathAge R T M B0 z Y0 Y1 D wN wQ err) :
+    D * liveTicks deathAge R T -
+      (wN * narrowCount deathAge R T z Y0 +
+        wQ * mediumCharge deathAge R T Y0 Y1 + err)
+      ≤ D * B0 * M * T * twinCount R T := by
+  unfold ScaledLiveEstimate at h
+  omega
+
+theorem twin_above_of_scaled_live_estimate (deathAge : Nat → Nat)
+    (R T M B0 z Y0 Y1 D wN wQ err B : Nat)
+    (hlarge : B + 3*T + 6 < R)
+    (h : ScaledLiveEstimate deathAge R T M B0 z Y0 Y1 D wN wQ err)
+    (hgap : wN * narrowCount deathAge R T z Y0 +
+        wQ * mediumCharge deathAge R T Y0 Y1 + err <
+        D * liveTicks deathAge R T) :
+    ∃ x : Nat, B < x ∧ TwinCenter x := by
+  have hc : 0 < twinCount R T := by
+    by_cases hz : twinCount R T = 0
+    · unfold ScaledLiveEstimate at h
+      rw [hz, Nat.mul_zero, Nat.zero_add] at h
+      omega
+    · omega
+  unfold twinCount at hc
+  generalize hl : twinSites R T = xs at hc
+  cases xs with
+  | nil => simp at hc
+  | cons x xs =>
+    have hm : x ∈ twinSites R T := by rw [hl]; simp
+    simp only [twinSites, List.mem_filter, decide_eq_true_eq] at hm
+    exact ⟨x, by omega [hm.2.1], hm.2.2⟩
+
+#print axioms NegativeMIN.observedTwin_stays
+#print axioms NegativeMIN.life_integral
+#print axioms NegativeMIN.scaled_twin_count_lower
+#print axioms NegativeMIN.twin_above_of_scaled_live_estimate
+
 #print axioms NegativeMIN.actual_twin_of_live_gap
 #print axioms NegativeMIN.unbounded_of_liveGap
 #print axioms NegativeMIN.canonical_gain_bound
