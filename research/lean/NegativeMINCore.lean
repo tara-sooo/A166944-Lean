@@ -6056,4 +6056,250 @@ theorem boxBudgetClip_live_exact (R T M z Y H budget : Nat) (hT : 6≤T) :
 #print axioms NegativeMIN.boxBudgetClip_original_budget
 #print axioms NegativeMIN.boxBudgetClip_live_exact
 
+
+/-! A magnitude-independent finite support bound, using a compressed
+signature of the last uses of the finitely many available labels.
+The idle ticks are not counted as events. -/
+def eventInc (s : State) : Nat := if winner s = 0 then 0 else 1
+def eventCount (s : State) (k : Nat) : Nat := pathCost eventInc s k
+def labelInc (p : Nat) (s : State) : Nat := if winner s = p then 1 else 0
+def labelCount (s : State) (k p : Nat) : Nat := pathCost (labelInc p) s k
+
+theorem eventCount_add (s : State) (a b : Nat) :
+    eventCount s (a+b)=eventCount s a+eventCount (evolve s a) b :=
+  pathCost_add eventInc s a b
+
+theorem eventCount_mono (s : State) (a b : Nat) (h : a≤b) :
+    eventCount s a≤eventCount s b := pathCost_mono eventInc s a b h
+
+theorem eventCount_step (s : State) (k : Nat) :
+    eventCount s (k+1)=eventCount s k+eventInc (evolve s k) := rfl
+
+theorem labelCount_le_eventCount (s : State) (k p : Nat) (hp : p≠0) :
+    labelCount s k p≤eventCount s k := by
+  induction k with
+  | zero => rfl
+  | succ k ih =>
+    unfold labelCount eventCount at *
+    simp only [pathCost,labelInc,eventInc]
+    by_cases h : winner (evolve s k)=p
+    · have h0 : winner (evolve s k)≠0 := by omega
+      simp [h,h0,ih]
+    · simp [h]
+      omega
+
+theorem eventCount_filter (s : State) (k : Nat) :
+    eventCount s k=((List.range k).filter (fun i => decide (winner (evolve s i)≠0))).length := by
+  unfold eventCount
+  rw [pathCost_sum,filter_length_indicator]
+  congr 1
+  apply List.map_congr_left
+  intro i _
+  unfold eventInc
+  by_cases h : winner (evolve s i)=0 <;> simp [h]
+
+theorem labelCount_filter (s : State) (k p : Nat) :
+    labelCount s k p=((List.range k).filter (fun i => decide (winner (evolve s i)=p))).length := by
+  unfold labelCount
+  rw [pathCost_sum,filter_length_indicator]
+  simp only [labelInc,decide_eq_true_eq]
+
+theorem support_gain_counts (s : State) (k : Nat) (ps : List Nat)
+    (hn : ps.Nodup)
+    (h : ∀ i : Nat,i<k → winner (evolve s i)=0 ∨ winner (evolve s i)∈ps) :
+    gain s (evolve s k)=(ps.map (fun p => (p-1)*labelCount s k p)).sum := by
+  rw [← gain_ledger]
+  induction k with
+  | zero => simp [labelCount,pathCost,sum_const_nat]
+  | succ k ih =>
+    have hpre := ih (fun i hi => h i (by omega))
+    rw [List.range_succ,List.map_append,List.sum_append]
+    simp only [List.map_cons,List.map_nil,List.sum_cons,List.sum_nil,Nat.add_zero]
+    have he : ps.map (fun p => (p-1)*labelCount s (k+1) p)=
+        ps.map (fun p => (p-1)*labelCount s k p+
+          (if winner (evolve s k)=p then winner (evolve s k)-1 else 0)) := by
+      apply List.map_congr_left
+      intro p _
+      unfold labelCount
+      simp only [pathCost,labelInc,Nat.mul_add]
+      by_cases hp : winner (evolve s k)=p <;> simp [hp]
+    rw [he,sum_map_add,← hpre]
+    have hh : ps.map (fun p => if winner (evolve s k)=p then winner (evolve s k)-1 else 0)=
+        ps.map (fun p => (winner (evolve s k)-1)*(if winner (evolve s k)=p then 1 else 0)) := by
+      apply List.map_congr_left
+      intro p _
+      by_cases hp : winner (evolve s k)=p <;> simp [hp]
+    rw [hh,sum_map_mul,indicator_key_sum _ _ hn]
+    rcases h k (by omega) with h0 | hm
+    · simp [h0]
+    · simp [hm]
+
+theorem gain_mod_zero_of_equal (a b p : Nat) (hle : b≤a)
+    (heq : a%p=b%p) : (a-b)%p=0 := by
+  have hq := Nat.div_le_div_right (c := p) hle
+  have ha := Nat.div_add_mod a p
+  have hb := Nat.div_add_mod b p
+  have hh := congrArg (fun n : Nat => p*n) (show b/p+(a/p-b/p)=a/p by omega)
+  rw [Nat.mul_add] at hh
+  have hd : a-b=p*(a/p-b/p) := by omega
+  rw [hd,Nat.mul_mod]
+  simp
+
+/-- A path cannot return to the same residues of all its used labels
+after any positive gain: the gain itself would be an even wall modulus. -/
+theorem no_used_residue_return (s : State) (k : Nat)
+    (he : s.x%2=0) (hg : 0<gain s (evolve s k))
+    (h : ∀ i : Nat,i<k → winner (evolve s i)=0 ∨
+      s.x%winner (evolve s i)=(evolve s k).x%winner (evolve s i)) : False := by
+  let Q := gain s (evolve s k)
+  have hm := evolve_center_le s k
+  have hpar := evolve_even s k he
+  have hQe : Q%2=0 := by dsimp [Q,gain]; omega
+  have hd : ∀ i : Nat,i<k → winner (evolve s i)=0 ∨ Q%winner (evolve s i)=0 := by
+    intro i hi
+    rcases h i hi with h0 | hr
+    · exact Or.inl h0
+    · exact Or.inr (gain_mod_zero_of_equal _ _ _ hm hr)
+  have hb := evolve_wall_gain s Q k hg hQe he hd
+  exact Nat.lt_irrefl Q hb
+
+theorem no_used_gain_divisor_return (s : State) (i j : Nat)
+    (he : s.x%2=0) (hij : i<j) (hi : winner (evolve s i)≠0)
+    (hd : ∀ t : Nat,i≤t → t<j → winner (evolve s t)=0 ∨
+      ((evolve s i).x-(evolve s j).x)%winner (evolve s t)=0) : False := by
+  let u := evolve s i
+  let k := j-i
+  have hk : i+k=j := by dsimp [k]; omega
+  have hf : evolve u k=evolve s j := by rw [← evolve_add s i k,hk]
+  have hmono := evolve_center_mono_segment s (i+1) j (by omega)
+  have hw := eligible_three_le u.x (u.n+1) (winner u) (winner_sound u hi)
+  have ht := tick_gain_exact u
+  change (evolve s j).x≤(tick u).x at hmono
+  have hG : 0<gain u (evolve u k) := by rw [hf]; unfold gain; change 0<(evolve s i).x-_; change (tick u).x+(winner u-1)=u.x at ht; dsimp [u] at ht hw; omega
+  have hu := evolve_even s i he
+  have hej := evolve_even u k hu
+  let Q := gain u (evolve u k)
+  have hQe : Q%2=0 := by dsimp [Q,gain]; have hm := evolve_center_le u k; omega
+  have hdiv : ∀ l : Nat,l<k → winner (evolve u l)=0 ∨ Q%winner (evolve u l)=0 := by
+    intro l hl
+    have hh := hd (i+l) (by omega) (by dsimp [k] at hl; omega)
+    rw [evolve_add] at hh
+    dsimp [Q,gain]
+    rw [hf]
+    exact hh
+  have hbad := evolve_wall_gain u Q k hG hQe hu hdiv
+  exact Nat.lt_irrefl Q hbad
+
+def lastWinner (s : State) (p : Nat) : Nat → Option Nat
+  | 0 => none
+  | k+1 => if winner (evolve s k)=p then some k else lastWinner s p k
+
+theorem lastWinner_none (s : State) (p k : Nat) (h : lastWinner s p k=none) :
+    ∀ i : Nat,i<k → winner (evolve s i)≠p := by
+  induction k with
+  | zero => intro i hi; omega
+  | succ k ih =>
+    by_cases hk : winner (evolve s k)=p
+    · simp [lastWinner,hk] at h
+    · have hh : lastWinner s p k=none := by simpa [lastWinner,hk] using h
+      intro i hi
+      by_cases he : i=k
+      · simpa [he] using hk
+      · exact ih hh i (by omega)
+
+theorem lastWinner_some (s : State) (p k r : Nat) (h : lastWinner s p k=some r) :
+    r<k ∧ winner (evolve s r)=p ∧
+      ∀ i : Nat,r<i → i<k → winner (evolve s i)≠p := by
+  induction k with
+  | zero => simp [lastWinner] at h
+  | succ k ih =>
+    by_cases hk : winner (evolve s k)=p
+    · have hr : k=r := by simpa [lastWinner,hk] using h
+      subst r
+      exact ⟨by omega,hk,fun i h1 h2 => by omega⟩
+    · have hh : lastWinner s p k=some r := by simpa [lastWinner,hk] using h
+      obtain ⟨hr,hp,hm⟩ := ih hh
+      refine ⟨by omega,hp,?_⟩
+      intro i h1 h2
+      by_cases he : i=k
+      · simpa [he] using hk
+      · exact hm i h1 (by omega)
+
+theorem mem_erase_preserve {α : Type} [DecidableEq α] (xs : List α) (a b : α)
+    (hne : b≠a) (hb : b∈xs) : b∈xs.erase a := by
+  induction xs with
+  | nil => simp at hb
+  | cons c cs ih =>
+    by_cases hc : c=a
+    · subst c
+      simp [hne] at hb
+      simpa using hb
+    · have hmem := List.mem_cons.mp hb
+      simp only [List.erase_cons_tail (by simpa using hc),List.mem_cons]
+      rcases hmem with h | h
+      · exact Or.inl h
+      · exact Or.inr (ih h)
+
+theorem nodup_subset_length_core {α : Type} [DecidableEq α] (xs ys : List α)
+    (hn : xs.Nodup) (h : ∀ a∈xs,a∈ys) : xs.length≤ys.length := by
+  induction xs generalizing ys with
+  | nil => simp
+  | cons a xs ih =>
+    have hnd := List.nodup_cons.mp hn
+    have ha := h a (by simp)
+    have hh := ih (ys.erase a) hnd.2 (fun b hb =>
+      mem_erase_preserve ys a b (by intro he; subst b; exact hnd.1 hb) (h b (by simp [hb])))
+    rw [List.length_erase_of_mem ha] at hh
+    have hy := List.length_pos_of_mem ha
+    simp only [List.length_cons]
+    omega
+
+theorem map_nodup_of_inj_core {α β : Type} (xs : List α) (f : α → β)
+    (hn : xs.Nodup) (h : ∀ a∈xs,∀ b∈xs,f a=f b → a=b) : (xs.map f).Nodup := by
+  induction xs with
+  | nil => simp
+  | cons a xs ih =>
+    have hn' := List.nodup_cons.mp hn
+    simp only [List.map_cons,List.nodup_cons]
+    refine ⟨?_,ih hn'.2 (fun b hb c hc => h b (by simp [hb]) c (by simp [hc]))⟩
+    intro ha
+    obtain ⟨b,hb,he⟩ := List.mem_map.mp ha
+    have hh := h b (by simp [hb]) a (by simp) he
+    exact hn'.1 (hh ▸ hb)
+
+theorem map_eq_at_mem_core {α β : Type} (xs : List α) (f g : α → β)
+    (h : xs.map f=xs.map g) (a : α) (ha : a∈xs) : f a=g a := by
+  induction xs with
+  | nil => simp at ha
+  | cons b bs ih =>
+    have he := List.cons.inj h
+    rcases List.mem_cons.mp ha with hab | ham
+    · subst a; exact he.1
+    · exact ih he.2 ham
+
+def vectorChoices {α : Type} (digits : List α) : Nat → List (List α)
+  | 0 => [[]]
+  | n+1 => digits.flatMap (fun a => (vectorChoices digits n).map (List.cons a))
+
+theorem vectorChoices_length {α : Type} (digits : List α) (n : Nat) :
+    (vectorChoices digits n).length=digits.length^n := by
+  induction n with
+  | zero => simp [vectorChoices]
+  | succ n ih =>
+    simp only [vectorChoices,List.length_flatMap,List.length_map,ih]
+    rw [sum_const_nat,Nat.pow_succ,Nat.mul_comm]
+
+theorem vectorChoices_mem {α : Type} (digits : List α) (xs : List α)
+    (h : ∀ a∈xs,a∈digits) : xs∈vectorChoices digits xs.length := by
+  induction xs with
+  | nil => simp [vectorChoices]
+  | cons a xs ih =>
+    apply List.mem_flatMap.mpr
+    refine ⟨a,h a (by simp),?_⟩
+    exact List.mem_map.mpr ⟨xs,ih (fun b hb => h b (by simp [hb])),rfl⟩
+
+#print axioms NegativeMIN.no_used_residue_return
+#print axioms NegativeMIN.support_gain_counts
+#print axioms NegativeMIN.vectorChoices_length
+
 end NegativeMIN
