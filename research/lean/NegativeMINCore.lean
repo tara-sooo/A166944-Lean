@@ -10240,4 +10240,183 @@ theorem stationaryPhase_pair_integral (xs : List Nat) (entry : Nat → Nat) (H :
 #print axioms NegativeMIN.stationaryPhase_clip_integral
 #print axioms NegativeMIN.stationaryPhase_pair_integral
 
+
+/-! Clock-free reverse ancestry. Every actual firing into a positive
+center x>2 comes from x+p-1, with p a divisor of x or x-2.
+The graph forgets clocks and tie-breaks only in the reverse direction;
+its ancestor set is an upper bound, not a reachability assertion. -/
+
+theorem tick_incoming_spatial_pin (s : State) (hp : winner s≠0)
+    (hx : 2<(tick s).x) :
+    (tick s).x % winner s=0 ∨ ((tick s).x-2)%winner s=0 := by
+  let p := winner s
+  let x := (tick s).x
+  have hpin := winner_sound s hp
+  change eligible s.x (s.n+1) p=true at hpin
+  have ho := eligible_three_le s.x (s.n+1) p hpin
+  have hg := tick_gain_exact s
+  change x+(p-1)=s.x at hg
+  by_cases hn : (s.n+1)%2=0
+  · left
+    simp only [eligible,Bool.and_eq_true,if_pos hn,decide_eq_true_eq] at hpin
+    have h := Nat.div_add_mod (s.x+1) p
+    rw [hpin.2.1,Nat.add_zero] at h
+    have he : x+p=p*((s.x+1)/p) := by omega
+    have hmod := congrArg (fun a : Nat => a%p) he
+    rw [Nat.add_mod,Nat.mod_self,Nat.add_zero,Nat.mod_mod,Nat.mul_mod_right] at hmod
+    exact hmod
+  · right
+    simp only [eligible,Bool.and_eq_true,if_neg hn,decide_eq_true_eq] at hpin
+    have h := Nat.div_add_mod (s.x-1) p
+    rw [hpin.2.2.1,Nat.add_zero] at h
+    have he : (x-2)+p=p*((s.x-1)/p) := by
+      change 2<x at hx
+      omega
+    have hmod := congrArg (fun a : Nat => a%p) he
+    rw [Nat.add_mod,Nat.mod_self,Nat.add_zero,Nat.mod_mod,Nat.mul_mod_right] at hmod
+    exact hmod
+
+theorem tick_incoming_label_le (s : State) (hp : winner s≠0)
+    (hx : 2<(tick s).x) : winner s≤(tick s).x := by
+  have h := tick_incoming_spatial_pin s hp hx
+  rcases h with h | h
+  · by_cases hh : (tick s).x<winner s
+    · rw [Nat.mod_eq_of_lt hh] at h
+      omega
+    · omega
+  · by_cases hh : (tick s).x<winner s
+    · have hlt : (tick s).x-2<winner s := by omega
+      rw [Nat.mod_eq_of_lt hlt] at h
+      omega
+    · omega
+
+def reverseParents (U x : Nat) : List Nat :=
+  ((List.range (x+1)).filter (fun p => oddPrime p &&
+    decide (x%p=0 ∨ (x-2)%p=0) && decide (x+p-1≤U))).map
+      (fun p => x+p-1)
+
+theorem actual_reverseParent (s : State) (U : Nat)
+    (hp : winner s≠0) (hx : 2<(tick s).x) (hU : s.x≤U) :
+    s.x∈reverseParents U (tick s).x := by
+  let p := winner s
+  let x := (tick s).x
+  have he := winner_sound s hp
+  have hprime : oddPrime p=true := by
+    change eligible s.x (s.n+1) p=true at he
+    exact (Bool.and_eq_true.mp he).1
+  have hpl := tick_incoming_label_le s hp hx
+  have hpin := tick_incoming_spatial_pin s hp hx
+  have hg := tick_gain_exact s
+  change x+(p-1)=s.x at hg
+  have hpb := oddPrime_bounds p hprime
+  have hs : x+p-1=s.x := by omega
+  unfold reverseParents
+  apply List.mem_map.mpr
+  refine ⟨p,List.mem_filter.mpr ⟨List.mem_range.mpr (by omega),?_⟩,hs⟩
+  simp [hprime,hpin,hs,hU]
+
+theorem reverseParents_range (U x y : Nat) (hy : y∈reverseParents U x) :
+    x<y ∧ y≤U := by
+  obtain ⟨p,hp,rfl⟩ := List.mem_map.mp hy
+  have h := (List.mem_filter.mp hp).2
+  simp only [Bool.and_eq_true,decide_eq_true_eq] at h
+  have hb := oddPrime_bounds p h.1.1
+  omega
+
+def reverseReach (U x : Nat) : Nat → List Nat
+  | 0 => [x]
+  | k+1 => (x::reverseParents U x).flatMap (fun y => reverseReach U y k)
+
+theorem reverseReach_step (U x k A : Nat) (h : A∈reverseReach U x k) :
+    A∈reverseReach U x (k+1) := by
+  apply List.mem_flatMap.mpr
+  exact ⟨x,by simp,h⟩
+
+theorem reverseReach_mono (U x a b A : Nat) (hab : a≤b)
+    (h : A∈reverseReach U x a) : A∈reverseReach U x b := by
+  induction b with
+  | zero =>
+    have he : a=0 := by omega
+    rwa [he] at h
+  | succ b ih =>
+    by_cases he : a=b+1
+    · rwa [he] at h
+    · exact reverseReach_step U x b A (ih (by omega))
+
+theorem actual_reverseReach (s : State) (U k : Nat)
+    (hU : s.x≤U) (hx : 2<(evolve s k).x) :
+    s.x∈reverseReach U (evolve s k).x (eventCount s k) := by
+  induction k with
+  | zero => simp [eventCount,pathCost,reverseReach,evolve]
+  | succ k ih =>
+    let t := evolve s k
+    have ht : 2<t.x := by
+      have h := tick_center_le t
+      change 2<(tick t).x at hx
+      omega
+    have hp := ih ht
+    have hu := evolve_center_le s k
+    rw [eventCount_step]
+    change s.x∈reverseReach U (tick t).x (eventCount s k+eventInc t)
+    by_cases hw : winner t=0
+    · have he : (tick t).x=t.x := by simp [tick,hw]
+      simpa [eventInc,hw,he,t] using hp
+    · have hpar := actual_reverseParent t U hw hx (by omega)
+      simp only [eventInc,if_neg hw]
+      apply List.mem_flatMap.mpr
+      exact ⟨t.x,by simp [hpar],hp⟩
+
+theorem reverseReach_length (U x B k : Nat) (hx : 2<x) (hU : x≤U)
+    (hB : ∀ y : Nat,2<y → y≤U → (reverseParents U y).length≤B) :
+    (reverseReach U x k).length≤(B+1)^k := by
+  induction k generalizing x with
+  | zero => simp [reverseReach]
+  | succ k ih =>
+    change ((x::reverseParents U x).flatMap (fun y => reverseReach U y k)).length≤(B+1)^(k+1)
+    rw [List.length_flatMap]
+    have h := sum_map_le (x::reverseParents U x) (fun y => (reverseReach U y k).length)
+      (fun _ => (B+1)^k) (by
+        intro y hy
+        rcases List.mem_cons.mp hy with rfl | hy
+        · exact ih x hx hU
+        · have hr := reverseParents_range U x y hy
+          exact ih y (by omega) hr.2)
+    rw [sum_const_nat,List.length_cons] at h
+    have hlen := hB x hx hU
+    have hm := Nat.mul_le_mul_right ((B+1)^k) (by omega : (reverseParents U x).length+1≤B+1)
+    rw [Nat.pow_succ,Nat.mul_comm ((B+1)^k) (B+1)]
+    exact Nat.le_trans h hm
+
+def shallowObsFiber (R T d : Nat) (b : DualBin) : List Nat :=
+  (fullObsFiber R T b).filter
+    (fun A => decide (eventCount (birth A) (observeAge R T A+b.1)≤d))
+
+theorem shallowObsFiber_bound (R T d B : Nat) (b : DualBin)
+    (hx : 2<b.2.2) (hU : b.2.2≤2*R)
+    (hB : ∀ y : Nat,2<y → y≤2*R → (reverseParents (2*R) y).length≤B) :
+    (shallowObsFiber R T d b).length≤(B+1)^d := by
+  have hn : (shallowObsFiber R T d b).Nodup :=
+    List.filter_sublist.nodup (fullObsFiber_nodup R T b)
+  have hsub : ∀ A∈shallowObsFiber R T d b,A∈reverseReach (2*R) b.2.2 d := by
+    intro A ha
+    have hh := List.mem_filter.mp ha
+    have hr := (fullObsFiber_mem R T b A).mp hh.1
+    have he : (orbit A (observeAge R T A+b.1)).x=b.2.2 := congrArg Prod.snd hr.2
+    have hA := hr.1
+    simp only [roots,List.mem_filter,List.mem_range,decide_eq_true_eq] at hA
+    have hb : (birth A).x≤2*R := by simp [birth]; omega
+    have h := actual_reverseReach (birth A) (2*R) (observeAge R T A+b.1) hb (by
+      change 2<(orbit A (observeAge R T A+b.1)).x
+      rw [he]
+      exact hx)
+    change A∈reverseReach (2*R) (orbit A (observeAge R T A+b.1)).x _ at h
+    rw [he] at h
+    exact reverseReach_mono _ _ _ _ _ (of_decide_eq_true hh.2) h
+  exact Nat.le_trans (nodup_subset_length_core _ _ hn hsub)
+    (reverseReach_length _ _ _ _ hx hU hB)
+
+#print axioms NegativeMIN.tick_incoming_spatial_pin
+#print axioms NegativeMIN.actual_reverseReach
+#print axioms NegativeMIN.shallowObsFiber_bound
+
 end NegativeMIN
