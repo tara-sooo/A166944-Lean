@@ -16,7 +16,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/cache@v4
+        with:
+          sparse-checkout: |
+            research/lean
+            .github/workflows/negative-min-core.yml
+            lean-toolchain
+      - uses: actions/cache/restore@v4
+        id: lean-cache
         with:
           path: ~/.elan
           key: negative-min-toolchain-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}
@@ -30,6 +36,11 @@ jobs:
           elan toolchain install "$(cat lean-toolchain)"
           lean --version
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - uses: actions/cache/save@v4
+        if: steps.lean-cache.outputs.cache-hit != 'true'
+        with:
+          path: ~/.elan
+          key: ${{ steps.lean-cache.outputs.cache-primary-key }}
       - name: Check only the independent core
         run: |
           set -eu
