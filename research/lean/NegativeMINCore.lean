@@ -10313,6 +10313,8 @@ theorem actual_reverseParent (s : State) (U : Nat)
   unfold reverseParents
   apply List.mem_map.mpr
   refine ⟨p,List.mem_filter.mpr ⟨List.mem_range.mpr (by omega),?_⟩,hs⟩
+  change x%p=0 ∨ (x-2)%p=0 at hpin
+  change (oddPrime p && decide (x%p=0 ∨ (x-2)%p=0) && decide (x+p-1≤U))=true
   simp [hprime,hpin,hs,hU]
 
 theorem reverseParents_range (U x y : Nat) (hy : y∈reverseParents U x) :
@@ -10355,7 +10357,7 @@ theorem actual_reverseReach (s : State) (U k : Nat)
       change 2<(tick t).x at hx
       omega
     have hp := ih ht
-    have hu := evolve_center_le s k
+    have hu : t.x≤s.x := evolve_center_le s k
     rw [eventCount_step]
     change s.x∈reverseReach U (tick t).x (eventCount s k+eventInc t)
     by_cases hw : winner t=0
@@ -10378,7 +10380,7 @@ theorem reverseReach_length (U x B k : Nat) (hx : 2<x) (hU : x≤U)
       (fun _ => (B+1)^k) (by
         intro y hy
         rcases List.mem_cons.mp hy with rfl | hy
-        · exact ih x hx hU
+        · exact ih y hx hU
         · have hr := reverseParents_range U x y hy
           exact ih y (by omega) hr.2)
     rw [sum_const_nat,List.length_cons] at h
