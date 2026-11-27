@@ -3518,4 +3518,159 @@ theorem rankClip_filter_length (xs : List Nat) (score : Nat → Nat) (M : Nat) (
 #print axioms NegativeMIN.debtDeath_fullCapped
 #print axioms NegativeMIN.rankClip_filter_length
 
+/-! The profitable record increment of a root at a physical state.
+All profits are nonnegative and at most the observation reward D. -/
+def profitNat (inc : State → Nat) (D R T A k : Nat) : Nat :=
+  (recordProfit (rootNet inc D R T A) k).toNat
+
+def physicalProfit (inc : State → Nat) (D R T A : Nat) (n : Int) : Nat :=
+  profitNat inc D R T A (physicalAge A n)
+
+theorem profitNat_le (inc : State → Nat) (D R T A k : Nat) :
+    profitNat inc D R T A k≤D := by
+  unfold profitNat
+  rw [recordProfit_eq,rootNet_increment]
+  have hd := recordDebt_nonneg (rootNet inc D R T A) k
+  have hr : observedReward R T A k≤1 := by unfold observedReward; split <;> omega
+  have hm := Nat.mul_le_mul_left D hr
+  simp only [Nat.mul_one] at hm
+  have he : (D:Int)*(observedReward R T A k : Nat)≤(D:Int) := by
+    exact_mod_cast hm
+  by_cases h : (D:Int)*(observedReward R T A k : Nat) -
+      (inc (orbit A k):Int)-recordDebt (rootNet inc D R T A) k≤0
+  · rw [Int.max_eq_left h]
+    omega
+  · rw [Int.max_eq_right (by omega : 0≤(D:Int)*(observedReward R T A k : Nat) -
+      (inc (orbit A k):Int)-recordDebt (rootNet inc D R T A) k)]
+    omega
+
+theorem profitNat_preobserve (inc : State → Nat) (D R T A k : Nat)
+    (h : k<observeAge R T A) : profitNat inc D R T A k=0 := by
+  unfold profitNat
+  rw [recordProfit_eq,rootNet_increment]
+  have hr : observedReward R T A k=0 := by
+    unfold observedReward
+    rw [if_neg (by omega)]
+  have hd := recordDebt_nonneg (rootNet inc D R T A) k
+  rw [hr]
+  rw [Int.max_eq_left (by simp; omega)]
+  rfl
+
+theorem physicalProfit_priority (inc : State → Nat) (D R T J x A B : Nat) (n : Int)
+    (hT : 6≤T) (ha : A∈fullFiber R T J x n) (hb : B∈fullFiber R T J x n)
+    (hp : Precedes (fun c => debtScore inc D R T c (absoluteAge R n)) B A) :
+    physicalProfit inc D R T A n≤physicalProfit inc D R T B n := by
+  have ha0 := (List.mem_filter.mp ha).1
+  have hb0 := (List.mem_filter.mp hb).1
+  have ha1 := (List.mem_filter.mp ha).2
+  have hb1 := (List.mem_filter.mp hb).2
+  simp only [decide_eq_true_eq] at ha1 hb1
+  have hc := contact_of_center R T A B n ha1.1 hb1.1
+    (ha1.2.2.1.trans hb1.2.2.1.symm) (ha1.2.2.2.trans hb1.2.2.2.symm)
+  have hclock := absoluteTick_age R n (Int.le_trans (epoch_le_birth R A ha0) ha1.1)
+  have hle : debtScore inc D R T B (absoluteAge R n)≤debtScore inc D R T A (absoluteAge R n) := by
+    simp only [Precedes] at hp
+    omega
+  have hd := historyCode_digit_le (roots R) (debtDigit inc D R T) A B (absoluteAge R n) ha0 hle
+  unfold debtDigit at hd
+  rw [hclock] at hd
+  let a := physicalAge A n
+  let b := physicalAge B n
+  let f := rootNet inc D R T A
+  let g := rootNet inc D R T B
+  change (recordDebt g b).toNat≤(recordDebt f a).toNat at hd
+  have hda := recordDebt_nonneg f a
+  have hdb := recordDebt_nonneg g b
+  have hdd : recordDebt g b≤recordDebt f a := by omega
+  have hra := observation_reward_clock R T A n hT ha0 ha1.1
+  have hrb := observation_reward_clock R T B n hT hb0 hb1.1
+  rw [contact_same_window_end R T A B hc.2.2.1] at hra
+  have hrew := hra.trans hrb.symm
+  have hx := hc.2.2.2
+  change orbit A a=orbit B b at hx
+  have hfa := rootNet_increment inc D R T A a
+  have hgb := rootNet_increment inc D R T B b
+  change f (a+1)-f a = _ at hfa
+  change g (b+1)-g b = _ at hgb
+  change observedReward R T A a=observedReward R T B b at hrew
+  rw [hrew,hx] at hfa
+  have hstep := hfa.trans hgb.symm
+  change (recordProfit f a).toNat≤(recordProfit g b).toNat
+  rw [recordProfit_eq,recordProfit_eq,hstep]
+  by_cases h : g (b+1)-g b-recordDebt f a≤0
+  · rw [Int.max_eq_left h]
+    have hmax := Int.le_max_left 0 (g (b+1)-g b-recordDebt g b)
+    omega
+  · rw [Int.max_eq_right (by omega : 0≤g (b+1)-g b-recordDebt f a),
+      Int.max_eq_right (by omega : 0≤g (b+1)-g b-recordDebt g b)]
+    omega
+
+theorem physicalFiber_sub_full (deathAge : Nat → Nat) (R T J x : Nat) (n : Int)
+    (A : Nat) (h : A∈physicalFiber deathAge R T J x n) :
+    A∈fullFiber R T J x n := by
+  have ha := List.mem_filter.mp h
+  simp only [Bool.and_eq_true,physicalLiveAt,decide_eq_true_eq] at ha
+  apply List.mem_filter.mpr
+  exact ⟨ha.1,by simp only [decide_eq_true_eq]; exact ⟨ha.2.1.1,ha.2.1.2.1,ha.2.2.1,ha.2.2.2⟩⟩
+
+theorem threshold_weight_sum (xs : List Nat) (w : Nat → Nat) (D : Nat)
+    (h : ∀ a∈xs, w a≤D) :
+    (xs.map w).sum=((List.range D).map (fun t => (xs.filter (fun a => decide (t<w a))).length)).sum := by
+  have he : ((List.range D).map (fun t => (xs.filter (fun a => decide (t<w a))).length)).sum =
+      ((List.range D).map (fun t => (xs.map (fun a => if decide (t<w a) then 1 else 0)).sum)).sum := by
+    congr 1
+    apply List.map_congr_left
+    intro t _
+    rw [filter_length_indicator]
+  rw [he,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro a ha
+  rw [← filter_length_indicator,range_below_length]
+  exact (Nat.min_eq_right (h a ha)).symm
+
+/-- The debt clip realizes the maximum sum of record increments among
+all size-M subsets at a physical fiber, with ties handled permanently
+by debt history. -/
+theorem debtDeath_fiber_profit_max (inc : State → Nat) (D R T M J x : Nat) (n : Int)
+    (hT : 6≤T) (d : Nat → Nat) (hc : FullCapped d R T M) :
+    ((physicalFiber d R T J x n).map (fun A => physicalProfit inc D R T A n)).sum≤
+      ((physicalFiber (debtDeath inc D R T M) R T J x n).map
+        (fun A => physicalProfit inc D R T A n)).sum := by
+  let w := fun A => physicalProfit inc D R T A n
+  let xs := fullFiber R T J x n
+  let score := fun A => debtScore inc D R T A (absoluteAge R n)
+  change ((physicalFiber d R T J x n).map w).sum≤
+    ((physicalFiber (debtDeath inc D R T M) R T J x n).map w).sum
+  rw [threshold_weight_sum _ w D (fun a _ => profitNat_le inc D R T a _),
+    threshold_weight_sum _ w D (fun a _ => profitNat_le inc D R T a _)]
+  apply sum_map_le
+  intro t _
+  let f := fun a => decide (t<w a)
+  have hn : xs.Nodup := by
+    unfold xs fullFiber
+    exact List.filter_sublist.nodup (roots_nodup R)
+  have hd : ∀ a∈xs, ∀ b∈xs, f a=true → Precedes score b a → f b=true := by
+    intro a ha b hb hf hp
+    have h := physicalProfit_priority inc D R T J x a b n hT ha hb hp
+    simp only [f,decide_eq_true_eq] at hf ⊢
+    change w a≤w b at h
+    omega
+  change ((physicalFiber d R T J x n).filter f).length≤
+    ((physicalFiber (debtDeath inc D R T M) R T J x n).filter f).length
+  rw [debtDeath_fiber_eq inc D R T M J x n hT]
+  change _≤((rankClip xs score M).filter f).length
+  rw [rankClip_filter_length xs score M f hn hd]
+  apply Nat.le_min.mpr
+  constructor
+  · exact Nat.le_trans (List.length_filter_le _ _) (hc J x n)
+  · unfold xs fullFiber physicalFiber
+    rw [List.filter_filter,List.filter_filter]
+    apply filter_len_mono
+    intro a ha hf
+    simp only [Bool.and_eq_true,decide_eq_true_eq,physicalLiveAt] at hf ⊢
+    exact ⟨hf.1,hf.2.1.1.1,hf.2.1.1.2.1,hf.2.2.1,hf.2.2.2⟩
+
+#print axioms NegativeMIN.debtDeath_fiber_profit_max
+
 end NegativeMIN
