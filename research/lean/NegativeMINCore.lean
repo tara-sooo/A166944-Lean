@@ -9183,13 +9183,13 @@ theorem chunkStep_sameSeen (z Y reset D : Nat) (a b : ChunkStats) (p : Nat)
       (chunkStep z Y reset D a p).nonempty+b.nonempty=
         (chunkStep z Y reset D b p).nonempty+a.nonempty := by
   by_cases hr : reset≤p
-  · simp [chunkStep,hr]
+  · simp [chunkStep,hr,Nat.add_comm]
   · by_cases hp : z<p ∧ p<Y
     · by_cases he : b.seen=[]
       · by_cases hd : D=0 <;> simp [chunkStep,hr,hp,hs,he,hd] <;> omega
       · by_cases hm : p∈b.seen <;> by_cases hd : D≤b.seen.length <;>
           simp [chunkStep,hr,hp,hs,he,hm,hd] <;> omega
-    · simp [chunkStep,hr,hp,hs]
+    · simp [chunkStep,hr,hp,hs,Nat.add_comm]
 
 theorem chunkFold_sameSeen_nonempty (z Y reset D : Nat) (a b : ChunkStats) (xs : List Nat)
     (hs : a.seen=b.seen) :
