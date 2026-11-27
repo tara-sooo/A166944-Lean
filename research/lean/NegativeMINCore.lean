@@ -10149,7 +10149,8 @@ theorem arrivalMass_sum (xs : List Nat) (entry : Nat → Nat) (H : Nat) :
     dsimp [e]
     omega
   rw [hf]
-  dsimp [e] at hcomp
+  change e+((List.range H).filter (fun u => !decide (u<e))).length=H at hcomp
+  have hmin : e=min H (entry A) := rfl
   omega
 
 theorem arrivalMass_clip (xs : List Nat) (entry : Nat → Nat) (M u : Nat)
