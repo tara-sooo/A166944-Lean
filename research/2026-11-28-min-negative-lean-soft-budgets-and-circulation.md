@@ -95,3 +95,9 @@ From the recurrence log(F_Q(k)+2) <= C k!(k+1)! log(Q+2), by dividing the log re
 - At R=2400 expected clipped life/(NT)=0.6102901183255851, exact fractional life/(NT)=0.625150087743604, integer local moment lower/(NT)=0.5889083874675448, mean budget=5/3. These demonstrate the finite formulas and do not test the required asymptotic small budget.
 
 The exact original real criterion/Mathlib bridge remains uncompiled. No full project build or new Mathlib dependency download; use standalone pinned Lean CI. Main and sibling branches unchanged. Issue #10 remains open. The analytical lower bound, the rigorous verification/formalization of the upper sieve, and the final extraction to conventional Mathlib twin primality are still required.
+
+## 7. Independent replay and compressed implementation
+
+The rounding audit was independently fetched at commit 0f80aad02fd96f905b9a2ec432d773a784a3c3ce, blob 7db826bbe3f3dd3f868f72b22f8099b46262699c, and executed again with exactly the same counts and numerical outputs. Both audits ran in an ECMAScript runtime, not a separately installed Node process. The circulation includes state capacities before observation as well as during it; the price field in the dual ranges over all such constrained state-time bins.
+
+The compressed Lean implementation first failed in run 46044106690 (identity-map simplification and an unavailable tactic). Commit 3de46b29c9552e2ba7903bf4a2962df4c3413186 repairs those two points. The earlier independent-budget stage 0e86509ea445ef4a189fa21525c96989a8095f0f is verified by successful run 46043933347. The compressed stage requires its own successful run before being called verified.
