@@ -10421,4 +10421,206 @@ theorem shallowObsFiber_bound (R T d B : Nat) (b : DualBin)
 #print axioms NegativeMIN.actual_reverseReach
 #print axioms NegativeMIN.shallowObsFiber_bound
 
+
+/-! Explicit direct canonical arrivals into height-zero resets.
+A spatial roughness certificate is sufficient for an actual first
+event; it does not merely assert that its clock is eligible. -/
+
+def RoughAt (x P : Nat) : Prop :=
+  ∀ p : Nat, ∀ plus : Bool, SpatialFactor x p plus → P≤p
+
+theorem winner_spatialFactor (s : State) (hp : winner s≠0) :
+    ∃ plus : Bool, SpatialFactor s.x (winner s) plus := by
+  have h := winner_sound s hp
+  by_cases hn : (s.n+1)%2=0
+  · simp only [eligible,Bool.and_eq_true,if_pos hn,decide_eq_true_eq] at h
+    exact ⟨false,h.1,h.2.1⟩
+  · simp only [eligible,Bool.and_eq_true,if_neg hn,decide_eq_true_eq] at h
+    exact ⟨true,h.1,h.2.1,h.2.2.1⟩
+
+theorem rough_quiet (s : State) (P k : Nat) (he : s.x%2=0)
+    (hh : 0≤height2 s) (hr : RoughAt s.x P)
+    (hk : height2 s+2*(k:Int)+1<(P:Int)) :
+    ∀ i : Nat,i<k → winner (evolve s i)=0 := by
+  induction k with
+  | zero => intro i hi; omega
+  | succ k ih =>
+    have hpre := ih (by omega)
+    intro i hi
+    by_cases hi' : i<k
+    · exact hpre i hi'
+    · have hie : i=k := by omega
+      subst i
+      by_cases hw : winner (evolve s k)=0
+      · exact hw
+      · obtain ⟨plus,hp⟩ := winner_spatialFactor _ hw
+        have hx := quiet_center s k hpre
+        rw [hx] at hp
+        have hP := hr _ plus hp
+        have hg := tick_gain_exact (evolve s k)
+        have hiden := height_gain_identity s (k+1)
+        have hnon := evolve_height_nonneg s (k+1) he hh
+        change height2 (tick (evolve s k))≥0 at hnon
+        change height2 (tick (evolve s k))+(gain s (tick (evolve s k)):Int)=
+          height2 s+2*((k+1:Nat):Int) at hiden
+        unfold gain at hiden
+        omega
+
+theorem rough_birth_stationary (x P k : Nat) (he : x%2=0)
+    (hr : RoughAt x P) (hk : 7+2*k<P) :
+    (orbit x k).x=x := by
+  have hb := birth_height2 x he
+  have hh := rough_quiet (birth x) P k he (by omega) hr (by omega)
+  exact quiet_center _ _ hh
+
+theorem shortReset_direct (x p : Nat) (hp : oddPrime p=true)
+    (h11 : 11≤p) (hx : x%2=0) (hdiv : x%p=0)
+    (hn : (-(x:Int)/2)%2=0)
+    (hclock : (-(x:Int)/2)%(2*(p:Int))=0)
+    (hr : RoughAt (x+p-1) p) :
+    orbit (x+p-1) ((p-7)/2)=⟨x,-(x:Int)/2⟩ := by
+  let A := x+p-1
+  let w := (p-7)/2
+  have hpo := oddPrime_bounds p hp
+  have hA : A%2=0 := by dsimp [A]; omega
+  have hw : 0<w := by dsimp [w]; omega
+  have hAw : 3-(A:Int)/2+(w:Int)=-(x:Int)/2 := by
+    dsimp [A,w]
+    omega
+  have hb := birth_height2 A hA
+  have hquiet := rough_quiet (birth A) p (w-1) hA (by omega) hr (by dsimp [w]; omega)
+  let t := orbit A (w-1)
+  have ht : t.x=A := quiet_center _ _ hquiet
+  have hc : t.n+1=-(x:Int)/2 := by
+    have h := evolve_clock (birth A) (w-1)
+    change t.n=(birth A).n+((w-1:Nat):Int) at h
+    simp only [birth] at h
+    omega
+  have hmod : (A+1)%p=0 := by
+    have he : A+1=x+p := by dsimp [A]; omega
+    rw [he,Nat.add_mod,hdiv,Nat.mod_self]
+    simp
+  have hel : eligible t.x (t.n+1) p=true := by
+    simp [eligible,ht,hc,hp,hn,hmod,hclock]
+  have hwin := winner_minimal t p (by omega) (by rw [ht]; dsimp [A]; omega) hel
+  obtain ⟨plus,hsp⟩ := winner_spatialFactor t (by omega)
+  rw [ht] at hsp
+  have hge := hr _ plus hsp
+  have hwp : winner t=p := by omega
+  have hstep : orbit A w=tick t := by
+    have he : w-1+1=w := by omega
+    rw [← he]
+    rfl
+  change orbit A w=_
+  rw [hstep]
+  apply State.ext
+  · have hg := tick_gain_exact t
+    rw [hwp,ht] at hg
+    dsimp [A] at hg
+    omega
+  · rw [tick_clock,hc]
+
+theorem shortReset_to_birth (x : Nat) (hx : x%2=0) (hr : RoughAt x 11) :
+    evolve ⟨x,-(x:Int)/2⟩ 3=birth x := by
+  let s : State := ⟨x,-(x:Int)/2⟩
+  have hh : height2 s=0 := by simp [height2,s]; omega
+  have hq := rough_quiet s 11 3 hx (by omega) hr (by omega)
+  change evolve s 3=birth x
+  apply State.ext
+  · exact quiet_center s 3 hq
+  · rw [evolve_clock]
+    simp [s,birth]
+    omega
+
+theorem shortReset_merge_birth (x p : Nat) (hp : oddPrime p=true)
+    (h11 : 11≤p) (hx : x%2=0) (hdiv : x%p=0)
+    (hn : (-(x:Int)/2)%2=0) (hclock : (-(x:Int)/2)%(2*(p:Int))=0)
+    (hr : RoughAt (x+p-1) p) (hrx : RoughAt x 11) :
+    orbit (x+p-1) ((p-7)/2+3)=birth x := by
+  unfold orbit
+  rw [evolve_add]
+  change evolve (orbit (x+p-1) ((p-7)/2)) 3=birth x
+  rw [shortReset_direct x p hp h11 hx hdiv hn hclock hr]
+  exact shortReset_to_birth x hx hrx
+
+theorem birth_merge_observed (R T A x k u : Nat)
+    (hT : 6≤T) (hA : A∈roots R) (hx : x∈roots R)
+    (hJ : windowId R T A=windowId R T x)
+    (hm : orbit A k=birth x) :
+    obsKey R T A u=obsKey R T x u := by
+  have ha := hA
+  have hb := hx
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at ha hb
+  have h1 := observeStart_ge_birth R T A hT ha.2.1 ha.2.2
+  have h2 := observeStart_ge_birth R T x hT hb.2.1 hb.2.2
+  have hs : observeStart R T A=observeStart R T x := by
+    unfold observeStart
+    rw [hJ]
+  have hclock := congrArg State.n hm
+  change (evolve (birth A) k).n=(birth x).n at hclock
+  rw [evolve_clock] at hclock
+  have hage : observeAge R T A=k+observeAge R T x := by
+    unfold observeAge
+    omega
+  unfold obsKey observedState
+  rw [hJ,hage,Nat.add_assoc]
+  unfold orbit
+  rw [evolve_add]
+  change (_, (evolve (orbit A k) _).x)=_
+  rw [hm]
+
+theorem stationary_birth_fan_bound (R T x M P : Nat) (ps : List Nat)
+    (hT : 6≤T) (hx : x∈roots R) (hP : RoughAt x P) (hlarge : 7+3*T<P)
+    (hn : ps.Nodup)
+    (hps : ∀ p∈ps,11≤p ∧ oddPrime p=true ∧ x%p=0 ∧
+      (-(x:Int)/2)%(2*(p:Int))=0 ∧ RoughAt (x+p-1) p ∧
+      x+p-1∈roots R ∧ windowId R T (x+p-1)=windowId R T x)
+    (hclock : (-(x:Int)/2)%2=0)
+    (u : Nat) (hu : u<T) :
+    min M (ps.length+1)≤
+      min M (fullObsFiber R T (u,(windowId R T x,x))).length := by
+  have hroot := hx
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hroot
+  have hxe : x%2=0 := by omega
+  have hage := observeAge_le_half R T x hT hroot.2.1 hroot.2.2
+  have hstation := rough_birth_stationary x P (observeAge R T x+u) hxe hP (by omega)
+  have hk : obsKey R T x u=(windowId R T x,x) := by
+    unfold obsKey observedState
+    rw [hstation]
+  let fan := x::ps.map (fun p => x+p-1)
+  have hfan : fan.Nodup := by
+    unfold fan
+    apply List.nodup_cons.mpr
+    constructor
+    · intro h
+      obtain ⟨p,hp,he⟩ := List.mem_map.mp h
+      have h11 := (hps p hp).1
+      omega
+    · apply map_nodup_of_inj_core _ _ hn
+      intro p hp q hq he
+      have h1 := (hps p hp).1
+      have h2 := (hps q hq).1
+      omega
+  have hsub : ∀ A∈fan,A∈fullObsFiber R T (u,(windowId R T x,x)) := by
+    intro A ha
+    rcases List.mem_cons.mp ha with rfl | hm
+    · exact (fullObsFiber_mem R T _ x).mpr ⟨hx,hk⟩
+    · obtain ⟨p,hp,rfl⟩ := List.mem_map.mp hm
+      obtain ⟨h11,hpr,hdiv,hcal,hr,hA,hJ⟩ := hps p hp
+      have hrx : RoughAt x 11 := by
+        intro q plus hq
+        have := hP q plus hq
+        omega
+      have hmerge := shortReset_merge_birth x p hpr h11 hxe hdiv hclock hcal hr hrx
+      have he := birth_merge_observed R T (x+p-1) x _ u hT hA hx hJ hmerge
+      exact (fullObsFiber_mem R T _ _).mpr ⟨hA,he.trans hk⟩
+  have hlen := nodup_subset_length_core _ _ hfan hsub
+  change fan.length≤_ at hlen
+  simp [fan] at hlen
+  omega
+
+#print axioms NegativeMIN.rough_quiet
+#print axioms NegativeMIN.shortReset_merge_birth
+#print axioms NegativeMIN.stationary_birth_fan_bound
+
 end NegativeMIN
