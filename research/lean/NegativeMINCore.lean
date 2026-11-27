@@ -6951,4 +6951,128 @@ theorem diversityBudgetClip_fullCapped (R T M budget z Y reset D wS wL : Nat) (h
 #print axioms NegativeMIN.historyBudgetClip_budget
 #print axioms NegativeMIN.diversityBudgetClip_budget
 
+
+/-! Individual history budgets and finite averaging.
+The history may depend on the entire canonical prefix, not just its current
+physical state. Budget tests include the next completed tick. -/
+
+def individualHistoryDeadline (cost : Nat → Nat → Nat) (R T : Nat)
+    (budget : Nat → Nat) : Nat → Nat :=
+  fun A => historyBudgetDeadline cost R T (budget A) A
+
+def individualHistoryClip (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat) : Nat → Nat :=
+  deadlineClip R T M (individualHistoryDeadline cost R T budget)
+
+def historyExpense (cost : Nat → Nat → Nat) (R T : Nat)
+    (d : Nat → Nat) : Nat :=
+  ((roots R).map (fun A => cost A (prefixAge d R T A))).sum
+
+def budgetTotal (R : Nat) (budget : Nat → Nat) : Nat :=
+  ((roots R).map budget).sum
+
+def individualHistoryMass (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat) : Nat :=
+  ((deadlineMasses R T (individualHistoryDeadline cost R T budget)).map (min M)).sum
+
+theorem individualHistoryDeadline_spec (cost : Nat → Nat → Nat) (R T : Nat)
+    (budget : Nat → Nat) (A i : Nat)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j) :
+    i<individualHistoryDeadline cost R T budget A ↔
+      i<observeAge R T A+T ∧ cost A (i+1)≤budget A :=
+  historyBudgetDeadline_spec cost R T (budget A) A i hm
+
+theorem individualHistoryClip_fullCapped (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat) (hT : 6≤T) :
+    FullCapped (individualHistoryClip cost R T M budget) R T M :=
+  deadlineClip_fullCapped _ _ _ _ hT
+
+theorem individualHistoryClip_budget (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat) (A : Nat)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hA : A∈roots R) :
+    cost A (prefixAge (individualHistoryClip cost R T M budget) R T A)≤budget A := by
+  have h := deadlineClip_prefix_le R T M A (individualHistoryDeadline cost R T budget) hA
+  have hb := historyBudgetDeadline_budget cost R T (budget A) A hm hz
+  exact Nat.le_trans (hm A _ _ h) hb
+
+theorem individualHistoryClip_total (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) :
+    historyExpense cost R T (individualHistoryClip cost R T M budget)≤budgetTotal R budget := by
+  unfold historyExpense budgetTotal
+  apply sum_map_le
+  intro A hA
+  exact individualHistoryClip_budget cost R T M budget A hm hz hA
+
+theorem individualHistoryClip_live_exact (cost : Nat → Nat → Nat) (R T M : Nat)
+    (budget : Nat → Nat) (hT : 6≤T) :
+    liveTicks (individualHistoryClip cost R T M budget) R T =
+      individualHistoryMass cost R T M budget :=
+  deadlineClip_live_exact _ _ _ _ hT
+
+/-- Explicit OPEN uniform analytic inequality for a monotone history cost.
+It must be separately proved for the chosen diversity/other cost. -/
+def HistoryLiveEstimate (cost : Nat → Nat → Nat) (R T M B0 D err : Nat) : Prop :=
+  ∀ d : Nat → Nat, FullCapped d R T M →
+    D*liveTicks d R T ≤ D*B0*M*T*twinCount R T + historyExpense cost R T d + err
+
+theorem individualHistoryMass_upper (cost : Nat → Nat → Nat) (R T M B0 D err : Nat)
+    (budget : Nat → Nat) (hT : 6≤T)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0)
+    (hEst : HistoryLiveEstimate cost R T M B0 D err) :
+    D*individualHistoryMass cost R T M budget≤
+      D*B0*M*T*twinCount R T+budgetTotal R budget+err := by
+  have h := hEst (individualHistoryClip cost R T M budget)
+    (individualHistoryClip_fullCapped cost R T M budget hT)
+  rw [individualHistoryClip_live_exact cost R T M budget hT] at h
+  have hb := individualHistoryClip_total cost R T M budget hm hz
+  omega
+
+/-- Exact finite averaging. Repetitions of a budget vector encode integer
+weights, so any finitely supported rational law can be used without a
+probability library. No independence is assumed by this extraction. -/
+theorem individualHistory_ensemble_upper (cost : Nat → Nat → Nat)
+    (R T M B0 D err : Nat) (bs : List (Nat → Nat))
+    (hT : 6≤T) (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hEst : HistoryLiveEstimate cost R T M B0 D err) :
+    D*(bs.map (individualHistoryMass cost R T M)).sum ≤
+      bs.length*(D*B0*M*T*twinCount R T+err) + (bs.map (budgetTotal R)).sum := by
+  induction bs with
+  | nil => simp
+  | cons b bs ih =>
+    have hb := individualHistoryMass_upper cost R T M B0 D err b hT hm hz hEst
+    simp only [List.map_cons,List.sum_cons,List.length_cons,Nat.mul_add,Nat.succ_mul]
+    omega
+
+theorem twin_above_of_history_ensemble (cost : Nat → Nat → Nat)
+    (R T M B0 D err B : Nat) (bs : List (Nat → Nat))
+    (hT : 6≤T) (hlarge : B+3*T+6<R)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hEst : HistoryLiveEstimate cost R T M B0 D err)
+    (hgap : bs.length*err+(bs.map (budgetTotal R)).sum <
+      D*(bs.map (individualHistoryMass cost R T M)).sum) :
+    ∃ x : Nat, B<x ∧ TwinCenter x := by
+  have h := individualHistory_ensemble_upper cost R T M B0 D err bs hT hm hz hEst
+  have hpos : 0<twinCount R T := by
+    by_cases he : twinCount R T=0
+    · rw [he,Nat.mul_zero,Nat.zero_add] at h
+      omega
+    · omega
+  unfold twinCount at hpos
+  generalize he : twinSites R T=xs at hpos
+  cases xs with
+  | nil => simp at hpos
+  | cons x xs =>
+    have hmem : x∈twinSites R T := by rw [he]; simp
+    simp only [twinSites,List.mem_filter,decide_eq_true_eq] at hmem
+    have hx := hmem.2.1
+    exact ⟨x,by omega,hmem.2.2⟩
+
+#print axioms NegativeMIN.individualHistoryClip_total
+#print axioms NegativeMIN.individualHistoryClip_live_exact
+#print axioms NegativeMIN.twin_above_of_history_ensemble
+
 end NegativeMIN
