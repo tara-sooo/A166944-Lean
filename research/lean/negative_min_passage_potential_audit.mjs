@@ -1,7 +1,7 @@
 // First-profitable-passage packing and bounded-defect suffix potential audit.
 // Run: node research/lean/negative_min_passage_potential_audit.mjs
 function run(){
- let checks=0,words=0,splits=0,roots=0,windows=0,ticks=0,thresholds=0,bruteChecks=0,potentialChecks=0,greedyExchangeChecks=0;
+ let checks=0,words=0,splits=0,roots=0,windows=0,ticks=0,thresholds=0,bruteChecks=0,potentialChecks=0,greedyExchangeChecks=0,localityChecks=0;
  const ck=(ok,msg)=>{checks++;if(!ok)throw Error(msg)};
  function counts(xs,z,Y,reset,d){
   let seen=new Set(),sat=0,low=0;
@@ -28,7 +28,19 @@ function run(){
     ck(Math.abs(j-ja-jb)<=1,"joint append");
     ck(s>=sb&&n>=nb&&j>=jb,"suffix monotonicity");
     if(i===1){ck(s-sb<=1&&n-nb<=1&&j-jb<=1,"unit decrement");
-     if(!(xs[0]>3&&xs[0]<17))ck(s===sb&&n===nb&&j===jb,"decrement needs relevant label")}
+     if(!(xs[0]>3&&xs[0]<17))ck(s===sb&&n===nb&&j===jb,"decrement needs relevant label");
+     let p=xs[0];
+     function headBlock(reset){let k=b.findIndex(t=>t>=reset);return b.slice(0,k<0?b.length:k)}
+     let short=headBlock(17),[ss,nn]=counts(short,3,13,17,d),[st,nt]=counts([p,...short],3,13,17,d);
+     ck(s-sb===st-ss&&n-nb===nt-nn,"sat and low suffix local to first reset");
+     let block=headBlock(19),j0=joint(block,3,13,17,19,d,2),j1=joint([p,...block],3,13,17,19,d,2);
+     ck(j-jb===j1-j0,"joint suffix local to first reset");
+     if(j>jb){
+      let broad=block.filter(t=>3<t&&t<17).length,ns=new Set(block.filter(t=>3<t&&t<13));
+      ck((3<p&&p<17&&broad===2)||(3<p&&p<13&&!ns.has(p)&&ns.size===d),"charged joint event is exact broad or novel diversity threshold");
+     }
+     localityChecks++;
+    }
     splits++;
    }
    ck(counts(xs.slice().reverse(),3,13,17,d)[0]===s,"reverse saturated count");
@@ -157,6 +169,6 @@ function run(){
   for(let q=1;q<=T;q++){row.layerSum+=total[q];row.maxProduct=Math.max(row.maxProduct,q*total[q]);if(q>1)ck(total[q]<=total[q-1],"threshold optimum monotone")}
   row.layerSum/=row.N*T;row.maxProduct/=row.N*T;row.thresholds=[...th.values()];results.push(row);
  }
- return {checks,words,splits,roots,windows,ticks,thresholds,bruteChecks,potentialChecks,greedyExchangeChecks,syntheticChecks,results}
+ return {checks,words,splits,roots,windows,ticks,thresholds,bruteChecks,potentialChecks,greedyExchangeChecks,syntheticChecks,localityChecks,results}
 }
 console.log(JSON.stringify(run()));
