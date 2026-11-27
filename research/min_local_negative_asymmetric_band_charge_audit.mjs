@@ -9,7 +9,7 @@ function audit(Rs){
  let rows=[];
  for(let R of Rs){
   const T=Math.ceil(Math.sqrt(2*R+1)),W=6*Math.floor(T/6),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1,Pmax=T/2;
-  let specs=[[3,11,47],[5,23,97],[7,47,193]].filter(s=>s[2]<=T).map(([z,Y,P])=>({z,Y,P,Q:2*[3,5,7].filter(p=>p<=z).reduce((a,p)=>a*p,1),high:0,near:0,last:0,band:0,small:0,sourceFast:0,targetFast:0,bothSlow:0,low:0,bandCount:0,repCount:0,broadRep:0,pairs:0,asymmetric:0,sourceChecks:0,targetChecks:0}));
+  let specs=[[3,11,47],[5,23,97],[7,47,193],[5,97,193],[7,193,389]].filter(s=>s[2]<=T).map(([z,Y,P])=>({z,Y,P,Q:2*[3,5,7].filter(p=>p<=z).reduce((a,p)=>a*p,1),high:0,near:0,last:0,band:0,small:0,sourceFast:0,targetFast:0,bothSlow:0,low:0,bandCount:0,repCount:0,broadRep:0,pairs:0,asymmetric:0,sourceChecks:0,targetChecks:0}));
   let events=0,checks=0;
   for(let A=lo;A<=hi;A+=6){
    let a=A,n=3-A/2,j=Math.floor((A-lo)/W),n0=3-(lo+j*W)/2,end=n0+T,trace=[],used=new Set();
