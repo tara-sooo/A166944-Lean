@@ -5928,4 +5928,121 @@ theorem same_box_repeat_gap (R H A i j p : Nat) (hH : 0<H)
 #print axioms NegativeMIN.separated_support_insert
 #print axioms NegativeMIN.same_box_repeat_gap
 
+
+/-! Use box-local repeat budgets to construct the actual capped policy,
+while paying the original narrow expense up to the proved box error. -/
+theorem boxStates_succ (R H A k b : Nat) :
+    boxStates R H A (k+1) b=boxStates R H A k b++
+      (([k].filter (fun i => decide (boxIndex R H A i=b))).map (orbit A)) := by
+  unfold boxStates
+  rw [List.range_succ,List.filter_append,List.map_append]
+
+theorem boxRepeatCost_step (inc : State → Nat) (Y R H A k : Nat) :
+    boxRepeatCost inc Y R H A k≤boxRepeatCost inc Y R H A (k+1) := by
+  unfold boxRepeatCost
+  let b := boxIndex R H A k+1
+  let c := boxIndex R H A (k+1)+1
+  have hbc : b≤c := by
+    have h := boxIndex_mono R H A k (k+1) (by omega)
+    dsimp [b,c]; omega
+  have he : b+(c-b)=c := by omega
+  have h1 := sum_map_le (List.range b)
+    (fun q => repeatExpense inc (boxStates R H A k q) (List.range Y))
+    (fun q => repeatExpense inc (boxStates R H A (k+1) q) (List.range Y))
+    (by intro q _; rw [boxStates_succ]; exact repeatExpense_append_le _ _ _ _)
+  change ((List.range b).map _).sum≤((List.range c).map _).sum
+  rw [← he,List.range_add,List.map_append,List.sum_append]
+  omega
+
+theorem boxRepeatCost_mono (inc : State → Nat) (Y R H A i j : Nat) (hij : i≤j) :
+    boxRepeatCost inc Y R H A i≤boxRepeatCost inc Y R H A j := by
+  induction j with
+  | zero => have h : i=0 := by omega; simp [h]
+  | succ j ih =>
+    by_cases h : i=j+1
+    · subst i; exact Nat.le_refl _
+    · exact Nat.le_trans (ih (by omega)) (boxRepeatCost_step inc Y R H A j)
+
+def boxBudgetDeadline (R T z Y H budget A : Nat) : Nat :=
+  ((List.range (observeAge R T A+T)).filter (fun i =>
+    decide (boxRepeatCost (narrowInc z Y) Y R H A (i+1)≤budget))).length
+
+theorem boxBudgetDeadline_spec (R T z Y H budget A i : Nat) :
+    i<boxBudgetDeadline R T z Y H budget A ↔
+      i<observeAge R T A+T ∧ boxRepeatCost (narrowInc z Y) Y R H A (i+1)≤budget := by
+  unfold boxBudgetDeadline
+  rw [antitone_count_spec]
+  · simp
+  · intro a b hab hb
+    simp only [decide_eq_true_eq] at hb ⊢
+    exact Nat.le_trans (boxRepeatCost_mono _ _ _ _ _ _ _ (by omega)) hb
+
+theorem boxRepeatCost_zero (inc : State → Nat) (Y R H A : Nat) :
+    boxRepeatCost inc Y R H A 0=0 := by
+  unfold boxRepeatCost
+  have h : ∀ b : Nat, boxStates R H A 0 b=[] := by intro b; simp [boxStates]
+  simp [h,repeatExpense]
+
+theorem boxBudgetDeadline_budget (R T z Y H budget A : Nat) :
+    boxRepeatCost (narrowInc z Y) Y R H A
+      (prefixAge (boxBudgetDeadline R T z Y H budget) R T A)≤budget := by
+  let d := prefixAge (boxBudgetDeadline R T z Y H budget) R T A
+  by_cases hd : d=0
+  · change boxRepeatCost (narrowInc z Y) Y R H A d≤budget
+    rw [hd,boxRepeatCost_zero]
+    omega
+  · have hlt : d-1<boxBudgetDeadline R T z Y H budget A := by
+      unfold d prefixAge
+      omega
+    have h := (boxBudgetDeadline_spec R T z Y H budget A (d-1)).mp hlt
+    have he : d-1+1=d := by omega
+    rw [he] at h
+    exact h.2
+
+def boxBudgetClip (R T M z Y H budget : Nat) : Nat → Nat :=
+  deadlineClip R T M (boxBudgetDeadline R T z Y H budget)
+
+theorem boxBudgetClip_repeat_budget (R T M z Y H budget A : Nat) (hA : A∈roots R) :
+    boxRepeatCost (narrowInc z Y) Y R H A (prefixAge (boxBudgetClip R T M z Y H budget) R T A)
+      ≤budget := by
+  have h := deadlineClip_prefix_le R T M A (boxBudgetDeadline R T z Y H budget) hA
+  exact Nat.le_trans (boxRepeatCost_mono _ _ _ _ _ _ _ h)
+    (boxBudgetDeadline_budget R T z Y H budget A)
+
+/-- Scaled original cost bound. No division or rounding of the box
+error is needed in this finite statement. -/
+theorem boxBudgetClip_original_budget (R T M z Y H budget A : Nat)
+    (hH : 0<H) (hT : 6≤T) (hA : A∈roots R) :
+    H*pathCost (narrowInc z Y) (birth A) (prefixAge (boxBudgetClip R T M z Y H budget) R T A)≤
+      H*budget+Y*(3*(observeAge R T A+T)+6+3*H) := by
+  let d := boxBudgetClip R T M z Y H budget
+  let k := prefixAge d R T A
+  have hr := hA
+  simp only [roots,List.mem_filter,decide_eq_true_eq] at hr
+  have he : A%2=0 := by omega
+  have hrep := boxBudgetClip_repeat_budget R T M z Y H budget A hA
+  have hf := narrow_box_error z Y R H A k hH he
+  have hp := box_cost_partition (narrowInc z Y) Y R H A k
+  have hprod := congrArg (fun x : Nat => H*x) hp
+  rw [Nat.mul_add] at hprod
+  have hm := Nat.mul_le_mul_left H hrep
+  have hk : k≤observeAge R T A+T := by dsimp [k,prefixAge]; omega
+  have hscale := Nat.mul_le_mul_left Y (show 3*k+6+3*H≤3*(observeAge R T A+T)+6+3*H by omega)
+  change H*boxRepeatCost (narrowInc z Y) Y R H A k≤H*budget at hm
+  change H*pathCost (narrowInc z Y) (birth A) k≤_
+  omega
+
+theorem boxBudgetClip_fullCapped (R T M z Y H budget : Nat) (hT : 6≤T) :
+    FullCapped (boxBudgetClip R T M z Y H budget) R T M :=
+  deadlineClip_fullCapped _ _ _ _ hT
+
+theorem boxBudgetClip_live_exact (R T M z Y H budget : Nat) (hT : 6≤T) :
+    liveTicks (boxBudgetClip R T M z Y H budget) R T=
+      ((deadlineMasses R T (boxBudgetDeadline R T z Y H budget)).map (min M)).sum :=
+  deadlineClip_live_exact _ _ _ _ hT
+
+#print axioms NegativeMIN.boxBudgetDeadline_budget
+#print axioms NegativeMIN.boxBudgetClip_original_budget
+#print axioms NegativeMIN.boxBudgetClip_live_exact
+
 end NegativeMIN
