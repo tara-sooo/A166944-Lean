@@ -5069,6 +5069,7 @@ theorem leastOddFactor_sound (n : Nat) (h3 : 3≤n) (ho : n%2=1) :
   simp only [Bool.and_eq_true,decide_eq_true_eq] at hs
   unfold leastOddFactor
   rw [he]
+  change oddPrime q=true ∧ n%q=0 ∧ q≤n
   exact ⟨hs.1,hs.2,by omega⟩
 
 theorem qmin_spatial (x : Nat) (h4 : 4≤x) (he : x%2=0) :
