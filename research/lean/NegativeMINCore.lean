@@ -4924,7 +4924,7 @@ theorem prefixGain_le (R T A : Nat) (d : Nat → Nat)
   have ha := observeAge_le_half R T A hT hr.2.1 hr.2.2
   have he : A%2=0 := by omega
   have hg := canonical_gain_bound A (prefixAge d R T A) he
-  unfold prefixAge at hg
+  unfold prefixAge at hg ⊢
   omega
 
 def forwardCleanCharge (R T z Y0 Y1 U : Nat) (d : Nat → Nat) : Nat :=
@@ -4946,6 +4946,7 @@ theorem medium_forward_total (R T z Y0 Y1 U : Nat) (d : Nat → Nat)
       intro A hA
       have h1 := medium_forward_reduction z Y0 Y1 U A (k A) hY
       have h2 := Nat.mul_le_mul_left 6 (prefixGain_le R T A d hT hA)
+      change 6*gain (birth A) (orbit A (k A))≤6*(3*T+6) at h2
       change U*m A≤U*f A+4*(U*Y1)*(1+n A)+6*gain (birth A) (orbit A (k A)) at h1
       omega)
   rw [sum_map_mul,sum_map_add,sum_map_add,sum_map_mul,sum_map_mul,sum_map_mul,
@@ -5022,7 +5023,7 @@ theorem optimalNet_boostedNarrow_comparison (R T M D z Y0 Y1 U wN wQ : Nat)
   have ho := optimalNetDeath_optimal (weightedInc z Y0 Y1 wN wQ) D R T M hT d hc
   have hm := Int.mul_le_mul_of_nonneg_left ho (show 0≤(U:Int) by omega)
   change (U:Int)*policyNet inc D R T d≤_ at h
-  change (U:Int)*policyNet inc D R T d≤_
+  change (U:Int)*policyNet inc D R T d≤(U:Int)*policyNet (weightedInc z Y0 Y1 wN wQ) D R T (optimalNetDeath (weightedInc z Y0 Y1 wN wQ) D R T M)+(forwardError R T z Y0 Y1 U wQ d:Int)
   omega
 
 #print axioms NegativeMIN.medium_forward_total
