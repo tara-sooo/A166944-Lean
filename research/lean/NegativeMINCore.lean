@@ -7044,6 +7044,7 @@ theorem individualHistory_ensemble_upper (cost : Nat → Nat → Nat)
   | nil => simp
   | cons b bs ih =>
     have hb := individualHistoryMass_upper cost R T M B0 D err b hT hm hz hEst
+    simp only [Nat.mul_add] at ih
     simp only [List.map_cons,List.sum_cons,List.length_cons,Nat.mul_add,Nat.succ_mul]
     omega
 
@@ -7074,5 +7075,77 @@ theorem twin_above_of_history_ensemble (cost : Nat → Nat → Nat)
 #print axioms NegativeMIN.individualHistoryClip_total
 #print axioms NegativeMIN.individualHistoryClip_live_exact
 #print axioms NegativeMIN.twin_above_of_history_ensemble
+
+
+/-- Count affordable roots at one observation bin for each budget vector. -/
+def historyBinMass (cost : Nat → Nat → Nat) (R T : Nat)
+    (b : Nat × (Nat × Nat)) (budget : Nat → Nat) : Nat :=
+  (obsLiveFiber (individualHistoryDeadline cost R T budget) R T b.1 b.2).length
+
+def ensembleBinMasses (cost : Nat → Nat → Nat) (R T : Nat)
+    (bs : List (Nat → Nat)) (b : Nat × (Nat × Nat)) : List Nat :=
+  bs.map (historyBinMass cost R T b)
+
+theorem ensembleMass_swap (cost : Nat → Nat → Nat) (R T M : Nat)
+    (bs : List (Nat → Nat)) :
+    (bs.map (individualHistoryMass cost R T M)).sum =
+      ((obsBins R T).map (fun b =>
+        ((ensembleBinMasses cost R T bs b).map (min M)).sum)).sum := by
+  unfold individualHistoryMass deadlineMasses ensembleBinMasses historyBinMass
+  simp only [List.map_map,Function.comp_def]
+  exact sum_map_swap bs (obsBins R T) (fun d b =>
+    min M (obsLiveFiber (individualHistoryDeadline cost R T d) R T b.1 b.2).length)
+
+theorem ensembleBin_sharp (cost : Nat → Nat → Nat) (R T M : Nat)
+    (bs : List (Nat → Nat)) (b : Nat × (Nat × Nat)) (hM : 0<M) :
+    let xs := ensembleBinMasses cost R T bs b
+    M*xs.sum*xs.sum ≤ (xs.map (min M)).sum*((M-1)*xs.sum+moment2 xs) :=
+  clip_sharp _ M hM
+
+/-- Local, rather than global, moment certificates. A few highly concentrated
+bins need not impose a large second-moment penalty on all other bins. -/
+theorem ensembleMass_local_lower (cost : Nat → Nat → Nat) (R T M : Nat)
+    (bs : List (Nat → Nat)) (lower : Nat × (Nat × Nat) → Nat)
+    (hM : 0<M)
+    (hLocal : ∀ b∈obsBins R T,
+      let xs := ensembleBinMasses cost R T bs b
+      lower b=0 ∨
+        (0<(M-1)*xs.sum+moment2 xs ∧
+         lower b*((M-1)*xs.sum+moment2 xs)≤M*xs.sum*xs.sum)) :
+    ((obsBins R T).map lower).sum≤(bs.map (individualHistoryMass cost R T M)).sum := by
+  rw [ensembleMass_swap]
+  apply sum_map_le
+  intro b hb
+  have h := hLocal b hb
+  dsimp only at h
+  rcases h with hzero | ⟨hpos,hbound⟩
+  · simp [hzero]
+  · have hs := ensembleBin_sharp cost R T M bs b hM
+    dsimp only at hs
+    have ht := Nat.le_trans hbound hs
+    exact Nat.le_of_mul_le_mul_right ht hpos
+
+theorem twin_above_of_local_ensemble_moments (cost : Nat → Nat → Nat)
+    (R T M B0 D err B : Nat) (bs : List (Nat → Nat))
+    (lower : Nat × (Nat × Nat) → Nat)
+    (hT : 6≤T) (hM : 0<M) (hlarge : B+3*T+6<R)
+    (hm : ∀ A i j : Nat, i≤j → cost A i≤cost A j)
+    (hz : ∀ A, cost A 0=0) (hEst : HistoryLiveEstimate cost R T M B0 D err)
+    (hLocal : ∀ b∈obsBins R T,
+      let xs := ensembleBinMasses cost R T bs b
+      lower b=0 ∨
+        (0<(M-1)*xs.sum+moment2 xs ∧
+         lower b*((M-1)*xs.sum+moment2 xs)≤M*xs.sum*xs.sum))
+    (hgap : bs.length*err+(bs.map (budgetTotal R)).sum <
+      D*((obsBins R T).map lower).sum) :
+    ∃ x : Nat, B<x ∧ TwinCenter x := by
+  have hl := ensembleMass_local_lower cost R T M bs lower hM hLocal
+  have hmul := Nat.mul_le_mul_left D hl
+  exact twin_above_of_history_ensemble cost R T M B0 D err B bs hT hlarge hm hz hEst
+    (Nat.lt_of_lt_of_le hgap hmul)
+
+#print axioms NegativeMIN.ensembleMass_swap
+#print axioms NegativeMIN.ensembleMass_local_lower
+#print axioms NegativeMIN.twin_above_of_local_ensemble_moments
 
 end NegativeMIN
