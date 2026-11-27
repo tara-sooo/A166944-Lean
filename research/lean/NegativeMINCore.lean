@@ -4594,7 +4594,7 @@ theorem highLedger_gain_le (z Y0 : Nat) (xs : List State) :
     ((highLedger z Y0 xs).2.map (fun a => winner a.state-1)).sum≤
       (xs.map (fun a => winner a-1)).sum := by
   induction xs with
-  | nil => rfl
+  | nil => simp [highLedger]
   | cons a xs ih =>
     by_cases h : Y0≤winner a <;> simp only [highLedger,h,if_true,if_false,
       List.map_cons,List.sum_cons] <;> omega
@@ -4731,7 +4731,7 @@ theorem sumTriples_lastTwo {α : Type} (w : α → Nat) (xs : List α) :
       cases xs with
       | nil => simp [sumTriples,lastTwoSum]
       | cons c xs =>
-        simp only [sumTriples,lastTwoSum,List.map_cons,List.sum_cons]
+        change (w a+(List.map w (b::c::xs)).sum)=w a+sumTriples (fun a _ _ => w a) (b::c::xs)+lastTwoSum w (b::c::xs)
         omega
 
 theorem lastTwoSum_le {α : Type} (w : α → Nat) (xs : List α) (C : Nat)
@@ -4855,9 +4855,10 @@ theorem medium_forward_reduction (z Y0 Y1 U A k : Nat)
   have hg := highLedger_gain_le z Y0 ss
   have hgain : ((xs.map (fun a => winner a.state-1)).sum)≤gain (birth A) (orbit A k) := by
     have hledger := gain_ledger (birth A) k
-    change (ss.map (fun a => winner a-1)).sum=gain (birth A) (orbit A k) at hledger
+    have hledger' : (ss.map (fun a => winner a-1)).sum=gain (birth A) (orbit A k) := by
+      simpa only [ss,prefixStates,List.map_map,Function.comp_def,orbit] using hledger
     change ((xs.map (fun a => winner a.state-1)).sum)≤(ss.map (fun a => winner a-1)).sum at hg
-    omega
+    exact Nat.le_trans hg (Nat.le_of_eq hledger')
   have hh : ∀ a∈xs, 3≤winner a.state := fun a ha =>
     Nat.le_trans hY (highLedger_high z Y0 ss a ha)
   have hb := badForward_sum_bound Y0 Y1 U xs (by omega) hh
