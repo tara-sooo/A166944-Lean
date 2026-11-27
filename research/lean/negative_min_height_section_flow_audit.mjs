@@ -30,24 +30,25 @@ function audit(){
   }
   for(let z of [...new Set([2*H+3,Math.floor(1.5*H),H,Math.floor(H/2),Math.floor(H/4),7])]){
    let F=new Float64Array(N),actualIncoming=new Float64Array(N),best=new Int32Array(N),safe=new Int32Array(N);best.fill(-1);safe.fill(-1);
-   let defect=0,routeDefect=0,changed=0,occ=0,look1=0,look8=0,look64=0;
+   let maxDefect3=0,lowDefect3=0,highDefect3=0,lowKeys=0,highKeys=0,roughControls=0,defect=0,routeDefect=0,changed=0,occ=0,look1=0,look8=0,look64=0;
    for(let i=Nx-1;i>=0;i--){let x=lo+2*i;for(let h=0;h<=H;h++){let a=i*S+h;if(h===3&&x>=R&&x%6===0){F[a]=1;best[a]=i;safe[a]=i;actualIncoming[a]+=1}if(h===H||F[a]===0)continue;occ++;let p=winners[a],b=to[a],diff=p>z;
     if(b>=0)actualIncoming[b]+=wt(a,b)*F[a];
-    if(diff){changed++;defect+=F[a];b=a+1;if(trueRoute[b]>=0)routeDefect+=F[a]*Math.exp(-2*trueDist[b]*Math.log(L)/H)}
+    if(diff){changed++;defect+=F[a];let g=2*(best[a]-i),v=Math.exp(-3*g*Math.log(L)/H);maxDefect3+=v;if(g<=h/2){lowDefect3+=v;lowKeys++;let bound=Math.min(z,(h-13*g/8-3-395/12)/2);ok(qm[i]>bound,"trial terminal roughness from best ancestor");roughControls++;}else{highDefect3+=v;highKeys++;}b=a+1;if(trueRoute[b]>=0)routeDefect+=F[a]*Math.exp(-2*trueDist[b]*Math.log(L)/H)}
     if(b<0)continue;F[b]=Math.min(1,F[b]+wt(a,b)*F[a]);if(best[a]>=0&&(best[b]<0||best[a]<best[b]))best[b]=best[a];if(!diff&&safe[a]>=0&&(safe[b]<0||safe[a]<safe[b]))safe[b]=safe[a];
    }}
    let res=0,resRoute=0,positive=0,bySink=new Float64Array(Nx);
    for(let a=0;a<N;a++){let r=Math.max(0,F[a]-Math.min(1,actualIncoming[a]));if(r<1e-12)continue;res+=r;positive++;if(trueRoute[a]>=0){let w=r*Math.exp(-2*trueDist[a]*Math.log(L)/H);resRoute+=w;bySink[trueRoute[a]]+=w;}
     let b=a,w=1;for(let k=1;k<=64;k++){if(b%S!==H){let t=to[b];if(t<0){w=0;break}w*=wt(b,t);b=t}if(k===1)look1+=r*w;if(k===8)look8+=r*w;if(k===64)look64+=r*w}
    }
-   let perSinkLower=0,perSinkPositive=0,mass=0,sinks=0,good=0,safeSinks=0,safeMass=0,bestMass=0,nonrough=0,nonrough10=0,shortGain=0;for(let i=0;i<Nx;i++){let a=i*S+H;mass+=F[a];let lb=Math.max(0,F[a]-bySink[i]);perSinkLower+=lb;if(lb>1e-10)perSinkPositive++;if(best[a]>=0){sinks++;let g=2*(best[a]-i);if(g<=4*H){good++;if(qm[i]<=H/2)nonrough++;if(qm[i]<=H/10)nonrough10++;if(g<=H/2)shortGain++}bestMass+=Math.exp(-g*Math.log(L)/H)}if(safe[a]>=0){safeSinks++;safeMass+=Math.exp(-2*(safe[a]-i)*Math.log(L)/H)}}
-   if(z===2*H+3)full={mass,sinks,good,nonrough,nonrough10,shortGain,restricted,literalChecks};
+   let maxMass3=0,perSinkLower=0,perSinkPositive=0,mass=0,sinks=0,good=0,safeSinks=0,safeMass=0,bestMass=0,nonrough=0,nonrough10=0,shortGain=0;for(let i=0;i<Nx;i++){let a=i*S+H;mass+=F[a];let lb=Math.max(0,F[a]-bySink[i]);perSinkLower+=lb;if(lb>1e-10)perSinkPositive++;if(best[a]>=0){sinks++;let g=2*(best[a]-i);if(g<=4*H){good++;if(qm[i]<=H/2)nonrough++;if(qm[i]<=H/10)nonrough10++;if(g<=H/2)shortGain++}bestMass+=Math.exp(-g*Math.log(L)/H);maxMass3+=Math.exp(-3*g*Math.log(L)/H)}if(safe[a]>=0){safeSinks++;safeMass+=Math.exp(-2*(safe[a]-i)*Math.log(L)/H)}}
+   if(z===2*H+3)full={mass,maxMass3,sinks,good,nonrough,nonrough10,shortGain,restricted,literalChecks};
+   ok(full.maxMass3+1e-6>=maxMass3-maxDefect3,"max-flow residual lower");
    for(let d of [defect,routeDefect,res,resRoute,look1,look8,look64])ok(full.mass+1e-6>=mass-d,"residual lower");
    ok(res<=defect+1e-6&&resRoute<=routeDefect+1e-6&&resRoute<=look64+1e-6&&look64<=look8+1e-6&&look8<=look1+1e-6&&look1<=res+1e-6,"residual order");
    ok(perSinkLower<=full.mass+1e-6&&perSinkLower+1e-6>=Math.max(0,mass-resRoute)&&perSinkPositive<=full.sinks,"localized sink bound");
    ok(safeSinks<=full.sinks&&safeMass<=full.mass+1e-6,"safe witnesses");
    let fmt=x=>+x.toFixed(3);
-   rows.push({R,H,z,mass:fmt(mass),sinks,good,bestMass:fmt(bestMass),defect:fmt(defect),localResidual:fmt(res),positive,margin:fmt(mass-defect),localMargin:fmt(mass-res),look8Margin:fmt(mass-look8),look64Margin:fmt(mass-look64),routedMargin:fmt(mass-resRoute),perSinkLower:fmt(perSinkLower),perSinkPositive,safeSinks,safeMass:fmt(safeMass),changed,occ,full});
+   rows.push({R,H,z,mass:fmt(mass),sinks,good,bestMass:fmt(bestMass),maxMass3:fmt(maxMass3),maxDefect3:fmt(maxDefect3),maxMargin3:fmt(maxMass3-maxDefect3),lowDefect3:fmt(lowDefect3),highDefect3:fmt(highDefect3),lowKeys,highKeys,roughControls,defect:fmt(defect),localResidual:fmt(res),positive,margin:fmt(mass-defect),localMargin:fmt(mass-res),look8Margin:fmt(mass-look8),look64Margin:fmt(mass-look64),routedMargin:fmt(mass-resRoute),perSinkLower:fmt(perSinkLower),perSinkPositive,safeSinks,safeMass:fmt(safeMass),changed,occ,full});
   }
  }
  return rows;
