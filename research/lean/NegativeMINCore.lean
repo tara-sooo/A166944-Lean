@@ -7971,11 +7971,11 @@ theorem dualPriceTotal_split (R T M : Nat) (ps : List DualPrice) :
     by_cases h : M<(fullObsFiber R T p.1).length
     · have h' : ¬ (fullObsFiber R T p.1).length≤M := by omega
       simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_true h,
-        decide_eq_false h',if_true,if_false,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
+        decide_eq_false h',if_true,if_false,Bool.false_eq_true,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
       omega
     · have h' : (fullObsFiber R T p.1).length≤M := by omega
       simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_false h,
-        decide_eq_true h',if_true,if_false,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
+        decide_eq_true h',if_true,if_false,Bool.false_eq_true,dualPriceTotal,List.map_cons,List.sum_cons] at ih ⊢
       omega
 
 theorem dualCharge_split (R T M A l : Nat) (ps : List DualPrice) :
@@ -7987,11 +7987,11 @@ theorem dualCharge_split (R T M A l : Nat) (ps : List DualPrice) :
     by_cases h : M<(fullObsFiber R T p.1).length
     · have h' : ¬ (fullObsFiber R T p.1).length≤M := by omega
       simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_true h,
-        decide_eq_false h',if_true,if_false,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
+        decide_eq_false h',if_true,if_false,Bool.false_eq_true,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
       omega
     · have h' : (fullObsFiber R T p.1).length≤M := by omega
       simp only [heavyDualPrices,lightDualPrices,List.filter_cons,decide_eq_false h,
-        decide_eq_true h',if_true,if_false,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
+        decide_eq_true h',if_true,if_false,Bool.false_eq_true,dualCharge,List.map_cons,List.sum_cons] at ih ⊢
       omega
 
 theorem dualCharge_mono (R T A l k : Nat) (ps : List DualPrice) (h : l≤k) :
@@ -8043,7 +8043,7 @@ theorem heavyDual_objective (R T M : Nat) (ps : List DualPrice) (slack : Nat →
   have h := dualCharge_sum d R T ls hl
   have he : ∀ A : Nat,life d R T A=T := by
     intro A
-    exact life_eq_full_of_survives d R T A (by rfl)
+    exact life_eq_full_of_survives d R T A (Nat.le_refl _)
   simp only [he] at h
   have hh := sum_map_le ls (fun p => p.2*(obsLiveFiber d R T p.1.1 p.1.2).length)
     (fun p => M*p.2) (by
@@ -8059,6 +8059,9 @@ theorem heavyDual_objective (R T M : Nat) (ps : List DualPrice) (slack : Nat →
   rw [sum_map_add,dualPriceTotal_split R T M ps,Nat.mul_add]
   change M*dualPriceTotal (heavyDualPrices R T M ps)+
     (((roots R).map slack).sum+((roots R).map (fun A => dualCharge R T A T ls)).sum)≤_
+  change M*dualPriceTotal (heavyDualPrices R T M ps)+
+    (((roots R).map slack).sum+((roots R).map (fun A => dualCharge R T A T ls)).sum)≤
+      M*dualPriceTotal (heavyDualPrices R T M ps)+M*dualPriceTotal ls+((roots R).map slack).sum
   omega
 
 theorem earliestFiber_has_merge (R T : Nat) (b : DualBin) (hT : 6≤T)
