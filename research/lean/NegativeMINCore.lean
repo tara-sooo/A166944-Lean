@@ -7651,7 +7651,7 @@ theorem compressedBudgetSum_exact (R H : Nat) (choices : Nat → List Nat)
   intro A ha
   have hh := productBudgetValue_scaled choices (roots R) H A (fun j => j)
     (roots_nodup R) hH ha
-  simpa only [List.map_id_fun] using hh
+  simpa using hh
 
 /-- The finite soft survival certificate uses only individual choice lists
 and observation bins. The analytic HistoryLiveEstimate remains OPEN. -/
@@ -7672,23 +7672,24 @@ theorem twin_above_of_compressed_soft (cost : Nat → Nat → Nat)
   change H*(bs.map (budgetTotal R)).sum=bs.length*compressedBudgetSum R choices at hC
   have hg : 2*(bs.length*err+(bs.map (budgetTotal R)).sum) <
       D*ensembleSoftMass cost R T M bs := by
-    by_contra hn
-    have hh : D*ensembleSoftMass cost R T M bs≤2*(bs.length*err+(bs.map (budgetTotal R)).sum) := by omega
-    have h1 : H*(D*ensembleSoftMass cost R T M bs) =
-        bs.length*(D*compressedSoftMass cost R T M H choices) := by
-      calc
-        _ = D*(H*ensembleSoftMass cost R T M bs) := by ac_rfl
-        _ = _ := by rw [hS]; ac_rfl
-    have h2 : H*(2*(bs.length*err+(bs.map (budgetTotal R)).sum)) =
-        bs.length*(2*(H*err+compressedBudgetSum R choices)) := by
-      calc
-        _ = 2*(H*(bs.length*err)+H*(bs.map (budgetTotal R)).sum) := by
-          simp only [Nat.mul_add]; ac_rfl
-        _ = _ := by rw [hC]; simp only [Nat.mul_add]; ac_rfl
-    have hmul := Nat.mul_le_mul_left H hh
-    rw [h1,h2] at hmul
-    have hbad := Nat.le_of_mul_le_mul_left hmul hK
-    omega
+    by_cases hn : 2*(bs.length*err+(bs.map (budgetTotal R)).sum) < D*ensembleSoftMass cost R T M bs
+    · exact hn
+    · have hh : D*ensembleSoftMass cost R T M bs≤2*(bs.length*err+(bs.map (budgetTotal R)).sum) := by omega
+      have h1 : H*(D*ensembleSoftMass cost R T M bs) =
+          bs.length*(D*compressedSoftMass cost R T M H choices) := by
+        calc
+          _ = D*(H*ensembleSoftMass cost R T M bs) := by ac_rfl
+          _ = _ := by rw [hS]; ac_rfl
+      have h2 : H*(2*(bs.length*err+(bs.map (budgetTotal R)).sum)) =
+          bs.length*(2*(H*err+compressedBudgetSum R choices)) := by
+        calc
+          _ = 2*(H*(bs.length*err)+H*(bs.map (budgetTotal R)).sum) := by
+            simp only [Nat.mul_add]; ac_rfl
+          _ = _ := by rw [hC]; simp only [Nat.mul_add]; ac_rfl
+      have hmul := Nat.mul_le_mul_left H hh
+      rw [h1,h2] at hmul
+      have hbad := Nat.le_of_mul_le_mul_left hmul hK
+      omega
   exact twin_above_of_soft_ensemble cost R T M B0 D err B bs hT hM hlarge hm hz hEst
     (fun b _ => productHistoryBudget_variance cost R T choices b) hg
 
