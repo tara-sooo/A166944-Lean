@@ -8137,4 +8137,189 @@ theorem earliestFiber_has_firing (R T : Nat) (b : DualBin) (hT : 6≤T)
 #print axioms NegativeMIN.earliestFiber_has_merge
 #print axioms NegativeMIN.earliestFiber_has_firing
 
+
+/-! Endpoint-priced prefix certificates. The full-root mass at a prefix's
+last live observation controls all its earlier physical contacts. -/
+
+def endpointBin (R T A l : Nat) : DualBin :=
+  (l-1,obsKey R T A (l-1))
+
+def endpointMass (R T A l : Nat) : Nat :=
+  (fullObsFiber R T (endpointBin R T A l)).length
+
+theorem fullObsFiber_nodup (R T : Nat) (b : DualBin) :
+    (fullObsFiber R T b).Nodup :=
+  List.filter_sublist.nodup (roots_nodup R)
+
+theorem endpointMass_positive (R T A l : Nat) (ha : A∈roots R) :
+    0<endpointMass R T A l := by
+  have hh : A∈fullObsFiber R T (endpointBin R T A l) :=
+    (fullObsFiber_mem R T _ A).mpr ⟨ha,rfl⟩
+  exact List.length_pos_of_mem hh
+
+theorem endpoint_contains_earlier (R T A l : Nat) (b : DualBin)
+    (hT : 6≤T) (hL : l≤T) (hu : b.1<l) (ha : A∈fullObsFiber R T b) :
+    ∀ B∈fullObsFiber R T b,B∈fullObsFiber R T (endpointBin R T A l) := by
+  have har := ((fullObsFiber_mem R T b A).mp ha).1
+  have hb : A∈fullObsFiber R T (endpointBin R T A l) :=
+    (fullObsFiber_mem R T _ A).mpr ⟨har,rfl⟩
+  exact fullObsFiber_nested R T b (endpointBin R T A l) A hT
+    (by unfold endpointBin; simp only; omega) (by unfold endpointBin; simp only; omega) ha hb
+
+theorem endpointMass_ge_earlier (R T A l : Nat) (b : DualBin)
+    (hT : 6≤T) (hL : l≤T) (hu : b.1<l) (ha : A∈fullObsFiber R T b) :
+    (fullObsFiber R T b).length≤endpointMass R T A l :=
+  nodup_subset_length_core _ _ (fullObsFiber_nodup R T b)
+    (endpoint_contains_earlier R T A l b hT hL hu ha)
+
+/-- Multiplicity-dependent integer numerator weights, with common
+denominator H. Each positive-length root has weight at most 1 and at
+most M divided by its full endpoint multiplicity. -/
+def EndpointWeightsOK (R T M H : Nat) (l w : Nat → Nat) : Prop :=
+  ∀ A∈roots R,l A≤T ∧ w A≤H ∧
+    w A*endpointMass R T A (l A)≤M*H
+
+def weightedPrefixLoad (R T : Nat) (l w : Nat → Nat) (b : DualBin) : Nat :=
+  ((fullObsFiber R T b).map (fun A => if b.1<l A then w A else 0)).sum
+
+theorem endpointWeights_load (R T M H : Nat) (l w : Nat → Nat) (b : DualBin)
+    (hT : 6≤T) (h : EndpointWeightsOK R T M H l w) :
+    weightedPrefixLoad R T l w b≤M*H := by
+  let xs := fullObsFiber R T b
+  let m := xs.length
+  by_cases hz : m=0
+  · have he : xs=[] := List.length_eq_zero_iff.mp hz
+    unfold weightedPrefixLoad
+    change (xs.map (fun A => if b.1<l A then w A else 0)).sum≤_
+    rw [he]
+    simp
+  · have hm : 0<m := by omega
+    have hh := sum_map_le xs (fun A => m*(if b.1<l A then w A else 0))
+      (fun _ => M*H) (by
+        intro A ha
+        by_cases hlt : b.1<l A
+        · have har := ((fullObsFiber_mem R T b A).mp ha).1
+          have hmass := endpointMass_ge_earlier R T A (l A) b hT (h A har).1 hlt ha
+          have hp := Nat.mul_le_mul_left (w A) hmass
+          rw [if_pos hlt,Nat.mul_comm m]
+          exact Nat.le_trans hp (h A har).2.2
+        · simp [hlt])
+    rw [sum_map_mul,sum_const_nat] at hh
+    change m*weightedPrefixLoad R T l w b≤m*(M*H) at hh
+    exact Nat.le_of_mul_le_mul_left hh hm
+
+theorem weightedDualCharge_sum (R T : Nat) (l w : Nat → Nat) (ps : List DualPrice) :
+    ((roots R).map (fun A => w A*dualCharge R T A (l A) ps)).sum =
+      (ps.map (fun p => p.2*weightedPrefixLoad R T l w p.1)).sum := by
+  unfold dualCharge
+  have he : (roots R).map (fun A => w A*(ps.map (fun p =>
+      if dualHit R T A (l A) p.1 then p.2 else 0)).sum)=
+      (roots R).map (fun A => (ps.map (fun p =>
+        w A*(if dualHit R T A (l A) p.1 then p.2 else 0))).sum) := by
+    apply List.map_congr_left
+    intro A _
+    rw [sum_map_mul]
+  rw [he,sum_map_swap]
+  congr 1
+  apply List.map_congr_left
+  intro p _
+  unfold weightedPrefixLoad fullObsFiber
+  rw [sum_filter_weight,← sum_map_mul]
+  congr 1
+  apply List.map_congr_left
+  intro A _
+  by_cases hk : obsKey R T A p.1.1=p.1.2 <;>
+    by_cases hu : p.1.1<l A <;> simp [dualHit,hk,hu,Nat.mul_comm]
+
+/-- A deterministic lower bound on EVERY feasible dual, with no moment
+or independent-residue hypothesis. Scale H clears denominators. -/
+theorem endpointWeights_dual_lower (cost : Nat → Nat → Nat) (R T M H D : Nat)
+    (l w : Nat → Nat) (ps : List DualPrice) (slack : Nat → Nat)
+    (hT : 6≤T) (hw : EndpointWeightsOK R T M H l w)
+    (hf : DualFeasible cost R T D ps slack) :
+    ((roots R).map (fun A => w A*(D*l A-cost A (observeAge R T A+l A)))).sum≤
+      H*dualObjective R M ps slack := by
+  have h := sum_map_le (roots R)
+    (fun A => w A*(D*l A-cost A (observeAge R T A+l A)))
+    (fun A => w A*dualCharge R T A (l A) ps+H*slack A) (by
+      intro A ha
+      have hA := hw A ha
+      have hh := hf A ha (observeAge R T A+l A) (by omega)
+      have he : min T (observeAge R T A+l A-observeAge R T A)=l A := by
+        rw [Nat.add_sub_cancel_left,Nat.min_eq_right hA.1]
+      rw [he] at hh
+      have hsub : D*l A-cost A (observeAge R T A+l A)≤
+          dualCharge R T A (l A) ps+slack A := by omega
+      have hmul := Nat.mul_le_mul_left (w A) hsub
+      rw [Nat.mul_add] at hmul
+      have hs := Nat.mul_le_mul_right (slack A) hA.2.1
+      omega)
+  rw [sum_map_add,weightedDualCharge_sum,sum_map_mul] at h
+  have hc := sum_map_le ps (fun p => p.2*weightedPrefixLoad R T l w p.1)
+    (fun p => (M*H)*p.2) (by
+      intro p _
+      rw [Nat.mul_comm p.2]
+      exact Nat.mul_le_mul_right p.2 (endpointWeights_load R T M H l w p.1 hT hw))
+  rw [sum_map_mul] at hc
+  change _≤(M*H)*dualPriceTotal ps at hc
+  unfold dualObjective
+  rw [Nat.mul_add]
+  have he : H*(M*dualPriceTotal ps)=(M*H)*dualPriceTotal ps := by ac_rfl
+  rw [he]
+  omega
+
+/-- For a single global ranking, retain a root's chosen prefix if and
+only if it is in the top M of its FULL endpoint group. Earlier groups
+are subsets, so every selected prefix is simultaneously feasible. -/
+def endpointRankDeath (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (A : Nat) : Nat :=
+  if 0<l A ∧ l A≤T ∧ cost A (observeAge R T A+l A)≤D*l A ∧
+    localRank (fullObsFiber R T (endpointBin R T A (l A))) score A≤M
+  then observeAge R T A+l A else 0
+
+theorem localRank_subset_core (xs ys : List Nat) (score : Nat → Nat) (A : Nat)
+    (hn : xs.Nodup) (h : ∀ B∈xs,B∈ys) :
+    localRank xs score A≤localRank ys score A := by
+  unfold localRank
+  apply nodup_subset_length_core
+  · exact List.filter_sublist.nodup hn
+  · intro B hB
+    have hb := List.mem_filter.mp hB
+    exact List.mem_filter.mpr ⟨h B hb.1,hb.2⟩
+
+theorem endpointRankDeath_observedCap (R T M D : Nat) (cost : Nat → Nat → Nat)
+    (l score : Nat → Nat) (hT : 6≤T) :
+    ObservedCap (endpointRankDeath R T M D cost l score) R T M := by
+  intro b hb
+  let d := endpointRankDeath R T M D cost l score
+  let xs := obsLiveFiber d R T b.1 b.2
+  let ys := fullObsFiber R T b
+  have hsub : ∀ A∈xs,A∈rankClip ys score M := by
+    intro A hA
+    have houter := List.mem_filter.mp hA
+    have hinner := List.mem_filter.mp houter.1
+    have har := hinner.1
+    have hk := of_decide_eq_true houter.2
+    have hal : liveAt d R T A b.1=true := hinner.2
+    have hmem : A∈ys := (fullObsFiber_mem R T b A).mpr ⟨har,hk⟩
+    have hlt : observeAge R T A+b.1<d A := of_decide_eq_true hal
+    unfold d endpointRankDeath at hlt
+    split at hlt
+    · rename_i hyes
+      have hlen : b.1<l A := by omega
+      have hInc := endpoint_contains_earlier R T A (l A) b hT hyes.2.1 hlen hmem
+      have hr := localRank_subset_core ys _ score A (fullObsFiber_nodup R T b) hInc
+      exact List.mem_filter.mpr ⟨hmem,by simp only [decide_eq_true_eq]; exact Nat.le_trans hr hyes.2.2.2⟩
+    · omega
+  have hnd : xs.Nodup := by
+    unfold xs obsLiveFiber
+    exact List.filter_sublist.nodup (List.filter_sublist.nodup (roots_nodup R))
+  have hh := nodup_subset_length_core xs (rankClip ys score M) hnd hsub
+  rw [rankClip_length _ _ _ (fullObsFiber_nodup R T b)] at hh
+  exact Nat.le_trans hh (Nat.min_le_left _ _)
+
+#print axioms NegativeMIN.endpointWeights_load
+#print axioms NegativeMIN.endpointWeights_dual_lower
+#print axioms NegativeMIN.endpointRankDeath_observedCap
+
 end NegativeMIN
