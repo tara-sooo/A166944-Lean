@@ -8920,4 +8920,190 @@ theorem satCount_append_bounds (z Y reset D : Nat) (xs ys : List Nat) :
 #print axioms NegativeMIN.chunkFold_interlace
 #print axioms NegativeMIN.satCount_append_bounds
 
+
+/-! Almost-additive word costs can be replaced by a common state-additive
+potential. The approximation error is per ROOT, not per TICK. The
+terminal clock is fixed globally, so the potential is a function of
+State alone, even for different synchronization windows. -/
+
+def WordCostDefect (C : List Nat → Nat) (E : Nat) : Prop :=
+  ∀ xs ys : List Nat,C (xs++ys)≤C xs+C ys+E ∧ C xs+C ys≤C (xs++ys)+E
+
+def WordSuffixMono (C : List Nat → Nat) : Prop :=
+  ∀ p : Nat,∀ xs : List Nat,C xs≤C (p::xs)
+
+theorem labelTrace_add (s : State) (a b : Nat) :
+    labelTrace s (a+b)=labelTrace s a++labelTrace (evolve s a) b := by
+  induction b with
+  | zero => simp [labelTrace]
+  | succ b ih =>
+    rw [Nat.add_succ,labelTrace_succ,ih,labelTrace_succ,List.append_assoc,evolve_add]
+
+theorem labelTrace_one_cons (s : State) (k : Nat) :
+    labelTrace s (k+1)=winner s::labelTrace (tick s) k := by
+  rw [Nat.add_comm k 1,labelTrace_add]
+  rfl
+
+def wordPotential (C : List Nat → Nat) (endClock : Int) (s : State) : Nat :=
+  C (labelTrace s (endClock-s.n).toNat)
+
+def potentialInc (F : State → Nat) (s : State) : Nat := F s-F (tick s)
+
+theorem wordPotential_mono (C : List Nat → Nat) (endClock : Int)
+    (h : WordSuffixMono C) (s : State) :
+    wordPotential C endClock (tick s)≤wordPotential C endClock s := by
+  unfold wordPotential
+  rw [tick_clock]
+  by_cases hn : s.n<endClock
+  · have he : (endClock-s.n).toNat=(endClock-(s.n+1)).toNat+1 := by omega
+    rw [he,labelTrace_one_cons]
+    exact h _ _
+  · have he : (endClock-s.n).toNat=0 := by omega
+    have he' : (endClock-(s.n+1)).toNat=0 := by omega
+    rw [he,he']
+    rfl
+
+theorem potentialInc_telescopes (F : State → Nat) (s : State) (k : Nat)
+    (h : ∀ s,F (tick s)≤F s) :
+    pathCost (potentialInc F) s k+F (evolve s k)=F s := by
+  induction k with
+  | zero => simp [pathCost,evolve]
+  | succ k ih =>
+    have hh := h (evolve s k)
+    change pathCost (potentialInc F) s k+(F (evolve s k)-F (tick (evolve s k)))+
+      F (tick (evolve s k))=F s
+    omega
+
+theorem wordPotential_prefix_bounds (C : List Nat → Nat) (endClock : Int)
+    (E : Nat) (s : State) (k : Nat)
+    (hd : WordCostDefect C E) (hm : WordSuffixMono C)
+    (ht : s.n+(k:Int)≤endClock) :
+    pathCost (potentialInc (wordPotential C endClock)) s k≤C (labelTrace s k)+E ∧
+      C (labelTrace s k)≤pathCost (potentialInc (wordPotential C endClock)) s k+E := by
+  have hlen : (endClock-s.n).toNat=k+(endClock-(evolve s k).n).toNat := by
+    rw [evolve_clock]
+    omega
+  have he : wordPotential C endClock s=
+      C (labelTrace s k++labelTrace (evolve s k) (endClock-(evolve s k).n).toNat) := by
+    unfold wordPotential
+    rw [hlen,labelTrace_add]
+  have hh := hd (labelTrace s k) (labelTrace (evolve s k) (endClock-(evolve s k).n).toNat)
+  have htel := potentialInc_telescopes (wordPotential C endClock) s k
+    (wordPotential_mono C endClock hm)
+  rw [he] at htel
+  unfold wordPotential at htel
+  omega
+
+theorem satCount_suffix_mono (z Y reset D : Nat) :
+    WordSuffixMono (satCount z Y reset D) := by
+  intro p xs
+  have h := (satCount_append_bounds z Y reset D [p] xs).1
+  change satCount z Y reset D [p]+satCount z Y reset D xs≤
+    satCount z Y reset D (p::xs) at h
+  omega
+
+theorem satCount_defect (z Y reset D : Nat) :
+    WordCostDefect (satCount z Y reset D) 1 := by
+  intro xs ys
+  have h := satCount_append_bounds z Y reset D xs ys
+  omega
+
+def wordHistoryCost (C : List Nat → Nat) (A k : Nat) : Nat :=
+  C (labelTrace (birth A) k)
+
+theorem wordHistory_potential_expense (C : List Nat → Nat) (endClock : Int)
+    (R T E : Nat) (d : Nat → Nat) (hd : WordCostDefect C E) (hm : WordSuffixMono C)
+    (ht : ∀ A∈roots R,(birth A).n+((observeAge R T A+T : Nat):Int)≤endClock) :
+    totalExpense (potentialInc (wordPotential C endClock)) R T d≤
+      historyExpense (wordHistoryCost C) R T d+(roots R).length*E ∧
+    historyExpense (wordHistoryCost C) R T d≤
+      totalExpense (potentialInc (wordPotential C endClock)) R T d+(roots R).length*E := by
+  have hb (A : Nat) (ha : A∈roots R) :=
+    wordPotential_prefix_bounds C endClock E (birth A) (prefixAge d R T A) hd hm (by
+      have h := ht A ha
+      have hk := Nat.min_le_right (d A) (observeAge R T A+T)
+      change prefixAge d R T A≤observeAge R T A+T at hk
+      omega)
+  constructor
+  · unfold totalExpense historyExpense
+    rw [← sum_const_nat (roots R) E,← sum_map_add]
+    apply sum_map_le
+    intro A ha
+    exact (hb A ha).1
+  · unfold totalExpense historyExpense
+    rw [← sum_const_nat (roots R) E,← sum_map_add]
+    apply sum_map_le
+    intro A ha
+    exact (hb A ha).2
+
+def wordPolicyNet (C : List Nat → Nat) (D R T : Nat) (d : Nat → Nat) : Int :=
+  (D:Int)*(liveTicks d R T:Int)-(historyExpense (wordHistoryCost C) R T d:Int)
+
+theorem wordPolicyNet_potential (C : List Nat → Nat) (endClock : Int)
+    (D R T E : Nat) (d : Nat → Nat) (hd : WordCostDefect C E) (hm : WordSuffixMono C)
+    (ht : ∀ A∈roots R,(birth A).n+((observeAge R T A+T : Nat):Int)≤endClock) :
+    wordPolicyNet C D R T d≤policyNet (potentialInc (wordPotential C endClock)) D R T d+
+      (((roots R).length*E:Nat):Int) ∧
+    policyNet (potentialInc (wordPotential C endClock)) D R T d≤wordPolicyNet C D R T d+
+      (((roots R).length*E:Nat):Int) := by
+  have h := wordHistory_potential_expense C endClock R T E d hd hm ht
+  rw [policyNet_eq]
+  unfold wordPolicyNet
+  omega
+
+theorem wordPolicyNet_near_optimal (C : List Nat → Nat) (endClock : Int)
+    (D R T M E : Nat) (d : Nat → Nat) (hd : WordCostDefect C E) (hm : WordSuffixMono C)
+    (ht : ∀ A∈roots R,(birth A).n+((observeAge R T A+T : Nat):Int)≤endClock)
+    (hT : 6≤T) (hc : FullCapped d R T M) :
+    let inc := potentialInc (wordPotential C endClock)
+    let opt := optimalNetDeath inc D R T M
+    wordPolicyNet C D R T d≤wordPolicyNet C D R T opt+
+      (((roots R).length*(2*E):Nat):Int) := by
+  dsimp only
+  let inc := potentialInc (wordPotential C endClock)
+  let opt := optimalNetDeath inc D R T M
+  have h1 := (wordPolicyNet_potential C endClock D R T E d hd hm ht).1
+  have h2 := (wordPolicyNet_potential C endClock D R T E opt hd hm ht).2
+  have h3 := optimalNetDeath_optimal inc D R T M hT d hc
+  change wordPolicyNet C D R T d≤policyNet inc D R T d+(((roots R).length*E:Nat):Int) at h1
+  change policyNet inc D R T opt≤wordPolicyNet C D R T opt+(((roots R).length*E:Nat):Int) at h2
+  change wordPolicyNet C D R T d≤wordPolicyNet C D R T opt+(((roots R).length*(2*E):Nat):Int)
+  rw [Nat.mul_comm 2 E,Nat.mul_assoc,Nat.mul_comm ((roots R).length*E) 2]
+  omega
+
+theorem twin_above_of_wordPotential_records (C : List Nat → Nat) (endClock : Int)
+    (D R T M E B0 err B : Nat) (hd : WordCostDefect C E) (hm : WordSuffixMono C)
+    (ht : ∀ A∈roots R,(birth A).n+((observeAge R T A+T : Nat):Int)≤endClock)
+    (hT : 6≤T) (hlarge : B+3*T+6<R)
+    (hEst : HistoryLiveEstimate (wordHistoryCost C) R T M B0 D err)
+    (hgap : err+(roots R).length*E<
+      optimalRecordMass (potentialInc (wordPotential C endClock)) D R T M) :
+    ∃ x : Nat,B<x ∧ TwinCenter x := by
+  let inc := potentialInc (wordPotential C endClock)
+  let d := optimalNetDeath inc D R T M
+  have hh := (wordHistory_potential_expense C endClock R T E d hd hm ht).2
+  have he := hEst d (optimalNetDeath_fullCapped inc D R T M hT)
+  have hr := optimalNetDeath_formula inc D R T M hT
+  rw [policyNet_eq] at hr
+  change D*liveTicks d R T≤D*B0*M*T*twinCount R T+historyExpense (wordHistoryCost C) R T d+err at he
+  change historyExpense (wordHistoryCost C) R T d≤totalExpense inc R T d+(roots R).length*E at hh
+  change err+(roots R).length*E<optimalRecordMass inc D R T M at hgap
+  have hc : 0<twinCount R T := by
+    by_cases hz : twinCount R T=0
+    · rw [hz,Nat.mul_zero,Nat.zero_add] at he
+      omega
+    · omega
+  unfold twinCount at hc
+  generalize hsites : twinSites R T=xs at hc
+  cases xs with
+  | nil => simp at hc
+  | cons x xs =>
+    have hmem : x∈twinSites R T := by rw [hsites]; simp
+    simp only [twinSites,List.mem_filter,decide_eq_true_eq] at hmem
+    exact ⟨x,by have := hmem.2.1; omega,hmem.2.2⟩
+
+#print axioms NegativeMIN.wordPotential_prefix_bounds
+#print axioms NegativeMIN.wordPolicyNet_near_optimal
+#print axioms NegativeMIN.twin_above_of_wordPotential_records
+
 end NegativeMIN
