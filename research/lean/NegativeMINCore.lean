@@ -5487,6 +5487,7 @@ theorem peak_suffix (f : Nat → Int) (a k : Nat) :
       max (runningPeak f a) (f a+max (runningPeak (netSuffix f a) k) (netSuffix f a (k+1)))
     have he : f a+netSuffix f a (k+1)=f (a+k+1) := by
       unfold netSuffix
+      rw [Nat.add_assoc]
       omega
     by_cases h : runningPeak (netSuffix f a) k≤netSuffix f a (k+1)
     · rw [Int.max_eq_right h]
