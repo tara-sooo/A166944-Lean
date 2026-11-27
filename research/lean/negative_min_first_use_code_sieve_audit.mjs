@@ -16,16 +16,16 @@ function audit(){
   let K=2;for(let x=R-3*T-6;x<=2*R;x+=2)K=Math.max(K,D(x));
   const w=log2ceil(K);
   const type=e=>(mode==='cell'?cell(e.x)===cell(e.y):Q%e.p===0)?0:e.p>=Y?2:1;
-  let codeChecks=0,splitChecks=0,ticks=0,events=0,repeatBlocks=0,highBlocks=0,encodedBits=0,phases=0;
-  function encode(word,start,dir){
-   let arr=dir===1?word:word.slice().reverse(),pos=start,bits="",formula=0,lo=0,nh=0,nm=0,blocks=0;
+  let codeChecks=0,splitChecks=0,ticks=0,events=0,repeatBlocks=0,highBlocks=0,encodedBits=0,phases=0,freeChecks=0,freeCuts=0;
+  function encode(word,start,dir,cuts=new Set()){
+   let arr=dir===1?word:word.slice().reverse(),pos=start,bits="",formula=0,lo=0,nh=0,nm=0,blocks=0,nfree=0; const marks=dir===1?cuts:new Set([...cuts].map(j=>word.length-j));
    function put(n,b){ok(Number.isInteger(n)&&n>=0&&n<2**b,"code field");if(b)bits+=n.toString(2).padStart(b,"0")}
    function unary(n){bits+="1".repeat(n)+"0"}
    for(;;){
-    let end=lo;while(end<arr.length&&type(arr[end])!==2)end++;
+    let end=lo;while(end<arr.length&&type(arr[end])!==2&&!(end>lo&&marks.has(end)))end++;
     const a=arr.slice(lo,end),m=a.filter(e=>type(e)===1).length,k=new Set(a.filter(e=>type(e)===1).map(e=>e.p)).size,b=log2ceil(m+1);
-    const more=end<arr.length;put(+more,1);unary(k);unary(b);
-    formula+=3+k+b+(k+1)*(b+q)+b*k*(k+1)/2+k*w+(more?2:0);
+    const flag=end===arr.length?0:type(arr[end])===2?1:2;put(flag,2);unary(k);unary(b);
+    formula+=4+k+b+(k+1)*(b+q)+b*k*(k+1)/2+k*w+(flag===1?2:0);
     const seen=[],counts=[];let base=0;nm+=m;blocks++;
     if(m>k)repeatBlocks++;
     function chunk(){for(const n of counts)put(n,b);put(base,b+q);counts.fill(0);base=0}
@@ -40,14 +40,14 @@ function audit(){
      pos+=dir===1?-(e.p-1):e.p-1;
     }
     chunk();ok(seen.length===k,"all distinct");
-    if(!more)break;
+    if(flag===0)break;if(flag===2){nfree++;lo=end;continue}
     const e=arr[end];ok(pos===(dir===1?e.x:e.y),"high continuity");
     const choices=cand(pos,dir,true);ok(choices.length<=4,"high degree");put(choices.indexOf(e.p),2);
     pos+=dir===1?-(e.p-1):e.p-1;nh++;highBlocks++;lo=end+1;
    }
    ok(bits.length===formula,"exact code length");encodedBits+=formula;
-   ok(blocks===nh+1,"blocks");
-   return {bits,pos,formula,nh,nm}
+   ok(blocks===nh+nfree+1,"blocks");
+   return {bits,pos,formula,nh,nm,nfree}
   }
   function decode(bits,start,dir){
    let i=0,x=start;
@@ -55,13 +55,13 @@ function audit(){
    function unary(){let n=0;while(read(1))n++;return n}
    function move(g){x+=dir===1?-g:g}
    for(;;){
-    const more=read(1),k=unary(),b=unary(),seen=[];
+    const flag=read(2),k=unary(),b=unary(),seen=[];ok(flag<=2,'flag');
     for(let j=0;j<=k;j++){
      let g=0;for(const p of seen)g+=read(b)*(p-1);
      g+=read(b+q);move(g);
      if(j<k){let ps=cand(x,dir,false),p=ps[read(w)];ok(p!==undefined&&!seen.includes(p),"valid first medium");let y=x+(dir===1?-(p-1):p-1);ok(type({x,y,p})===1,"medium class");seen.push(p);move(p-1)}
     }
-    if(!more)break;
+    if(flag===0)break;if(flag===2)continue;
     const p=cand(x,dir,true)[read(2)];ok(p!==undefined,"high pin");ok(type({x,y:x+(dir===1?-(p-1):p-1),p})===2,"high class");move(p-1)
    }
    ok(i===bits.length,"complete code");return x
@@ -79,6 +79,7 @@ function audit(){
    ok(f.pos===x&&r.pos===A&&f.formula===r.formula,"symmetric code length");
    ok(decode(f.bits,A,1)===x&&decode(r.bits,x,-1)===A,"two directional reconstruction");codeChecks+=2;
    ok(word.length+1<=(Q/2)*(1+f.nh+f.nm),"phase count");phases+=word.length+1;
+   if(mode==="base"){const cuts=new Set(),used=new Set();for(let i=0;i<word.length;i++){const e=word[i];if(type(e)===2)used.clear();else if(type(e)===1){used.add(e.p);if(used.size===3){if(i+1<word.length)cuts.add(i+1);used.clear()}}}const g=encode(word,A,1,cuts),h=encode(word,x,-1,cuts);ok(decode(g.bits,A,1)===x&&decode(h.bits,x,-1)===A,"free-cut reconstruction");freeChecks+=2;freeCuts+=cuts.size;}
    let map=endpointCodes.get(x);if(!map){map=new Map();endpointCodes.set(x,map)}
    ok(!map.has(r.bits)||map.get(r.bits)===A,"reverse code injectivity");map.set(r.bits,A);maxMultiplicity=Math.max(maxMultiplicity,map.size);
    for(const j of new Set([0,Math.floor(word.length/2),word.length])){
@@ -87,7 +88,7 @@ function audit(){
     ok(a.formula<=f.formula&&b.formula<=f.formula,"contiguous subpath monotonicity");ok(decode(a.bits,A,1)===v&&decode(b.bits,x,-1)===v,"split reconstruction");splitChecks++;
    }
   }
-  runs.push({mode,R,T,Q,Y,K,roots:rootCount,ticks,events,phases,codeChecks,splitChecks,repeatBlocks,highBlocks,encodedBits,maxMultiplicity});
+  runs.push({mode,R,T,Q,Y,K,roots:rootCount,ticks,events,phases,codeChecks,splitChecks,repeatBlocks,highBlocks,encodedBits,maxMultiplicity,freeChecks,freeCuts});
  }
  // Independent small Selberg weight audit: direct Mobius inversion, then quadratic form and pointwise majorant.
  const sieve=[];const {ps}=table(400);
