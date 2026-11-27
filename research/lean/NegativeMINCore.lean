@@ -6665,8 +6665,10 @@ theorem chunkStep_inv (z Y reset D : Nat) (c : ChunkStats) (p : Nat)
           simp [ChunkInvariant,hem,hs,ht]
           omega
         · have hD : 1 ≤ D := by omega
-          simp [ChunkInvariant,hem,hnot,hd,hn,hl,hD]
-          omega
+          have hd0 : ¬ D ≤ 0 := by omega
+          simp only [hem,List.not_mem_nil,if_false,List.length_nil,if_true,if_neg hd0]
+          change ([p] : List Nat).Nodup ∧ 1 ≤ D ∧ (D+1)*c.saturated+1 ≤ c.total+1 ∧ c.nonempty+1 ≤ c.total+1
+          exact ⟨by simp,hD,by omega,by omega⟩
       · have hlen : 0<c.seen.length := List.length_pos_iff.mpr hem
         by_cases hm : p∈c.seen
         · simp [ChunkInvariant,hm,hem,hn,hl]
