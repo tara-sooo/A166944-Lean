@@ -4235,4 +4235,123 @@ theorem imbalancedMedium_prefix_bound (Y0 Y1 U A k : Nat) (hY : 0<Y0)
 #print axioms NegativeMIN.gain_ledger
 #print axioms NegativeMIN.imbalancedMedium_prefix_bound
 
+/-! Remove first POSITIVE charges as well. Zero-cost uses of a
+label are not allowed to consume the first charged occurrence. -/
+def chargedStates (inc : State → Nat) (A k : Nat) : List State :=
+  (prefixStates A k).filter (fun s => decide (0<inc s))
+
+theorem chargedStates_cost (inc : State → Nat) (A k : Nat) :
+    ((chargedStates inc A k).map inc).sum=pathCost inc (birth A) k := by
+  unfold chargedStates
+  rw [sum_filter_weight,← prefixStates_cost]
+  congr 1
+  apply List.map_congr_left
+  intro a _
+  by_cases h : 0<inc a
+  · simp [h]
+  · have hz : inc a=0 := by omega
+    simp [hz]
+
+def firstPositiveExpense (inc : State → Nat) (Y A k : Nat) : Nat :=
+  firstExpense inc (chargedStates inc A k) (List.range Y)
+
+def repeatPositiveExpense (inc : State → Nat) (Y A k : Nat) : Nat :=
+  repeatExpense inc (chargedStates inc A k) (List.range Y)
+
+theorem positiveExpense_partition (inc : State → Nat) (Y A k : Nat) :
+    firstPositiveExpense inc Y A k+repeatPositiveExpense inc Y A k=pathCost inc (birth A) k := by
+  unfold firstPositiveExpense repeatPositiveExpense
+  rw [first_repeat_partition,chargedStates_cost]
+
+theorem firstPositiveExpense_le (inc : State → Nat) (Y A k C : Nat)
+    (h : ∀ s : State, inc s≤C) :
+    firstPositiveExpense inc Y A k≤C*Y := by
+  unfold firstPositiveExpense
+  have hb := firstExpense_le inc (chargedStates inc A k) (List.range Y) C h
+  simpa only [List.length_range] using hb
+
+def balancedMedium (Y0 Y1 U : Nat) (s : State) : Nat :=
+  if winner s<U*qmin s.x then mediumInc Y0 Y1 s else 0
+
+theorem medium_balance_partition (Y0 Y1 U : Nat) (s : State) :
+    imbalancedMedium Y0 Y1 U s+balancedMedium Y0 Y1 U s=mediumInc Y0 Y1 s := by
+  unfold imbalancedMedium balancedMedium
+  by_cases h : U*qmin s.x≤winner s
+  · simp [h,show ¬winner s<U*qmin s.x by omega]
+  · simp [h,show winner s<U*qmin s.x by omega]
+
+theorem balancedMedium_le (Y0 Y1 U : Nat) (s : State) (hY : 0<Y0) :
+    balancedMedium Y0 Y1 U s≤2*Y1 := by
+  unfold balancedMedium
+  split
+  · exact mediumInc_le_band Y0 Y1 s hY
+  · omega
+
+theorem pathCost_add_inc (a b : State → Nat) (s : State) (k : Nat) :
+    pathCost (fun x => a x+b x) s k=pathCost a s k+pathCost b s k := by
+  rw [pathCost_sum,pathCost_sum,pathCost_sum,sum_map_add]
+
+theorem pathCost_mul_inc (a : State → Nat) (c : Nat) (s : State) (k : Nat) :
+    pathCost (fun x => c*a x) s k=c*pathCost a s k := by
+  rw [pathCost_sum,pathCost_sum,sum_map_mul]
+
+theorem medium_cost_balance (Y0 Y1 U A k : Nat) :
+    pathCost (mediumInc Y0 Y1) (birth A) k=
+      pathCost (imbalancedMedium Y0 Y1 U) (birth A) k+
+      pathCost (balancedMedium Y0 Y1 U) (birth A) k := by
+  rw [← pathCost_add_inc]
+  have he : mediumInc Y0 Y1 = fun s => imbalancedMedium Y0 Y1 U s+balancedMedium Y0 Y1 U s := by
+    funext s
+    exact (medium_balance_partition Y0 Y1 U s).symm
+  rw [← he]
+
+def residualExpense (z Y0 Y1 U wN wQ A k : Nat) : Nat :=
+  wN*repeatPositiveExpense (narrowInc z Y0) Y0 A k+
+  wQ*repeatPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k
+
+def removedExpense (z Y0 Y1 U wN wQ A k : Nat) : Nat :=
+  wN*firstPositiveExpense (narrowInc z Y0) Y0 A k+
+  wQ*(firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k+
+      pathCost (imbalancedMedium Y0 Y1 U) (birth A) k)
+
+theorem residualExpense_partition (z Y0 Y1 U wN wQ A k : Nat) :
+    pathCost (weightedInc z Y0 Y1 wN wQ) (birth A) k=
+      residualExpense z Y0 Y1 U wN wQ A k+removedExpense z Y0 Y1 U wN wQ A k := by
+  unfold weightedInc
+  rw [pathCost_add_inc,pathCost_mul_inc,pathCost_mul_inc,medium_cost_balance Y0 Y1 U]
+  rw [← positiveExpense_partition (narrowInc z Y0) Y0 A k,
+    ← positiveExpense_partition (balancedMedium Y0 Y1 U) Y1 A k]
+  unfold residualExpense removedExpense
+  simp only [Nat.mul_add]
+  omega
+
+/-- Exact scaled error of deleting first positive charges and the
+imbalanced part. This keeps the original cost unchanged and explicit. -/
+theorem removedExpense_bound (z Y0 Y1 U wN wQ A k : Nat)
+    (hY : 0<Y0) (hA : A%2=0) :
+    U*removedExpense z Y0 Y1 U wN wQ A k≤
+      U*(wN*Y0+wQ*(2*Y1*Y1))+wQ*(3*(2*k+6)) := by
+  have hn := firstPositiveExpense_le (narrowInc z Y0) Y0 A k 1 (narrowInc_le_one z Y0)
+  have hq := firstPositiveExpense_le (balancedMedium Y0 Y1 U) Y1 A k (2*Y1)
+    (fun s => balancedMedium_le Y0 Y1 U s hY)
+  have hi := imbalancedMedium_prefix_bound Y0 Y1 U A k hY hA
+  rw [Nat.one_mul] at hn
+  have h1 := Nat.mul_le_mul_left (U*wN) hn
+  have h2 := Nat.mul_le_mul_left (U*wQ) hq
+  have h3 := Nat.mul_le_mul_left wQ hi
+  have he1 : U*(wN*firstPositiveExpense (narrowInc z Y0) Y0 A k) =
+      U*wN*firstPositiveExpense (narrowInc z Y0) Y0 A k := by ac_rfl
+  have he2 : U*(wQ*firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k) =
+      U*wQ*firstPositiveExpense (balancedMedium Y0 Y1 U) Y1 A k := by ac_rfl
+  have he3 : U*(wQ*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k) =
+      wQ*(U*pathCost (imbalancedMedium Y0 Y1 U) (birth A) k) := by ac_rfl
+  unfold removedExpense
+  simp only [Nat.mul_add]
+  rw [he1,he2,he3]
+  simp only [← Nat.mul_assoc] at h1 h2 ⊢
+  omega
+
+#print axioms NegativeMIN.residualExpense_partition
+#print axioms NegativeMIN.removedExpense_bound
+
 end NegativeMIN
