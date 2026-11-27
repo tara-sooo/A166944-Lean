@@ -9606,27 +9606,31 @@ theorem resetBlockScan_head_difference (reset : Nat) (P : List Nat → Nat)
       have h := ih (a++[p]) (b++[p])
       simpa [List.append_assoc] using h
 
+theorem resetBlockCost_cons_reset (reset : Nat) (P : List Nat → Nat)
+    (hz : P []=0) (p : Nat) (xs : List Nat) (hp : reset≤p) :
+    resetBlockCost reset P (p::xs)=resetBlockCost reset P xs := by
+  simp [resetBlockCost,resetBlockScan,hp,hz]
+
 theorem resetBlockCost_cons_exact (reset : Nat) (P : List Nat → Nat)
-    (hz : P []=0) (p : Nat) (xs : List Nat) :
+    (p : Nat) (xs : List Nat) (hp : p<reset) :
     resetBlockCost reset P (p::xs)+P (resetHead reset xs)=
-      resetBlockCost reset P xs+P (resetHead reset (p::xs)) := by
+      resetBlockCost reset P xs+P (p::resetHead reset xs) := by
   unfold resetBlockCost
-  by_cases hp : reset≤p
-  · simp [resetBlockScan,resetHead,hp,hz]
-  · simp only [resetBlockScan,resetHead,if_neg hp,List.nil_append]
-    have h := resetBlockScan_head_difference reset P [p] [] xs
-    simpa using h
+  simp only [resetBlockScan,if_neg (by omega : ¬reset≤p),List.nil_append]
+  have h := resetBlockScan_head_difference reset P [p] [] xs
+  simpa using h
 
 theorem jointBlockScore_empty (z Y Yb D K : Nat) :
     jointBlockScore z Y Yb D K []=0 := by
   simp [jointBlockScore]
 
-theorem jointWordCount_cons_exact (z Y Yb reset D K p : Nat) (xs : List Nat) :
+theorem jointWordCount_cons_exact (z Y Yb reset D K p : Nat) (xs : List Nat)
+    (hp : p<reset) :
     jointWordCount z Y Yb reset D K (p::xs)+
       jointBlockScore z Y Yb D K (resetHead reset xs)=
     jointWordCount z Y Yb reset D K xs+
-      jointBlockScore z Y Yb D K (resetHead reset (p::xs)) :=
-  resetBlockCost_cons_exact reset _ (jointBlockScore_empty z Y Yb D K) p xs
+      jointBlockScore z Y Yb D K (p::resetHead reset xs) :=
+  resetBlockCost_cons_exact reset _ p xs hp
 
 theorem distinctFilteredCount_cons (f : Nat → Bool) (p : Nat) (xs : List Nat) :
     distinctFilteredCount f (p::xs)=distinctFilteredCount f xs+
@@ -9655,11 +9659,33 @@ theorem jointBlockScore_cons_threshold (z Y Yb D K p : Nat) (xs : List Nat)
   change (if K<(xs.filter f).length ∧ D<distinctFilteredCount g xs then 1 else 0) <
     (if K<((p::xs).filter f).length ∧ D<distinctFilteredCount g (p::xs) then 1 else 0) at h
   rw [hb,hd] at h
-  by_cases hf : z<p ∧ p<Yb <;> by_cases hg : z<p ∧ p<Y <;> by_cases hm : p∈xs
-  all_goals
-    simp [f,g,hf,hg,hm] at h
-    simp [hf,hg,hm]
-    split at h <;> split at h <;> omega
+  have hnew : K<(xs.filter f).length+(if f p=true then 1 else 0) ∧
+      D<distinctFilteredCount g xs+(if g p=true ∧ p∉xs then 1 else 0) := by
+    by_cases hn : K<(xs.filter f).length+(if f p=true then 1 else 0) ∧
+        D<distinctFilteredCount g xs+(if g p=true ∧ p∉xs then 1 else 0)
+    · exact hn
+    · rw [if_neg hn] at h
+      omega
+  have hold : ¬(K<(xs.filter f).length ∧ D<distinctFilteredCount g xs) := by
+    intro hh
+    rw [if_pos hh,if_pos hnew] at h
+    omega
+  by_cases hK : K<(xs.filter f).length
+  · right
+    have hn : ¬ D<distinctFilteredCount g xs := fun hh => hold ⟨hK,hh⟩
+    by_cases hg : g p=true ∧ p∉xs
+    · rw [if_pos hg] at hnew
+      have hgg : z<p ∧ p<Y := of_decide_eq_true hg.1
+      exact ⟨hgg.1,hgg.2,hg.2,by omega⟩
+    · rw [if_neg hg] at hnew
+      omega
+  · left
+    by_cases hf : f p=true
+    · rw [if_pos hf] at hnew
+      have hff : z<p ∧ p<Yb := of_decide_eq_true hf
+      exact ⟨hff.1,hff.2,by omega⟩
+    · rw [if_neg hf] at hnew
+      omega
 
 theorem jointWordCount_cons_charge (z Y Yb reset D K p : Nat) (xs : List Nat)
     (h : jointWordCount z Y Yb reset D K xs<jointWordCount z Y Yb reset D K (p::xs)) :
@@ -9667,14 +9693,14 @@ theorem jointWordCount_cons_charge (z Y Yb reset D K p : Nat) (xs : List Nat)
       ((z<p ∧ p<Yb ∧ ((resetHead reset xs).filter (fun r => decide (z<r ∧ r<Yb))).length=K) ∨
        (z<p ∧ p<Y ∧ p∉resetHead reset xs ∧
          distinctFilteredCount (fun r => decide (z<r ∧ r<Y)) (resetHead reset xs)=D)) := by
-  have he := jointWordCount_cons_exact z Y Yb reset D K p xs
   by_cases hp : reset≤p
-  · simp [resetHead,hp,jointBlockScore_empty] at he
+  · have he := resetBlockCost_cons_reset reset (jointBlockScore z Y Yb D K) (jointBlockScore_empty z Y Yb D K) p xs hp
+    change jointWordCount z Y Yb reset D K (p::xs)=jointWordCount z Y Yb reset D K xs at he
     omega
   · have hlt : p<reset := by omega
+    have he := jointWordCount_cons_exact z Y Yb reset D K p xs hlt
     have hh : jointBlockScore z Y Yb D K (resetHead reset xs)<
         jointBlockScore z Y Yb D K (p::resetHead reset xs) := by
-      simp only [resetHead,if_neg hp] at he
       omega
     exact ⟨hlt,jointBlockScore_cons_threshold z Y Yb D K p _ hh⟩
 
@@ -9691,7 +9717,8 @@ theorem runningPeak_close (f g : Nat → Int) (E : Int) (k : Nat)
   have hg := bestPrefix_le g k
   have h1 := (h (bestPrefix f k) hf).1
   have h2 := (h (bestPrefix g k) hg).2
-  rw [bestPrefix_peak] at h1 h2
+  rw [bestPrefix_peak f k] at h1
+  rw [bestPrefix_peak g k] at h2
   have h3 := runningPeak_ge_of_le g (bestPrefix f k) k hf
   have h4 := runningPeak_ge_of_le f (bestPrefix g k) k hg
   omega
