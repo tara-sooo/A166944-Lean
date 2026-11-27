@@ -126,6 +126,58 @@ function audit(){
   }
   return {primal,slack,prices};
  }
+
+ function endpointRank(rs,T,M,groups){
+  let n=rs.length,H=1n;
+  const gcdB=(a,b)=>{while(b){[a,b]=[b,a%b]}return a};
+  for(let j=1;j<=n;j++){let q=BigInt(j);H=H/gcdB(H,q)*q}
+  // Individually maximize exact rational gain times min(1,M/m).
+  const opts=rs.map((r,i)=>{
+   let best={k:0,g:0,ids:[],weighted:0n};
+   for(let k=1;k<=T;k++){
+    if(r.g[k]<=0)continue;
+    let ids=groups.nodes[groups.at[i][k-1]].ids,m=ids.length;
+    let w=BigInt(r.g[k])*BigInt(Math.min(M,m))*(H/BigInt(m));
+    if(w>best.weighted)best={k,g:r.g[k],ids,weighted:w};
+   }return best;
+  });
+  let expected=opts.reduce((s,x)=>s+x.weighted,0n);
+  // Conditional expectation of the exact uniform random ordering.
+  // A root already in the order has deterministic rank; a remaining
+  // root has uniform remaining rank among its group.
+  let rank=Array(n).fill(-1),selected=[],changes=0;
+  function value(){
+   let v=0n;
+   for(let i=0;i<n;i++){
+    let o=opts[i];if(!o.k)continue;
+    if(rank[i]>=0){
+     let before=o.ids.filter(j=>rank[j]>=0&&rank[j]<rank[i]).length;
+     if(before<M)v+=BigInt(o.g)*H;
+    }else{
+     let seen=o.ids.filter(j=>rank[j]>=0).length,remaining=o.ids.length-seen;
+     if(seen<M)v+=BigInt(o.g)*BigInt(Math.min(M-seen,remaining))*(H/BigInt(remaining));
+    }
+   }return v;
+  }
+  ck(value()===expected,"initial exact expected value");
+  for(let k=0;k<n;k++){
+   let before=value(),best=-1,bestVal=-1n,sum=0n;
+   for(let i=0;i<n;i++)if(rank[i]<0){rank[i]=k;let v=value();rank[i]=-1;sum+=v;if(v>bestVal){bestVal=v;best=i}}
+   ck(sum===BigInt(n-k)*before,"conditional expectation identity");ck(bestVal>=before,"derandomization");rank[best]=k;changes++;
+  }
+  let net=0;
+  for(let i=0;i<n;i++){
+   let o=opts[i],good=o.k>0&&o.ids.filter(j=>rank[j]<rank[i]).length<M;
+   selected[i]=good?o.k:0;if(good)net+=o.g;
+  }
+  ck(BigInt(net)*H===value(),"integer priority net");ck(BigInt(net)*H>=expected,"exact endpoint lower");
+  for(let u=0;u<T;u++){
+   let m=new Map();for(let i=0;i<n;i++)if(selected[i]>u){let x=rs[i].x[u];m.set(x,(m.get(x)||0)+1)}
+   for(let x of m.values())ck(x<=M,"priority cap");
+  }
+  return {expected:Number(expected)/Number(H),net,changes};
+ }
+
  function cutoff(rs,T,M,groups,K){
   // Maximize each root's own net profit before its full cohort exceeds K.
   let stops=rs.map((r,i)=>{let best=0,kbest=0;for(let k=1;k<=T;k++){if(groups.nodes[groups.at[i][k-1]].ids.length>K)break;if(r.g[k]>best){best=r.g[k];kbest=k}}return kbest});
@@ -146,7 +198,7 @@ function audit(){
  let results=[];
  for(let config of [{R:600,T:18,M:1,count:34},{R:2400,T:36,M:2,count:60},{R:12000,T:72,M:4,count:100},{R:48000,T:144,M:8,count:100},{R:192000,T:288,M:16,count:100}]){
   let {R,T,M,count}=config,W=T,D=1,priceScale=Math.max(1,Math.floor(T/18));
-  let row={...config,rootCount:0,rawProfit:0,opt:0,cutM:0,cut2M:0,cut4M:0,price0:0,priceSmall:0,priceOther:0,priceReset:0,slack:0,groups:0,heavyGroups:0,positivePriceGroups:0};
+  let row={...config,rootCount:0,rawProfit:0,opt:0,cutM:0,cut2M:0,cut4M:0,price0:0,priceSmall:0,priceOther:0,priceReset:0,slack:0,groups:0,heavyGroups:0,positivePriceGroups:0,endpointBound:0,endpointNet:0,prioritySteps:0};
   let totalWindows=Math.ceil((Math.floor(R/6)+1)/(W/6)),chosen=new Set();
   for(let j=0;j<Math.min(count,totalWindows);j++)chosen.add(Math.floor(j*totalWindows/Math.min(count,totalWindows)));
   for(let j of chosen){
@@ -154,6 +206,7 @@ function audit(){
    if(!rs.length)continue;windows++;roots+=rs.length;row.rootCount+=rs.length;
    let gr=group(rs,T),sol=optimize(rs,T,M,gr,true);
    if(R<=2400||j===0){let raw=optimize(rs,T,M,gr,false);ck(raw.primal===sol.primal,"uncontracted optimizer matches");comparisons++}
+   let ep=endpointRank(rs,T,M,gr);ck(ep.net<=sol.primal,"endpoint net vs exact optimum");row.endpointBound+=ep.expected;row.endpointNet+=ep.net;row.prioritySteps+=ep.changes;
    row.rawProfit+=rs.reduce((s,r)=>s+Math.max(...r.g),0);row.opt+=sol.primal;row.slack+=sol.slack.reduce((s,x)=>s+x,0);
    for(let K of [M,2*M,4*M]){let q=cutoff(rs,T,M,gr,K);ck(q.best<=sol.primal,"cutoff lower vs exact optimum");row[K===M?"cutM":K===2*M?"cut2M":"cut4M"]+=q.best}
    row.groups+=gr.nodes.length;
@@ -163,7 +216,7 @@ function audit(){
    }
   }
   ck(row.opt===row.slack+row.price0+row.priceSmall+row.priceOther,"dual aggregate");
-  row.normalizedOpt=row.opt/(row.rootCount*T);row.normalizedCutM=row.cutM/(row.rootCount*T);row.normalizedCut2M=row.cut2M/(row.rootCount*T);row.normalizedCut4M=row.cut4M/(row.rootCount*T);
+  row.normalizedEndpointBound=row.endpointBound/(row.rootCount*T);row.normalizedEndpointNet=row.endpointNet/(row.rootCount*T);row.normalizedOpt=row.opt/(row.rootCount*T);row.normalizedCutM=row.cutM/(row.rootCount*T);row.normalizedCut2M=row.cut2M/(row.rootCount*T);row.normalizedCut4M=row.cut4M/(row.rootCount*T);
   results.push(row);
  }
  return {assertions,cycles,windows,roots,ticks,comparisons,smallFiringHeavy,results};
