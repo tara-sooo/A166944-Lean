@@ -21,8 +21,8 @@ function audit(){
  function init(ps){
   let F=4*ps.reduce((a,b)=>a*b,1),N=F/2,keep=new Uint8Array(N).fill(1);return {ps,F,keep};
  }
- function add(old,p){
-  const {ps,F,keep}=old,qs=[...ps,p],F1=F*p,N=F/2,N1=F1/2,B=Math.min(p-3,Math.floor(Math.log(p)**2),F/2);
+ function add(old,p,zero=false){
+  const {ps,F,keep}=old,qs=[...ps,p],F1=F*p,N=F/2,N1=F1/2,B=zero?0:Math.min(p-3,Math.floor(Math.log(p)**2),F/2);
   const oldMass=new Uint32Array(F/2),baseFull=new Uint32Array(F/2),newMass=new Uint32Array(F1/2),goodMass=new Uint32Array(F1/2),badMass=new Uint32Array(F1/2),newKeep=new Uint8Array(N1);
   const goodArrival=new Map(),moved=new Map(),targetBase=new Map(),gainOld=new Uint32Array(N),endOld=new Uint32Array(N),gainNew=new Uint32Array(N1),endNew=new Uint32Array(N1);
   let early=0,terminal=0,unchanged=0,repeat=0,regular=0,highHeight=0,postLong=0,oldTailEvents=0,oldHeightBad=0,eligibleTerminal=0,retOld=0,retNew=0,keptBad=0,keptReg=0,keptIdle=0,checks=0,events=0,oldEvents=0;
@@ -72,7 +72,7 @@ function audit(){
      newKeep[idx]=1;retNew++;goodMass[a.x/2]++;
      if(first===-1)keptIdle++;
      else{
-      keptReg++;let key=o.x+":"+sign,v=moved.get(key)||{m:0,target:a.x,base:o.x/2};
+      keptReg++;let key=o.x+":"+sign,v=moved.get(key)||{m:0,target:a.x,base:o.x/2,source:o.x+shift};
       ck(v.target===a.x,"terminal fiber and sign determine full new target");v.m++;moved.set(key,v);
       let f=goodArrival.get(a.x)||new Set();f.add(key);goodArrival.set(a.x,f);
      }
@@ -95,6 +95,23 @@ function audit(){
   let K0=moment(oldMass)/F,Kfull0=moment(baseFull)/F,K1=moment(newMass)/F1,Kg=moment(goodMass)/F1,Kb=moment(badMass)/F1;
   let factor=1+(4*Math.sqrt(Math.floor(B/2)+1)+4)/p,exactBound=K0+(2*cross+moveActual)/F1;
   ck(moveSquares<=2*moment(oldMass)&&moveActual<=2*moveSquares&&Kg<=exactBound+1e-10&&exactBound<=K0*factor+1e-10,"regular moment recursion");
+  let zeroBound=null,g0=0,g1=0,mg0=0,mg1=0,firstGain=0,maxKept=0,lambda=1/17;
+  if(zero){
+   let flow=new Int32Array(F1/2);
+   for(let y=0;y<flow.length;y++)flow[y]=oldMass[y%(F/2)];
+   let seen=new Set();
+   for(let v of moved.values()){
+    ck(v.target===v.source-p+1&&!seen.has(v.target)&&mod(v.source-1,p)*mod(v.source+1,p)===0,"zero-relay unique target");
+    ck(mod(v.target-1,p)!==0&&mod(v.target+1,p)!==0,"target not outgoing");
+    seen.add(v.target);flow[v.source/2]-=v.m;flow[v.target/2]+=v.m;
+   }
+   for(let y=0;y<flow.length;y++)ck(flow[y]>=goodMass[y],"baseline minus move plus arrival dominates");
+   zeroBound=K0*(1+4/p);
+   ck(Kg<=moment(flow)/F1+1e-10&&moment(flow)/F1<=K0+2*cross/F1+1e-10&&K0+2*cross/F1<=zeroBound+1e-10,"improved zero-relay recursion");
+   for(let i=0;i<N;i++)if(keep[i]){g0+=gainOld[i];mg0+=Math.exp(lambda*gainOld[i]);}
+   for(let i=0;i<N1;i++)if(newKeep[i]){g1+=gainNew[i];mg1+=Math.exp(lambda*gainNew[i]);maxKept=Math.max(maxKept,gainNew[i]);}
+   ck(g1<=p*g0+2*(p-1)*retOld&&mg1<=(p+2*Math.expm1(lambda*(p-1)))*mg0+1e-6,"selected gain and exponential moment recursion");
+  }
   const Ds=[0,1,2,4,6,8,12,15,20].filter(D=>p>6*D+7);
   let short=[];
   for(let D of Ds){
@@ -108,11 +125,12 @@ function audit(){
    }
    short.push({D,n0,n1,K0:moment(a)/F,K1:moment(b)/F1});
   }
-  let out={p,F,F1,N1,B,checks,events,oldEvents,early:early/N1,terminal:terminal/N1,repeat:repeat/N1,regular:regular/N1,highHeight:highHeight/N1,postLong:postLong/N1,earlyBound:2*oldTailEvents/N1,retOld:retOld/N,retNew:retNew/N1,keptIdle:keptIdle/N1,keptReg:keptReg/N1,keptBad:keptBad/N1,Kfull0,K1,K0,Kg,Kb,exactBound,regularBound:K0*factor,short};
+  let out={p,F,F1,N1,B,zeroBound,meanSelectedGain:g1/N1,mgfSelected:mg1/N1,maxKept,checks,events,oldEvents,early:early/N1,terminal:terminal/N1,repeat:repeat/N1,regular:regular/N1,highHeight:highHeight/N1,postLong:postLong/N1,earlyBound:2*oldTailEvents/N1,retOld:retOld/N,retNew:retNew/N1,keptIdle:keptIdle/N1,keptReg:keptReg/N1,keptBad:keptBad/N1,Kfull0,K1,K0,Kg,Kb,exactBound,regularBound:K0*factor,short};
   return {ps:qs,F:F1,keep:newKeep,out};
  }
  let a=init([3]),rows=[];for(let p of [5,7,11,13,17]){a=add(a,p);rows.push(a.out)}
  let b=init([3,5]),sparse=[];for(let p of [101,103]){b=add(b,p);sparse.push(b.out)}
- return {rows,sparse};
+ let c=init([3]),zero=[];for(let p of [5,7,11,13,17]){c=add(c,p,true);zero.push(c.out)}
+ return {rows,sparse,zero};
 }
 if(typeof console!=="undefined")console.log(JSON.stringify(audit(),null,2));
