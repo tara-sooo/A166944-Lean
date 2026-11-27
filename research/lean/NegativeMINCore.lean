@@ -9676,14 +9676,18 @@ theorem jointBlockScore_cons_threshold (z Y Yb D K p : Nat) (xs : List Nat)
     by_cases hg : g p=true ∧ p∉xs
     · rw [if_pos hg] at hnew
       have hgg : z<p ∧ p<Y := of_decide_eq_true hg.1
-      exact ⟨hgg.1,hgg.2,hg.2,by omega⟩
+      refine ⟨hgg.1,hgg.2,hg.2,?_⟩
+      change distinctFilteredCount g xs=D
+      omega
     · rw [if_neg hg] at hnew
       omega
   · left
     by_cases hf : f p=true
     · rw [if_pos hf] at hnew
       have hff : z<p ∧ p<Yb := of_decide_eq_true hf
-      exact ⟨hff.1,hff.2,by omega⟩
+      refine ⟨hff.1,hff.2,?_⟩
+      change (xs.filter f).length=K
+      omega
     · rw [if_neg hf] at hnew
       omega
 
