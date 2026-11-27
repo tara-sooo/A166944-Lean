@@ -9,7 +9,7 @@ function audit(){
  const rows=[];
  for(const [R,T,M] of [[12000,48,4],[48000,96,8],[192000,192,16],[384000,288,24]]){
   const W=6*Math.floor(T/6),lo=Math.ceil(R/6)*6,Y=Math.floor(T/Math.sqrt(Math.log(R))),windows=Math.floor((2*R-lo)/W)+1;
-  let N=0,total=0,old=0,raw=0,energy=0,twinMass=0,nonTwinTerminal=0,interior=0,recordChecks=0,binChecks=0,prefixRoots=0,ticks=0,highFires=0;
+  let N=0,total=0,single=0,old=0,raw=0,energy=0,twinMass=0,nonTwinTerminal=0,interior=0,recordChecks=0,binChecks=0,prefixRoots=0,ticks=0,highFires=0;
   for(let J=0;J<windows;J++){
    const a0=lo+J*W,a1=Math.min(2*R,a0+W-6),obs=3-a0/2,end=obs+T;
    const bins=new Map();
@@ -28,15 +28,15 @@ function audit(){
     ok(rootRec===peak,"record telescoping");raw+=rootRec;if(rootRec>0)prefixRoots++;
    }
    for(const b of bins.values()){
-    let m=0,m0=0,v=0,v0=0,br=0,be=0;
-    for(let k=8;k>=1;k--){m+=b.hist[k];m0+=b.oldHist[k];v+=Math.min(M,m);v0+=Math.min(M,m0);br+=m;be+=m*m}
-    ok(v>=v0,"clip monotonicity");binChecks++;total+=v;old+=v0;energy+=be;
+    let m=0,m0=0,v=0,v0=0,v1=0,br=0,be=0;
+    for(let k=8;k>=1;k--){m+=b.hist[k];m0+=b.oldHist[k];v+=Math.min(M,m);v1+=Math.min(1,m);v0+=Math.min(M,m0);br+=m;be+=m*m}
+    ok(v>=v0&&M*v1>=v&&v>=v1,"clip and per-cap monotonicity");binChecks++;total+=v;single+=v1;old+=v0;energy+=be;
     if(twin(b.x))twinMass+=v;else if(b.fire>end)nonTwinTerminal+=v;else interior+=v;
    }
   }
   ok(total===twinMass+nonTwinTerminal+interior,"mass partition");
   // record threshold mass is normalized by 8NT; old comparator uses the same scale.
-  rows.push({R,T,M,Y,N,ticks,recordChecks,binChecks,highFires,prefixRoots,rawRecord:raw/(8*N*T),meanThresholdMultiplicity:raw?energy/raw:0,optimal:total/(8*N*T),oldPotentialCost:old/(8*N*T),twin:twinMass/(8*N*T),nonTwinTerminal:nonTwinTerminal/(8*N*T),interior:interior/(8*N*T)});
+  rows.push({R,T,M,Y,N,ticks,recordChecks,binChecks,highFires,prefixRoots,rawRecord:raw/(8*N*T),meanThresholdMultiplicity:raw?energy/raw:0,optimal:total/(8*N*T),singleCap:single/(8*N*T),perCap:total/(8*M*N*T),oldPotentialCost:old/(8*N*T),twin:twinMass/(8*N*T),nonTwinTerminal:nonTwinTerminal/(8*N*T),interior:interior/(8*N*T)});
  }
  return rows
 }
