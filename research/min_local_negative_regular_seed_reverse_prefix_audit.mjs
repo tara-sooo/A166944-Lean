@@ -81,7 +81,7 @@ function audit(Rs){
  let rows=[];
  for(let R of Rs){
   let S=Math.sqrt(2*R+1),T=Math.ceil(S),W=6*Math.floor(T/6),lo=6*Math.ceil(R/6),hi=6*Math.floor(2*R/6),N=(hi-lo)/6+1;
-  let specs=[[5,3,31,2,4,16],[7,3,61,3,8,32],[11,5,97,3,12,64]].filter(s=>s[2]<T);
+  let specs=[[5,3,31,2,4,16],[7,3,61,3,8,32],[11,5,97,3,12,64],[13,3,97,4,4,2],[13,5,113,4,8,16]].filter(s=>s[2]<T);
   let controls=[];
   for(let [z,zs,U,k,M0,M] of specs){
    let s=seeds.get(z),F=s.F,Q=2*primes.filter(p=>p<=zs).reduce((a,b)=>a*b,1),D=4*z;
