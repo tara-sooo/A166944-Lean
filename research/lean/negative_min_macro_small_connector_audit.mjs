@@ -8,7 +8,7 @@ function audit(){
  function trial(n){let a=[];for(let p of pr){if(p*p>n)break;if(n%p===0){a.push(p);while(n%p===0)n/=p}}if(n>1)a.push(n);return a}
  function next(x,n){let w=Infinity,p=0,s=0;for(let t of [-1,1])for(let q of fac(x+t)){let u=mod((t===1?0:q+2)-n,2*q)||2*q;if(u<w||u===w&&q<p){w=u;p=q;s=t}}return {w,p,s}}
  function literal(x,n){let s=mod(n,2)?-1:1;return trial(x+s).find(p=>mod(n,2*p)===(s===1?0:p+2))||0}
- let rows=[],rootCount=0,eventCount=0,anchorPinChecks=0,wallChecks=0,roughBad=0,nonresetGood=0,resetGood=0,nearPairs=0,nearPinChecks=0,distinctRecords=0,connectorTicks=0,connectorEvents=0,connectorHits=0,connectorExits=0,terminalCases=0,terminalRough=0,terminalShort=0,terminalSinkCount=0,lowOnly=0,terminalLowRoughChecks=0,blockChecks=0,resetNearChecks=0,distinctMacroSites=0;
+ let rows=[],rootCount=0,eventCount=0,anchorPinChecks=0,wallChecks=0,roughBad=0,nonresetGood=0,resetGood=0,nearPairs=0,nearPinChecks=0,distinctRecords=0,connectorTicks=0,connectorEvents=0,connectorHits=0,connectorExits=0,terminalCases=0,terminalRough=0,terminalShort=0,terminalSinkCount=0,lowOnly=0,terminalLowRoughChecks=0,blockChecks=0,resetNearChecks=0,distinctMacroSites=0,alternateTerminalShort=0,syntheticNear=0,syntheticOpposite=0;
  for(let R of [192000,768000]){
   let H=Math.floor(R**.4),Y=Math.ceil(H/2),K=Math.max(5,Math.floor(H/32)),z=3,Q=6,B=4*H,C=Math.ceil(17*Q/8+395/12+2*K);
   ok(C+Q/2+3<Y,"separation margins");
@@ -24,6 +24,7 @@ function audit(){
       ok(d>=0&&d<Q&&d%2===0,"terminal wall");
       ok(mod(x+d-(1-a.s),a.p)===0,"terminal spatial pin");
       let qm=Math.min(sp[x-1],sp[x+1]);
+      if(qm<H/4){ok(H-a.h<=13*d/8+395/12+H/2,"alternate terminal short alignment");alternateTerminalShort++}
       if(qm>=K){terminalRough++;ok(mod(x-1,a.p)!==0&&mod(x+1,a.p)!==0,"terminal sieve forms distinct")}
       else{terminalShort++;ok(H-a.h<=13*d/8+395/12+2*K,"terminal alignment")}
      }else if(!lastNonSmall){
@@ -85,6 +86,21 @@ function audit(){
   terminalSinkCount+=term.size;distinctMacroSites+=keys.size;
   rows.push({R,H,Y,K,z,Q,C,roots:localRoots,events:localEvents,allSinks:sinks.size,terminalMacroSinks:term.size,macroKeys:keys.size,roughBad:localBad,nonresetGood:localNonreset,resetGood:localReset,nearPairs:lp,distinctNonresetStates:localStates,connectorHits:localEnd,connectorExits:localExits});
  }
- return{rows,rootCount,eventCount,anchorPinChecks,wallChecks,roughBad,nonresetGood,resetGood,nearPairs,nearPinChecks,distinctRecords,connectorTicks,connectorEvents,connectorHits,connectorExits,terminalCases,terminalRough,terminalShort,terminalSinkCount,lowOnly,terminalLowRoughChecks,blockChecks,resetNearChecks,distinctMacroSites}
+ // Arithmetic-only nonvacuous pair controls, not actual winners.
+ for(let p of [67,71,73,79,83])for(let q of [67,71,73,79,83])if(p!==q)for(let s of [-1,1])for(let t of [-1,1])for(let m=1;m<=3;m++)for(let j=1;j<=3;j++){
+  let h=m*p+(s===1?0:3),hh=j*q+(t===1?0:3);
+  let r=mod(2*(h-(s===1?0:p+2)),4*p);
+  for(let d=-6;d<=6;d+=2){
+   let e=hh-h-d/2;if(Math.abs(e)>50)continue;
+   for(let x=r+4*p;x<=r+4*p*q;x+=4*p){
+    let n=h-x/2,nn=hh-(x+d)/2;
+    if(mod(nn,2*q)!==(t===1?0:q+2))continue;
+    ok(mod(x-(1-s),p)===0&&mod(x+d-(1-t),q)===0,"synthetic spatial pins");
+    ok(Math.abs(m*p-j*q)<=50+3+3,"synthetic near height");syntheticNear++;if(s!==t)syntheticOpposite++;break;
+   }
+  }
+ }
+ ok(syntheticNear>0&&syntheticOpposite>0&&alternateTerminalShort>0,"nonvacuous supplemental controls");
+ return{alternateTerminalShort,syntheticNear,syntheticOpposite,rows,rootCount,eventCount,anchorPinChecks,wallChecks,roughBad,nonresetGood,resetGood,nearPairs,nearPinChecks,distinctRecords,connectorTicks,connectorEvents,connectorHits,connectorExits,terminalCases,terminalRough,terminalShort,terminalSinkCount,lowOnly,terminalLowRoughChecks,blockChecks,resetNearChecks,distinctMacroSites}
 }
 console.log(JSON.stringify(audit(),null,2));
