@@ -24,7 +24,7 @@ Set \(a=.2062,\ c=.334,\ d_U=.5999,\ B(d)=2\log(d/a-1)/d\). Denote \(U=\mathbf1_
 \[
  P=B(d_0)+\int_c^{1/2}B(\max\{d_0,d_2(t)-.0001\})\,\frac{dt}{t(1-t)}.
 \]
-For the subtracted term, upper-sieve the other neighbor at \(4R^c\). For \(t\le1/3\) use \(d_U\); for \(1/3<t<c+O(1/L)\) use \(d_0\). The latter thin slice can only contain semiprimes apart from a boundary of vanishing mass. Both upper coefficients are on the \(2/d\) plateau. Writing \(M(s)=\omega(1/s)/s\), the resulting upper coefficient is
+For the subtracted term, with chosen level exponent \(d\), majorize roughness of the other neighbor by sifting at \(\min(4R^c,R^{d/2.1})\). Its sieve parameter is in \([2.1,3)\), respecting \(z\le Q^{1/2}\) in Wu Lemma 2.2 and giving \(2/d\). For \(t\le1/3\) use \(d_U\); for \(1/3<t<c+O(1/L)\) use \(d_0\). The latter thin slice can only contain semiprimes apart from a boundary of vanishing mass. Both upper coefficients are on the \(2/d\) plateau. Writing \(M(s)=\omega(1/s)/s\), the resulting upper coefficient is
 \[
  V=\frac2{d_U}[M(a)-M(c)]+\left(\frac2{d_0}-\frac2{d_U}\right)\log\frac{2c}{1-c}.
 \]
