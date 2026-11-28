@@ -139,3 +139,31 @@ Second component: R=12000,48000,192000, gain<=4H, cutoff z=floor(2H/3),floor(H/3
 - Reopened f6c1a1ce9472ab21a76171cefdc28c585404912a, research/2026-11-28-min-negative-deficit-record-depth-and-weighted-transfer.md §§1-5,7-9. The previous deficit inequalities, record source roughness, two-form sieve and exact physical pins are reused, with the new weighting (3) and the included bottom-crossing ledger. Previous near-square weighted transfer used only in section 7.
 - Reopened at pinned base the earlier static-frontier/missed-clock note (research/2026-11-27-min-local-negative-static-frontier-equivalence-and-missed-clocks.md), dyadic-insertion, small-descent, and global-top-relay pruning notes. The old static-frontier equivalence required a small fixed G/H; the present short-record equivalence permits arbitrary fixed O(sqrt R) gain budget at all polynomial H. No fresh high-level distribution theorem used. No claim of mathematical literature priority.
 - Core b0e26798535b2c997f1383c1dc37bbe560aac938 not edited; main/sibling branches untouched. No new Lean compile, independent specialist review, M85 or unconditional twin proof. The required lower is still missing: either a static roughness breakthrough, or the density-scale active M85 branch with polynomial postevent record depth and macroscopic gain from polynomially subtop labels. The latter is a stronger necessary structural reduction, not a supplied active cohort. The hard transfer can reduce the cutoff by a subpower factor at negligible density loss but not yet by a fixed exponent gap; its short-record trial lower is equivalent at leading order to static roughness. The broadened twin criterion is genuinely more permissive on record depth, but does not circumvent the arithmetic lower-bound obstacle by itself.
+
+
+## 10. Further consequence: hard-budget record-only score and an exact L1 layer cake
+
+This step uses the hard-budget set transfer (13), rather than the earlier heavily gain-discounted score (16). Let a_x and t_x be the minimum strict postevent record counts among successful actual and trial canonical witnesses respectively with the SAME hard gain budget B_gain<=4H; use infinity for unreachable sinks. Define
+    C^hard_K(x)=exp(-a_x/K),  F^hard_(z,K)(x)=exp(-t_x/K)
+with exp(-infinity)=0, K>0. Each admissible path within the gain budget is treated equally with respect to its gain. In particular an admissible path of gain close to 4H is no longer discounted by L^-52. These exact minima can be computed with the earlier Pareto (A,M,k) recurrence. The weight is not the old projected max recursion on M alone; the gain constraint is hard and must be retained in the witness state.
+
+For arbitrary real t>=0 write A(t)={x:a_x<=t}, T(t)={x:t_x<=t}, where the integer record counts mean using floor(t). For each fixed x, the two threshold indicators differ only on the interval between a_x and t_x, with constant sign there (possibly one endpoint infinite). Therefore the exact identity, including infinite minima, is
+    sum_x |C^hard_K(x)-F^hard_(z,K)(x)|
+       = integral_0^infty |A(t) symmetric_difference T(t)| exp(-t/K) dt/K.  (17)
+The proof integrates each indicator difference, takes the absolute value using its constant sign, then sums over the finite common universe of spatial centers. This is a strong L1 identity, not merely an estimate on the difference of the two totals.
+
+Let k0=floor(R^epsilon0) from section 5, with the fixed polynomial lower for z. Insert (13) on 0<=t<=k0, and the trivial O(R) bound beyond k0. Jensen's inequality for the exponential distribution gives
+    sum_x |C^hard_K(x)-F^hard_(z,K)(x)|
+      << R/L³ [1+log(1+K)+log^+(H/z)] + R exp(-k0/K).      (18)
+This applies uniformly to subpolynomial K and to z=H exp(-L^gamma) with 0<gamma<1 fixed. There is NO gain discount and NO use of the mod2310 wait certificate in (18). The price compared with the earlier O(R/L³) projected residual bound is the extra logarithmic terms and the requirement of subpolynomial K for negligible density-scale error.
+
+Integrating (14) by the same layer cake, using the inclusion of every z-rough canonical birth with record count zero, also gives
+    0 <= sum_x F^hard_(z,K)(x) - |S_z|
+       << R/L³ [1+log(1+K)] + O(B_gain + R exp(-k0/K)).    (19)
+The actual weighted non-twin mass at near-square H is bounded by integrating (8), without any excessive-gain tail because the score already has a hard budget. Alternatively the trial non-twin mass directly satisfies
+    sum_(non-twin x) F^hard_(z,K)(x)
+      << R/L³ [1+log(1+K)+log^+(sqrt(2R+1)/z)]
+             + O(B_gain + R exp(-k0/K)).                   (20)
+This follows from (19) and the intermediate roughness upper on the non-twin z-rough births. A trial total score exceeding the order in (20) along unbounded R suffices for twins. For H=floor(4 sqrt R/L^B0), z=H exp(-L^gamma), K=exp(L^kappa), fixed 0<gamma,kappa<1, B_gain=4H, the capacity is O(R/L^(3-max(gamma,kappa))); thus a density-scale lower suffices, with no gain penalty within the entire original budget. Neither that weighted lower nor a positive constant proportion of successful roots has been established. Equation (19) shows exactly the static-frontier limitation of this approach at that precision.
+
+An additional finite audit of the identity and score, research/lean/negative_min_hard_record_layer_cake_audit.mjs @ae95d1e23218134eccaefb3ee27fa8dc2e54e15a, blob 441c3f8c169f32592ac7509e2898db96d136307f, was executed in ECMAScript with exact pinned and branch readback. Direct per-root min-depth maps for R=12000,48000,192000, H=floor(R^.4), budget4H, three cutoffs z=floor(2H/3), floor(H/3), max(9,floor(H/6)), and K=1,3,10,100. There were 25085 union-site incidences, 989 shared sites of unequal minimum record counts, 24111 stationary trial birth controls, 789 additional trial-site incidences beyond these static births; 36 comparisons of direct L1 with the exactly corresponding discrete layer-cake histogram, all passed (double precision with tolerance). Strict cancellation in the unlocalized difference of total scores occurred in all 36 comparisons. The individual depth maps and set counts were integer exact; the exponentials are not interval certified. This is an executed identity check, not a numerical verification of the asymptotic arithmetic bounds.
