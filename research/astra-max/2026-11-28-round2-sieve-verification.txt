@@ -1,0 +1,19 @@
+Issue #10, round 2. Output from executables fetched at d8413da6ef5f1bd5c6b2a1b15a1f043bfab98817.
+Python 3.12.14
+
+$ python -B research/lean/negative_min_bilateral_rough_bounds.py
+classical c=.324 lower  >= 0.013643023
+bilateral c=.334 lower  >= 0.005684586
+phase ell=.28 b=.4 lower >= 0.011662575
+phase ell=.312 b=.35 lower >= 0.040241490
+phase ell=.223 b=.5 lower >= 0.040726796
+finite first-event check: {'stationary': 1312, 'plus': 798, 'minus': 809}
+non-twin upper constant at theta=0.49 < 0.32
+non-twin upper constant at theta=0.4999 < 0.0032
+ideal single-exchange obstruction at c=.4: factor < .999
+Exit status 0.
+
+$ python -B research/lean/negative_min_narrow_quotient_richert.py
+z=0.08 cells=897 integral >= 0.020771201   L * P(rough quotient with Omega<=3) >= 0.177122335
+z=0.09 cells=781 integral >= 0.011989835   L * P(rough quotient with Omega<=3) >= 0.102240969
+Exit status 0.
