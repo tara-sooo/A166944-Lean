@@ -128,3 +128,61 @@ function audit(){
  return {anchors,shellTests,pinTests,nonexceptional,stoppedTicks,timeStops,gainStops,recordTests,nearPairs,actualMeetings,cutIncidences,cutKeys,sameLabelTests,actualCases};
 }
 console.log(JSON.stringify(audit(),null,2));
+
+// Independent synthetic geometry controls; these are not canonical trajectories.
+function syntheticAudit(){
+ const assert=(v,m)=>{if(!v)throw Error(m)};
+ const mod=(x,m)=>((x%m)+m)%m;
+ const primes=[11,13,17,19,23,29,31,37,41,43,47];
+ let pairTests=0,clockTests=0,crtTests=0,collisionTests=0,cutOverlap=0,cutIncidences=0,maxMultiplicity=0;
+ for(const c of [0,2]){
+   const b=c===0?0:3,E=48,T=9,anchors=[];
+   for(const p of primes)for(let x=1000+mod(c-1000,2*p);x<=1600;x+=2*p){
+     // Force even x and x=c mod p; c is even.
+     assert(x%2===0&&mod(x-c,p)===0,"anchor class");
+     anchors.push({p,x,n:p+b-x/2});
+   }
+   for(let i=0;i<anchors.length;i++)for(let j=i+1;j<anchors.length;j++){
+     const a=anchors[i],b0=anchors[j],d=b0.x-a.x;
+     const near=Math.abs(d)<=E&&Math.abs(b0.n-a.n)<=T;
+     assert(near===(Math.abs(d)<=E&&Math.abs(b0.p-a.p-d/2)<=T),"refined near equivalence");pairTests++;
+     if(near){
+       clockTests++;
+       const possible=[];
+       for(let q=a.p+d/2-T;q<=a.p+d/2+T;q++)possible.push(q);
+       assert(possible.length===2*T+1&&possible.includes(b0.p),"clock window");
+       if(a.p!==b0.p){
+         const m=a.p*b0.p;
+         let count=0,rep=-1;
+         for(let x=0;x<m;x++)if(mod(x-c,a.p)===0&&mod(x+d-c,b0.p)===0){count++;rep=x}
+         assert(count===1&&mod(a.x-rep,m)===0,"CRT class");
+         crtTests++;
+       }
+       // Geometric envelopes intersect iff both x and clock intervals overlap.
+       const lo=Math.max(a.x-E,b0.x-E),hi=Math.min(a.x,b0.x);
+       const l=Math.max(a.n,b0.n),h=Math.min(a.n+T,b0.n+T);
+       assert(lo<=hi&&l<=h,"envelope overlap");collisionTests++;
+     }
+   }
+ }
+ for(const n of [-2*11*13,-2*11*13*17,2-11*13,2-11*13*17]){
+   const s=n%2===0?1:-1,clock=n%2===0?n:n-2;
+   const labels=primes.filter(p=>clock%p===0);
+   const cuts=new Map(),same=new Set();
+   for(const p of labels)for(let x=1000;x<=1500;x+=2)if((x+s)%p===0){
+     const dest=x-p+1;
+     for(let z=dest+2;z<=x;z+=2){
+       const key=z+","+p;assert(!same.has(key),"same p interval disjoint");same.add(key);
+       const set=cuts.get(z)||new Set();set.add(p);cuts.set(z,set);cutIncidences++;
+     }
+   }
+   for(const set of cuts.values()){
+     assert(set.size<=labels.length,"clock multiplicity");
+     if(set.size>1)cutOverlap++;
+     maxMultiplicity=Math.max(maxMultiplicity,set.size);
+   }
+ }
+ assert(clockTests>0&&crtTests>0&&collisionTests>0&&cutOverlap>0&&maxMultiplicity>=2,"nonvacuous");
+ return {pairTests,clockTests,crtTests,collisionTests,cutOverlap,cutIncidences,maxMultiplicity};
+}
+console.log(JSON.stringify(syntheticAudit(),null,2));
