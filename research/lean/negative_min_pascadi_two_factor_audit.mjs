@@ -1,9 +1,9 @@
 // Exact exponent margins, squarefree mask cancellation and finite calendar controls; not a proof of the distribution theorem.
 function audit(){
  const ok=(x,msg)=>{if(!x)throw Error(msg)},gcd=(a,b)=>{while(b){let t=a%b;a=b;b=t}return a},mod=(a,m)=>(a%m+m)%m;
- // Exact rational margins in units 1/(8000000) for delta=j/100000.
- let margins=0; const S=8000000;
- for(let j=1;j<=99;j++){let d=80*j,eps=d/100; // rational calculation scaled by 100 below
+ // Exact rational margins in units 1/(80000000) for delta=j/100000.
+ let margins=0; const S=80000000;
+ for(let j=1;j<=99;j++){let d=800*j,eps=d/100; // all exponent-grid calculations are exact safe integers
   for(let k=0;k<=20;k++){let nu=3*S/8-d*k/20,D=5*S/8-d,Q1=nu-d/10,Q2=D-Q1;
    ok(Q1>0&&Q2>0,"positive levels");
    ok(Q1<=nu-eps&&2*nu+Q2<=S-15*eps&&2*nu+5*Q2<=2*S-40*eps,"Pascadi margins");
