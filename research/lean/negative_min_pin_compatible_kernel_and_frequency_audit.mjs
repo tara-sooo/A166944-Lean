@@ -2,7 +2,7 @@
 function audit(){
  const S=10n**25n,N=20000,E=1200000,B=BigInt,assert=(v,m)=>{if(!v)throw Error(m)},ceil=(a,b)=>(a+b-1n)/b;
  const lo=[],hi=[];
- for(let i=0;i<=6*N;i++){
+ for(let i=0;i<=7*N;i++){
   if(i<N){lo[i]=hi[i]=0n;continue;}
   if(i<=2*N){lo[i]=hi[i]=S;continue;}
   lo[i]=lo[i-1]+lo[i-1-N]/B(i-N);
@@ -30,6 +30,25 @@ function audit(){
  const lowMassU=vU-uL,highMassU=uU-mL;
  const hiSquareU=ceil(2n*(S-gL)*lowMassU*highMassU,S*S)+ceil((S*S-gL*gL)*lowMassU*lowMassU,S*S*S);
  assert(hiSquareU<1n*S/100n,"model .208 square upper "+dec(hiSquareU));
+ // Aggregate checks for key earlier correction and symmetric-source lower bounds.
+ const low16=M(192000)[0]-mU;
+ const modelLowSector=low16*low16/S-ceil(mU*mU,S)-hiSquareU;
+ assert(modelLowSector>109n*S/100n,"previous low correction compatible");
+ const model20=M(240000)[0]-uU, model20High=uL-M(438000)[1];
+ assert(model20>0n&&model20High>0n,".20-.365 masses");
+ const model20Low=2n*(S-gU)*model20*model20High/(S*S);
+ assert(model20Low>75n*S/100000n,".20 correction compatible");
+ const highSource=M(447600)[0]-M(451200)[1], highPin=M(249600)[0]-M(249960)[1];
+ assert(highSource>0n&&highPin>0n,"thin high cells");
+ const thinModel=(S-gU)*highSource*highPin/(S*S);
+ assert(thinModel>5n*S/100000000n,"thin high correction compatible");
+ const sym=[];
+ for(const [t,req] of [[360000,980000],[375000,590000],[384000,375000],[388800,270000],[400800,15000],[401520,2000],[401640,500]]){
+  const mass=4n*mL*(M(t)[0]-mU)/S;
+  assert(mass>B(req)*S/1000000n,"stationary lower compatibility");
+  sym.push({exponent:t/E,modelLower:dec(mass),required:req/1000000});
+ }
+
  // Compatibility with prior mixed .11 lower: unchanged F x F triple boxes.
  const one= S*750n*25n*10000n/(1850n*2110n*6815n);
  assert(one*one/S>3n*S/100000n,"mixed factor model compatibility");
@@ -63,6 +82,6 @@ function audit(){
   const p=fac(n),q=fac(n+2),i=p.filter(v=>v>=7&&v<=17).length,j=q.filter(v=>v>=7&&v<=17).length;
   if(i&&j){assert(p[0]>=2&&q[0]>=2,"actual factors");assert(gcd(n,n+2)===1,"odd disjoint");pinChecks++;}
  }
- return {bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},vector114:{ratio:dec(vectorRatio),coefficient:dec(vectorCoeff)},modelDHRBox:dec(newerBox*newerBox/S),DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
+ return {bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),modelLowSector:dec(modelLowSector),model20Lower:dec(model20Low),thinModel:dec(thinModel),sym,mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},vector114:{ratio:dec(vectorRatio),coefficient:dec(vectorCoeff)},modelDHRBox:dec(newerBox*newerBox/S),DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
 }
 console.log(JSON.stringify(audit(),null,2));
