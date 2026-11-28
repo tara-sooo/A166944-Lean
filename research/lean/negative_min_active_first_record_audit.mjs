@@ -18,14 +18,14 @@ function audit(){
      if(A-x>B)break;
      hits++;all++;lastChecks++;let qmin=Math.min(sp[x-1],sp[x+1]);
      if(last)ok(last<=2*idle+1&&last<4*qmin+1,"last label / terminal roughness");
-     ok(H-3+2/3<=4**k*(idle+2/3)+1e-8,"deficit depth");
+     ok(BigInt(3*H-7)<=4n**BigInt(k)*BigInt(3*idle+2),"deficit depth");if(k)ok(BigInt(6*qmin-1)*4n**BigInt(k-1)>=BigInt(H-2),"sharper first-event depth");
      if(qmin<H/16){ah++;activeHits++;depths[k]=(depths[k]||0)+1;if(k===1)activeOne++;if(k===2){activeTwo++;ok(qmin>=H/24-3,"two-event obstruction")};let old=records.get(x);if(!old||A<old.A)records.set(x,{A,x,n:n+idle,qmin,k});}
      break;
     }
     ok(e.w<=idle,"strict pre-record");let pre=h+e.w-1,hn=h+e.w-(e.p-1)/2;
     ok(pre<H&&hn<H&&hn>=0,"pre and post heights");let dn=H-hn;
     ok(e.p<=2*dn+1,"label deficit");ok(d<=4*dn+2,"one-step deficit");deficitChecks++;
-    if(k===0){ok(hn<=(2*H+7)/3+3,"first record deficit");firstChecks++}
+    if(k===0){ok(3*hn<=2*H+4,"first record deficit");firstChecks++}
     last=e.p;k++;x-=e.p-1;n+=e.w;t+=e.w;h=hn;d=dn;ok(h===x/2+n&&t===h-3+(A-x)/2,"ledger");if(A-x>B)break;
    }
   }
@@ -60,7 +60,7 @@ function audit(){
  for(let r of ps.filter(r=>r>=37&&r<=500&&r%12===1)){
   let q=ps.find(q=>q%12===7&&29*r<=8*q+1&&9*q<33*r-4);
   if(!q)continue;
-  let H=Math.floor((33*r-1)/2)-1;
+  let H=Math.max(16*r+1,Math.floor((9*q-3)/2)+1,4*q+1);
   let p=ps.find(p=>p%12===7&&5*q-1<=2*p&&3*p-3<2*H&&p>q);
   if(!p||16*r>=H||H<=4*q||9*q-3>=2*H)continue;
   let g=p+q-2,w1=(3*p-7)/2,w2=(9*q-2*p-1)/2,I=H-4*q,wr=(33*r-8*q-1)/2,Z=4*H+10;
@@ -90,7 +90,7 @@ function audit(){
   examples.push({H,p,q,r,w1,w2,I,wr,age:t,g,extra,rootDigits:String(A).length});
   if(examples.length>=8)break;
  }
- ok(examples.length>0,"nonvacuous CRT examples");
+ ok(examples.length>0&&examples.some(e=>e.extra>0),"nonvacuous CRT and continued record examples");
  return{rows,roots,hits,activeHits,deficitChecks,lastChecks,firstChecks,suffixChecks,activeOne,activeTwo,sectionTransfer,examples,crtPins,crtTicks,crtEvents,allFactorChecks}
 }
 console.log(JSON.stringify(audit(),null,2));
