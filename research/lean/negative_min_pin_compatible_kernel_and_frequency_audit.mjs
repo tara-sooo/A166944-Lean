@@ -33,6 +33,7 @@ function audit(){
  // Compatibility with prior mixed .11 lower: unchanged F x F triple boxes.
  const one= S*750n*25n*10000n/(1850n*2110n*6815n);
  assert(one*one/S>3n*S/100000n,"mixed factor model compatibility");
+ const newerBox=S*500n*25n*10000n/(1850n*2110n*6565n);assert(newerBox*newerBox/S>2n*S/100000n,"DHR lower compatibility");
  // Aggregate h over dyadic blocks, balanced .515.
  const X=515000;const firstErr=14*2*X+5*X+3*1000000;
  assert(firstErr<20*1000000,"BC averaged first");
@@ -46,6 +47,7 @@ function audit(){
   const coeff=factor*1000000n**2n/(4n*B(z)**2n*B(div));
   return {z:z/1e6,s:lev/z,f:dec(f),coeff:dec(coeff),raw:coeff};
  }
+ const vectorRatio=2n*log(189,114)[0]-S;assert(vectorRatio>0n,".114 vector positivity");const pm=log(211000,208500)[0];const vectorCoeff=4n*1000000n**2n*vectorRatio*pm/S*pm/S*9n/(303000n**2n*160n);assert(vectorCoeff>3n*S/1000000n,".114 vector coefficient");
  const dh=[dhr(135000,577000,208500,211000,16),dhr(130000,577000,208500,211000,16),dhr(125000,577000,208500,211000,16)];
  assert(dh[0].raw>4n*S/10000000n,".135 explicit coefficient");
  // Finite CRT counts for both pins and genuine least exceptions.
@@ -61,6 +63,6 @@ function audit(){
   const p=fac(n),q=fac(n+2),i=p.filter(v=>v>=7&&v<=17).length,j=q.filter(v=>v>=7&&v<=17).length;
   if(i&&j){assert(p[0]>=2&&q[0]>=2,"actual factors");assert(gcd(n,n+2)===1,"odd disjoint");pinChecks++;}
  }
- return {bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
+ return {bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},vector114:{ratio:dec(vectorRatio),coefficient:dec(vectorCoeff)},modelDHRBox:dec(newerBox*newerBox/S),DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
 }
 console.log(JSON.stringify(audit(),null,2));
