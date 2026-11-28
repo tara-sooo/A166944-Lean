@@ -76,7 +76,14 @@ In the limiting d=5/8 normalization, the required J_R/M_R values are:
   b0=.325: >.1280683323
   b0=1/3: >.2136502282
   b0=.350: >.3858592909.
-The fixed band in §2 uses d=.6246, so its exact thresholds use d=.6246, not these ideal limits. One can make d arbitrarily close to .625 using smaller slack and a new fixed source band, but J_R normalization and lower must then be established for that band. No evidence that these corrections are already available. No comparison at b0>.35 is claimed for this particular bridge (p and modulus capacity are fixed, and its proof uses b0<=.35). The threshold calculation is a direct formula, not an assertion that a given improvement in §3 transfers to J. 
+The fixed band in §2 uses d=.6246, so its exact thresholds use d=.6246, not these ideal limits. The thresholds in the actual fixed-band proof are:
+  b0=0.313000000: >0.007177196
+  b0=0.315000000: >0.027684113
+  b0=0.320000000: >0.078965026
+  b0=0.325000000: >0.130286472
+  b0=0.333333333: >0.215984250
+  b0=0.350000000: >0.388436857
+One can make d arbitrarily close to .625 using smaller slack and a new fixed source band, but J_R normalization and lower must then be established for that band. No evidence that these corrections are already available. No comparison at b0>.35 is claimed for this particular bridge (p and modulus capacity are fixed, and its proof uses b0<=.35). The threshold calculation is a direct formula, not an assertion that a given improvement in §3 transfers to J. 
 
 ## 5. Exploratory signed recursion and audit
 
