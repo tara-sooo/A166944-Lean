@@ -24,7 +24,7 @@ For \(b=1/2\), the cutoff \(4\sqrt R\) accepts exactly the prime neighbors among
 \[
  \tfrac12\log(3/2)\,[B(d_0)-B(d_B)+2/d_B-2/d_U].
 \]
-Exactly half of this balanced range is present in each of the positive and negative populations. All upper cutoffs \(\ell\) here have \(1<d/\ell<3\). The analytic sieve approximation errors can be taken arbitrarily small with parameters fixed before the limit.
+Exactly half of this balanced range is present in each of the positive and negative populations. For each upper sieve at requested cutoff \(z_{\rm req}\) and level exponent \(d\), use \(\min(z_{\rm req},R^{d/2.1})\). The original parameters \(d/\ell\) in this argument lie between 1 and 3, so the reduced cutoff has parameter in \([2.1,3)\). This respects the printed hypothesis \(z\le Q^{1/2}\) in Wu Lemma 2.2 and gives precisely \(2/d\). The same convention applies to the terminal upper below. The analytic sieve approximation errors can be taken arbitrarily small with parameters fixed before the limit.
 
 For the computations take \(M(a)\le.561522/a\) and
 \[
