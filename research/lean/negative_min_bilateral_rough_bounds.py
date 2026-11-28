@@ -153,6 +153,10 @@ def main():
         assert result > F(minimum), (ell, b, float(result))
         print(f"phase ell={ell} b={b} lower >=", floor_decimal(result))
     print("finite first-event check:", first_event_check())
+    for theta, bound in [(F(".49"), F(".32")), (F(".4999"), F(".0032"))]:
+        k_upper = 4 * (2 - 1 / (1 - theta) + log_bounds((1 - theta) / theta)[1])
+        assert k_upper < bound
+        print(f"non-twin upper constant at theta={float(theta)} < {float(bound)}")
     ideal_d, amax = F(5, 8), F(".568")
     assert log_bounds(1 / amax)[1] < amax
     ceiling = 2 * ideal_d * (1 + log_bounds(F(3, 2))[1]) * amax
