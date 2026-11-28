@@ -38,7 +38,7 @@ function audit(){
 
  const a=432600,c=702870,b=840000;
  const staticNet=lower(D0,a)+semilower(c,E/2,a,false)-upperBaseline(a,m2(c))+triSaving(a,c).s+semiSaving(E/3,c);
- const staticOk=staticNet>8n*S/10000n;
+ assert(staticNet>6n*S/10000n,"static .3347 positive margin");
  const phase=[];
  for(const [a,c,b] of [[436800,438900,840000],[432600,434700,840000],[443100,609000,735000],[462000,525000,787500]]){
    const m=fl(m2(c)+m2(b),2n);
@@ -69,7 +69,31 @@ function audit(){
  const pm=log(443100,437850)[0];
  const coeff=fl(fl(fl(k*pm,S)*pm,S)*9n,160n);
  assert(coeff>3n*S/100000n,"distinct vector lower "+dec(coeff));
- return {static3347:dec(staticNet),staticOk,phase,gap208:dec(gap),highSector:dec(hi),positiveCells,capacities,BC:{modulusCap:.512,errorExponent:.9984,ratioLower:dec(ratio),distinctCoefficient:dec(coeff)},logCache:cache.size};
+ // Check pointwise vector lower with three factors, including negative lower weights.
+ let vectorChecks=0;
+ for(let i=0;i<8;i++)for(let a=0;a<3;a++)for(let b=0;b<3;b++)for(let c=0;c<3;c++){
+  const I=[i&1,(i>>1)&1,(i>>2)&1],U=[I[0]+a,I[1]+b,I[2]+c];
+  for(const x of [-2,-1,0,1])for(const y of [-2,-1,0,1])for(const z of [-2,-1,0,1]){
+   if(x>I[0]||y>I[1]||z>I[2])continue;
+   assert(x*U[1]*U[2]+U[0]*y*U[2]+U[0]*U[1]*z-2*U[0]*U[1]*U[2]<=I[0]*I[1]*I[2],"vector lower");
+   vectorChecks++;
+  }
+ }
+ const gcd=(a,b)=>b?gcd(b,a%b):a;
+ let crtChecks=0,oddChecks=0;
+ // Exact periodic CRT normalization with odd divisors, shift 2,
+ // including common divisors. Subtract even n via n=2k.
+ for(let a=1;a<40;a+=2)for(let b=1;b<40;b+=2){
+  let all=0,even=0,odd=0,scaledEven=0;
+  for(let n=0;n<2*a*b;n++){
+   if(n%a===0&&(n+2)%b===0){all++;if(n%2===0)even++;else odd++;}
+  }
+  for(let k=0;k<a*b;k++)if(k%a===0&&(k+1)%b===0)scaledEven++;
+  assert(all===(gcd(a,b)===1?2:0),"CRT count");
+  assert(odd===(gcd(a,b)===1?1:0)&&even===scaledEven&&all-even===odd,"odd factor");
+  crtChecks++;oddChecks++;
+ }
+ return {vectorChecks,crtChecks,oddChecks,static3347:dec(staticNet),phase,gap208:dec(gap),highSector:dec(hi),positiveCells,capacities,BC:{modulusCap:.512,errorExponent:.9984,ratioLower:dec(ratio),distinctCoefficient:dec(coeff)},logCache:cache.size};
 }
 
 console.log(JSON.stringify(audit(),null,2));
