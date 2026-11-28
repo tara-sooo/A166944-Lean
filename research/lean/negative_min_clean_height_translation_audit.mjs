@@ -6,11 +6,11 @@ function audit(){
  function fac(n){n=Math.abs(n);let a=[];while(n>1){let p=sp[n];ok(p>0,"factor range");a.push(p);while(n%p===0)n/=p}return a}
  function win(x,h,z=Infinity){let n=h-x/2+1,s=mod(n,2)?-1:1;for(let p of fac(x+s))if(p<=z&&mod(n,2*p)===(s===1?0:p+2))return p;return 0}
  function hw(x,h,z=Infinity){let n=h-x/2+1,s=mod(n,2)?-1:1;for(let p of fac(2*h+(s===1?3:-3)))if(p<=z&&mod(x+s,p)===0&&mod(n,2*p)===(s===1?0:p+2))return p;return 0}
- let low=[],lowStates=0,shiftPins=0,cleanBlocks=0,cleanStates=0,changedStates=0,goodStarts=0,actualChecks=0;
+ let low=[],d1Checks=0,lowStates=0,shiftPins=0,cleanBlocks=0,cleanStates=0,changedStates=0,goodStarts=0,actualChecks=0;
  for(let D of [1,2,3,5,8,12,20,32]){
   let M=D+3,z=2*M+3,fib=new Map(),maxg=0,maxt=0;
   for(let x=24000;x<=48000;x+=2){let y=x,h=3,t=0;while(h<M){let p=hw(y,h,z);ok(p===win(y,h,z),"height eligibility");if(p)y-=p-1;h+=1-(p?(p-1)/2:0);t++;lowStates++;ok(h>=0&&y>2&&t<100000,"low run")}
-   let g=x-y;ok(t===D+g/2,"ledger");maxg=Math.max(maxg,g);maxt=Math.max(maxt,t);fib.set(y,(fib.get(y)||0)+1)}
+   let g=x-y;ok(t===D+g/2,"ledger");if(D===1){ok(g===(mod(x,12)===8?2:mod(x,12)===10?4:0),"exact D1 map");d1Checks++;}maxg=Math.max(maxg,g);maxt=Math.max(maxt,t);fib.set(y,(fib.get(y)||0)+1)}
   low.push({D,z,starts:12001,sinks:fib.size,maxFiber:Math.max(...fib.values()),maxGain:maxg,maxTime:maxt});
  }
  for(let D of [1,2]){
@@ -53,6 +53,19 @@ function audit(){
   ok(common.size<=pres.size&&pres.size<=rejoin.size&&rejoin.size<=trueS.size,"certificate hierarchy");
   repairs.push({R,H,z,trial:tr.size,common:common.size,preserved:pres.size,rejoined:rejoin.size,true:trueS.size,changedVertices:allDef,sameColorChanged:sameDef});
  }
- return {low,lowStates,shiftPins,cleanBlocks,cleanStates,changedStates,goodStarts,actualChecks,repairs}
+ // Exact finite inclusion-exclusion controls for the growing-width proof.
+ let sieveChecks=0,sieveRows=[];
+ for(let D of [1,2,4,8,16]){
+  let z=2*D+11,k=D+6,ps=pr.filter(p=>p>z&&p<=z+70).slice(0,10),den=1n;
+  for(let p of ps)den*=BigInt(p);
+  let main=1n;for(let p of ps)main*=BigInt(p-k);
+  let coeff=Array(ps.length+1).fill(0n);coeff[0]=1n;
+  for(let p of ps){for(let j=ps.length;j>=1;j--)coeff[j]=BigInt(p)*coeff[j]+BigInt(k)*coeff[j-1];coeff[0]*=BigInt(p)}
+  // coeff[j] = den * elementary symmetric sum of k/p.
+  for(let j=0;j<=ps.length;j++){let partial=0n;for(let i=0;i<=j;i++)partial+=(i%2?-1n:1n)*coeff[i];ok(j%2?partial<=main:partial>=main,"Bonferroni signs");sieveChecks++}
+  let sum=coeff.reduce((a,c,j)=>a+(j%2?-c:c),0n);ok(sum===main,"exact product");sieveChecks++;
+  sieveRows.push({D,k,primes:ps.length,den:String(den),main:String(main)});
+ }
+ return {low,d1Checks,lowStates,shiftPins,cleanBlocks,cleanStates,changedStates,goodStarts,actualChecks,repairs,sieveChecks,sieveRows}
 }
 console.log(JSON.stringify(audit(),null,2));
