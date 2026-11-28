@@ -10630,4 +10630,73 @@ theorem stationary_birth_fan_bound (R T x M P : Nat) (ps : List Nat)
 #print axioms NegativeMIN.shortReset_merge_birth
 #print axioms NegativeMIN.stationary_birth_fan_bound
 
+
+/-- A physical first-height observation along the canonical orbit, at a stated
+age, center and cumulative spatial budget. Heights in the dynamics are doubled. -/
+def FirstHeightSite (A H B x t : Nat) : Prop :=
+  (orbit A t).x = x ∧ gain (birth A) (orbit A t) ≤ B ∧
+  height2 (orbit A t) = 2 * (H : Int) ∧
+  ∀ j : Nat, j < t → height2 (orbit A j) < 2 * (H : Int)
+
+/-- After entry into a sufficiently rough center the time to the target
+height and the entire intervening height profile are exact. -/
+theorem rough_entry_profile (s : State) (h H P : Nat)
+    (he : s.x % 2 = 0) (hh : height2 s = 2 * (h : Int))
+    (hle : h ≤ H) (hp : 2 * H + 1 < P) (hr : RoughAt s.x P) :
+    ∀ j : Nat, j ≤ H - h →
+      (evolve s j).x = s.x ∧
+      height2 (evolve s j) = 2 * (h : Int) + 2 * (j : Int) := by
+  intro j hj
+  have hq := rough_quiet s P j he (by omega) hr (by omega)
+  have hx := quiet_center s j hq
+  have hid := height_gain_identity s j
+  have hz : gain s (evolve s j) = 0 := by simp [gain, hx]
+  rw [hz, hh] at hid
+  exact ⟨hx, by omega⟩
+
+/-- Prefixes reaching the same rough center can include actual moves.
+The prefix maximum and the original budget determine first-hit admissibility. -/
+theorem firstHeightSite_of_rough_entry (A H B a h P : Nat)
+    (he : (orbit A a).x % 2 = 0)
+    (hh : height2 (orbit A a) = 2 * (h : Int))
+    (hle : h ≤ H) (hp : 2 * H + 1 < P) (hr : RoughAt (orbit A a).x P)
+    (hB : gain (birth A) (orbit A a) ≤ B)
+    (hpre : ∀ j : Nat, j < a → height2 (orbit A j) < 2 * (H : Int)) :
+    FirstHeightSite A H B (orbit A a).x (a + (H - h)) := by
+  have hat (j : Nat) : orbit A (a+j) = evolve (orbit A a) j := evolve_add (birth A) a j
+  have prof := rough_entry_profile (orbit A a) h H P he hh hle hp hr
+  obtain ⟨hx, ht⟩ := prof (H-h) (Nat.le_refl _)
+  rw [← hat] at hx ht
+  refine ⟨hx, ?_, by omega, ?_⟩
+  · simpa only [gain, hx] using hB
+  · intro j hj
+    by_cases hja : j < a
+    · exact hpre j hja
+    · have hj' : a + (j-a) = j := by omega
+      have ht' := (prof (j-a) (by omega)).2
+      rw [← hat, hj'] at ht'
+      omega
+
+/-- In particular, a rough canonical birth contributes its own distinct
+center with zero displacement at the first target height. -/
+theorem firstHeightSite_of_rough_birth (A H P : Nat)
+    (he : A % 2 = 0) (hH : 3 ≤ H) (hp : 2 * H + 1 < P)
+    (hr : RoughAt A P) : FirstHeightSite A H 0 A (H-3) := by
+  have h := firstHeightSite_of_rough_entry A H 0 0 3 P he
+    (by simpa [orbit, evolve] using birth_height2 A he) hH hp hr
+    (by simp [gain, orbit, evolve]) (by intro j hj; omega)
+  simpa [orbit, evolve, birth] using h
+
+/-- Integer-scaled exponent inequalities of Pascadi (4.15), with the
+epsilon margins dropped. The conclusion bounds only this system. -/
+theorem dispersion_level_ceiling (scale nu a b c : Int)
+    (h1 : a ≤ nu) (h2 : 2*nu + b + 2*c ≤ scale)
+    (h3 : 2*nu + 5*b + 2*c ≤ 2*scale) :
+    8*(a+b+c) ≤ 5*scale := by omega
+
+#print axioms NegativeMIN.rough_entry_profile
+#print axioms NegativeMIN.firstHeightSite_of_rough_entry
+#print axioms NegativeMIN.firstHeightSite_of_rough_birth
+#print axioms NegativeMIN.dispersion_level_ceiling
+
 end NegativeMIN
