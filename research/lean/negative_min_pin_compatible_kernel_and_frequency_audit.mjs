@@ -53,6 +53,54 @@ function audit(){
  const one= S*750n*25n*10000n/(1850n*2110n*6815n);
  assert(one*one/S>3n*S/100000n,"mixed factor model compatibility");
  const newerBox=S*500n*25n*10000n/(1850n*2110n*6565n);assert(newerBox*newerBox/S>2n*S/100000n,"DHR lower compatibility");
+
+ // Stronger kernel: satisfy ideal pinned upper as well as lower.
+ const b2=222000,c1=264000,c2=276000;
+ const [b2L,b2U]=M(b2),[c1L,c1U]=M(c1),[c2L,c2U]=M(c2);
+ const highL=3n*(uL-c1U)/4n+9n*(c1L-c2U)/10n+c2L-mU;
+ const highU=ceil(3n*(uU-c1L),4n)+ceil(9n*(c1U-c2L),10n)+c2U-mL;
+ const g2L=(mL-highU)*S/(b2U-uL),g2U=ceil((mU-highL)*S,b2L-uU);
+ assert(g2L>0n&&g2U<49n*S/100n,"strong kernel g");
+ assert(b2U<32n*S/10n,"strong upper");
+ function omega(l,r){
+  // y=1/t-1, reciprocal monotonicity, enclosure on entire t-cell.
+  const yl=Math.floor(N*(E-r)/r),yr=Math.ceil(N*(E-l)/l);
+  assert(yl>=N&&yr<lo.length,"omega range");
+  return [lo[yl]*B(N)/B(yr),ceil(hi[yr]*B(N),B(yl))];
+ }
+ function gAt(l,r){if(r<=u0)return [g2L,g2U];if(r<=c1)return [3n*S/4n,3n*S/4n];if(r<=c2)return [9n*S/10n,9n*S/10n];return[S,S]}
+ let pinMin=10n*S,upperMin=10n*S,pinCells=0,upperCells=0;
+ for(const [a,b] of [[b2,u0],[u0,c1],[c1,c2],[c2,c],[c,E/2]])for(let l=a;l<b;){
+  const r=Math.min(b,l+60),[omL,omU]=omega(l,r),[gL0,gU0]=gAt(l,r);
+  const upper=2n*B(l)*S*S/(B(d-l)*omU); // U_pin / natural density
+  const upGap=upper-S-gU0;if(upGap<upperMin)upperMin=upGap;
+  assert(upGap>0n,"pin upper "+l+" "+dec(upGap));upperCells++;
+  if(l<u0){
+   const lower=ceil(2n*B(r)*log(d-2*l,l)[1]*S,B(d-r)*omL);
+   const gap=S-gU0-lower;if(gap<pinMin)pinMin=gap;
+   assert(gap>0n,"pin lower "+l+" "+dec(gap));pinCells++;
+  }
+  l=r;
+ }
+ const bands=[[b2,u0,g2L,g2U],[u0,c1,3n*S/4n,3n*S/4n],[c1,c2,9n*S/10n,9n*S/10n],[c2,c,S,S]];
+ function FL(t){
+  let h=0n;for(const [l,r,gl,gu] of bands){if(t<=l)continue;const end=Math.min(t,r);const mass=M(l)[0]-M(end)[1];if(mass>0n)h+=gl*mass/S;}return h;
+ }
+ function FU(t){
+  let h=0n;for(const [l,r,gl,gu] of bands){if(t<=l)continue;const end=Math.min(t,r);const mass=M(l)[1]-M(end)[0];h+=ceil(gu*mass,S);}return h;
+ }
+ let strongGap=10n*S,strongCells=0;
+ for(let l=b2;l<d/2;){
+  const r=Math.min(d/2,l+120),m=M(r)[0],L=ceil(2n*B(E)*log(d-l,l)[1],B(d));
+  const gap=m-FU(r)-L;if(gap<strongGap)strongGap=gap;assert(gap>0n,"strong tail "+l+" "+dec(gap));strongCells++;l=r;
+ }
+ const eU=M(249600)[1]-mL;
+ // F(E208) = F(.208)-m; abs >= mL-FU(.208).
+ const fAbs=mL-FU(249600);assert(fAbs>0n,"strong high sector");
+ const strongHigh=ceil(eU*eU,S)-fAbs*fAbs/S;
+ assert(strongHigh<2n*S/10n,"strong model high square "+dec(strongHigh));
+ const strongModel={g:[dec(g2L),dec(g2U)],pinMin:dec(pinMin),pinUpperMin:dec(upperMin),pinCells,upperCells,strongTailMargin:dec(strongGap),strongTailCells:strongCells,model208Upper:dec(strongHigh)};
+
  // Aggregate h over dyadic blocks, balanced .515.
  const X=515000;const firstErr=14*2*X+5*X+3*1000000;
  assert(firstErr<20*1000000,"BC averaged first");
@@ -82,6 +130,6 @@ function audit(){
   const p=fac(n),q=fac(n+2),i=p.filter(v=>v>=7&&v<=17).length,j=q.filter(v=>v>=7&&v<=17).length;
   if(i&&j){assert(p[0]>=2&&q[0]>=2,"actual factors");assert(gcd(n,n+2)===1,"odd disjoint");pinChecks++;}
  }
- return {bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),modelLowSector:dec(modelLowSector),model20Lower:dec(model20Low),thinModel:dec(thinModel),sym,mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},vector114:{ratio:dec(vectorRatio),coefficient:dec(vectorCoeff)},modelDHRBox:dec(newerBox*newerBox/S),DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
+ return {strongModel,bMass:[dec(bL),dec(bU)],uMass:[dec(uL),dec(uU)],cMass:[dec(mL),dec(mU)],g:[dec(gL),dec(gU)],pinRatioUpper:dec(rU),pinFloorLower:dec(S-gU),tailCells:cells,minGap:dec(min),lowerBandMargin:dec(first),upperBandMargin:dec(second),model208Upper:dec(hiSquareU),modelLowSector:dec(modelLowSector),model20Lower:dec(model20Low),thinModel:dec(thinModel),sym,mixedBoxModelLower:dec(one*one/S),BC:{first:firstErr/20000000,second:secondErr/8000000},vector114:{ratio:dec(vectorRatio),coefficient:dec(vectorCoeff)},modelDHRBox:dec(newerBox*newerBox/S),DHR:dh.map(({raw,...x})=>x),crt,pinChecks};
 }
 console.log(JSON.stringify(audit(),null,2));
